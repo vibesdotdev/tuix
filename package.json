@@ -1,0 +1,17 @@
+{
+  "name": "tuix",
+  "private": true,
+  "scripts": {
+    "build": "bun run --filter='@tuix/*' build",
+    "test": "bun run --filter='@tuix/*' test",
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

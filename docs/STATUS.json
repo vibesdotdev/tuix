@@ -1,0 +1,3604 @@
+{
+  "version": "1.0.0",
+  "generated": "2025-07-29T06:37:47.839Z",
+  "files": {
+    "cli/parser/parser.ts": {
+      "path": "cli/parser/parser.ts",
+      "status": "pass",
+      "description": "Parser implementation complete with tests",
+      "lastUpdated": "2025-07-28T23:03:14.009Z"
+    },
+    "cli/config/schema.ts": {
+      "path": "cli/config/schema.ts",
+      "status": "final",
+      "description": "Provides reusable Zod schemas for common CLI options and arguments.",
+      "lastUpdated": "2025-07-28T23:30:36.163Z"
+    },
+    "cli/config/validation.ts": {
+      "path": "cli/config/validation.ts",
+      "status": "pass",
+      "description": "Refactored normalizeCommand and added JSDoc.",
+      "lastUpdated": "2025-07-28T23:33:44.859Z"
+    },
+    "cli/config/merge.test.ts": {
+      "path": "cli/config/merge.test.ts",
+      "status": "pass",
+      "description": "Updated to reflect expandAliases refactoring and improved recursion test.",
+      "lastUpdated": "2025-07-28T23:30:12.728Z"
+    },
+    "cli/config/lazy.ts": {
+      "path": "cli/config/lazy.ts",
+      "status": "pass",
+      "description": "Refactored for better type safety.",
+      "lastUpdated": "2025-07-28T23:22:19.028Z"
+    },
+    "cli/config/env.test.ts": {
+      "path": "cli/config/env.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:58:08.278Z"
+    },
+    "cli/config/defaults.ts": {
+      "path": "cli/config/defaults.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:56:28.101Z"
+    },
+    "cli/config/defaults.test.ts": {
+      "path": "cli/config/defaults.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:56:30.197Z"
+    },
+    "cli/config/loader.ts": {
+      "path": "cli/config/loader.ts",
+      "status": "pass",
+      "description": "Well-defined and fully tested.",
+      "lastUpdated": "2025-07-28T23:24:34.595Z"
+    },
+    "cli/config/lazy.test.ts": {
+      "path": "cli/config/lazy.test.ts",
+      "status": "pass",
+      "description": "Improved test coverage, though one type error remains.",
+      "lastUpdated": "2025-07-28T23:22:24.802Z"
+    },
+    "cli/config/index.ts": {
+      "path": "cli/config/index.ts",
+      "status": "final",
+      "description": "Exports the public API of the config module, adhering to conventions.",
+      "lastUpdated": "2025-07-28T23:20:16.978Z"
+    },
+    "cli/config/env.ts": {
+      "path": "cli/config/env.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T05:01:44.246Z"
+    },
+    "cli/config/loader.test.ts": {
+      "path": "cli/config/loader.test.ts",
+      "status": "pass",
+      "description": "Comprehensive test coverage.",
+      "lastUpdated": "2025-07-28T23:24:40.200Z"
+    },
+    "cli/config/merge.ts": {
+      "path": "cli/config/merge.ts",
+      "status": "pass",
+      "description": "Refactored expandAliases and added JSDoc. Some type errors remain.",
+      "lastUpdated": "2025-07-28T23:30:04.972Z"
+    },
+    "cli/config/validation.test.ts": {
+      "path": "cli/config/validation.test.ts",
+      "status": "pass",
+      "description": "Updated to reflect normalizeCommand refactoring and added warning test.",
+      "lastUpdated": "2025-07-28T23:33:52.214Z"
+    },
+    "ui/stores/formStore.ts": {
+      "path": "ui/stores/formStore.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.819Z"
+    },
+    "ui/components/forms/button/Button.tsx": {
+      "path": "ui/components/forms/button/Button.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.820Z"
+    },
+    "ui/components/forms/text-input/TextInput.tsx": {
+      "path": "ui/components/forms/text-input/TextInput.tsx",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.821Z"
+    },
+    "ui/components/layout/viewport/index.ts": {
+      "path": "ui/components/layout/viewport/index.ts",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.821Z"
+    },
+    "ui/components/layout/scrollable-box/ScrollableBox.tsx": {
+      "path": "ui/components/layout/scrollable-box/ScrollableBox.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.822Z"
+    },
+    "ui/components/layout/flex/Flex.tsx": {
+      "path": "ui/components/layout/flex/Flex.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.822Z"
+    },
+    "ui/components/navigation/tabs/Tabs.tsx": {
+      "path": "ui/components/navigation/tabs/Tabs.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.822Z"
+    },
+    "ui/components/navigation/help/index.ts": {
+      "path": "ui/components/navigation/help/index.ts",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.822Z"
+    },
+    "ui/components/feedback/progress-bar/index.ts": {
+      "path": "ui/components/feedback/progress-bar/index.ts",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.822Z"
+    },
+    "ui/components/display/large-text/index.ts": {
+      "path": "ui/components/display/large-text/index.ts",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.823Z"
+    },
+    "ui/components/display/text/Text.tsx": {
+      "path": "ui/components/display/text/Text.tsx",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.823Z"
+    },
+    "ui/components/data/FilterBox.tsx": {
+      "path": "ui/components/data/FilterBox.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.823Z"
+    },
+    "ui/components/data/table/Table.tsx": {
+      "path": "ui/components/data/table/Table.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.823Z"
+    },
+    "ui/components/data/list/List.tsx": {
+      "path": "ui/components/data/list/List.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.824Z"
+    },
+    "screenshot/README.md": {
+      "path": "screenshot/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.069Z"
+    },
+    "screenshot/index.ts": {
+      "path": "screenshot/index.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.824Z"
+    },
+    "core/types/core.ts": {
+      "path": "core/types/core.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.824Z"
+    },
+    "core/types/errors/utils.ts": {
+      "path": "core/types/errors/utils.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.824Z"
+    },
+    "core/types/errors/types.ts": {
+      "path": "core/types/errors/types.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.825Z"
+    },
+    "core/types/errors/boundary.ts": {
+      "path": "core/types/errors/boundary.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.825Z"
+    },
+    "core/context/README.md": {
+      "path": "core/context/README.md",
+      "status": "final",
+      "lastUpdated": "2025-07-29T06:02:49.112Z"
+    },
+    "core/update/reactivity/module.ts": {
+      "path": "core/update/reactivity/module.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.826Z"
+    },
+    "core/update/reactivity/runes.ts": {
+      "path": "core/update/reactivity/runes.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.826Z"
+    },
+    "core/update/reactivity/jsx-lifecycle.ts": {
+      "path": "core/update/reactivity/jsx-lifecycle.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.826Z"
+    },
+    "core/update/reactivity/docs/hooks-integration.md": {
+      "path": "core/update/reactivity/docs/hooks-integration.md",
+      "status": "fail",
+      "description": "Documentation file 'hooks-integration.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "core/update/reactivity/components/reactive-component.ts": {
+      "path": "core/update/reactivity/components/reactive-component.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.826Z"
+    },
+    "core/input/focus/manager.ts": {
+      "path": "core/input/focus/manager.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.827Z"
+    },
+    "core/input/focus/manager.test.ts": {
+      "path": "core/input/focus/manager.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.827Z"
+    },
+    "core/runtime/interactive.ts": {
+      "path": "core/runtime/interactive.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.827Z"
+    },
+    "core/runtime/README.md": {
+      "path": "core/runtime/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.073Z"
+    },
+    "core/runtime/mvu/runtime/factory.ts": {
+      "path": "core/runtime/mvu/runtime/factory.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.827Z"
+    },
+    "core/runtime/bootstrap.ts": {
+      "path": "core/runtime/bootstrap.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.828Z"
+    },
+    "core/terminal/input/keys.ts": {
+      "path": "core/terminal/input/keys.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.828Z"
+    },
+    "core/terminal/ansi/styles/borders.test.ts": {
+      "path": "core/terminal/ansi/styles/borders.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.828Z"
+    },
+    "core/terminal/ansi/styles/parser.ts": {
+      "path": "core/terminal/ansi/styles/parser.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.828Z"
+    },
+    "core/terminal/ansi/styles/color.ts": {
+      "path": "core/terminal/ansi/styles/color.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.829Z"
+    },
+    "core/terminal/ansi/styles/style.test.ts": {
+      "path": "core/terminal/ansi/styles/style.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.829Z"
+    },
+    "core/model/scope/manager.ts": {
+      "path": "core/model/scope/manager.ts",
+      "status": "warning",
+      "description": "Needs more tests",
+      "lastUpdated": "2025-07-29T03:56:36.490Z"
+    },
+    "core/model/scope/docs/ARCHITECTURE.md": {
+      "path": "core/model/scope/docs/ARCHITECTURE.md",
+      "status": "fail",
+      "description": "Documentation file 'ARCHITECTURE.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "core/model/scope/jsx/components/ScopeDebugView.tsx": {
+      "path": "core/model/scope/jsx/components/ScopeDebugView.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.830Z"
+    },
+    "core/model/scope/jsx/components/Scope.tsx": {
+      "path": "core/model/scope/jsx/components/Scope.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.830Z"
+    },
+    "core/model/scope/jsx/hooks/use-scope.test.ts": {
+      "path": "core/model/scope/jsx/hooks/use-scope.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.830Z"
+    },
+    "core/view/coordination/component-coordinator.ts": {
+      "path": "core/view/coordination/component-coordinator.ts",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.830Z"
+    },
+    "core/view/layout/box.test.ts": {
+      "path": "core/view/layout/box.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.830Z"
+    },
+    "core/view/layout/flexbox.test.ts": {
+      "path": "core/view/layout/flexbox.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.831Z"
+    },
+    "core/view/primitives/view.test.ts": {
+      "path": "core/view/primitives/view.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.831Z"
+    },
+    "core/integration.test.ts": {
+      "path": "core/integration.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.831Z"
+    },
+    "core/services/impl/terminal.test.ts": {
+      "path": "core/services/impl/terminal.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.831Z"
+    },
+    "core/services/input.ts": {
+      "path": "core/services/input.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.832Z"
+    },
+    "core/debug/README.md": {
+      "path": "core/debug/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.078Z"
+    },
+    "logger/LOGGER-GUIDE.MD": {
+      "path": "logger/LOGGER-GUIDE.MD",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.832Z"
+    },
+    "logger/core/module.ts": {
+      "path": "logger/core/module.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.832Z"
+    },
+    "logger/core/logger.ts": {
+      "path": "logger/core/logger.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.832Z"
+    },
+    "logger/transports/transports.ts": {
+      "path": "logger/transports/transports.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.833Z"
+    },
+    "logger/transports/bun-transports.ts": {
+      "path": "logger/transports/bun-transports.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.833Z"
+    },
+    "logger/formatters/formatters.ts": {
+      "path": "logger/formatters/formatters.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.833Z"
+    },
+    "logger/README.md": {
+      "path": "logger/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.079Z"
+    },
+    "logger/types.ts": {
+      "path": "logger/types.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.833Z"
+    },
+    "logger/components/LogComponents.ts": {
+      "path": "logger/components/LogComponents.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.833Z"
+    },
+    "config/schema.ts": {
+      "path": "config/schema.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.833Z"
+    },
+    "config/core/module.ts": {
+      "path": "config/core/module.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.833Z"
+    },
+    "config/core/loader.ts": {
+      "path": "config/core/loader.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.833Z"
+    },
+    "config/README.md": {
+      "path": "config/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.080Z"
+    },
+    "config/types.ts": {
+      "path": "config/types.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.834Z"
+    },
+    "config/constants.ts": {
+      "path": "config/constants.ts",
+      "status": "pass",
+      "description": "Removed 'any' from SCHEMA_TYPES array to comply with no 'any' rule in RULES.md",
+      "lastUpdated": "2025-07-29T03:39:06.889Z"
+    },
+    "config/sources/utils.ts": {
+      "path": "config/sources/utils.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.834Z"
+    },
+    "config/sources/config.ts": {
+      "path": "config/sources/config.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.834Z"
+    },
+    "config/index.ts": {
+      "path": "config/index.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.834Z"
+    },
+    "plugins/README.md": {
+      "path": "plugins/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.080Z"
+    },
+    "plugins/integrations/cli/stores/pluginStore.ts": {
+      "path": "plugins/integrations/cli/stores/pluginStore.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.834Z"
+    },
+    "plugins/types.ts": {
+      "path": "plugins/types.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.834Z"
+    },
+    "plugins/api/scope/index.ts": {
+      "path": "plugins/api/scope/index.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "plugins/api/Logging.tsx": {
+      "path": "plugins/api/Logging.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "plugins/api/jsx/app.ts": {
+      "path": "plugins/api/jsx/app.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "plugins/api/jsx/stores/index.ts": {
+      "path": "plugins/api/jsx/stores/index.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "plugins/api/jsx/stores/pluginStore.ts": {
+      "path": "plugins/api/jsx/stores/pluginStore.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "plugins/api/jsx/types.ts": {
+      "path": "plugins/api/jsx/types.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "tests/integration/event-system.integration.test.ts": {
+      "path": "tests/integration/event-system.integration.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "tests/integration/coordination.test.ts": {
+      "path": "tests/integration/coordination.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "tests/integration/performance.test.ts": {
+      "path": "tests/integration/performance.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "tests/integration/services-performance.test.ts": {
+      "path": "tests/integration/services-performance.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "tests/integration/context.integration.test.ts": {
+      "path": "tests/integration/context.integration.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.835Z"
+    },
+    "cli/core/helpData.ts": {
+      "path": "cli/core/helpData.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:34:46.495Z"
+    },
+    "cli/core/lazy.ts": {
+      "path": "cli/core/lazy.ts",
+      "status": "pass",
+      "description": "Refactored to remove duplicate LazyCache, fixed 'any' type, and added JSDoc.",
+      "lastUpdated": "2025-07-28T23:35:50.948Z"
+    },
+    "cli/core/module.ts": {
+      "path": "cli/core/module.ts",
+      "status": "pass",
+      "description": "Addressed TODO comments and fixed related type errors.",
+      "lastUpdated": "2025-07-28T23:42:49.592Z"
+    },
+    "cli/runner/argumentProcessor.test.ts": {
+      "path": "cli/runner/argumentProcessor.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-29T03:45:51.276Z"
+    },
+    "cli/runner/resultHandler.ts": {
+      "path": "cli/runner/resultHandler.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.837Z"
+    },
+    "cli/CLEANUP_SUMMARY.md": {
+      "path": "cli/CLEANUP_SUMMARY.md",
+      "status": "fail",
+      "description": "Documentation file 'CLEANUP_SUMMARY.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "cli/TYPE_ERRORS_SUMMARY.md": {
+      "path": "cli/TYPE_ERRORS_SUMMARY.md",
+      "status": "fail",
+      "description": "Documentation file 'TYPE_ERRORS_SUMMARY.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "cli/index.ts": {
+      "path": "cli/index.ts",
+      "status": "pass",
+      "description": "Removed TODO and fixed exports.",
+      "lastUpdated": "2025-07-28T23:44:35.851Z"
+    },
+    "cli/COMPLIANCE_PROGRESS.md": {
+      "path": "cli/COMPLIANCE_PROGRESS.md",
+      "status": "fail",
+      "description": "Documentation file 'COMPLIANCE_PROGRESS.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "cli/COMPLIANCE_REPORT.md": {
+      "path": "cli/COMPLIANCE_REPORT.md",
+      "status": "fail",
+      "description": "Documentation file 'COMPLIANCE_REPORT.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "cli/jsx/app.ts": {
+      "path": "cli/jsx/app.ts",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.839Z"
+    },
+    "cli/jsx/stores/index.ts": {
+      "path": "cli/jsx/stores/index.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.840Z"
+    },
+    "cli/jsx/components/CommandLineHelp.tsx": {
+      "path": "cli/jsx/components/CommandLineHelp.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.840Z"
+    },
+    "testing/README.md": {
+      "path": "testing/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.088Z"
+    },
+    "testing/testUtils.ts": {
+      "path": "testing/testUtils.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.841Z"
+    },
+    "testing/testUtils.test.ts": {
+      "path": "testing/testUtils.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.841Z"
+    },
+    "process-manager/manager.ts": {
+      "path": "process-manager/manager.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.841Z"
+    },
+    "process-manager/bun-fs.ts": {
+      "path": "process-manager/bun-fs.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.841Z"
+    },
+    "process-manager/module.ts": {
+      "path": "process-manager/module.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.842Z"
+    },
+    "process-manager/Plugin.tsx": {
+      "path": "process-manager/Plugin.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.842Z"
+    },
+    "process-manager/types.ts": {
+      "path": "process-manager/types.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.842Z"
+    },
+    "process-manager/components/streams/spawn.ts": {
+      "path": "process-manager/components/streams/spawn.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.842Z"
+    },
+    "process-manager/components/streams/index.ts": {
+      "path": "process-manager/components/streams/index.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.842Z"
+    },
+    "index.ts": {
+      "path": "index.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:07:09.797Z"
+    },
+    "jsx/core/module.ts": {
+      "path": "jsx/core/module.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.843Z"
+    },
+    "jsx/core/configValidator.ts": {
+      "path": "jsx/core/configValidator.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.843Z"
+    },
+    "jsx/config/integration.ts": {
+      "path": "jsx/config/integration.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.843Z"
+    },
+    "jsx/config/components/SetConfig.tsx": {
+      "path": "jsx/config/components/SetConfig.tsx",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.843Z"
+    },
+    "jsx/config/hooks/useConfig.ts": {
+      "path": "jsx/config/hooks/useConfig.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-28T23:24:02.844Z"
+    },
+    "jsx/runtime/index.test.ts": {
+      "path": "jsx/runtime/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "jsx/runtime/index.ts": {
+      "path": "jsx/runtime/index.ts",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-28T23:24:02.844Z"
+    },
+    "debug/README.md": {
+      "path": "debug/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.092Z"
+    },
+    "ui/README.md": {
+      "path": "ui/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.064Z"
+    },
+    "core/types/README.md": {
+      "path": "core/types/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.070Z"
+    },
+    "core/coordination/choreography.md": {
+      "path": "core/coordination/choreography.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.070Z"
+    },
+    "core/coordination/orchestrator.md": {
+      "path": "core/coordination/orchestrator.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.070Z"
+    },
+    "core/coordination/integrationPatterns.md": {
+      "path": "core/coordination/integrationPatterns.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.071Z"
+    },
+    "core/coordination/streamOptimizer.md": {
+      "path": "core/coordination/streamOptimizer.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.071Z"
+    },
+    "core/coordination/performanceMonitor.md": {
+      "path": "core/coordination/performanceMonitor.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.071Z"
+    },
+    "core/coordination/errorRecovery.md": {
+      "path": "core/coordination/errorRecovery.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.071Z"
+    },
+    "core/coordination/README.md": {
+      "path": "core/coordination/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.071Z"
+    },
+    "core/update/README.md": {
+      "path": "core/update/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.071Z"
+    },
+    "core/update/reactivity/docs/migration-guide.md": {
+      "path": "core/update/reactivity/docs/migration-guide.md",
+      "status": "fail",
+      "description": "Documentation file 'migration-guide.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "core/input/README.md": {
+      "path": "core/input/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.072Z"
+    },
+    "core/runtime/scheduler/README.md": {
+      "path": "core/runtime/scheduler/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.073Z"
+    },
+    "core/runtime/bun/README.md": {
+      "path": "core/runtime/bun/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.073Z"
+    },
+    "core/runtime/fiber/README.md": {
+      "path": "core/runtime/fiber/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.073Z"
+    },
+    "core/terminal/ansi/styles/docs/modules.md": {
+      "path": "core/terminal/ansi/styles/docs/modules.md",
+      "status": "fail",
+      "description": "Documentation file 'modules.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "core/terminal/ansi/styles/docs/plugins.md": {
+      "path": "core/terminal/ansi/styles/docs/plugins.md",
+      "status": "fail",
+      "description": "Documentation file 'plugins.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "core/terminal/ansi/styles/README.md": {
+      "path": "core/terminal/ansi/styles/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.074Z"
+    },
+    "core/terminal/README.md": {
+      "path": "core/terminal/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.075Z"
+    },
+    "core/README.md": {
+      "path": "core/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.075Z"
+    },
+    "core/model/scope/docs/USAGE-GUIDE.md": {
+      "path": "core/model/scope/docs/USAGE-GUIDE.md",
+      "status": "fail",
+      "description": "Documentation file 'USAGE-GUIDE.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "core/model/README.md": {
+      "path": "core/model/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.076Z"
+    },
+    "core/view/cache/README.md": {
+      "path": "core/view/cache/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.076Z"
+    },
+    "core/view/lifecycle/README.md": {
+      "path": "core/view/lifecycle/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.077Z"
+    },
+    "core/view/README.md": {
+      "path": "core/view/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.077Z"
+    },
+    "core/os/README.md": {
+      "path": "core/os/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.077Z"
+    },
+    "core/services/README.md": {
+      "path": "core/services/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.078Z"
+    },
+    "cli/README.md": {
+      "path": "cli/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.085Z"
+    },
+    "cli/commands/doctor/README.md": {
+      "path": "cli/commands/doctor/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.086Z"
+    },
+    "cli/commands/align/README.md": {
+      "path": "cli/commands/align/README.md",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:50:07.923Z"
+    },
+    "cli/TEST_COVERAGE_SUMMARY.md": {
+      "path": "cli/TEST_COVERAGE_SUMMARY.md",
+      "status": "fail",
+      "description": "Documentation file 'TEST_COVERAGE_SUMMARY.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "cli/jsx/README.md": {
+      "path": "cli/jsx/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.086Z"
+    },
+    "process-manager/README.md": {
+      "path": "process-manager/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.088Z"
+    },
+    "styling/README.md": {
+      "path": "styling/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.089Z"
+    },
+    "jsx/README.md": {
+      "path": "jsx/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-28T23:28:07.091Z"
+    },
+    "cli/config/schema.md": {
+      "path": "cli/config/schema.md",
+      "status": "pass",
+      "description": "Documents the common CLI schemas.",
+      "lastUpdated": "2025-07-28T23:30:54.567Z"
+    },
+    "cli/types.ts": {
+      "path": "cli/types.ts",
+      "status": "pass",
+      "description": "Fixed 'any' types in LazyHandler and Handler interfaces by introducing generics as per STANDARDS.md",
+      "lastUpdated": "2025-07-29T03:38:51.421Z"
+    },
+    "cli/types.md": {
+      "path": "cli/types.md",
+      "status": "pass",
+      "description": "Documents the purpose of the main CLI types file.",
+      "lastUpdated": "2025-07-28T23:32:30.375Z"
+    },
+    "cli/core/helpData.test.ts": {
+      "path": "cli/core/helpData.test.ts",
+      "status": "pass",
+      "description": "Comprehensive test coverage.",
+      "lastUpdated": "2025-07-28T23:34:46.477Z"
+    },
+    "cli/core/lazy.md": {
+      "path": "cli/core/lazy.md",
+      "status": "pass",
+      "description": "Documents the lazy loading utilities.",
+      "lastUpdated": "2025-07-28T23:36:09.024Z"
+    },
+    "cli/core/module.md": {
+      "path": "cli/core/module.md",
+      "status": "pass",
+      "description": "Documents the core CLI module.",
+      "lastUpdated": "2025-07-28T23:41:20.566Z"
+    },
+    "cli/core/module.test.ts": {
+      "path": "cli/core/module.test.ts",
+      "status": "pass",
+      "description": "Provides basic test coverage for the core CLI module.",
+      "lastUpdated": "2025-07-28T23:41:28.991Z"
+    },
+    "cli/jsx/argv-parser.ts": {
+      "path": "cli/jsx/argv-parser.ts",
+      "status": "warning",
+      "description": "Contains TODO/FIXME comments.",
+      "lastUpdated": "2025-07-29T03:37:23.005Z"
+    },
+    "jsx/debug/Wrapper.test.tsx": {
+      "path": "jsx/debug/Wrapper.test.tsx",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:06:44.690Z"
+    },
+    "jsx/debug/Wrapper.tsx": {
+      "path": "jsx/debug/Wrapper.tsx",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:06:44.247Z"
+    },
+    "scope.ts": {
+      "path": "scope.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:07:56.222Z"
+    },
+    "cli/constants.ts": {
+      "path": "cli/constants.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:08:14.184Z"
+    },
+    "cli/errors.ts": {
+      "path": "cli/errors.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:08:57.655Z"
+    },
+    "cli/errors.test.ts": {
+      "path": "cli/errors.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:08:58.969Z"
+    },
+    "cli/hooks/index.ts": {
+      "path": "cli/hooks/index.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:12:19.007Z"
+    },
+    "cli/hooks/manager.ts": {
+      "path": "cli/hooks/manager.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:18:12.275Z"
+    },
+    "cli/hooks/manager.test.ts": {
+      "path": "cli/hooks/manager.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:18:13.556Z"
+    },
+    "cli/hooks/types.ts": {
+      "path": "cli/hooks/types.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:18:43.833Z"
+    },
+    "cli/hooks/utils.test.ts": {
+      "path": "cli/hooks/utils.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:34:51.068Z"
+    },
+    "cli/commands/align/templates/modules.md": {
+      "path": "cli/commands/align/templates/modules.md",
+      "status": "fail",
+      "description": "Documentation file 'modules.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "cli/commands/align/templates/README.md": {
+      "path": "cli/commands/align/templates/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-29T04:22:29.009Z"
+    },
+    "cli/commands/align/templates/plugins.md": {
+      "path": "cli/commands/align/templates/plugins.md",
+      "status": "fail",
+      "description": "Documentation file 'plugins.md' is standalone. It should be named README.md or accompany a feature file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/index.test.ts": {
+      "path": "ui/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/stores/textInputStore.test.ts": {
+      "path": "ui/stores/textInputStore.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.815Z"
+    },
+    "ui/stores/textInputStore.ts": {
+      "path": "ui/stores/textInputStore.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.815Z"
+    },
+    "ui/stores/formStore.test.ts": {
+      "path": "ui/stores/formStore.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.815Z"
+    },
+    "ui/stores/viewportStore.ts": {
+      "path": "ui/stores/viewportStore.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.815Z"
+    },
+    "ui/stores/viewportStore.test.ts": {
+      "path": "ui/stores/viewportStore.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.815Z"
+    },
+    "ui/components/forms/index.test.ts": {
+      "path": "ui/components/forms/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/forms/file-picker/index.test.ts": {
+      "path": "ui/components/forms/file-picker/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/forms/file-picker/FilePicker.test.tsx": {
+      "path": "ui/components/forms/file-picker/FilePicker.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/forms/file-picker/FilePicker.tsx": {
+      "path": "ui/components/forms/file-picker/FilePicker.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/forms/file-picker/index.ts": {
+      "path": "ui/components/forms/file-picker/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/forms/button/Button.test.tsx": {
+      "path": "ui/components/forms/button/Button.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/forms/button/index.test.ts": {
+      "path": "ui/components/forms/button/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/forms/button/index.ts": {
+      "path": "ui/components/forms/button/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/forms/index.ts": {
+      "path": "ui/components/forms/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/forms/text-input/index.test.ts": {
+      "path": "ui/components/forms/text-input/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/forms/text-input/TextInput.test.tsx": {
+      "path": "ui/components/forms/text-input/TextInput.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/forms/text-input/index.ts": {
+      "path": "ui/components/forms/text-input/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/index.test.ts": {
+      "path": "ui/components/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/layout/viewport/Viewport.tsx": {
+      "path": "ui/components/layout/viewport/Viewport.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/layout/viewport/index.test.ts": {
+      "path": "ui/components/layout/viewport/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/layout/viewport/Viewport.test.tsx": {
+      "path": "ui/components/layout/viewport/Viewport.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.816Z"
+    },
+    "ui/components/layout/box/index.test.ts": {
+      "path": "ui/components/layout/box/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/layout/box/Box.test.tsx": {
+      "path": "ui/components/layout/box/Box.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/layout/box/Box.tsx": {
+      "path": "ui/components/layout/box/Box.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/layout/box/index.ts": {
+      "path": "ui/components/layout/box/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/layout/index.test.ts": {
+      "path": "ui/components/layout/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/layout/scrollable-box/index.test.ts": {
+      "path": "ui/components/layout/scrollable-box/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/layout/scrollable-box/ScrollableBox.test.tsx": {
+      "path": "ui/components/layout/scrollable-box/ScrollableBox.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/layout/scrollable-box/index.ts": {
+      "path": "ui/components/layout/scrollable-box/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/layout/index.ts": {
+      "path": "ui/components/layout/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/layout/flex/index.test.ts": {
+      "path": "ui/components/layout/flex/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/layout/flex/Flex.test.tsx": {
+      "path": "ui/components/layout/flex/Flex.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/layout/flex/index.ts": {
+      "path": "ui/components/layout/flex/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/navigation/tabs/Tabs.test.tsx": {
+      "path": "ui/components/navigation/tabs/Tabs.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/navigation/tabs/index.ts": {
+      "path": "ui/components/navigation/tabs/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/navigation/index.ts": {
+      "path": "ui/components/navigation/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/feedback/index.test.ts": {
+      "path": "ui/components/feedback/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/feedback/progress-bar/index.test.ts": {
+      "path": "ui/components/feedback/progress-bar/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/feedback/spinner/Spinner.test.tsx": {
+      "path": "ui/components/feedback/spinner/Spinner.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.817Z"
+    },
+    "ui/components/feedback/spinner/index.test.ts": {
+      "path": "ui/components/feedback/spinner/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/feedback/spinner/index.ts": {
+      "path": "ui/components/feedback/spinner/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/feedback/spinner/Spinner.tsx": {
+      "path": "ui/components/feedback/spinner/Spinner.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/feedback/index.ts": {
+      "path": "ui/components/feedback/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/feedback/modal/index.test.ts": {
+      "path": "ui/components/feedback/modal/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/feedback/modal/Modal.test.tsx": {
+      "path": "ui/components/feedback/modal/Modal.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/feedback/modal/index.ts": {
+      "path": "ui/components/feedback/modal/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/feedback/modal/Modal.tsx": {
+      "path": "ui/components/feedback/modal/Modal.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/system/exit/Exit.tsx": {
+      "path": "ui/components/system/exit/Exit.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/system/exit/index.ts": {
+      "path": "ui/components/system/exit/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/system/index.ts": {
+      "path": "ui/components/system/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/display/index.test.ts": {
+      "path": "ui/components/display/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/display/large-text/index.test.ts": {
+      "path": "ui/components/display/large-text/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/display/index.ts": {
+      "path": "ui/components/display/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/display/text/index.test.ts": {
+      "path": "ui/components/display/text/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/display/text/index.ts": {
+      "path": "ui/components/display/text/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/display/text/Text.test.tsx": {
+      "path": "ui/components/display/text/Text.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/index.ts": {
+      "path": "ui/components/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/data/index.test.ts": {
+      "path": "ui/components/data/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/data/FilterBox.test.tsx": {
+      "path": "ui/components/data/FilterBox.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.818Z"
+    },
+    "ui/components/data/table/index.test.ts": {
+      "path": "ui/components/data/table/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/data/table/index.ts": {
+      "path": "ui/components/data/table/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "ui/components/data/table/Table.test.tsx": {
+      "path": "ui/components/data/table/Table.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "ui/components/data/list/index.test.ts": {
+      "path": "ui/components/data/list/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "ui/components/data/list/List.test.tsx": {
+      "path": "ui/components/data/list/List.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "ui/components/data/list/index.ts": {
+      "path": "ui/components/data/list/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "ui/components/data/index.ts": {
+      "path": "ui/components/data/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "ui/index.ts": {
+      "path": "ui/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "screenshot/index.test.ts": {
+      "path": "screenshot/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "core/types/errors.ts": {
+      "path": "core/types/errors.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "core/types/messages.ts": {
+      "path": "core/types/messages.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "core/types/schemas.ts": {
+      "path": "core/types/schemas.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "core/types/index.ts": {
+      "path": "core/types/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "core/types/errors/base.ts": {
+      "path": "core/types/errors/base.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.819Z"
+    },
+    "core/types/errors/index.ts": {
+      "path": "core/types/errors/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/types/errors/recovery.ts": {
+      "path": "core/types/errors/recovery.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/types/guards.ts": {
+      "path": "core/types/guards.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/types/values.ts": {
+      "path": "core/types/values.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/context/component.ts": {
+      "path": "core/context/component.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T06:02:49.112Z"
+    },
+    "core/context/index.ts": {
+      "path": "core/context/index.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T06:02:49.112Z"
+    },
+    "core/context/component.test.ts": {
+      "path": "core/context/component.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T06:02:49.112Z"
+    },
+    "core/coordination/errorRecovery.test.ts": {
+      "path": "core/coordination/errorRecovery.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/integrationPatterns.ts": {
+      "path": "core/coordination/integrationPatterns.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/performanceMonitor.ts": {
+      "path": "core/coordination/performanceMonitor.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/errorRecovery.ts": {
+      "path": "core/coordination/errorRecovery.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/choreography.test.ts": {
+      "path": "core/coordination/choreography.test.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-29T06:02:12.444Z"
+    },
+    "core/coordination/module.ts": {
+      "path": "core/coordination/module.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/streamOptimizer.ts": {
+      "path": "core/coordination/streamOptimizer.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/errors.ts": {
+      "path": "core/coordination/errors.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/orchestrator.ts": {
+      "path": "core/coordination/orchestrator.ts",
+      "status": "warning",
+      "description": "Contains `any` type.",
+      "lastUpdated": "2025-07-29T06:02:12.444Z"
+    },
+    "core/coordination/choreography.ts": {
+      "path": "core/coordination/choreography.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/streamOptimizer.test.ts": {
+      "path": "core/coordination/streamOptimizer.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/types.ts": {
+      "path": "core/coordination/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/constants.ts": {
+      "path": "core/coordination/constants.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/integrationPatterns.test.ts": {
+      "path": "core/coordination/integrationPatterns.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/orchestrator.test.ts": {
+      "path": "core/coordination/orchestrator.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/index.ts": {
+      "path": "core/coordination/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.820Z"
+    },
+    "core/coordination/performanceMonitor.test.ts": {
+      "path": "core/coordination/performanceMonitor.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/update/reactivity/events.ts": {
+      "path": "core/update/reactivity/events.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/update/reactivity/index.ts": {
+      "path": "core/update/reactivity/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/errors.ts": {
+      "path": "core/errors.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/input/errors.ts": {
+      "path": "core/input/errors.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/input/mouse/hitTest.test.ts": {
+      "path": "core/input/mouse/hitTest.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/input/mouse/router.ts": {
+      "path": "core/input/mouse/router.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/input/mouse/hitTest.ts": {
+      "path": "core/input/mouse/hitTest.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/input/mouse/router.test.ts": {
+      "path": "core/input/mouse/router.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/input/types.ts": {
+      "path": "core/input/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/input/constants.ts": {
+      "path": "core/input/constants.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/input/index.ts": {
+      "path": "core/input/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/runtime/module/base.ts": {
+      "path": "core/runtime/module/base.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.821Z"
+    },
+    "core/runtime/module/registry.ts": {
+      "path": "core/runtime/module/registry.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/mvu/runtime/scheduler.ts": {
+      "path": "core/runtime/mvu/runtime/scheduler.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/mvu/runtime/types.ts": {
+      "path": "core/runtime/mvu/runtime/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/mvu/runtime/core.ts": {
+      "path": "core/runtime/mvu/runtime/core.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/mvu/runtime/subscriptions.ts": {
+      "path": "core/runtime/mvu/runtime/subscriptions.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/mvu/runtime/index.ts": {
+      "path": "core/runtime/mvu/runtime/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/mvu/runtime.ts": {
+      "path": "core/runtime/mvu/runtime.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/mvu/index.ts": {
+      "path": "core/runtime/mvu/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/mvu/runtime.test.ts": {
+      "path": "core/runtime/mvu/runtime.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/runtime/index.ts": {
+      "path": "core/runtime/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/terminal/input/index.ts": {
+      "path": "core/terminal/input/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/terminal/ansi/ansi.ts": {
+      "path": "core/terminal/ansi/ansi.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/terminal/ansi/styles/module.ts": {
+      "path": "core/terminal/ansi/styles/module.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/terminal/ansi/styles/color.test.ts": {
+      "path": "core/terminal/ansi/styles/color.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.822Z"
+    },
+    "core/terminal/ansi/styles/style/builder.ts": {
+      "path": "core/terminal/ansi/styles/style/builder.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/style/factory.ts": {
+      "path": "core/terminal/ansi/styles/style/factory.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/style/types.ts": {
+      "path": "core/terminal/ansi/styles/style/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/style/index.ts": {
+      "path": "core/terminal/ansi/styles/style/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/types.ts": {
+      "path": "core/terminal/ansi/styles/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/gradients.ts": {
+      "path": "core/terminal/ansi/styles/gradients.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/borders.ts": {
+      "path": "core/terminal/ansi/styles/borders.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/events.ts": {
+      "path": "core/terminal/ansi/styles/events.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/render.ts": {
+      "path": "core/terminal/ansi/styles/render.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/index.ts": {
+      "path": "core/terminal/ansi/styles/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/style.ts": {
+      "path": "core/terminal/ansi/styles/style.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/styles/advanced.ts": {
+      "path": "core/terminal/ansi/styles/advanced.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/ansi/index.ts": {
+      "path": "core/terminal/ansi/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/output/string/width.ts": {
+      "path": "core/terminal/output/string/width.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/terminal/output/string/width.test.ts": {
+      "path": "core/terminal/output/string/width.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/types.ts": {
+      "path": "core/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/constants.ts": {
+      "path": "core/constants.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.823Z"
+    },
+    "core/model/scope/manager.test.ts": {
+      "path": "core/model/scope/manager.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/types.ts": {
+      "path": "core/model/scope/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/index.ts": {
+      "path": "core/model/scope/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/stores/currentScope.store.ts": {
+      "path": "core/model/scope/jsx/stores/currentScope.store.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/stores/index.ts": {
+      "path": "core/model/scope/jsx/stores/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/stores/rootScope.store.ts": {
+      "path": "core/model/scope/jsx/stores/rootScope.store.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/stores/parentScope.store.ts": {
+      "path": "core/model/scope/jsx/stores/parentScope.store.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/components/Unscoped.tsx": {
+      "path": "core/model/scope/jsx/components/Unscoped.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/components/ScopeFallback.tsx": {
+      "path": "core/model/scope/jsx/components/ScopeFallback.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/components/ScopeContent.tsx": {
+      "path": "core/model/scope/jsx/components/ScopeContent.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/components/Scoped.tsx": {
+      "path": "core/model/scope/jsx/components/Scoped.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/components/index.ts": {
+      "path": "core/model/scope/jsx/components/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/components/ScopeDebugOverlay.tsx": {
+      "path": "core/model/scope/jsx/components/ScopeDebugOverlay.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/hooks/use-scope.ts": {
+      "path": "core/model/scope/jsx/hooks/use-scope.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/scope/jsx/hooks/index.ts": {
+      "path": "core/model/scope/jsx/hooks/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.824Z"
+    },
+    "core/model/events/channels.ts": {
+      "path": "core/model/events/channels.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/model/events/channels.test.ts": {
+      "path": "core/model/events/channels.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/model/events/index.ts": {
+      "path": "core/model/events/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/model/events/event-bus.ts": {
+      "path": "core/model/events/event-bus.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/model/events/event-bus.test.ts": {
+      "path": "core/model/events/event-bus.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/dynamic-layout.ts": {
+      "path": "core/view/layout/dynamic-layout.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/flexbox.ts": {
+      "path": "core/view/layout/flexbox.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/join.ts": {
+      "path": "core/view/layout/join.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/types.ts": {
+      "path": "core/view/layout/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/spacer.ts": {
+      "path": "core/view/layout/spacer.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/index.ts": {
+      "path": "core/view/layout/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/positioning.ts": {
+      "path": "core/view/layout/positioning.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/box.ts": {
+      "path": "core/view/layout/box.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/layout/grid.ts": {
+      "path": "core/view/layout/grid.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/lifecycle/lifecycle-manager.ts": {
+      "path": "core/view/lifecycle/lifecycle-manager.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/view-cache.ts": {
+      "path": "core/view/view-cache.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.825Z"
+    },
+    "core/view/primitives/view.ts": {
+      "path": "core/view/primitives/view.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/view/index.ts": {
+      "path": "core/view/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/view/performance/optimized-renderer.ts": {
+      "path": "core/view/performance/optimized-renderer.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/index.ts": {
+      "path": "core/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/input.ts": {
+      "path": "core/services/impl/input.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/storage.ts": {
+      "path": "core/services/impl/storage.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/renderer.test.ts": {
+      "path": "core/services/impl/renderer.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/input.test.ts": {
+      "path": "core/services/impl/input.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/storage/state.ts": {
+      "path": "core/services/impl/storage/state.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/storage/file.ts": {
+      "path": "core/services/impl/storage/file.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/storage/cache.ts": {
+      "path": "core/services/impl/storage/cache.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/storage/transaction.ts": {
+      "path": "core/services/impl/storage/transaction.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/storage/index.ts": {
+      "path": "core/services/impl/storage/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/storage/config.ts": {
+      "path": "core/services/impl/storage/config.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/renderer.ts": {
+      "path": "core/services/impl/renderer.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/terminal.ts": {
+      "path": "core/services/impl/terminal.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/impl/index.ts": {
+      "path": "core/services/impl/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/module.ts": {
+      "path": "core/services/module.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/storage.ts": {
+      "path": "core/services/storage.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.826Z"
+    },
+    "core/services/renderer.ts": {
+      "path": "core/services/renderer.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "core/services/terminal.ts": {
+      "path": "core/services/terminal.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "core/services/index.ts": {
+      "path": "core/services/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "core/services/events/types.ts": {
+      "path": "core/services/events/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "core/debug/index.test.ts": {
+      "path": "core/debug/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "core/debug/index.ts": {
+      "path": "core/debug/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/core/bun-logger.ts": {
+      "path": "logger/core/bun-logger.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/core/bun-logger.test.ts": {
+      "path": "logger/core/bun-logger.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/core/events.test.ts": {
+      "path": "logger/core/events.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/core/module.test.ts": {
+      "path": "logger/core/module.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/core/events.ts": {
+      "path": "logger/core/events.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/core/presets.ts": {
+      "path": "logger/core/presets.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/core/presets.test.ts": {
+      "path": "logger/core/presets.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/core/logger.test.ts": {
+      "path": "logger/core/logger.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/index.test.ts": {
+      "path": "logger/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "logger/module.ts": {
+      "path": "logger/module.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/types.test.ts": {
+      "path": "logger/types.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/transports/transports.test.ts": {
+      "path": "logger/transports/transports.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/transports/bun-transports.test.ts": {
+      "path": "logger/transports/bun-transports.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/formatters/index.test.ts": {
+      "path": "logger/formatters/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "logger/formatters/formatters.test.ts": {
+      "path": "logger/formatters/formatters.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/formatters/index.ts": {
+      "path": "logger/formatters/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/components/LogExplorer.test.ts": {
+      "path": "logger/components/LogExplorer.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/components/LiveLogDashboard.test.ts": {
+      "path": "logger/components/LiveLogDashboard.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/components/LiveLogDashboard.ts": {
+      "path": "logger/components/LiveLogDashboard.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/components/LogExplorer.ts": {
+      "path": "logger/components/LogExplorer.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.827Z"
+    },
+    "logger/components/LogComponents.test.ts": {
+      "path": "logger/components/LogComponents.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "logger/module.test.ts": {
+      "path": "logger/module.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "logger/constants.ts": {
+      "path": "logger/constants.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "logger/constants.test.ts": {
+      "path": "logger/constants.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "logger/index.ts": {
+      "path": "logger/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "config/core/events.ts": {
+      "path": "config/core/events.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "config/module.ts": {
+      "path": "config/module.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "config/jsxConfig.ts": {
+      "path": "config/jsxConfig.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "config/sources/utils.test.ts": {
+      "path": "config/sources/utils.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "config/sources/config.test.ts": {
+      "path": "config/sources/config.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "config/config.test.ts": {
+      "path": "config/config.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/errors.test.ts": {
+      "path": "plugins/errors.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/index.test.ts": {
+      "path": "plugins/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "plugins/errors.ts": {
+      "path": "plugins/errors.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/types.test.ts": {
+      "path": "plugins/types.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/integrations/cli/app.test.ts": {
+      "path": "plugins/integrations/cli/app.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/integrations/cli/index.test.ts": {
+      "path": "plugins/integrations/cli/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "plugins/integrations/cli/app.ts": {
+      "path": "plugins/integrations/cli/app.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/integrations/cli/stores/pluginStore.test.ts": {
+      "path": "plugins/integrations/cli/stores/pluginStore.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/integrations/cli/Plugin.tsx": {
+      "path": "plugins/integrations/cli/Plugin.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/integrations/cli/Plugin.test.tsx": {
+      "path": "plugins/integrations/cli/Plugin.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/integrations/cli/index.ts": {
+      "path": "plugins/integrations/cli/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/integrations/cli/builtin/logging.test.ts": {
+      "path": "plugins/integrations/cli/builtin/logging.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/integrations/cli/builtin/logging.ts": {
+      "path": "plugins/integrations/cli/builtin/logging.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.828Z"
+    },
+    "plugins/constants.ts": {
+      "path": "plugins/constants.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/constants.test.ts": {
+      "path": "plugins/constants.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/api/Logging.test.tsx": {
+      "path": "plugins/api/Logging.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/api/scope/index.test.ts": {
+      "path": "plugins/api/scope/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "plugins/api/jsx/app.test.ts": {
+      "path": "plugins/api/jsx/app.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/api/jsx/types.test.ts": {
+      "path": "plugins/api/jsx/types.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/api/jsx/stores/index.test.ts": {
+      "path": "plugins/api/jsx/stores/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "plugins/api/jsx/stores/pluginStore.test.ts": {
+      "path": "plugins/api/jsx/stores/pluginStore.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/api/jsx/components/Plugin.tsx": {
+      "path": "plugins/api/jsx/components/Plugin.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/api/jsx/components/Plugin.test.tsx": {
+      "path": "plugins/api/jsx/components/Plugin.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/api/jsx/Components.test.tsx": {
+      "path": "plugins/api/jsx/Components.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/api/jsx/Components.tsx": {
+      "path": "plugins/api/jsx/Components.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "plugins/index.ts": {
+      "path": "plugins/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "tests/integration/service-integration.test.ts": {
+      "path": "tests/integration/service-integration.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "tests/integration/debug-mvu.integration.test.ts": {
+      "path": "tests/integration/debug-mvu.integration.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/core/help.ts": {
+      "path": "cli/core/help.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T05:05:03.178Z"
+    },
+    "cli/core/lazyCache.ts": {
+      "path": "cli/core/lazyCache.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/core/loader.ts": {
+      "path": "cli/core/loader.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/core/lazyCache.test.ts": {
+      "path": "cli/core/lazyCache.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/core/parser.ts": {
+      "path": "cli/core/parser.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/core/events.ts": {
+      "path": "cli/core/events.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T05:02:28.584Z"
+    },
+    "cli/core/registry.ts": {
+      "path": "cli/core/registry.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/core/help.test.ts": {
+      "path": "cli/core/help.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T05:05:04.840Z"
+    },
+    "cli/core/config.ts": {
+      "path": "cli/core/config.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:59:44.172Z"
+    },
+    "cli/core/viewRuntime.ts": {
+      "path": "cli/core/viewRuntime.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/core/loader.test.ts": {
+      "path": "cli/core/loader.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/core/runner.ts": {
+      "path": "cli/core/runner.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.829Z"
+    },
+    "cli/module.ts": {
+      "path": "cli/module.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:29:30.933Z"
+    },
+    "cli/plugin.ts": {
+      "path": "cli/plugin.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:33:21.158Z"
+    },
+    "cli/runner/cliRunner.ts": {
+      "path": "cli/runner/cliRunner.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/commandExecutor.ts": {
+      "path": "cli/runner/commandExecutor.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/errorHandler.ts": {
+      "path": "cli/runner/errorHandler.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/helpDisplay.ts": {
+      "path": "cli/runner/helpDisplay.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/helpDisplay.test.ts": {
+      "path": "cli/runner/helpDisplay.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/configManager.ts": {
+      "path": "cli/runner/configManager.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/errorHandler.test.ts": {
+      "path": "cli/runner/errorHandler.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/argumentProcessor.ts": {
+      "path": "cli/runner/argumentProcessor.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/pluginLoader.test.ts": {
+      "path": "cli/runner/pluginLoader.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/pluginLoader.ts": {
+      "path": "cli/runner/pluginLoader.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/runner/index.ts": {
+      "path": "cli/runner/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/validation.ts": {
+      "path": "cli/plugin/validation.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/define.test.ts": {
+      "path": "cli/plugin/define.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/dependencies.ts": {
+      "path": "cli/plugin/dependencies.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/middleware.ts": {
+      "path": "cli/plugin/middleware.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/manager.ts": {
+      "path": "cli/plugin/manager.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/utils.test.ts": {
+      "path": "cli/plugin/utils.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/utils.ts": {
+      "path": "cli/plugin/utils.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/types.ts": {
+      "path": "cli/plugin/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/dependencies.test.ts": {
+      "path": "cli/plugin/dependencies.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/index.ts": {
+      "path": "cli/plugin/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/define.ts": {
+      "path": "cli/plugin/define.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/plugin/validation.test.ts": {
+      "path": "cli/plugin/validation.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/parser/schema.ts": {
+      "path": "cli/parser/schema.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/parser/value.ts": {
+      "path": "cli/parser/value.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/parser/parser.test.ts": {
+      "path": "cli/parser/parser.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.830Z"
+    },
+    "cli/parser/command.test.ts": {
+      "path": "cli/parser/command.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/parser/value.test.ts": {
+      "path": "cli/parser/value.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/parser/types.ts": {
+      "path": "cli/parser/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/parser/options.test.ts": {
+      "path": "cli/parser/options.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/parser/index.ts": {
+      "path": "cli/parser/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/parser/command.ts": {
+      "path": "cli/parser/command.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/parser/options.ts": {
+      "path": "cli/parser/options.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/plugin.test.ts": {
+      "path": "cli/plugin.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/adapters/jsxRuntime.ts": {
+      "path": "cli/adapters/jsxRuntime.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:36:24.195Z"
+    },
+    "cli/hooks/lifecycle.ts": {
+      "path": "cli/hooks/lifecycle.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/hooks/utils.ts": {
+      "path": "cli/hooks/utils.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:34:49.435Z"
+    },
+    "cli/hooks/pluginHooks.ts": {
+      "path": "cli/hooks/pluginHooks.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:32:39.254Z"
+    },
+    "cli/hooks/lifecycle.test.ts": {
+      "path": "cli/hooks/lifecycle.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/mvu/app.ts": {
+      "path": "cli/mvu/app.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/mvu/model.ts": {
+      "path": "cli/mvu/model.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/mvu/update.test.ts": {
+      "path": "cli/mvu/update.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/mvu/index.ts": {
+      "path": "cli/mvu/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/mvu/storeAdapter.ts": {
+      "path": "cli/mvu/storeAdapter.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/mvu/update.ts": {
+      "path": "cli/mvu/update.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/configMerger.ts": {
+      "path": "cli/registry/configMerger.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/dependencyManager.test.ts": {
+      "path": "cli/registry/dependencyManager.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/types.ts": {
+      "path": "cli/registry/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/serviceCollector.ts": {
+      "path": "cli/registry/serviceCollector.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/lifecycleManager.ts": {
+      "path": "cli/registry/lifecycleManager.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/dependencyManager.ts": {
+      "path": "cli/registry/dependencyManager.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/index.ts": {
+      "path": "cli/registry/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/pluginStore.ts": {
+      "path": "cli/registry/pluginStore.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.831Z"
+    },
+    "cli/registry/pluginStore.test.ts": {
+      "path": "cli/registry/pluginStore.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/commands/doctor/index.ts": {
+      "path": "cli/commands/doctor/index.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:44:44.342Z"
+    },
+    "cli/jsx/app.test.ts": {
+      "path": "cli/jsx/app.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/stores/commandStore.ts": {
+      "path": "cli/jsx/stores/commandStore.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/stores/cliStore.ts": {
+      "path": "cli/jsx/stores/cliStore.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/types.ts": {
+      "path": "cli/jsx/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/LoadPlugin.tsx": {
+      "path": "cli/jsx/components/LoadPlugin.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/Flag.tsx": {
+      "path": "cli/jsx/components/Flag.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/CommandLineScope.tsx": {
+      "path": "cli/jsx/components/CommandLineScope.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/CLI.tsx": {
+      "path": "cli/jsx/components/CLI.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/Plugin.tsx": {
+      "path": "cli/jsx/components/Plugin.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/Option.tsx": {
+      "path": "cli/jsx/components/Option.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/Exit.tsx": {
+      "path": "cli/jsx/components/Exit.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/Command.tsx": {
+      "path": "cli/jsx/components/Command.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/Help.tsx": {
+      "path": "cli/jsx/components/Help.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/Arg.tsx": {
+      "path": "cli/jsx/components/Arg.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/index.ts": {
+      "path": "cli/jsx/components/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/Example.tsx": {
+      "path": "cli/jsx/components/Example.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/components/CLI.test.tsx": {
+      "path": "cli/jsx/components/CLI.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/jsx/argv-parser.test.ts": {
+      "path": "cli/jsx/argv-parser.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/router/middleware.ts": {
+      "path": "cli/router/middleware.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/router/handlerExecutor.test.ts": {
+      "path": "cli/router/handlerExecutor.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.832Z"
+    },
+    "cli/router/eventIntegration.ts": {
+      "path": "cli/router/eventIntegration.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/middleware.test.ts": {
+      "path": "cli/router/middleware.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/commandResolver.ts": {
+      "path": "cli/router/commandResolver.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/commandResolver.test.ts": {
+      "path": "cli/router/commandResolver.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/types.ts": {
+      "path": "cli/router/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/suggestions.test.ts": {
+      "path": "cli/router/suggestions.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/commandRegistry.test.ts": {
+      "path": "cli/router/commandRegistry.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/commandRegistry.ts": {
+      "path": "cli/router/commandRegistry.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/index.ts": {
+      "path": "cli/router/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/suggestions.ts": {
+      "path": "cli/router/suggestions.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "cli/router/handlerExecutor.ts": {
+      "path": "cli/router/handlerExecutor.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/e2eHarness.test.ts": {
+      "path": "testing/e2eHarness.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/e2eHarness.ts": {
+      "path": "testing/e2eHarness.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/inputAdapter.test.ts": {
+      "path": "testing/inputAdapter.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/visualTest.test.ts": {
+      "path": "testing/visualTest.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/index.test.ts": {
+      "path": "testing/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "testing/inputAdapter.ts": {
+      "path": "testing/inputAdapter.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/visualTest.ts": {
+      "path": "testing/visualTest.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/index.ts": {
+      "path": "testing/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/harness.test.ts": {
+      "path": "testing/harness.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "testing/harness.ts": {
+      "path": "testing/harness.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "process-manager/doctor.ts": {
+      "path": "process-manager/doctor.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "process-manager/manager.test.ts": {
+      "path": "process-manager/manager.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "process-manager/index.test.ts": {
+      "path": "process-manager/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "process-manager/events.test.ts": {
+      "path": "process-manager/events.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "process-manager/types.test.ts": {
+      "path": "process-manager/types.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "process-manager/templates.test.ts": {
+      "path": "process-manager/templates.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "process-manager/templates.ts": {
+      "path": "process-manager/templates.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.833Z"
+    },
+    "process-manager/components/ProcessMonitor.ts": {
+      "path": "process-manager/components/ProcessMonitor.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/components/ProcessStatusView.test.tsx": {
+      "path": "process-manager/components/ProcessStatusView.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/components/streams/index.test.ts": {
+      "path": "process-manager/components/streams/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "process-manager/components/streams/spawn.test.ts": {
+      "path": "process-manager/components/streams/spawn.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/components/ProcessStatusView.tsx": {
+      "path": "process-manager/components/ProcessStatusView.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/components/ProcessMonitor.test.ts": {
+      "path": "process-manager/components/ProcessMonitor.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/Plugin.test.tsx": {
+      "path": "process-manager/Plugin.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/module.test.ts": {
+      "path": "process-manager/module.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/constants.ts": {
+      "path": "process-manager/constants.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/bun-fs.test.ts": {
+      "path": "process-manager/bun-fs.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/events.ts": {
+      "path": "process-manager/events.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/constants.test.ts": {
+      "path": "process-manager/constants.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/index.ts": {
+      "path": "process-manager/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "process-manager/doctor.test.ts": {
+      "path": "process-manager/doctor.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.834Z"
+    },
+    "jsx/app.test.ts": {
+      "path": "jsx/app.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/errors.test.ts": {
+      "path": "jsx/errors.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/scope.ts": {
+      "path": "jsx/scope.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/context/index.test.ts": {
+      "path": "jsx/context/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "jsx/context/index.ts": {
+      "path": "jsx/context/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/core/events.ts": {
+      "path": "jsx/core/events.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/core/render.ts": {
+      "path": "jsx/core/render.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/scope.test.ts": {
+      "path": "jsx/scope.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/index.test.ts": {
+      "path": "jsx/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "jsx/events.test.ts": {
+      "path": "jsx/events.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/module.ts": {
+      "path": "jsx/module.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/index.test.ts": {
+      "path": "jsx/config/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "jsx/config/stores/configStore.test.ts": {
+      "path": "jsx/config/stores/configStore.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/stores/index.test.ts": {
+      "path": "jsx/config/stores/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "jsx/config/stores/configStore.ts": {
+      "path": "jsx/config/stores/configStore.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/stores/index.ts": {
+      "path": "jsx/config/stores/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/components/LoadConfig.tsx": {
+      "path": "jsx/config/components/LoadConfig.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/components/SetConfig.test.tsx": {
+      "path": "jsx/config/components/SetConfig.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/components/index.test.ts": {
+      "path": "jsx/config/components/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "jsx/config/components/ConfigProvider.test.tsx": {
+      "path": "jsx/config/components/ConfigProvider.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/components/index.ts": {
+      "path": "jsx/config/components/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/components/ConfigProvider.tsx": {
+      "path": "jsx/config/components/ConfigProvider.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/components/LoadConfig.test.tsx": {
+      "path": "jsx/config/components/LoadConfig.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.835Z"
+    },
+    "jsx/config/hooks/index.test.ts": {
+      "path": "jsx/config/hooks/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "jsx/config/hooks/useConfig.test.ts": {
+      "path": "jsx/config/hooks/useConfig.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/config/hooks/index.ts": {
+      "path": "jsx/config/hooks/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/config/index.ts": {
+      "path": "jsx/config/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/config/integration.test.ts": {
+      "path": "jsx/config/integration.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/errors.ts": {
+      "path": "jsx/errors.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/app.ts": {
+      "path": "jsx/app.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/runtime/dev.ts": {
+      "path": "jsx/runtime/dev.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/runtime/dev.test.ts": {
+      "path": "jsx/runtime/dev.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/types.ts": {
+      "path": "jsx/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/module.test.ts": {
+      "path": "jsx/module.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/constants.ts": {
+      "path": "jsx/constants.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/events.ts": {
+      "path": "jsx/events.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/constants.test.ts": {
+      "path": "jsx/constants.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/index.ts": {
+      "path": "jsx/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "jsx/debug/index.test.ts": {
+      "path": "jsx/debug/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "jsx/debug/index.ts": {
+      "path": "jsx/debug/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/core/store.test.ts": {
+      "path": "debug/core/store.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/core/index.test.ts": {
+      "path": "debug/core/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "debug/core/patcher.ts": {
+      "path": "debug/core/patcher.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/core/patcher.test.ts": {
+      "path": "debug/core/patcher.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/core/enabler.test.ts": {
+      "path": "debug/core/enabler.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/core/enabler.ts": {
+      "path": "debug/core/enabler.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/core/index.ts": {
+      "path": "debug/core/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/core/store.ts": {
+      "path": "debug/core/store.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/logger/transport.test.ts": {
+      "path": "debug/logger/transport.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.836Z"
+    },
+    "debug/logger/transport.ts": {
+      "path": "debug/logger/transport.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/cli/index.test.ts": {
+      "path": "debug/cli/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "debug/cli/index.ts": {
+      "path": "debug/cli/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/types.ts": {
+      "path": "debug/types.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/tea/DebugApp.test.ts": {
+      "path": "debug/tea/DebugApp.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/tea/DebugApp.ts": {
+      "path": "debug/tea/DebugApp.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/constants.ts": {
+      "path": "debug/constants.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/mvu/integration.ts": {
+      "path": "debug/mvu/integration.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/constants.test.ts": {
+      "path": "debug/constants.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/index.ts": {
+      "path": "debug/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/index.test.ts": {
+      "path": "debug/jsx/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "debug/jsx/stores/debugWrapperStore.test.ts": {
+      "path": "debug/jsx/stores/debugWrapperStore.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/stores/debugWrapperStore.ts": {
+      "path": "debug/jsx/stores/debugWrapperStore.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/components/tabs/DebugEvents.tsx": {
+      "path": "debug/jsx/components/tabs/DebugEvents.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/components/tabs/DebugScopes.tsx": {
+      "path": "debug/jsx/components/tabs/DebugScopes.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/components/tabs/DebugPerformance.test.tsx": {
+      "path": "debug/jsx/components/tabs/DebugPerformance.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/components/tabs/DebugPerformance.tsx": {
+      "path": "debug/jsx/components/tabs/DebugPerformance.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/components/tabs/DebugOverview.tsx": {
+      "path": "debug/jsx/components/tabs/DebugOverview.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/components/tabs/DebugOverview.test.tsx": {
+      "path": "debug/jsx/components/tabs/DebugOverview.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/components/tabs/DebugEvents.test.tsx": {
+      "path": "debug/jsx/components/tabs/DebugEvents.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.837Z"
+    },
+    "debug/jsx/components/tabs/DebugRender.tsx": {
+      "path": "debug/jsx/components/tabs/DebugRender.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/tabs/DebugConsole.tsx": {
+      "path": "debug/jsx/components/tabs/DebugConsole.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/tabs/DebugRender.test.tsx": {
+      "path": "debug/jsx/components/tabs/DebugRender.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/tabs/DebugConsole.test.tsx": {
+      "path": "debug/jsx/components/tabs/DebugConsole.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/tabs/DebugScopes.test.tsx": {
+      "path": "debug/jsx/components/tabs/DebugScopes.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/DebugToolbar.tsx": {
+      "path": "debug/jsx/components/DebugToolbar.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/DebugLogs.tsx": {
+      "path": "debug/jsx/components/DebugLogs.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/LogsView.tsx": {
+      "path": "debug/jsx/components/LogsView.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/LogsView.test.tsx": {
+      "path": "debug/jsx/components/LogsView.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/RichDebugInterface.test.tsx": {
+      "path": "debug/jsx/components/RichDebugInterface.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/DebugLogs.test.tsx": {
+      "path": "debug/jsx/components/DebugLogs.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/ScopeExplorer.test.tsx": {
+      "path": "debug/jsx/components/ScopeExplorer.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/StateInspector.tsx": {
+      "path": "debug/jsx/components/StateInspector.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/EventList.tsx": {
+      "path": "debug/jsx/components/EventList.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/PerformanceView.tsx": {
+      "path": "debug/jsx/components/PerformanceView.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/ScopeExplorer.tsx": {
+      "path": "debug/jsx/components/ScopeExplorer.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/DebugWrapper.tsx": {
+      "path": "debug/jsx/components/DebugWrapper.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/EventList.test.tsx": {
+      "path": "debug/jsx/components/EventList.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/PerformanceView.test.tsx": {
+      "path": "debug/jsx/components/PerformanceView.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/DebugWrapper.test.tsx": {
+      "path": "debug/jsx/components/DebugWrapper.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/StateInspector.test.tsx": {
+      "path": "debug/jsx/components/StateInspector.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/RichDebugInterface.tsx": {
+      "path": "debug/jsx/components/RichDebugInterface.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/OutputView.tsx": {
+      "path": "debug/jsx/components/OutputView.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/DebugToolbar.test.tsx": {
+      "path": "debug/jsx/components/DebugToolbar.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/components/OutputView.test.tsx": {
+      "path": "debug/jsx/components/OutputView.test.tsx",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/jsx/index.ts": {
+      "path": "debug/jsx/index.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "debug/debug.test.ts": {
+      "path": "debug/debug.test.ts",
+      "status": "unknown",
+      "lastUpdated": "2025-07-29T06:37:47.838Z"
+    },
+    "cli/hooks/README.md": {
+      "path": "cli/hooks/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-29T04:28:10.567Z"
+    },
+    "cli/hooks/pluginHooks.test.ts": {
+      "path": "cli/hooks/pluginHooks.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:32:41.055Z"
+    },
+    "cli/adapters/jsxRuntime.test.ts": {
+      "path": "cli/adapters/jsxRuntime.test.ts",
+      "status": "final",
+      "lastUpdated": "2025-07-29T04:36:25.579Z"
+    },
+    "cli/commands/doctor/index.test.ts": {
+      "path": "cli/commands/doctor/index.test.ts",
+      "status": "fail",
+      "description": "Barrel file (index.ts) should not have a test file.",
+      "lastUpdated": "2025-07-29T06:37:47.839Z"
+    },
+    "cli/config/README.md": {
+      "path": "cli/config/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-29T04:52:53.527Z"
+    },
+    "core/update/reactivity/README.md": {
+      "path": "core/update/reactivity/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-29T05:21:31.533Z"
+    },
+    "core/model/scope/README.md": {
+      "path": "core/model/scope/README.md",
+      "status": "pass",
+      "description": "Documentation file.",
+      "lastUpdated": "2025-07-29T05:21:31.536Z"
+    }
+  }
+}

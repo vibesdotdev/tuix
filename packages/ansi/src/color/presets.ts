@@ -1,0 +1,18 @@
+import * as color from "./utils";
+
+export const black = color.ansi(0);
+export const red = color.ansi(1);
+export const green = color.ansi(2);
+export const yellow = color.ansi(3);
+export const blue = color.ansi(4);
+export const magenta = color.ansi(5);
+export const cyan = color.ansi(6);
+export const white = color.ansi(7);
+export const gray = color.ansi(8);
+export const brightRed = color.ansi(9);
+export const brightGreen = color.ansi(10);
+export const brightYellow = color.ansi(11);
+export const brightBlue = color.ansi(12);
+export const brightMagenta = color.ansi(13);
+export const brightCyan = color.ansi(14);
+export const brightWhite = color.ansi(15);

@@ -1,0 +1,20 @@
+# Monorepo Bun configuration for TUIX
+
+[jsx]
+# Ensure JSX transforms import from the framework package
+factory = "jsx"
+fragment = "Fragment"
+importSource = "@tuix/jsx"
+
+[test]
+coverage = true
+coverageDirectory = "./coverage"
+coverageReporter = ["text", "lcov"]
+# Reasonable default timeout for unit tests
+timeout = 5000
+root = "./"
+ignore = ["node_modules/**", "dist/**", ".git/**"]
+coverageSkipTestFiles = true
+
+[loader]
+".tuix" = "tsx"

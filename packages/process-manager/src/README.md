@@ -1,0 +1,1077 @@
+# Process Manager
+
+## Overview
+
+The Process Manager module provides comprehensive process lifecycle management using Bun's native IPC capabilities. It enables spawning, monitoring, restarting, and coordinating multiple processes with health checking, file watching, resource monitoring, and advanced logging. Built for production-scale process orchestration.
+
+## Installation
+
+```bash
+# Process Manager is included with tuix
+import { ProcessManager, createProcessManager } from 'tuix/process-manager'
+```
+
+## Quick Start
+
+```typescript
+import { createProcessManager } from 'tuix/process-manager'
+
+// Create a process manager
+const manager = await createProcessManager({
+  tuixDir: '.tuix',
+  autoRestart: true,
+  maxRestarts: 5
+})
+
+// Start a process
+await manager.start({
+  name: 'web-server',
+  command: 'bun',
+  args: ['run', 'server.ts'],
+  autostart: true,
+  autorestart: true,
+  env: { PORT: '3000' }
+})
+
+// Monitor process status
+const status = await manager.status('web-server')
+console.log(`Process status: ${status.status}`)
+console.log(`PID: ${status.pid}`)
+console.log(`Restarts: ${status.restarts}`)
+
+// Stop the process
+await manager.stop('web-server')
+```
+
+## Core Concepts
+
+### Process Lifecycle Management
+Complete process lifecycle from spawn to cleanup:
+1. **Configuration**: Define process parameters and behavior
+2. **Starting**: Spawn process with proper environment setup
+3. **Monitoring**: Track health, resources, and output
+4. **Restarting**: Automatic restart on crashes with backoff
+5. **Stopping**: Graceful shutdown with configurable timeouts
+
+### Health Checking
+Multiple health check strategies:
+- **Output Pattern**: Monitor stdout/stderr for success patterns
+- **HTTP Health Check**: Ping HTTP endpoints for liveness
+- **TCP Connection**: Test TCP port connectivity
+- **Custom Script**: Run custom health check scripts
+
+### File Watching
+Automatic process restart on file changes:
+```typescript
+const config = {
+  name: 'api',
+  command: 'bun',
+  args: ['run', 'api.ts'],
+  watch: true,
+  watchPaths: ['src/**/*.ts', 'config/**/*.json'],
+  ignoreWatch: ['logs/**', 'node_modules/**'],
+  watchDebounce: 1000
+}
+```
+
+### Resource Monitoring
+Track memory, CPU, and network usage:
+```typescript
+const stats = await manager.getStats('my-process')
+console.log(`Memory: ${stats.memory}MB`)
+console.log(`CPU: ${stats.cpu}%`)
+console.log(`Uptime: ${stats.uptime}s`)
+```
+
+### Process Groups
+Organize related processes:
+```typescript
+// Start database cluster
+await manager.start({
+  name: 'db-primary',
+  group: 'database',
+  command: 'postgres',
+  args: ['-c', 'config_file=primary.conf']
+})
+
+// Stop entire group
+await manager.stopGroup('database')
+```
+
+## API Reference
+
+### ProcessManager
+
+#### `new ProcessManager(config?: ProcessManagerConfig, cwd?: string)`
+Creates a new process manager instance.
+
+#### `manager.init(): Promise<void>`
+Initializes the process manager and loads existing processes.
+
+#### `manager.start(config: ProcessConfig): Promise<void>`
+Starts a new process with the given configuration.
+
+#### `manager.stop(name: string): Promise<void>`
+Stops a running process gracefully.
+
+#### `manager.restart(name: string): Promise<void>`
+Restarts a process (stops then starts).
+
+#### `manager.status(name: string): Promise<ProcessState>`
+Gets the current status of a process.
+
+#### `manager.list(): Promise<ProcessState[]>`
+Lists all managed processes.
+
+#### `manager.logs(name: string, lines?: number): Promise<ProcessLog[]>`
+Gets recent log entries for a process.
+
+#### `manager.followLogs(name: string, callback: (log: ProcessLog) => void): () => void`
+Follows live log output from a process. Returns unsubscribe function.
+
+#### `manager.getStats(name: string): Promise<ProcessStats>`
+Gets resource usage statistics for a process.
+
+#### `manager.startGroup(group: string): Promise<void>`
+Starts all processes in a group.
+
+#### `manager.stopGroup(group: string): Promise<void>`
+Stops all processes in a group.
+
+#### `manager.cleanup(): Promise<void>`
+Cleans up resources and stops all processes.
+
+### Process Configuration
+
+```typescript
+interface ProcessConfig {
+  name: string              // Unique process name
+  command: string           // Command to execute
+  args?: string[]          // Command arguments
+  cwd?: string             // Working directory
+  env?: Record<string, string>  // Environment variables
+  autostart?: boolean      // Start on manager init
+  autorestart?: boolean    // Restart on crash
+  restartDelay?: number    // Delay before restart (ms)
+  maxRestarts?: number     // Maximum restart attempts
+  watch?: boolean          // Enable file watching
+  watchPaths?: string[]    // Paths to watch
+  ignoreWatch?: string[]   // Paths to ignore
+  watchDebounce?: number   // Debounce delay (ms)
+  logFile?: string         // Log output file
+  errorFile?: string       // Error output file
+  maxMemory?: number       // Memory limit (MB)
+  maxCpu?: number          // CPU limit (percentage)
+  group?: string           // Process group name
+  interpreter?: string     // Process interpreter
+  healthCheck?: HealthCheckConfig  // Health check config
+}
+```
+
+### Health Check Configuration
+
+```typescript
+interface HealthCheckConfig {
+  type: 'output' | 'http' | 'tcp' | 'script'
+  outputPattern?: string | RegExp  // For output type
+  url?: string                     // For HTTP type
+  method?: 'GET' | 'POST' | 'HEAD' // For HTTP type
+  host?: string                    // For TCP type
+  port?: number                    // For TCP type
+  script?: string                  // For script type
+  interval?: number               // Check interval (ms)
+  timeout?: number                // Check timeout (ms)
+  retries?: number                // Retry attempts
+  startPeriod?: number            // Grace period (ms)
+}
+```
+
+## Examples
+
+### Web Application Server
+```typescript
+import { createProcessManager } from 'tuix/process-manager'
+
+const manager = await createProcessManager()
+
+// Start web server with health checking
+await manager.start({
+  name: 'web-server',
+  command: 'bun',
+  args: ['run', 'server.ts'],
+  env: {
+    NODE_ENV: 'production',
+    PORT: '3000'
+  },
+  autostart: true,
+  autorestart: true,
+  maxRestarts: 10,
+  restartDelay: 2000,
+  watch: true,
+  watchPaths: ['src/**/*.ts', 'public/**/*'],
+  ignoreWatch: ['logs/**', 'tmp/**'],
+  healthCheck: {
+    type: 'http',
+    url: 'http://localhost:3000/health',
+    interval: 30000,
+    timeout: 5000,
+    retries: 3
+  },
+  maxMemory: 512, // 512MB limit
+  logFile: './logs/server.log',
+  errorFile: './logs/server.error.log'
+})
+
+// Monitor the server
+setInterval(async () => {
+  const stats = await manager.getStats('web-server')
+  console.log(`Server: ${stats.memory}MB, ${stats.cpu}% CPU, ${Math.floor(stats.uptime / 60)}min uptime`)
+}, 60000)
+```
+
+### Microservices Architecture
+```typescript
+const manager = await createProcessManager({
+  tuixDir: './.tuix',
+  autoRestart: true,
+  maxRestarts: 5
+})
+
+// Start API gateway
+await manager.start({
+  name: 'api-gateway',
+  group: 'api',
+  command: 'bun',
+  args: ['run', 'gateway.ts'],
+  env: { PORT: '8080' },
+  healthCheck: {
+    type: 'http',
+    url: 'http://localhost:8080/health'
+  }
+})
+
+// Start user service
+await manager.start({
+  name: 'user-service',
+  group: 'services',
+  command: 'bun',
+  args: ['run', 'user-service.ts'],
+  env: { PORT: '8001', DATABASE_URL: process.env.USER_DB_URL },
+  healthCheck: {
+    type: 'tcp',
+    host: 'localhost',
+    port: 8001
+  }
+})
+
+// Start order service
+await manager.start({
+  name: 'order-service',
+  group: 'services',
+  command: 'bun',
+  args: ['run', 'order-service.ts'],
+  env: { PORT: '8002', DATABASE_URL: process.env.ORDER_DB_URL },
+  healthCheck: {
+    type: 'tcp',
+    host: 'localhost',
+    port: 8002
+  }
+})
+
+// Start background workers
+await manager.start({
+  name: 'email-worker',
+  group: 'workers',
+  command: 'bun',
+  args: ['run', 'workers/email.ts'],
+  healthCheck: {
+    type: 'output',
+    outputPattern: /Worker ready/,
+    interval: 10000
+  }
+})
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  console.log('Shutting down services...')
+  await manager.stopGroup('services')
+  await manager.stopGroup('workers')
+  await manager.stop('api-gateway')
+  process.exit(0)
+})
+```
+
+### Development with Hot Reload
+```typescript
+const manager = await createProcessManager()
+
+// Development server with file watching
+await manager.start({
+  name: 'dev-server',
+  command: 'bun',
+  args: ['--hot', 'run', 'src/index.ts'],
+  env: {
+    NODE_ENV: 'development',
+    DEBUG: 'true'
+  },
+  watch: true,
+  watchPaths: [
+    'src/**/*.ts',
+    'src/**/*.tsx',
+    'config/**/*.json',
+    'public/**/*'
+  ],
+  ignoreWatch: [
+    'node_modules/**',
+    'dist/**',
+    'logs/**',
+    '**/*.log'
+  ],
+  watchDebounce: 500,
+  autorestart: true,
+  healthCheck: {
+    type: 'output',
+    outputPattern: /Server listening on/,
+    startPeriod: 3000
+  }
+})
+
+// Follow logs for development
+const unfollow = manager.followLogs('dev-server', (log) => {
+  const timestamp = log.timestamp.toISOString()
+  console.log(`[${timestamp}] ${log.level.toUpperCase()}: ${log.message}`)
+})
+
+// Stop following on exit
+process.on('exit', unfollow)
+```
+
+### Database Cluster Management
+```typescript
+const manager = await createProcessManager()
+
+// Primary database
+await manager.start({
+  name: 'postgres-primary',
+  group: 'database',
+  command: 'postgres',
+  args: ['-D', '/var/lib/postgresql/data', '-c', 'config_file=primary.conf'],
+  env: {
+    POSTGRES_DB: 'myapp',
+    POSTGRES_USER: 'app',
+    POSTGRES_PASSWORD: process.env.DB_PASSWORD
+  },
+  healthCheck: {
+    type: 'tcp',
+    host: 'localhost',
+    port: 5432,
+    interval: 5000
+  },
+  maxMemory: 2048
+})
+
+// Read replica
+await manager.start({
+  name: 'postgres-replica',
+  group: 'database',
+  command: 'postgres',
+  args: ['-D', '/var/lib/postgresql/replica', '-c', 'config_file=replica.conf'],
+  env: {
+    POSTGRES_DB: 'myapp',
+    POSTGRES_USER: 'app',
+    POSTGRES_PASSWORD: process.env.DB_PASSWORD
+  },
+  healthCheck: {
+    type: 'tcp',
+    host: 'localhost',
+    port: 5433,
+    interval: 5000
+  },
+  maxMemory: 1024
+})
+
+// Redis cache
+await manager.start({
+  name: 'redis-cache',
+  group: 'cache',
+  command: 'redis-server',
+  args: ['--port', '6379', '--maxmemory', '256mb'],
+  healthCheck: {
+    type: 'tcp',
+    host: 'localhost',
+    port: 6379,
+    interval: 10000
+  }
+})
+```
+
+### Custom Health Checks
+```typescript
+// Script-based health check
+await manager.start({
+  name: 'custom-service',
+  command: 'bun',
+  args: ['run', 'service.ts'],
+  healthCheck: {
+    type: 'script',
+    script: `
+      const response = await fetch('http://localhost:3000/deep-health')
+      const data = await response.json()
+      if (data.status === 'healthy' && data.database === 'connected') {
+        process.exit(0) // Healthy
+      } else {
+        process.exit(1) // Unhealthy
+      }
+    `,
+    interval: 60000,
+    timeout: 10000,
+    retries: 2
+  }
+})
+
+// Output pattern health check
+await manager.start({
+  name: 'worker-service',
+  command: 'bun',
+  args: ['run', 'worker.ts'],
+  healthCheck: {
+    type: 'output',
+    outputPattern: /Worker processed \d+ jobs successfully/,
+    interval: 30000
+  }
+})
+```
+
+## Integration
+
+The Process Manager integrates with all Tuix modules:
+
+- **Logger**: Structured logging for all process events and output
+- **Config**: Process configuration from config files
+- **CLI**: CLI commands for process management
+- **JSX**: React-like components for process monitoring UIs
+- **Core**: Process lifecycle integration with application runtime
+- **Plugins**: Process manager plugin for CLI applications
+
+### JSX Process Monitor Component
+
+```tsx
+import { ProcessMonitor } from 'tuix/process-manager'
+
+const Dashboard = () => (
+  <vstack>
+    <text style={{ bold: true }}>Process Dashboard</text>
+    <ProcessMonitor 
+      processes={['web-server', 'api-gateway', 'worker']}
+      refreshInterval={5000}
+      showLogs={true}
+      showStats={true}
+    />
+  </vstack>
+)
+```
+
+### CLI Integration
+
+```typescript
+// Add process management commands to CLI
+import { ProcessManagerPlugin } from 'tuix/process-manager'
+
+const config = defineConfig({
+  name: 'myapp',
+  plugins: [
+    ProcessManagerPlugin({
+      tuixDir: '.tuix',
+      configFile: 'processes.json'
+    })
+  ]
+})
+
+// Now you have these commands:
+// myapp ps list
+// myapp ps start <name>
+// myapp ps stop <name>
+// myapp ps restart <name>
+// myapp ps logs <name>
+// myapp ps status <name>
+```
+
+### Configuration Integration
+
+```typescript
+// tuix.config.ts
+export default defineConfig({
+  processManager: {
+    tuixDir: '.tuix',
+    autoRestart: true,
+    maxRestarts: 5,
+    processes: [
+      {
+        name: 'web-server',
+        command: 'bun run server.ts',
+        autostart: true,
+        env: { PORT: '3000' }
+      }
+    ]
+  }
+})
+```
+
+## Testing
+
+```bash
+# Run process manager tests
+bun test src/process-manager
+
+# Test process lifecycle
+bun test src/process-manager/lifecycle.test.ts
+
+# Test health checks
+bun test src/process-manager/health.test.ts
+
+# Test file watching
+bun test src/process-manager/watcher.test.ts
+```
+
+## Contributing
+
+See [contributing.md](../contributing.md) for development setup and guidelines.
+
+## License
+
+MIT
+
+# Tuix Process Manager
+
+The Tuix Process Manager provides robust process orchestration for development environments, with cross-platform support, automatic restart capabilities, integrated logging, and **automatic state persistence** across CLI invocations.
+
+## Key Features
+
+- **Automatic State Persistence**: Processes persist across CLI invocations
+- **Lazy Initialization**: No need to manually call `init()` anymore
+- **Config Integration**: Works seamlessly with Tuix config system
+- **Cross-Platform**: Works on macOS, Linux, and Windows
+- **Process Recovery**: Automatically reconnects to running processes
+- **IPC Communication**: Reliable inter-process communication
+
+## Quick Start
+
+### Basic Usage in JSX CLI (with State Persistence)
+
+```tsx
+import { jsx, Plugin, Command } from 'tuix'
+import { createConfiguredProcessManager, ProcessMonitor } from 'tuix/process-manager'
+import { config } from 'tuix/config'
+
+const DevCLI = () => {
+  // Create app config that persists state
+  const appConfig = await config.cli('dev-cli')
+
+  return (
+    <Plugin name="dev" description="Development environment">
+      <Command
+        name="start"
+        description="Start all development processes"
+        handler={async () => {
+          // ProcessManager automatically initializes and recovers state
+          const pm = await createConfiguredProcessManager(appConfig)
+
+          // Add your processes (only if not already added)
+          if (!pm.status('frontend')) {
+            await pm.add({
+              name: 'frontend',
+              command: 'bun',
+              args: ['run', 'dev'],
+              cwd: './frontend',
+              autostart: true
+            })
+          }
+
+          if (!pm.status('backend')) {
+            await pm.add({
+              name: 'backend',
+              command: 'bun',
+              args: ['run', 'server'],
+              cwd: './backend',
+              autostart: true,
+              env: {
+                PORT: '3001'
+              }
+            })
+          }
+
+          // Start all processes
+          const result = await pm.startAll()
+
+          if (result.success) {
+            return <text color="green">✅ All processes started successfully!</text>
+          } else {
+            return (
+              <vstack>
+                <text color="red">❌ Some processes failed to start:</text>
+                {result.failures.map(failure => (
+                  <text color="gray">  • {failure}</text>
+                ))}
+              </vstack>
+            )
+          }
+        }}
+      />
+
+      <Command
+        name="status"
+        description="Show process status"
+        handler={async () => {
+          // ProcessManager recovers state automatically
+          const pm = await createConfiguredProcessManager(appConfig)
+          const processes = pm.list() // Shows all processes from previous runs!
+
+          if (processes.length === 0) {
+            return <text color="gray">No processes configured. Run 'dev start' first.</text>
+          }
+
+          return (
+            <vstack>
+              {processes.map(proc => (
+                <hstack>
+                  <text color={proc.status === 'running' ? 'green' : 'red'}>
+                    {proc.status === 'running' ? '●' : '○'}
+                  </text>
+                  <text> {proc.name}: {proc.status}</text>
+                  {proc.pid && <text color="gray"> (PID: {proc.pid})</text>}
+                </hstack>
+              ))}
+            </vstack>
+          )
+        }}
+      />
+
+      <Command
+        name="monitor"
+        description="Interactive process monitor"
+        interactive={true}
+        handler={async () => {
+          const pm = await createConfiguredProcessManager(appConfig)
+          return <ProcessMonitor processManager={pm} />
+        }}
+      />
+
+      <Command
+        name="stop"
+        description="Stop all processes"
+        handler={async () => {
+          const pm = await createConfiguredProcessManager(appConfig)
+          await pm.stopAll()
+          return <text color="yellow">🛑 All processes stopped</text>
+        }}
+      />
+    </Plugin>
+  )
+}
+
+jsx(<DevCLI />)
+```
+
+## State Persistence (NEW!)
+
+ProcessManager now automatically persists state between CLI invocations:
+
+```bash
+# First invocation - starts processes
+$ bun my-cli dev start
+✅ All processes started successfully!
+
+# Second invocation - shows running processes from first invocation!
+$ bun my-cli dev status
+● frontend: running (PID: 12345)
+● backend: running (PID: 12346)
+
+# Even after terminal restart, state persists
+$ bun my-cli dev stop
+🛑 All processes stopped
+```
+
+### How It Works
+
+1.  **Config Integration**: When you provide an app config, ProcessManager saves state to it
+2.  **Lazy Initialization**: No need to call `init()` - it happens automatically
+3.  **Automatic Recovery**: On startup, ProcessManager recovers running processes
+4.  **Dual Persistence**: State is saved to both config and `.tuix/` directory
+
+### Manual Usage (without Config)
+
+```typescript
+// Old way still works but doesn't persist between invocations
+const pm = new ProcessManager()
+await pm.init() // Must manually init
+
+// New way with persistence
+const appConfig = await config.cli('my-app')
+const pm = await createConfiguredProcessManager(appConfig)
+// No init needed - automatic!
+```
+
+## Process Configuration
+
+### Basic Process Config
+
+```typescript
+interface ProcessConfig {
+  name: string              // Unique process identifier
+  command: string           // Command to execute
+  args?: string[]          // Command arguments
+  cwd?: string             // Working directory
+  env?: Record<string, string>  // Environment variables
+  autostart?: boolean      // Start automatically (default: true)
+  restartPolicy?: 'always' | 'on-failure' | 'never'
+  restartDelay?: number    // Delay between restarts (ms)
+  maxRestarts?: number     // Maximum restart attempts
+}
+```
+
+### Example Configurations
+
+```typescript
+// Web server with auto-restart
+await pm.add({
+  name: 'api-server',
+  command: 'bun',
+  args: ['server.ts'],
+  cwd: './api',
+  env: {
+    NODE_ENV: 'development',
+    PORT: '3000'
+  },
+  restartPolicy: 'on-failure',
+  maxRestarts: 5,
+  restartDelay: 2000
+})
+
+// Build watcher
+await pm.add({
+  name: 'build-watch',
+  command: 'bun',
+  args: ['build', '--watch'],
+  cwd: './src',
+  autostart: true
+})
+
+// Database process
+await pm.add({
+  name: 'postgres',
+  command: 'postgres',
+  args: ['-D', './data'],
+  env: {
+    PGPORT: '5432'
+  },
+  restartPolicy: 'always'
+})
+```
+
+## Interactive Process Monitor
+
+The ProcessMonitor component provides a real-time view of all processes:
+
+```tsx
+import { ProcessMonitor } from 'tuix/process-manager'
+
+// In your command handler
+handler={() => <ProcessMonitor refreshInterval={1000} />}
+```
+
+Features:
+
+- Real-time status updates
+- CPU and memory usage
+- Log viewing
+- Interactive controls (start/stop/restart)
+- Color-coded status indicators
+
+## Advanced Features
+
+### Process Groups
+
+Group related processes for coordinated management:
+
+```typescript
+pm.createGroup({
+  name: 'backend-services',
+  processes: ['api', 'worker', 'scheduler'],
+  startOrder: 'sequential',  // or 'parallel'
+  stopOrder: 'sequential'
+})
+
+// Start entire group
+await pm.startGroup('backend-services')
+```
+
+### Event Streaming
+
+React to process events:
+
+```typescript
+import { Effect, Stream } from 'effect'
+
+const eventStream = pm.events
+
+await Effect.runPromise(
+  Stream.runForEach(eventStream, event => {
+    console.log(`Process ${event.process}: ${event.type}`)
+
+    if (event.type === 'error') {
+      // Handle process errors
+      console.error(event.data.error)
+    }
+  })
+)
+```
+
+### Health Checks
+
+Configure health checks for processes:
+
+```typescript
+await pm.add({
+  name: 'web-app',
+  command: 'bun',
+  args: ['app.ts'],
+  healthCheck: {
+    type: 'http',
+    url: 'http://localhost:3000/health',
+    interval: 30000,
+    timeout: 5000,
+    retries: 3
+  }
+})
+```
+
+## Integration with Effect
+
+The ProcessManager integrates seamlessly with Effect for dependency injection:
+
+```typescript
+import { Effect, Layer } from 'effect'
+import { ProcessManagerLayer, pm } from 'tuix/process-manager'
+import { LoggerLayer } from 'tuix/logger'
+
+// Create a program that uses ProcessManager
+const program = Effect.gen(function* (_) {
+  // Add a process
+  yield* _(pm.add({
+    name: 'my-service',
+    command: 'bun',
+    args: ['service.ts']
+  }))
+
+  // Start it
+  yield* _(pm.start('my-service'))
+
+  // Get status
+  const status = yield* _(pm.status('my-service'))
+  console.log(status)
+})
+
+// Run with dependencies
+await Effect.runPromise(
+  program.pipe(
+    Effect.provide(ProcessManagerLayer()),
+    Effect.provide(LoggerLayer)
+  )
+)
+```
+
+## CLI Integration
+
+### Complete Example CLI
+
+```tsx
+import { jsx } from 'tuix/jsx'
+import { Plugin, Command, Flag, Arg } from 'tuix/cli/jsx'
+import { ProcessManager, ProcessMonitor } from 'tuix/process-manager'
+
+const CLI = () => {
+  const pm = new ProcessManager({ tuixDir: '.dev' })
+
+  return (
+    <Plugin name="dev" description="Development environment manager">
+      <Command
+        name="add"
+        description="Add a new process"
+        handler={async ({ args, flags }) => {
+          await pm.init()
+
+          await pm.add({
+            name: args.name,
+            command: args.command,
+            args: args.args?.split(' '),
+            cwd: flags.cwd,
+            autostart: !flags.noAutostart
+          })
+
+          return <text color="green">✅ Added process: {args.name}</text>
+        }}
+      >
+        <Arg name="name" required description="Process name" />
+        <Arg name="command" required description="Command to run" />
+        <Arg name="args" description="Command arguments" />
+        <Flag name="cwd" alias="d" description="Working directory" />
+        <Flag name="no-autostart" description="Don't start automatically" />
+      </Command>
+
+      <Command
+        name="start"
+        description="Start process(es)"
+        handler={async ({ args }) => {
+          await pm.init()
+
+          if (args.name) {
+            await pm.start(args.name)
+            return <text color="green">✅ Started: {args.name}</text>
+          } else {
+            const result = await pm.startAll()
+            return result.success
+              ? <text color="green">✅ All processes started</text>
+              : <text color="red">❌ Some processes failed</text>
+          }
+        }}
+      >
+        <Arg name="name" description="Process name (omit for all)" />
+      </Command>
+
+      <Command
+        name="monitor"
+        description="Interactive process monitor"
+        interactive={true}
+        handler={() => <ProcessMonitor />}
+      />
+
+      <Command
+        name="logs"
+        description="View process logs"
+        handler={async ({ args, flags }) => {
+          await pm.init()
+          const logs = await pm.getLogs(args.name, flags.lines)
+
+          return (
+            <vstack>
+              <text bold>Logs for {args.name}:</text>
+              {logs.map(log => (
+                <text color={log.level === 'error' ? 'red' : 'gray'}>
+                  [{log.timestamp.toISOString()}] {log.message}
+                </text>
+              ))}
+            </vstack>
+          )
+        }}
+      >
+        <Arg name="name" required description="Process name" />
+        <Flag name="lines" alias="n" type="number" default={50} description="Number of lines" />
+      </Command>
+    </Plugin>
+  )
+}
+
+jsx(<CLI />)
+```
+
+## Best Practices
+
+1.  **Always initialize**: Call `pm.init()` before any operations
+2.  **Use descriptive names**: Process names should clearly indicate their purpose
+3.  **Set working directories**: Always specify `cwd` for proper file resolution
+4.  **Configure restart policies**: Choose appropriate policies for each process type
+5.  **Monitor logs**: Use the `.tuix/logs/` directory for debugging
+6.  **Clean shutdown**: Use `pm.stopAll()` or handle SIGTERM properly
+
+## Troubleshooting
+
+### Common Issues
+
+1.  **"Command not found"**: Ensure the command is in PATH or use absolute paths
+2.  **"Process already exists"**: Remove the process first with `pm.remove(name)`
+3.  **"IPC connection failed"**: Check `.tuix/sockets/` permissions
+4.  **Orphaned processes**: Run `pm.init()` to detect and clean up orphans
+
+### Debug Mode
+
+Enable debug logging:
+
+```bash
+TUIX_DEBUG=true bun your-cli.tsx
+```
+
+This will show detailed information about process spawning, IPC connections, and state management.
+
+## API Reference
+
+### ProcessManager Methods
+
+- `init()`: Initialize the manager and recover existing processes
+- `add(config)`: Add a new process configuration
+- `remove(name)`: Remove a process
+- `start(name)`: Start a specific process
+- `stop(name)`: Stop a specific process
+- `restart(name)`: Restart a process
+- `startAll()`: Start all processes with autostart enabled
+- `stopAll()`: Stop all running processes
+- `status(name?)`: Get status of one or all processes
+- `list()`: List all configured processes
+- `getLogs(name, lines?)`: Retrieve process logs
+- `save()`: Persist current state to disk
+- `shutdown()`: Clean shutdown of manager
+
+### Events
+
+The ProcessManager emits these events via the `events` stream:
+
+- `starting`: Process is starting
+- `started`: Process successfully started
+- `stopping`: Process is stopping
+- `stopped`: Process stopped
+- `error`: Process encountered an error
+- `log`: New log entry from process
+- `health`: Health check result
+
+## Migration from Other Tools
+
+### From PM2
+
+```javascript
+// PM2 config
+module.exports = {
+  apps: [{
+    name: 'api',
+    script: 'server.js',
+    env: { PORT: 3000 }
+  }]
+}
+
+// Tuix equivalent
+await pm.add({
+  name: 'api',
+  command: 'node',
+  args: ['server.js'],
+  env: { PORT: '3000' }
+})
+```
+
+### From Foreman/Overmind
+
+```procfile
+web: bun run dev
+api: bun server.ts
+worker: bun worker.ts
+```
+
+```typescript
+// Tuix equivalent
+const processes = [
+  { name: 'web', command: 'bun', args: ['run', 'dev'] },
+  { name: 'api', command: 'bun', args: ['server.ts'] },
+  { name: 'worker', command: 'bun', args: ['worker.ts'] }
+]
+
+for (const proc of processes) {
+  await pm.add(proc)
+}
+```

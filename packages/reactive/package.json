@@ -1,0 +1,59 @@
+{
+  "name": "@tuix/reactive",
+  "version": "1.0.0-rc.3",
+  "description": "Reactivity system with runes, scopes, and JSX lifecycle management",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./runes": {
+      "types": "./src/runes/index.ts",
+      "import": "./src/runes/index.ts",
+      "default": "./src/runes/index.ts"
+    },
+    "./scope": {
+      "types": "./src/scope/index.ts",
+      "import": "./src/scope/index.ts",
+      "default": "./src/scope/index.ts"
+    },
+    "./events": {
+      "types": "./src/events/index.ts",
+      "import": "./src/events/index.ts",
+      "default": "./src/events/index.ts"
+    },
+    "./*": {
+      "types": "./src/*",
+      "import": "./src/*",
+      "default": "./src/*"
+    }
+  },
+  "scripts": {
+    "build": "bun build --target=bun --minify --splitting src/index.ts --outdir=dist/",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit --pretty false"
+  },
+  "dependencies": {
+    "@tuix/core": "workspace:*",
+    "effect": "^3.16.9"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "bun": "^1.0.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  }
+}
