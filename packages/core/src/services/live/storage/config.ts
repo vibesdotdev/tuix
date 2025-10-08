@@ -5,7 +5,7 @@
  */
 
 import { Effect, Ref, Stream } from 'effect'
-import { StorageError } from '../../../types/errors'
+import { StorageError } from '../../../types/errors/base'
 import { StorageUtils } from '../../storage'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
@@ -110,21 +110,159 @@ export class ConfigStorage {
       Ref.set(this.configStore, new Map())
     })
   }
+
+  /**
+   * Load configuration from standard locations with schema validation
+   */
+  loadConfig<T>(
+    appName: string,
+    schema: z.ZodSchema<T>,
+    defaults: T
+  ): Effect.Effect<T, StorageError> {
+    return Effect.gen(function* (_) {
+      const configPath = yield* _(Effect.sync(() => {
+        const homeDir = process.env.HOME || process.env.USERPROFILE || '~'
+        return path.join(homeDir, '.config', appName, 'config.json')
+      }))
+
+      // Try to load from file
+      const fileExists = yield* _(
+        Effect.tryPromise({
+          try: () => fs.access(configPath).then(() => true).catch(() => false),
+          catch: () => new StorageError({
+            path: configPath,
+            operation: 'read',
+            message: 'Failed to check config file'
+          })
+        })
+      )
+
+      if (!fileExists) {
+        return defaults
+      }
+
+      const data = yield* _(
+        Effect.tryPromise({
+          try: () => fs.readFile(configPath, 'utf-8'),
+          catch: (error) => new StorageError({
+            path: configPath,
+            operation: 'read',
+            cause: error,
+            message: `Failed to read config from ${configPath}`
+          })
+        })
+      )
+
+      const parsed = yield* _(
+        Effect.try({
+          try: () => JSON.parse(data),
+          catch: (error) => new StorageError({
+            path: configPath,
+            operation: 'parse',
+            cause: error,
+            message: 'Failed to parse config JSON'
+          })
+        })
+      )
+
+      // Validate with schema
+      const validated = yield* _(
+        Effect.try({
+          try: () => schema.parse(parsed),
+          catch: (error) => new StorageError({
+            path: configPath,
+            operation: 'validate',
+            cause: error,
+            message: 'Config validation failed'
+          })
+        })
+      )
+
+      return validated
+    })
+  }
+
+  /**
+   * Save configuration to user config directory
+   */
+  saveConfig<T>(
+    appName: string,
+    config: T,
+    schema: z.ZodSchema<T>
+  ): Effect.Effect<void, StorageError> {
+    return Effect.gen(function* (_) {
+      // Validate first
+      const validated = yield* _(
+        Effect.try({
+          try: () => schema.parse(config),
+          catch: (error) => new StorageError({
+            path: appName,
+            operation: 'validate',
+            cause: error,
+            message: 'Config validation failed before save'
+          })
+        })
+      )
+
+      const configPath = yield* _(Effect.sync(() => {
+        const homeDir = process.env.HOME || process.env.USERPROFILE || '~'
+        return path.join(homeDir, '.config', appName, 'config.json')
+      }))
+
+      const configDir = path.dirname(configPath)
+
+      // Ensure directory exists
+      yield* _(
+        Effect.tryPromise({
+          try: () => fs.mkdir(configDir, { recursive: true }),
+          catch: (error) => new StorageError({
+            path: configDir,
+            operation: 'write',
+            cause: error,
+            message: 'Failed to create config directory'
+          })
+        })
+      )
+
+      // Write config
+      yield* _(
+        Effect.tryPromise({
+          try: () => fs.writeFile(configPath, JSON.stringify(validated, null, 2), 'utf-8'),
+          catch: (error) => new StorageError({
+            path: configPath,
+            operation: 'write',
+            cause: error,
+            message: 'Failed to write config file'
+          })
+        })
+      )
+    })
+  }
+
+  /**
+   * Get the path to the user config file
+   */
+  getConfigPath(appName: string): Effect.Effect<string, StorageError> {
+    return Effect.sync(() => {
+      const homeDir = process.env.HOME || process.env.USERPROFILE || '~'
+      return path.join(homeDir, '.config', appName, 'config.json')
+    })
+  }
+
+  /**
+   * Watch configuration file for changes
+   */
+  watchConfig<T>(
+    appName: string,
+    schema: z.ZodSchema<T>
+  ): Effect.Effect<Effect.Effect<T, StorageError>, StorageError> {
+    return Effect.gen(function* (_) {
+      const configPath = yield* _(this.getConfigPath(appName))
+
+      // Return an effect that represents the stream of changes
+      // For now, just return a simple effect that reads once
+      // TODO: Implement actual file watching
+      return this.loadConfig(appName, schema, {} as T)
+    })
+  }
 }
-```
-
-Now let me also fix the cache.ts file:
-
-<tool_call>
-<function=edit_file>
-<parameter=path>
-tuix/packages/core/src/services/live/storage/cache.ts
-</parameter>
-<parameter=mode>
-edit
-</parameter>
-<parameter=display_description>
-Fix cache storage error import to use proper package path
-</parameter>
-</function>
-</tool_call>

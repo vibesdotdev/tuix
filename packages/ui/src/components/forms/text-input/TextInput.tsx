@@ -40,7 +40,7 @@ import { isBindableRune, isStateRune } from '@tuix/reactive/runes/runes'
 import type { View } from '@tuix/view/primitives/view'
 import { text, hstack } from '@tuix/view/primitives/view'
 import { style, colors, border } from '@tuix/ansi'
-import { createTextInputStore, type TextInputStore } from '@tuix/ui/stores/textInputStore'
+import { createTextInputStore, type TextInputStore } from '../../../stores/textInputStore'
 
 // Types
 export type EchoMode = 'normal' | 'password' | 'none'

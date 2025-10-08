@@ -16,6 +16,36 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./services": {
+      "types": "./src/services/index.ts",
+      "import": "./src/services/index.ts",
+      "default": "./src/services/index.ts"
+    },
+    "./types": {
+      "types": "./src/types/index.ts",
+      "import": "./src/types/index.ts",
+      "default": "./src/types/index.ts"
+    },
+    "./services/live": {
+      "types": "./src/services/live/index.ts",
+      "import": "./src/services/live/index.ts",
+      "default": "./src/services/live/index.ts"
+    },
+    "./services/live/terminal": {
+      "types": "./src/services/live/terminal.ts",
+      "import": "./src/services/live/terminal.ts",
+      "default": "./src/services/live/terminal.ts"
+    },
+    "./services/live/renderer": {
+      "types": "./src/services/live/renderer.ts",
+      "import": "./src/services/live/renderer.ts",
+      "default": "./src/services/live/renderer.ts"
+    },
+    "./services/live/storage": {
+      "types": "./src/services/live/storage.ts",
+      "import": "./src/services/live/storage.ts",
+      "default": "./src/services/live/storage.ts"
+    },
     "./*": {
       "types": "./src/*",
       "import": "./src/*",
@@ -31,16 +61,13 @@
     "@effect/schema": "^0.75.5",
     "@tuix/input": "workspace:*",
     "@tuix/runtime": "workspace:*",
-    "effect": "^3.16.9"
+    "effect": "^3.16.9",
+    "@tuix/ansi": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
+    "typescript": "^5.3.0",
+    "@tuix/reactive": "workspace:*",
+    "@tuix/view": "workspace:*"
   }
 }

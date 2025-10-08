@@ -8,4 +8,6 @@ export {
 
 export { visualWidth, truncate, pad } from './width'
 
-export { escape, sequence, colorize } from './escape'
+export { escape, sequence } from './escape'
+// TODO: Re-export colorize when ANSI_CODES is implemented
+// export { colorize } from './escape'

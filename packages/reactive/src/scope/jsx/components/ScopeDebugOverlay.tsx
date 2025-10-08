@@ -7,9 +7,9 @@
 
 import { Effect } from 'effect'
 import { scopeManager } from '../../manager'
-import { text, vstack, hstack } from '../../../../view/primitives/view'
+import { text, vstack, hstack } from '@tuix/view/primitives/view'
 import { colors, toAnsiSequence, ColorProfile, type Color } from '@tuix/ansi'
-import type { View } from '../../../../types'
+import type { View } from '@tuix/core/types'
 import { TerminalService } from '../../../../services'
 import { RendererService } from '../../../../services'
 

@@ -1,23 +1,4 @@
-/**
- * Border Effects - Terminal UI border styling utilities
- *
- * Provides complex border styles for terminal UI applications.
- */
-
-import { type Color } from '../color'
-import { type GradientConfig } from '../gradient'
-import { type PatternConfig } from './pattern'
-
-/**
- * Complex border style configuration
- */
-export interface BorderStyle {
-  readonly type: 'solid' | 'dashed' | 'dotted' | 'double' | 'gradient' | 'pattern'
-  readonly width: number
-  readonly color?: Color
-  readonly gradient?: GradientConfig
-  readonly pattern?: PatternConfig
-}
+import type { BorderStyle } from "../types"
 
 /**
  * Create a styled border

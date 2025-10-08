@@ -8,20 +8,6 @@ import type {
   VerticalAlign,
 } from '../types'
 
-const normalizeSpacing = (values: number[]): [number, number, number, number] => {
-  if (values.length === 0) return [0, 0, 0, 0]
-  if (values.length === 1) {
-    const [all] = values
-    return [all, all, all, all]
-  }
-  if (values.length === 2) {
-    const [vertical, horizontal] = values
-    return [vertical, horizontal, vertical, horizontal]
-  }
-  const [top, right, bottom, left] = values as [number, number, number, number]
-  return [top, right, bottom, left]
-}
-
 export class Style extends Data.Class<{ props: StyleProps }> {
   constructor(props: Partial<StyleProps> = {}) {
     super({ props: { ...props } })

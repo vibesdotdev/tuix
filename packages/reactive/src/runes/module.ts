@@ -9,7 +9,7 @@ import { ModuleBase, ModuleError } from '@tuix/runtime'
 import type { EventBus, BaseEvent } from '@tuix/reactive/events/event-bus'
 import type { RuneEvent, StateEvent, EffectEvent, RuneHandle } from './events'
 import { ReactivityEventChannels } from './events'
-import { JSXEventChannels } from '@tuix/jsx/events'
+import { JSXEventChannels } from '../events/channels'
 import type { LifecycleEvent } from './events'
 
 /**

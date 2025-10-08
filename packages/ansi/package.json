@@ -93,18 +93,11 @@
     }
   },
   "scripts": {
-    "build": "bun build --target=bun --minify --splitting src/index.ts --outdir=dist/",
     "test": "bun test",
     "typecheck": "tsc --noEmit --pretty false"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
+    "typescript": "^5.9.3"
   }
 }

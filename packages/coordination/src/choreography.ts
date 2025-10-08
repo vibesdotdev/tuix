@@ -10,7 +10,10 @@ import { Effect } from 'effect'
 import type { EventBus } from '@tuix/reactive/events/event-bus'
 import { ModuleBase, ModuleError } from '@tuix/runtime'
 import type { ProcessEvent, ProcessOutputEvent, ProcessHealthEvent } from '@tuix/process-manager/events'
-import type { CLICommandEvent, CLIParseEvent } from '@tuix/cli/core/events'
+// TODO: Create @tuix/cli package or define these types
+// import type { CLICommandEvent, CLIParseEvent } from '@tuix/cli/core/events'
+type CLICommandEvent = any
+type CLIParseEvent = any
 import type { ConfigEvent } from '@tuix/config/core/events'
 import type { LogEvent } from '@tuix/logger/core/events'
 import { SUBMODULE_NAMES } from './constants'

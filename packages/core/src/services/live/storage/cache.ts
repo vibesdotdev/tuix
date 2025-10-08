@@ -5,7 +5,7 @@
  */
 
 import { Effect, Ref } from 'effect'
-import { StorageError } from '../../../types/errors'
+import { StorageError } from '../../../types/errors/base'
 import { z } from 'zod'
 
 interface CacheEntry {

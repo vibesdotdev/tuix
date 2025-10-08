@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-/** @jsxImportSource tuix */
+/** @jsxImportSource @tuix/jsx */
 
 /**
  * Process Manager Plugin for JSX CLI Applications
@@ -7,12 +7,12 @@
  * Provides process management commands integrated with the CLI framework
  */
 
-import type { JSXCommandContext } from "@tuix/cli";
+import type { JSXCommandContext } from "@tuix/bin";
 import { ProcessManager as ProcessManagerClass } from "./manager";
 import { ProcessMonitor } from "./index";
 import { createConsoleLogger } from "@tuix/logger";
 import { PrettyLogEntry } from "@tuix/logger";
-import { runApp } from "@tuix/core";
+import { runApp } from "@tuix/runtime";
 import { LiveServices } from "@tuix/core";
 import { Effect } from "effect";
 import type { ProcessConfig } from "./types";

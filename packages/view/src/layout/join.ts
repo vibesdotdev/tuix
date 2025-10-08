@@ -5,7 +5,7 @@
  */
 
 import { Effect } from 'effect'
-import { stringWidth } from '@tuix/core/terminal/output/string/width'
+import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
 
 /**

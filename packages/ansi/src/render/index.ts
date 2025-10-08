@@ -254,3 +254,23 @@ export const renderLines = (
   style: Style | StyleProps,
   options: RenderOptions = {}
 ): string[] => renderStyled(input, style, options).split('\n')
+
+/**
+ * Convert style props to ANSI escape sequence
+ */
+export const toAnsiStyleCode = (props: StyleProps, profile: ColorProfile = ColorProfile.TrueColor): string => {
+  let sequence = ''
+
+  // Add color sequences
+  if (props.foreground) {
+    sequence += toAnsiSequence(props.foreground, profile, false)
+  }
+  if (props.background) {
+    sequence += toAnsiSequence(props.background, profile, true)
+  }
+
+  // Add decoration sequences
+  sequence += buildDecorationSequence(props)
+
+  return sequence
+}

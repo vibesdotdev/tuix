@@ -12,6 +12,7 @@ export { LogExplorer } from './components/LogExplorer'
 export * from './components/LogComponents'
 export { LiveLogDashboard, ProcessLogView } from './components/LiveLogDashboard'
 export * from './core/presets'
+export * from './core/module'
 
 import { Effect, Layer, Context } from 'effect'
 import type { Logger, LoggerConfig, LogLevel } from './types'

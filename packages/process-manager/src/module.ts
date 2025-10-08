@@ -6,7 +6,7 @@
  */
 
 import { Effect } from "effect";
-import { ModuleBase, ModuleError } from "@tuix/core";
+import { ModuleBase, ModuleError } from "@tuix/runtime";
 import type { EventBus } from "@tuix/core";
 import type {
   ProcessEvent,

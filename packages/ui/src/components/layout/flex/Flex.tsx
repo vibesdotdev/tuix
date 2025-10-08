@@ -31,7 +31,7 @@
 
 import { jsx } from '@tuix/jsx'
 import type { View } from '@tuix/view/primitives/view'
-import { Box, type BoxProps } from '@tuix/ui/components/layout/box'
+import { Box, type BoxProps } from '../box'
 
 // Types
 export interface FlexProps extends Omit<BoxProps, 'direction'> {

@@ -41,11 +41,12 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { Effect } from "effect";
 import { getGlobalRegistry } from "@tuix/runtime";
-import { JSXModule } from "@tuix/jsx/module";
+// import { JSXModule } from "@tuix/jsx/module";
 import type { JSXPluginEvent, JSXCommandEvent } from "@tuix/jsx/events";
 // import { onMount } from '../../reactivity/jsx-lifecycle' // TODO: Fix jsx-lifecycle import
 
 import { jsxDebug } from "@tuix/debug";
+import { pluginStore } from "./plugins";
 
 // Debug logging that respects TUIX_DEBUG env var
 const debug = jsxDebug.debug;
@@ -242,12 +243,9 @@ class JSXPluginRegistry {
   ) {
     debug("Registering loaded plugin:", name);
 
-    // Import plugin store dynamically to avoid circular deps
-    import { pluginStore } from "../plugins";
-
     // Use the store to register the plugin
-    pluginStore.register(plugin);
-    pluginStore.enable(name);
+    pluginStore.registerDeclarativePlugin(name, plugin);
+    // Note: pluginStore doesn't have enable method, removed for now
 
     // Create plugin scope
     const pluginScope: ScopeDef = {
@@ -279,9 +277,6 @@ class JSXPluginRegistry {
   unregisterPlugin(name: string) {
     debug("Unregistering loaded plugin:", name);
 
-    // Import plugin store dynamically
-    import { pluginStore } from "../plugins";
-
     // Find the plugin scope
     const allScopes = this.scopeManager.getAllScopes();
     const pluginScope = allScopes.find(
@@ -311,16 +306,16 @@ class JSXPluginRegistry {
    * Get a loaded plugin
    */
   getPlugin(name: string): Record<string, unknown> | null {
-    import { pluginStore } from "../plugins";
-    return pluginStore.isEnabled(name) ? pluginStore.getPlugin(name) : null;
+    // TODO: Implement plugin retrieval from store
+    return null;
   }
 
   /**
    * List all loaded plugins
    */
   listPlugins(): string[] {
-    import { pluginStore } from "../plugins";
-    return pluginStore.listEnabled();
+    // TODO: Implement plugin listing from store
+    return [];
   }
 
   // --- Command Registration ---

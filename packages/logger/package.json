@@ -28,16 +28,13 @@
     "typecheck": "tsc --noEmit --pretty false"
   },
   "dependencies": {
-    "@tuix/core": "workspace:*"
+    "@tuix/core": "workspace:*",
+    "@tuix/ansi": "workspace:*",
+    "@tuix/process-manager": "workspace:*",
+    "@tuix/reactive": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
   }
 }

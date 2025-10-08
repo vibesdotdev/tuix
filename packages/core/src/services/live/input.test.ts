@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
 import { Effect, Stream, Queue } from 'effect'
 import { InputServiceLive } from './input'
-import { KeyType } from '@tuix/input/keys'
+import { KeyType } from '@tuix/input/keyboard'
 
 describe('Input Service Implementation', () => {
   describe('Key event parsing', () => {

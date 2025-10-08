@@ -31,16 +31,12 @@
     "@tuix/core": "workspace:*",
     "@tuix/ansi": "workspace:*",
     "@tuix/view": "workspace:*",
-    "@tuix/reactive": "workspace:*"
+    "@tuix/reactive": "workspace:*",
+    "@tuix/runtime": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
+    "typescript": "^5.3.0",
+    "@tuix/jsx": "workspace:*"
   }
 }

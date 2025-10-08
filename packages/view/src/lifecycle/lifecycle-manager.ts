@@ -1,7 +1,6 @@
 import { Effect, Ref, Duration } from 'effect'
-import { EventBus } from '../../model/events/event-bus'
+import { EventBus, generateId } from '@tuix/reactive/events/event-bus'
 import type { ScopeContext } from '../../scope'
-import { generateId } from '../../model/events/event-bus'
 
 // Error types
 export class ComponentError extends Error {

@@ -5,7 +5,7 @@
  */
 
 import { Effect } from 'effect'
-import { StorageError } from '../../../types/errors'
+import { StorageError } from '../../../types/errors/base'
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
 import { z } from 'zod'

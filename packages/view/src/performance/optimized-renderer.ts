@@ -1,7 +1,6 @@
 import { Effect } from 'effect'
-import { EventBus } from '../../model/events/event-bus'
+import { EventBus, generateId } from '@tuix/reactive/events/event-bus'
 import { ComponentLifecycleManager } from '../lifecycle/lifecycle-manager'
-import { generateId } from '../../model/events/event-bus'
 
 // Error types
 export class RenderError extends Error {

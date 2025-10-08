@@ -4,8 +4,8 @@
  * Reusable components for displaying logs with proper formatting and colors
  */
 
-import { View, text, hstack, vstack, styledText } from "@tuix/core";
-import { style, color, colors } from "@tuix/core";
+import { View, text, hstack, vstack, styledText } from "@tuix/view";
+import { style, color, colors } from "@tuix/ansi";
 import type { LogLevel } from "@tuix/logger/types";
 
 // Level colors matching the formatters

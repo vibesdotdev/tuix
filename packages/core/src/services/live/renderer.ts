@@ -4,11 +4,11 @@
 import { Effect, Equal, Layer, Option, Ref, pipe } from "effect";
 
 import type { StyleProps as AnsiStyle } from "@tuix/ansi";
-import { stringWidth } from "../../../view/string/width";
+import { stringWidth } from "@tuix/view/string/width";
 import { RendererService } from "../renderer";
 import { TerminalService } from "../terminal";
 import type { View } from "../../../types/core";
-import { RenderError } from "../../../types/errors";
+import { RenderError } from "../../types/errors";
 import type { Viewport } from "../../../types/schemas";
 import { toAnsiStyleCode } from "@tuix/ansi";
 

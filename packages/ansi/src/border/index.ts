@@ -20,5 +20,5 @@ export {
   type BoxOptions,
 } from './utils'
 
-export type { Border, BorderStyle } from '../types'
-export { BorderSide } from '../types'
+export type { Border, BorderStyle } from './types'
+export { BorderSide } from './types'

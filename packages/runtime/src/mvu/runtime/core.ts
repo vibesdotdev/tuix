@@ -5,9 +5,9 @@
  */
 
 import { Effect, Queue, Fiber, Ref, FiberRef, Layer, Context, Duration } from 'effect'
-import type { Component, View, Update, Command } from '../../../core/types'
-import { TerminalService, InputService, RendererService } from '../../../core/services'
-import { KeyUtils } from '@tuix/input/keys'
+import type { Component, View, Update, Command } from '@tuix/core/types'
+import { TerminalService, InputService, RendererService } from '@tuix/core/services'
+import { KeyUtils } from '@tuix/input/keyboard'
 import type { RuntimeConfig, RuntimeState, SystemMsg, RuntimeMetrics } from './types'
 import { RuntimeError } from './types'
 import { FrameScheduler, TimerManager, CommandScheduler } from './scheduler'

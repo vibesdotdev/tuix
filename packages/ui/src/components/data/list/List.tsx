@@ -31,9 +31,9 @@
  */
 
 import { jsx } from '@tuix/jsx'
-import { $state, $derived, $effect } from '../../../../core/update/reactivity/runes.js'
-import type { StateRune } from '../../../../core/update/reactivity/runes.js'
-import { isStateRune } from '../../../../core/update/reactivity/runes.js'
+import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
+import type { StateRune } from '@tuix/reactive/runes/runes'
+import { isStateRune } from '@tuix/reactive/runes/runes'
 import { style, Colors, type Style } from '@tuix/ansi'
 
 // Types

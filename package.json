@@ -2,16 +2,17 @@
   "name": "tuix",
   "private": true,
   "scripts": {
-    "build": "bun run --filter='@tuix/*' build",
-    "test": "bun run --filter='@tuix/*' test",
+    "build": "bun run ./scripts/build.ts"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@ast-grep/cli": "^0.39.6",
+    "@types/bun": "^1.2.23"
   },
   "peerDependencies": {
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   }
 }

@@ -17,11 +17,11 @@ import type { View, Cmd, AppServices, KeyEvent } from '@tuix/core/types'
 import { vstack, hstack } from '@tuix/view'
 import { style, colors, border } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view/string/width'
-import { Box } from '@tuix/ui/components/layout/box/Box'
-import { Text } from '@tuix/ui/components/display/text/Text'
-import { Flex } from '@tuix/ui/components/layout/flex/Flex'
-import { List, type ListItem } from '@tuix/ui/components/data/list/List'
-import { Spinner } from '@tuix/ui/components/feedback/spinner/Spinner'
+import { Box } from '../../layout/box/Box'
+import { Text } from '../../display/text/Text'
+import { Flex } from '../../layout/flex/Flex'
+import { List, type ListItem } from '../../data/list/List'
+import { Spinner } from '../../feedback/spinner/Spinner'
 
 // =============================================================================
 // Types

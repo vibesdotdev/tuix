@@ -5,8 +5,8 @@
  */
 
 import { Effect } from "effect";
-import { View, text, vstack, hstack, styledText } from "@tuix/core";
-import { style, color, colors } from "@tuix/core";
+import { View, text, vstack, hstack, styledText } from "@tuix/view";
+import { style, color, colors } from "@tuix/ansi";
 import type {
   ProcessState,
   ProcessLog,

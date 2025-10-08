@@ -54,7 +54,7 @@
  */
 
 import { Effect } from 'effect'
-import { stringWidth } from '../../terminal/output/string/width'
+import { stringWidth } from '@tuix/view/string/width'
 import type { View, RenderError } from './types'
 import { style as createStyle, renderStyledSync, type Style } from '@tuix/ansi'
 

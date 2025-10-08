@@ -3,9 +3,9 @@
  */
 
 import { Effect, Layer, Queue, Stream, Option } from 'effect'
-import { InputService } from '../services/input'
+import { InputService } from '@tuix/core/services'
 import type { KeyEvent, MouseEvent, Component } from '@tuix/core/types'
-import { KeyType } from '../core/keys'
+import { KeyType } from '@tuix/input/keyboard'
 
 /**
  * Test input adapter that allows programmatic key injection
@@ -187,10 +187,10 @@ export const runTestApp = async <Model, Msg>(
   testScript: (adapter: TestInputAdapter) => Promise<void>,
   config?: Record<string, unknown>
 ): Promise<void> => {
-  const { runApp } = await import('../core/runtime')
-  const { TerminalServiceLive } = await import('../core/services/impl/terminal')
-  const { RendererServiceLive } = await import('../core/services/impl/renderer')
-  const { StorageServiceLive } = await import('../core/services/impl/storage')
+  const { runApp } = await import('@tuix/runtime')
+  const { TerminalServiceLive } = await import('@tuix/core/services/live/terminal')
+  const { RendererServiceLive } = await import('@tuix/core/services/live/renderer')
+  const { StorageServiceLive } = await import('@tuix/core/services/live/storage')
   const { Layer } = await import('effect')
 
   // Create test services with test input

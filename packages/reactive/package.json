@@ -31,6 +31,31 @@
       "import": "./src/events/index.ts",
       "default": "./src/events/index.ts"
     },
+    "./events/event-bus": {
+      "types": "./src/events/event-bus.ts",
+      "import": "./src/events/event-bus.ts",
+      "default": "./src/events/event-bus.ts"
+    },
+    "./jsx-lifecycle": {
+      "types": "./src/runes/jsx-lifecycle.ts",
+      "import": "./src/runes/jsx-lifecycle.ts",
+      "default": "./src/runes/jsx-lifecycle.ts"
+    },
+    "./scope/manager": {
+      "types": "./src/scope/manager.ts",
+      "import": "./src/scope/manager.ts",
+      "default": "./src/scope/manager.ts"
+    },
+    "./scope/jsx/stores": {
+      "types": "./src/scope/jsx/stores/index.ts",
+      "import": "./src/scope/jsx/stores/index.ts",
+      "default": "./src/scope/jsx/stores/index.ts"
+    },
+    "./runes/runes": {
+      "types": "./src/runes/runes.ts",
+      "import": "./src/runes/runes.ts",
+      "default": "./src/runes/runes.ts"
+    },
     "./*": {
       "types": "./src/*",
       "import": "./src/*",
@@ -44,16 +69,15 @@
   },
   "dependencies": {
     "@tuix/core": "workspace:*",
-    "effect": "^3.16.9"
+    "effect": "^3.16.9",
+    "@tuix/runtime": "workspace:*",
+    "@tuix/jsx": "workspace:*",
+    "@tuix/debug": "workspace:*",
+    "@tuix/ansi": "workspace:*",
+    "@tuix/view": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
   }
 }

@@ -5,7 +5,7 @@
  */
 
 import { Effect, Ref } from 'effect'
-import { StorageError } from '../../../types/errors'
+import { StorageError } from '../../../types/errors/base'
 import * as fs from 'node:fs/promises'
 
 interface TransactionOperation {

@@ -12,7 +12,7 @@ import {
   InputService,
   RendererService,
   StorageService,
-} from '../core/services/index'
+} from '@tuix/core/services'
 import type {
   Component,
   KeyEvent,
@@ -22,8 +22,8 @@ import type {
   Viewport,
   TerminalCapabilities,
   Cmd,
-} from '../core/types/core'
-import { TerminalError, InputError, RenderError, StorageError } from '../core/errors'
+} from '@tuix/core/types'
+import { TerminalError, InputError, RenderError, StorageError } from '@tuix/core/types/errors'
 
 // =============================================================================
 // Test Environment

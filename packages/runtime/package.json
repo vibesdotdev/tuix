@@ -16,10 +16,20 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./module/registry": {
+      "types": "./src/module/registry.ts",
+      "import": "./src/module/registry.ts",
+      "default": "./src/module/registry.ts"
+    },
+    "./interactive": {
+      "types": "./src/interactive.ts",
+      "import": "./src/interactive.ts",
+      "default": "./src/interactive.ts"
+    },
     "./*": {
-      "types": "./src/*",
-      "import": "./src/*",
-      "default": "./src/*"
+      "types": "./src/*.ts",
+      "import": "./src/*.ts",
+      "default": "./src/*.ts"
     }
   },
   "scripts": {
@@ -29,16 +39,20 @@
   },
   "dependencies": {
     "@tuix/core": "workspace:*",
-    "effect": "^3.17.14"
+    "effect": "^3.17.14",
+    "@tuix/reactive": "workspace:*",
+    "@tuix/jsx": "workspace:*",
+    "@tuix/bin": "workspace:*",
+    "@tuix/config": "workspace:*",
+    "@tuix/process-manager": "workspace:*",
+    "@tuix/logger": "workspace:*",
+    "@tuix/ansi": "workspace:*",
+    "@tuix/coordination": "workspace:*",
+    "@tuix/view": "workspace:*",
+    "@tuix/input": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
   }
 }

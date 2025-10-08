@@ -7,7 +7,7 @@
 
 import { Stream, Effect, Chunk, pipe, Schedule, Fiber } from 'effect'
 import type { View } from '@tuix/core/types'
-import { text, vstack, hstack } from '@tuix/core/view'
+import { text, vstack, hstack } from '@tuix/view'
 import { jsx } from '@tuix/jsx/runtime'
 import { style, type Style } from '@tuix/ansi'
 import { $state, $effect, $derived } from '@tuix/reactive/runes'

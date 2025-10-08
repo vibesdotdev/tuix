@@ -38,7 +38,9 @@
  * ```
  */
 
-import { $state, $derived, color, style, View } from '@tuix/core'
+import { $state, $derived } from '@tuix/reactive/runes/runes'
+import { color, style } from '@tuix/ansi'
+import type { View } from '@tuix/core/types'
 import { Text, Flex, Box } from '@tuix/ui'
 import type { JSX } from '@tuix/jsx'
 

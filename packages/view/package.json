@@ -16,15 +16,25 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./primitives/view": {
+      "types": "./src/primitives/view.ts",
+      "import": "./src/primitives/view.ts",
+      "default": "./src/primitives/view.ts"
+    },
     "./primitives/*": {
-      "types": "./src/primitives/*",
-      "import": "./src/primitives/*",
-      "default": "./src/primitives/*"
+      "types": "./src/primitives/*.ts",
+      "import": "./src/primitives/*.ts",
+      "default": "./src/primitives/*.ts"
     },
     "./layout/*": {
       "types": "./src/layout/*",
       "import": "./src/layout/*",
       "default": "./src/layout/*"
+    },
+    "./string/width": {
+      "types": "./src/string/width.ts",
+      "import": "./src/string/width.ts",
+      "default": "./src/string/width.ts"
     },
     "./*": {
       "types": "./src/*",
@@ -40,16 +50,11 @@
   "dependencies": {
     "@tuix/core": "workspace:*",
     "@tuix/ansi": "workspace:*",
-    "effect": "^3.16.9"
+    "effect": "^3.16.9",
+    "@tuix/reactive": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
   }
 }

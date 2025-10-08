@@ -6,6 +6,7 @@ import { Effect, Layer, Stream, Queue, Chunk, Option, PubSub } from 'effect'
 import { InputService } from '../input'
 import { InputError } from '../../types/errors'
 import type { KeyEvent, MouseEvent, WindowSize } from '../../types'
+import { ANSI_SEQUENCES } from '@tuix/input/keyboard/keys'
 
 /**
  * Platform abstraction for input operations

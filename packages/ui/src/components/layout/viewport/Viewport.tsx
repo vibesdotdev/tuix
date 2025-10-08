@@ -35,7 +35,7 @@ import { $effect } from '@tuix/reactive/runes/runes'
 import type { View } from '@tuix/view/primitives/view'
 import { style, colors, border, Borders, type Style } from '@tuix/ansi'
 import { vstack, hstack, text, styledText } from '@tuix/view/primitives/view'
-import { createViewportStore, type ViewportStore } from '@tuix/ui/stores/viewportStore'
+import { createViewportStore, type ViewportStore } from '../../../stores/viewportStore'
 
 // Types
 export interface ViewportProps {

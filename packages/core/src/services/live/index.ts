@@ -15,11 +15,17 @@ import { StorageServiceLive } from './storage'
 /**
  * Convenience layer that wires up all default service implementations.
  * Most entry points should call `Effect.provide(_, LiveServices)`.
+ *
+ * RendererServiceLive depends on TerminalService, so we provide it to renderer
  */
+const RendererWithTerminal = RendererServiceLive.pipe(
+  Layer.provide(TerminalServiceLive)
+)
+
 export const LiveServices = Layer.mergeAll(
   TerminalServiceLive,
   InputServiceLive,
-  RendererServiceLive,
+  RendererWithTerminal,
   StorageServiceLive
 )
 
@@ -27,4 +33,3 @@ export { TerminalServiceLive } from './terminal'
 export { InputServiceLive } from './input'
 export { RendererServiceLive } from './renderer'
 export { StorageServiceLive } from './storage'
-

@@ -6,7 +6,7 @@
 
 import type { Effect, Duration, Context } from 'effect'
 import type { View, Component, Update, UpdateResult } from '../../../core/types'
-import type { KeyEvent } from '@tuix/input/keys'
+import type { KeyEvent } from '@tuix/input/keyboard'
 
 /**
  * System messages produced by the runtime

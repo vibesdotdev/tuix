@@ -22,9 +22,9 @@ import {
   testInteraction,
   testLifecycle,
 } from './testUtils'
-import { createRuntime } from '../core/runtime'
-import { text, vstack } from '../core/view'
-import type { Component, MouseEvent, WindowSize, Cmd } from '../core/types'
+import { createRuntime } from '@tuix/runtime'
+import { text, vstack } from '@tuix/view'
+import type { Component, MouseEvent, WindowSize, Cmd } from '@tuix/core/types'
 
 describe('Testing Utilities', () => {
   describe('Mock Services', () => {

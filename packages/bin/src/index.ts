@@ -1,5 +1,6 @@
 // Re-export everything from the new modular packages
-export * from "@tuix/cli";
+// TODO: Create @tuix/cli package or remove CLI functionality
+// export * from "@tuix/cli";
 export * from "@tuix/config";
 export * from "@tuix/core";
 export * from "@tuix/debug";

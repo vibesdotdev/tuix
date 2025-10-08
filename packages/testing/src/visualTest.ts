@@ -5,7 +5,7 @@
 import { Effect, Layer } from 'effect'
 import * as View from '@tuix/view'
 import { stringWidth } from '@tuix/view/string/width'
-import { RendererService } from '../services/renderer'
+import { RendererService } from '@tuix/core/services'
 
 /**
  * Test individual view components and their rendered output
@@ -165,8 +165,8 @@ export async function testRendererPipeline() {
   console.log('🔧 Testing Complete Renderer Pipeline\n')
 
   const { Effect, Layer, Ref } = await import('effect')
-  const { RendererServiceLive } = await import('../core/services/impl/renderer')
-  const { TerminalServiceLive } = await import('../core/services/impl/terminal')
+  const { RendererServiceLive } = await import('@tuix/core/services/live/renderer')
+  const { TerminalServiceLive } = await import('@tuix/core/services/live/terminal')
 
   // Create a mock terminal buffer to capture output
   class MockTerminal {

@@ -1,4 +1,5 @@
-import { ANSI_CODES, type ANSICode } from '../types'
+// TODO: Re-enable when ANSI_CODES is implemented
+// import { ANSI_CODES, type ANSICode } from '../types'
 
 const ESC = '\u001b['
 
@@ -15,13 +16,14 @@ export const sequence = (...codes: ReadonlyArray<number | `${number}${string}` |
   return `${ESC}${parts}${hasCommand ? '' : 'm'}`
 }
 
-export const colorize = (text: string, code: ANSICode, reset: ANSICode = 'reset'): string => {
-  const start = ANSI_CODES[code]
-  const end = ANSI_CODES[reset]
+// TODO: Re-enable when ANSI_CODES is implemented
+// export const colorize = (text: string, code: ANSICode, reset: ANSICode = 'reset'): string => {
+//   const start = ANSI_CODES[code]
+//   const end = ANSI_CODES[reset]
+//
+//   if (!start || !end) return text
+//   return `${start}${text}${end}`
+// }
 
-  if (!start || !end) return text
-  return `${start}${text}${end}`
-}
-
-export { ANSI_CODES }
-export type { ANSICode }
+// export { ANSI_CODES }
+// export type { ANSICode }

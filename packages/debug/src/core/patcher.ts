@@ -143,7 +143,7 @@ async function patchRenderSystem() {
 
 async function patchLoggerModule() {
   try {
-    const loggerModule = await import('@logger')
+    const loggerModule = await import('@tuix/logger')
 
     // Create debug transport
     const DebugTransport = {

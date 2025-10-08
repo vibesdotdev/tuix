@@ -10,19 +10,19 @@ import { EventBus, getGlobalEventBus } from "@tuix/reactive/events/event-bus";
 import { ModuleRegistry, getGlobalRegistry } from "./module/registry";
 
 // Core modules
-import { JSXModule } from "@tuix/jsx/module";
-import { CLIModule } from "@tuix/cli/module";
-import { ReactivityModule } from "@tuix/reactive/module";
+// import { JSXModule } from "@tuix/jsx/module";
+// import { CLIModule } from "@tuix/bin/module";
+import { ReactivityModule } from "@tuix/reactive";
 
 // Service modules
-import { ServiceModule } from "@tuix/core/services/module";
+import { ServiceModule } from "@tuix/core/services";
 import { ConfigModule } from "@tuix/config";
-import { ProcessManagerModule } from "@tuix/process-manager/module";
-import { LoggerModule } from "@tuix/logger/module";
-import { StylingModule } from "@tuix/ansi/module";
+import { ProcessManagerModule } from "@tuix/process-manager";
+import { LoggerModule } from "@tuix/logger";
+// import { StylingModule } from "@tuix/ansi/module";
 
 // Coordination module
-import { CoordinationModule } from "@tuix/coordination/module";
+import { CoordinationModule } from "@tuix/coordination";
 
 // Component system module
 // Component system module removed - functionality moved to core/view
@@ -58,11 +58,11 @@ export function bootstrap(
     const registry = getGlobalRegistry();
 
     // Core modules (always enabled)
-    const jsxModule = new JSXModule(eventBus);
-    const cliModule = new CLIModule(eventBus);
+    // const jsxModule = new JSXModule(eventBus);
+    // const cliModule = new CLIModule(eventBus);
     const reactivityModule = new ReactivityModule(eventBus);
 
-    yield* registry.registerMany([jsxModule, cliModule, reactivityModule]);
+    yield* registry.registerMany([reactivityModule]);
 
     // Service layer modules
     const serviceModule = new ServiceModule(eventBus);
@@ -81,10 +81,10 @@ export function bootstrap(
       yield* registry.register(processManagerModule);
     }
 
-    if (config.enableStyling !== false) {
-      const stylingModule = new StylingModule(eventBus);
-      yield* registry.register(stylingModule);
-    }
+    // if (config.enableStyling !== false) {
+    //   const stylingModule = new StylingModule(eventBus);
+    //   yield* registry.register(stylingModule);
+    // }
 
     if (config.enableCoordination) {
       const coordinationModule = new CoordinationModule(eventBus);
@@ -118,8 +118,8 @@ export function bootstrapMinimal(): Effect<ModuleRegistry, Error> {
 
     // Only core modules
     yield* registry.registerMany([
-      new JSXModule(eventBus),
-      new CLIModule(eventBus),
+      // new JSXModule(eventBus),
+      // new CLIModule(eventBus),
       new ReactivityModule(eventBus),
     ]);
 
@@ -149,14 +149,14 @@ export interface BootstrapResult {
   readonly registry: ModuleRegistry;
   readonly status: "initialized" | "partial" | "failed";
   readonly modules: {
-    readonly jsx: JSXModule;
-    readonly cli: CLIModule;
+    // readonly jsx: JSXModule;
+    // readonly cli: CLIModule;
     readonly reactivity: ReactivityModule;
     readonly services?: ServiceModule;
     readonly config?: ConfigModule;
     readonly processManager?: ProcessManagerModule;
     readonly logger?: LoggerModule;
-    readonly styling?: StylingModule;
+    // readonly styling?: StylingModule;
     readonly coordination?: CoordinationModule;
     // Component system is now integrated into core/view
   };
@@ -187,7 +187,7 @@ export function bootstrapWithModules(
     const registry = registryResult.right;
 
     // Check if bootstrap succeeded fully
-    const requiredModules = ["jsx", "cli", "reactivity"];
+    const requiredModules = ["reactivity"];
     const missingModules = requiredModules.filter(
       (name) => !registry.hasModule(name)
     );
@@ -198,15 +198,15 @@ export function bootstrapWithModules(
       registry,
       status,
       modules: {
-        jsx: registry.getModule<JSXModule>("jsx")!,
-        cli: registry.getModule<CLIModule>("cli")!,
+        // jsx: registry.getModule<JSXModule>("jsx")!,
+        // cli: registry.getModule<CLIModule>("cli")!,
         reactivity: registry.getModule<ReactivityModule>("reactivity")!,
         services: registry.getModule<ServiceModule>("services"),
         config: registry.getModule<ConfigModule>("config"),
         processManager:
           registry.getModule<ProcessManagerModule>("process-manager"),
         logger: registry.getModule<LoggerModule>("logger"),
-        styling: registry.getModule<StylingModule>("styling"),
+        // styling: registry.getModule<StylingModule>("styling"),
         coordination: registry.getModule<CoordinationModule>("coordination"),
         // Component system is now integrated into core/view
       },

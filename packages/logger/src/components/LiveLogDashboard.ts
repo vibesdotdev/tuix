@@ -4,8 +4,8 @@
  * Advanced log dashboard with real-time updates, filtering, and preset support
  */
 
-import { View, text, vstack, hstack, styledText } from "@tuix/core";
-import { style, color, colors } from "@tuix/core";
+import { View, text, vstack, hstack, styledText } from "@tuix/view";
+import { style, color, colors } from "@tuix/ansi";
 import { LEVEL_COLORS, LEVEL_EMOJIS, logUtils } from "./LogComponents";
 import type { LogLevel } from "@tuix/logger/types";
 import type { ProcessLog } from "@tuix/process-manager/types";

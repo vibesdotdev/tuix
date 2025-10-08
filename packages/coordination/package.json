@@ -45,16 +45,15 @@
   "dependencies": {
     "@tuix/core": "workspace:*",
     "@tuix/reactive": "workspace:*",
-    "effect": "^3.16.9"
+    "effect": "^3.16.9",
+    "@tuix/bin": "workspace:*",
+    "@tuix/config": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "typescript": "^5.3.0"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
-  },
-  "engines": {
-    "bun": ">=1.0.0"
+    "typescript": "^5.3.0",
+    "@tuix/runtime": "workspace:*",
+    "@tuix/process-manager": "workspace:*",
+    "@tuix/logger": "workspace:*"
   }
 }
