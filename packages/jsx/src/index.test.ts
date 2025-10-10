@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { Effect } from 'effect'
 import { jsx, jsxs, jsxDEV, Fragment, createElement, JSXContext } from './index'
-import { scopeManager } from '@tuix/reactive/scope/manager'
+import { scopeManager } from './scope/manager'
 import { text } from '@tuix/view/primitives/view'
 
 describe('JSX Runtime', () => {

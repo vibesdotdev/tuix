@@ -1,52 +1,44 @@
 {
   "name": "@tuix/bin",
   "version": "1.0.0-rc.3",
-  "description": "TUIX CLI binary - entry point for the TUI framework",
+  "description": "TUIX CLI - Modern Terminal UI Framework",
   "type": "module",
-  "main": "./index.ts",
-  "module": "./index.ts",
-  "types": "./index.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "bin": {
-    "tuix": "./bin/index.ts"
+    "tuix": "./src/bin/tuix.ts"
   },
   "files": [
-    "bin",
+    "src",
     "README.md"
   ],
   "exports": {
     ".": {
-      "import": "./index.ts",
-      "types": "./index.ts"
-    },
-    "./*": {
-      "types": "./src/*",
-      "import": "./src/*",
-      "default": "./src/*"
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
     }
   },
   "scripts": {
-    "test": "bun test",
+    "build": "bun build --target=bun --minify --splitting src/index.ts --outdir=dist/",
+    "start": "bun run src/bin/tuix.ts",
     "typecheck": "tsc --noEmit --pretty false"
   },
   "dependencies": {
-    "@tuix/config": "workspace:*",
     "@tuix/core": "workspace:*",
-    "@tuix/debug": "workspace:*",
     "@tuix/jsx": "workspace:*",
+    "@tuix/ui": "workspace:*",
+    "@tuix/themes": "workspace:*",
+    "@tuix/docs": "workspace:*",
+    "@tuix/config": "workspace:*",
     "@tuix/logger": "workspace:*",
     "@tuix/process-manager": "workspace:*",
     "@tuix/testing": "workspace:*",
-    "@tuix/ui": "workspace:*",
-    "@effect/cli": "^0.68.0",
-    "@effect/platform-node": "^0.92.0",
-    "@effect/schema": "^0.75.5",
-    "@types/figlet": "^1.7.0",
-    "biome": "^0.3.3",
-    "commander": "^11.1.0",
-    "effect": "^3.16.9",
-    "figlet": "^1.8.1",
-    "strip-ansi": "^7.1.0",
-    "zod": "^3.22.0"
+    "@tuix/debug": "workspace:*",
+    "@tuix/update": "workspace:*",
+    "@tuix/telemetry": "workspace:*",
+    "effect": "^3.0.0"
   },
   "devDependencies": {
     "@types/bun": "latest",

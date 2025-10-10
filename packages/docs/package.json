@@ -1,0 +1,42 @@
+{
+  "name": "@tuix/docs",
+  "version": "1.0.0-rc.3",
+  "description": "Documentation generation and interactive help system for TUIX applications",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "types": "./src/*",
+      "import": "./src/*",
+      "default": "./src/*"
+    }
+  },
+  "scripts": {
+    "build": "bun build --target=bun --minify --splitting src/index.ts --outdir=dist/",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit --pretty false"
+  },
+  "dependencies": {
+    "@tuix/core": "workspace:*",
+    "@tuix/jsx": "workspace:*",
+    "@tuix/ui": "workspace:*",
+    "@tuix/reactive": "workspace:*",
+    "@tuix/view": "workspace:*",
+    "effect": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.0"
+  }
+}

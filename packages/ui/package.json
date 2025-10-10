@@ -32,7 +32,8 @@
     "@tuix/ansi": "workspace:*",
     "@tuix/view": "workspace:*",
     "@tuix/reactive": "workspace:*",
-    "@tuix/runtime": "workspace:*"
+    "@tuix/runtime": "workspace:*",
+    "@tuix/themes": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",

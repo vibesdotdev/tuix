@@ -17,6 +17,10 @@
 export * as components from './components/index.js'
 export * from './components/index.js'
 
+// Form Validation
+export * as validation from './validation/index.js'
+export * from './validation/index.js'
+
 // Re-export commonly used components at the top level for convenience
 export { Button } from './components/forms/button/index.js'
 export { Modal } from './components/feedback/modal/index.js'
@@ -24,3 +28,23 @@ export { Table } from './components/data/table/index.js'
 export { Text } from './components/display/text/index.js'
 export { Box } from './components/layout/box/index.js'
 export { Flex } from './components/layout/flex/index.js'
+export { Select } from './components/forms/select/index.js'
+export { Checkbox } from './components/forms/checkbox/index.js'
+export { Radio } from './components/forms/radio/index.js'
+export { Confirm } from './components/forms/confirm/index.js'
+export { Form } from './components/forms/form/index.js'
+
+// New modern components
+export { Panel } from './components/layout/panel/index.js'
+export { Header } from './components/display/header/index.js'
+export { Badge } from './components/display/badge/index.js'
+export { StatusIndicator } from './components/display/status-indicator/index.js'
+export { Divider } from './components/display/divider/index.js'
+export { ProgressBar } from './components/feedback/progress-bar/index.js'
+
+// Layout patterns
+export { StaticLayout } from './components/layout/static-layout/StaticLayout.js'
+export { InteractiveLayout } from './components/layout/interactive-layout/InteractiveLayout.js'
+
+// Theme utilities
+export * from './theme/index.js'

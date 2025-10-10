@@ -150,38 +150,14 @@ export class Color {
   }
 
   /**
-   * Apply a glow effect to text content using this color
+   * Note: For applying visual effects (glow, shadows, etc.) to colored text,
+   * use the effects module directly:
    *
-   * @param content - Array of text lines to apply the glow effect to
-   * @returns Array of lines with glow effect applied
-   */
-  applyGlow(content: string[]): string[] {
-    // This method would integrate with effects module but requires complex type handling
-    // In a full implementation, it would use the existing effects.createGlow function
-    return content;
-  }
-
-  /**
-   * Apply a drop shadow effect to text content using this color
+   * ```ts
+   * import { createGlow, createDropShadow } from '@tuix/ansi/effects'
    *
-   * @param content - Array of text lines to apply the shadow effect to
-   * @returns Array of lines with shadow effect applied
+   * const color = Color.hex('#22c55e')
+   * const glowedText = createGlow(content, { color: color.def, radius: 2 })
+   * ```
    */
-  applyDropShadow(content: string[]): string[] {
-    // This method would integrate with effects module but requires complex type handling
-    // In a full implementation, it would use the existing effects.createDropShadow function
-    return content;
-  }
-
-  /**
-   * Apply an inner shadow effect to text content using this color
-   *
-   * @param content - Array of text lines to apply the inner shadow effect to
-   * @returns Array of lines with inner shadow effect applied
-   */
-  applyInnerShadow(content: string[]): string[] {
-    // This method would integrate with effects module but requires complex type handling
-    // In a full implementation, it would use the existing effects.createInnerShadow function
-    return content;
-  }
 }

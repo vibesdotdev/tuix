@@ -39,6 +39,31 @@ TUIX is a bun-native monorepo for building terminal user interfaces with a **JSX
 
 ## Quick Start
 
+### 🎬 Interactive Demos (For Vibes Team)
+
+**See TUIX in action with live, interactive demos:**
+
+```bash
+# Install dependencies
+bun install
+
+# 🤖 AI Chat - Live streaming with auto-demo
+# Watch messages stream character-by-character, just like your blessed CLI
+bun run apps/demo/src/index.ts ai-chat
+
+# 📊 System Dashboard - Real-time metrics updating every second
+# See CPU, memory, disk, network metrics update live
+bun run apps/demo/src/index.ts dashboard
+
+# ✨ Feature Showcase - Complete tour of all TUIX capabilities
+# Borders, colors, gradients, layouts, and more
+bun run apps/demo/src/index.ts showcase
+```
+
+**These demos prove TUIX can match the quality of your blessed implementation while fixing emoji rendering issues.**
+
+👉 **Start here:** [VIBES_DEMO_READY.md](VIBES_DEMO_READY.md) - Everything you need to evaluate TUIX
+
 ### CLI Usage
 
 ```bash
@@ -116,6 +141,15 @@ bun run build
 
 ## Documentation
 
+### For the Vibes Team
+- **[🎉 Demos Ready!](VIBES_DEMO_READY.md)** - Start here! Interactive demos that prove TUIX quality
+- [Getting Started Guide](VIBES_GETTING_STARTED.md) - Quick start for vibes team evaluation
+- [TUIX vs Blessed Comparison](VIBES_COMPARISON.md) - Why switch from blessed to TUIX
+- [Demo Summary](DEMO_SUMMARY.md) - Overview of all demo commands
+
+### General Documentation
+- [Pitch Document](PITCH.md) - Why TUIX for terminal UIs
+- [Showcase Features](SHOWCASE_FEATURES.md) - Detailed feature breakdown
 - [Package Documentation](packages/tuix/README.md) - Detailed package information
 - [ANSI Documentation](packages/ansi/README.md) - ANSI utilities and terminal control
 - [CLI Documentation](packages/cli/README.md) - CLI framework guide

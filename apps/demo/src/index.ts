@@ -7,7 +7,7 @@
  * Demonstrates JSX-based TUI with the runtime
  */
 
-import { runApp } from '@tuix/runtime'
+import { runApp } from '@tuix/jsx'
 import App from "./app";
 
 await runApp(App)

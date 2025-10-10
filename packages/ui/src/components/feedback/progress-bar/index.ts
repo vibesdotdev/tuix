@@ -1,5 +1,6 @@
-// TODO: Implement MVU/JSX ProgressBar component when needed
-// The TEA ProgressBar component has been moved to src/tea/examples/feedback/ProgressBar
-// This file will contain the MVU/JSX implementation when required
+/**
+ * @tuix/ui - ProgressBar component exports
+ */
 
-export {}
+export { ProgressBar, progressBar } from './ProgressBar'
+export type { ProgressBarProps } from './ProgressBar'

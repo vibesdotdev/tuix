@@ -30,6 +30,36 @@
       "import": "./src/events.ts",
       "default": "./src/events.ts"
     },
+    "./app": {
+      "types": "./src/app/index.ts",
+      "import": "./src/app/index.ts",
+      "default": "./src/app/index.ts"
+    },
+    "./scope": {
+      "types": "./src/scope/index.ts",
+      "import": "./src/scope/index.ts",
+      "default": "./src/scope/index.ts"
+    },
+    "./scope/manager": {
+      "types": "./src/scope/manager.ts",
+      "import": "./src/scope/manager.ts",
+      "default": "./src/scope/manager.ts"
+    },
+    "./scope/types": {
+      "types": "./src/scope/types.ts",
+      "import": "./src/scope/types.ts",
+      "default": "./src/scope/types.ts"
+    },
+    "./scope/components": {
+      "types": "./src/scope/components/index.ts",
+      "import": "./src/scope/components/index.ts",
+      "default": "./src/scope/components/index.ts"
+    },
+    "./scope/stores": {
+      "types": "./src/scope/stores/index.ts",
+      "import": "./src/scope/stores/index.ts",
+      "default": "./src/scope/stores/index.ts"
+    },
     "./config": {
       "types": "./src/index.ts",
       "import": "./src/index.ts",
@@ -51,12 +81,12 @@
     "@tuix/ansi": "workspace:*",
     "@tuix/config": "workspace:*",
     "@tuix/runtime": "workspace:*",
+    "@tuix/reactive": "workspace:*",
     "@tuix/debug": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "typescript": "^5.3.0",
-    "@tuix/reactive": "workspace:*",
     "@tuix/view": "workspace:*"
   }
 }

@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "@tuix/core": "workspace:*",
+    "@tuix/storage": "workspace:*",
+    "@tuix/jsx": "workspace:*",
     "@effect/schema": "^0.75.5",
     "zod": "^3.22.0",
     "@tuix/reactive": "workspace:*"

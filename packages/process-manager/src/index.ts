@@ -248,7 +248,9 @@ export async function createProcessManager(
 export { ProcessMonitor } from './components/ProcessMonitor'
 
 // Export the plugin
-export { ProcessManagerPlugin } from './Plugin'
+export { ProcessManager as ProcessManagerPlugin } from './plugin'
+export type { ProcessManagerProps } from './plugin'
+export * from './plugin/commands'
 
 // Constants
 export * from './constants'

@@ -18,14 +18,10 @@ export * from './runes/jsx-lifecycle'
 export * from './runes/components/reactive-component'
 
 // =============================================================================
-// Scope Management
+// Runtime Integration
 // =============================================================================
 
-export * from './scope/manager'
-export * from './scope/types'
-export * from './scope/jsx/hooks'
-export * from './scope/jsx/components'
-export * from './scope/jsx/stores'
+export * from './runtime'
 
 // =============================================================================
 // Event Bus

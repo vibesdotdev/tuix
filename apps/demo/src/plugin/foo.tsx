@@ -2,7 +2,7 @@ import { Plugin, Command } from "@tuix/jsx";
 
 export default function Foo({ scope = 'foo' }) {
   return (
-    <Plugin {scope}>
+    <Plugin name={scope}>
       <vstack>
         <box>
           <Command name="bar">
@@ -10,12 +10,9 @@ export default function Foo({ scope = 'foo' }) {
           </Command>
         </box>
         <box>
-          <readline
-            prompt="foo>"
-            onInput={(input) => console.log(input)}
-          />
+          <text>TODO: readline component</text>
         </box>
       </vstack>
     </Plugin>
-_ )
+  )
 }

@@ -6,6 +6,7 @@
 import type { Border, BorderSide, BorderStyle, Color } from '../types'
 import { BorderSide as BSide } from '../types'
 import { border } from './presets'
+import { pad as padToWidth, visualWidth } from '../core/width'
 
 // =============================================================================
 // Border Utilities
@@ -137,9 +138,9 @@ export const renderBox = (options: BoxOptions): string => {
     let line = content[i] ?? ''
     if (padding > 0) {
       const paddingStr = ' '.repeat(padding)
-      line = paddingStr + line.padEnd(paddedWidth) + paddingStr
+      line = paddingStr + padToWidth(line, paddedWidth) + paddingStr
     } else {
-      line = line.padEnd(innerWidth)
+      line = padToWidth(line, innerWidth)
     }
 
     lines.push(left + line + right)

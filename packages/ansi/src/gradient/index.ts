@@ -1,63 +1,6 @@
 import type { Color, GradientConfig, GradientStop } from '../types'
 import { ColorProfile } from '../color/profile'
-import { toAnsiSequence } from '../color/convert'
-
-type RGB = { r: number; g: number; b: number }
-
-const ANSI_16_RGB: Record<number, RGB> = {
-  0: { r: 0, g: 0, b: 0 },
-  1: { r: 128, g: 0, b: 0 },
-  2: { r: 0, g: 128, b: 0 },
-  3: { r: 128, g: 128, b: 0 },
-  4: { r: 0, g: 0, b: 128 },
-  5: { r: 128, g: 0, b: 128 },
-  6: { r: 0, g: 128, b: 128 },
-  7: { r: 192, g: 192, b: 192 },
-  8: { r: 128, g: 128, b: 128 },
-  9: { r: 255, g: 0, b: 0 },
-  10: { r: 0, g: 255, b: 0 },
-  11: { r: 255, g: 255, b: 0 },
-  12: { r: 0, g: 0, b: 255 },
-  13: { r: 255, g: 0, b: 255 },
-  14: { r: 0, g: 255, b: 255 },
-  15: { r: 255, g: 255, b: 255 },
-}
-
-const colorToRgb = (color: Color): RGB => {
-  switch (color.type) {
-    case 'rgb':
-      return { r: color.r, g: color.g, b: color.b }
-    case 'hex': {
-      const value = color.value.replace('#', '')
-      const r = parseInt(value.slice(0, 2), 16)
-      const g = parseInt(value.slice(2, 4), 16)
-      const b = parseInt(value.slice(4, 6), 16)
-      return { r, g, b }
-    }
-    case 'ansi':
-      return ANSI_16_RGB[color.code] ?? ANSI_16_RGB[7]!
-    case 'ansi256': {
-      const code = color.code
-      if (code < 16) {
-        return ANSI_16_RGB[code] ?? ANSI_16_RGB[7]!
-      }
-      if (code >= 232) {
-        const gray = (code - 232) * 10 + 8
-        return { r: gray, g: gray, b: gray }
-      }
-      const index = code - 16
-      const r = Math.floor(index / 36)
-      const g = Math.floor((index % 36) / 6)
-      const b = index % 6
-      return { r: r * 51, g: g * 51, b: b * 51 }
-    }
-    case 'adaptive':
-      return colorToRgb(color.dark)
-    case 'none':
-    default:
-      return { r: 0, g: 0, b: 0 }
-  }
-}
+import { toAnsiSequence, colorToRgb, type RGB } from '../color/convert'
 
 const lerp = (start: number, end: number, factor: number): number => start + (end - start) * factor
 

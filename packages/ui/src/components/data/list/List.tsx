@@ -30,11 +30,10 @@
  * ```
  */
 
-import { jsx } from '@tuix/jsx'
 import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
 import type { StateRune } from '@tuix/reactive/runes/runes'
 import { isStateRune } from '@tuix/reactive/runes/runes'
-import { style, Colors, type Style } from '@tuix/ansi'
+import { style, colors, type Style } from '@tuix/ansi'
 
 // Types
 export type SelectionMode = 'single' | 'multi' | 'none'
@@ -233,38 +232,35 @@ export function List<T = any>(props: ListProps<T>): JSX.Element {
   // Render helpers
   function renderEmptyState(): JSX.Element {
     if (typeof props.emptyMessage === 'string') {
-      return jsx('text', {
-        style: style().foreground(color.gray).italic(),
-        children: props.emptyMessage || 'No items to display',
-      })
+      return (
+        <text style={style().foreground(colors.gray).italic()}>
+          {props.emptyMessage || 'No items to display'}
+        </text>
+      )
     }
-    return (
-      props.emptyMessage ||
-      jsx('text', {
-        style: style().foreground(color.gray).italic(),
-        children: 'No items to display',
-      })
+    return props.emptyMessage ?? (
+      <text style={style().foreground(colors.gray).italic()}>
+        No items to display
+      </text>
     )
   }
 
   function renderFilter(): JSX.Element | null {
     if (!props.showFilter) return null
 
-    return jsx('hstack', {
-      gap: 1,
-      style: style().marginBottom(1),
-      children: [
-        jsx('text', { children: '🔍' }),
-        jsx('text-input', {
-          value: filterValue,
-          placeholder: props.filterPlaceholder || 'Filter...',
-          onSubmit: value => {
+    return (
+      <hstack gap={1} style={style().marginBottom(1)}>
+        <text>🔍</text>
+        <text-input
+          value={filterValue}
+          placeholder={props.filterPlaceholder || 'Filter...'}
+          onSubmit={value => {
             filterValue.$set(value)
             props.onFilter?.(value)
-          },
-        }),
-      ],
-    })
+          }}
+        />
+      </hstack>
+    )
   }
 
   function renderScrollbar(): JSX.Element | null {
@@ -274,15 +270,18 @@ export function List<T = any>(props: ListProps<T>): JSX.Element {
     const scrollPercent = scrollOffset() / (filteredItems().length - height)
     const thumbPosition = Math.floor(scrollPercent * (height - 1))
 
-    return jsx('vstack', {
-      style: style().position('absolute').right(0).top(0),
-      children: Array.from({ length: height }, (_, i) =>
-        jsx('text', {
-          children: i === thumbPosition ? '█' : '│',
-          style: style().foreground(i === thumbPosition ? color.white : color.gray),
-        })
-      ),
-    })
+    return (
+      <vstack style={style().position('absolute').right(0).top(0)}>
+        {Array.from({ length: height }, (_, i) => (
+          <text
+            key={i}
+            style={style().foreground(i === thumbPosition ? colors.white : colors.gray)}
+          >
+            {i === thumbPosition ? '█' : '│'}
+          </text>
+        ))}
+      </vstack>
+    )
   }
 
   function renderItem(item: T, index: number): JSX.Element {
@@ -293,15 +292,19 @@ export function List<T = any>(props: ListProps<T>): JSX.Element {
         : selectedIndices().includes(actualIndex)
     const isFocused = focused() && actualIndex === selectedIndex()
 
-    return jsx('interactive', {
-      onClick: () => handleItemClick(actualIndex),
-      onMouseEnter: () => {
-        if (selectionMode === 'single') {
-          selectIndex(actualIndex)
-        }
-      },
-      children: props.renderItem(item, actualIndex, isSelected, isFocused),
-    })
+    return (
+      <interactive
+        key={actualIndex}
+        onClick={() => handleItemClick(actualIndex)}
+        onMouseEnter={() => {
+          if (selectionMode === 'single') {
+            selectIndex(actualIndex)
+          }
+        }}
+      >
+        {props.renderItem(item, actualIndex, isSelected, isFocused)}
+      </interactive>
+    )
   }
 
   // Main render
@@ -316,40 +319,39 @@ export function List<T = any>(props: ListProps<T>): JSX.Element {
     })
   })
 
-  return jsx('interactive', {
-    onKeyPress: handleKeyPress,
-    onFocus: () => {
-      focused.$set(true)
-    },
-    onBlur: () => {
-      focused.$set(false)
-    },
-    onMouseEnter: () => {
-      hovering.$set(true)
-    },
-    onMouseLeave: () => {
-      hovering.$set(false)
-    },
-    focusable: props.focusable !== false,
-    className: props.className,
-    children: jsx('vstack', {
-      style: listStyle(),
-      children: [
-        renderFilter(),
-        filteredItems().length === 0
-          ? renderEmptyState()
-          : jsx('box', {
-              style: style(),
-              children: [
-                jsx('vstack', {
-                  children: visibleItems().map((item, index) => renderItem(item, index)),
-                }),
-                renderScrollbar(),
-              ],
-            }),
-      ],
-    }),
-  })
+  return (
+    <interactive
+      onKeyPress={handleKeyPress}
+      onFocus={() => {
+        focused.$set(true)
+      }}
+      onBlur={() => {
+        focused.$set(false)
+      }}
+      onMouseEnter={() => {
+        hovering.$set(true)
+      }}
+      onMouseLeave={() => {
+        hovering.$set(false)
+      }}
+      focusable={props.focusable !== false}
+      className={props.className}
+    >
+      <vstack style={listStyle()}>
+        {renderFilter()}
+        {filteredItems().length === 0 ? (
+          renderEmptyState()
+        ) : (
+          <box style={style()}>
+            <vstack>
+              {visibleItems().map((item, index) => renderItem(item, index))}
+            </vstack>
+            {renderScrollbar()}
+          </box>
+        )}
+      </vstack>
+    </interactive>
+  )
 }
 
 // Preset list styles
@@ -362,14 +364,16 @@ export function SimpleList<T = any>(
     ...props,
     renderItem:
       props.renderItem ||
-      ((item, _, selected, focused) =>
-        jsx('text', {
-          style: style()
-            .background(selected ? color.blue : 'transparent')
-            .foreground(selected ? color.white : color.white)
-            .bold(focused),
-          children: String(item),
-        })),
+      ((item, _, selected, focused) => (
+        <text
+          style={style()
+            .background(selected ? colors.blue : 'transparent')
+            .foreground(selected ? colors.white : colors.white)
+            .bold(focused)}
+        >
+          {String(item)}
+        </text>
+      )),
   })
 }
 
@@ -379,39 +383,34 @@ export function CheckList<T = any>(
   return List({
     ...props,
     selectionMode: 'multi',
-    renderItem: (item, _, selected) =>
-      jsx('hstack', {
-        gap: 1,
-        children: [
-          jsx('text', {
-            children: selected ? '☑' : '☐',
-            style: style().foreground(selected ? color.green : color.gray),
-          }),
-          jsx('text', { children: String(item) }),
-        ],
-      }),
+    renderItem: (item, _, selected) => (
+      <hstack gap={1}>
+        <text style={style().foreground(selected ? colors.green : colors.gray)}>
+          {selected ? '☑' : '☐'}
+        </text>
+        <text>{String(item)}</text>
+      </hstack>
+    ),
   })
 }
 
 export function NumberedList<T = any>(props: Omit<ListProps<T>, 'renderItem'>): JSX.Element {
   return List({
     ...props,
-    renderItem: (item, index, selected, focused) =>
-      jsx('hstack', {
-        gap: 1,
-        children: [
-          jsx('text', {
-            style: style().foreground(color.gray),
-            children: `${(index + 1).toString().padStart(3)}.`,
-          }),
-          jsx('text', {
-            style: style()
-              .background(selected ? color.blue : 'transparent')
-              .foreground(selected ? color.white : color.white)
-              .bold(focused),
-            children: String(item),
-          }),
-        ],
-      }),
+    renderItem: (item, index, selected, focused) => (
+      <hstack gap={1}>
+        <text style={style().foreground(colors.gray)}>
+          {(index + 1).toString().padStart(3)}.
+        </text>
+        <text
+          style={style()
+            .background(selected ? colors.blue : 'transparent')
+            .foreground(selected ? colors.white : colors.white)
+            .bold(focused)}
+        >
+          {String(item)}
+        </text>
+      </hstack>
+    ),
   })
 }

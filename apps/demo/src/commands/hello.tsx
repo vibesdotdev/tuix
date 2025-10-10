@@ -13,7 +13,7 @@ export interface HelloProps {
   name?: string
 }
 
-export function Hello({ name = 'World' }: HelloProps) {
+export default function Hello({ name = 'World' }: HelloProps) {
   return (
     <vstack>
       <text style={{ foreground: colors.green, bold: true }}>

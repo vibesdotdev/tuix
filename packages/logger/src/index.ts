@@ -14,6 +14,10 @@ export { LiveLogDashboard, ProcessLogView } from './components/LiveLogDashboard'
 export * from './core/presets'
 export * from './core/module'
 
+// Plugin exports
+export { Logger as LoggerPlugin } from './plugin'
+export type { LoggerProps } from './plugin'
+
 import { Effect, Layer, Context } from 'effect'
 import type { Logger, LoggerConfig, LogLevel } from './types'
 import { TuixLogger, makeLoggerLayer, makeQueuedLoggerLayer } from './core/logger'

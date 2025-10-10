@@ -4,7 +4,8 @@
  */
 
 export * from './types'
-export * from './box'
+// Export styledBox and panel from box, but not 'box' to avoid conflict with primitives/view
+export { styledBox, panel, hbox, vbox } from './box'
 export * from './flexbox'
 export * from './grid'
 export * from './join'

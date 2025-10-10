@@ -5,8 +5,8 @@
  */
 
 import { debug } from './store'
-import { scopeManager } from '@tuix/reactive/scope/manager'
-import type { ScopeDef } from '@tuix/reactive/scope/types'
+import { scopeManager } from '@tuix/jsx/scope/manager'
+import type { ScopeDef } from '@tuix/jsx/scope/types'
 import type { Component } from '@tuix/core/types'
 import type { JSXElement, JSXChildren } from '@tuix/jsx/types'
 import type { LogEntry, LoggerConfig, LogTransport } from '@tuix/logger/types'

@@ -25,7 +25,7 @@ describe('String Width', () => {
     it('should handle spaces and tabs', () => {
       expect(stringWidth(' ')).toBe(1)
       expect(stringWidth('  ')).toBe(2)
-      expect(stringWidth('\t')).toBe(1) // Tab counts as 1 for display width
+      expect(stringWidth('\t')).toBe(0) // Tab is a control character with 0 visual width
       expect(stringWidth('a b')).toBe(3)
     })
   })
@@ -55,7 +55,7 @@ describe('String Width', () => {
 
     it('should handle mixed text and ANSI codes', () => {
       const text = 'Normal \x1b[31mred\x1b[0m more text'
-      expect(stringWidth(text)).toBe(18) // "Normal red more text"
+      expect(stringWidth(text)).toBe(20) // "Normal red more text" = 20 chars
     })
   })
 
@@ -87,7 +87,7 @@ describe('String Width', () => {
   describe('Mixed content', () => {
     it('should handle text with emoji and ANSI codes', () => {
       const text = '\x1b[32m✅ Success\x1b[0m'
-      expect(stringWidth(text)).toBe(9) // "✅ Success" (2 + 1 + 7)
+      expect(stringWidth(text)).toBe(10) // "✅ Success" (2 + 1 + 7) = 10 chars
     })
 
     it('should handle Unicode with ANSI codes', () => {
@@ -97,7 +97,7 @@ describe('String Width', () => {
 
     it('should handle complex mixed content', () => {
       const text = 'Hello \x1b[32m🌍\x1b[0m world! café'
-      expect(stringWidth(text)).toBe(18) // "Hello 🌍 world! café"
+      expect(stringWidth(text)).toBe(20) // "Hello 🌍 world! café" (6 + 2 + 7 + 5) = 20
     })
   })
 

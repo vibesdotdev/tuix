@@ -22,9 +22,7 @@
  * ```
  */
 
-import { jsx } from '@tuix/jsx'
 import { $state, $effect } from '@tuix/reactive/runes/runes'
-import { text } from '@tuix/view/primitives/view'
 import { style, colors } from '@tuix/ansi'
 
 // Types
@@ -87,26 +85,19 @@ export function Spinner(props: SpinnerProps): JSX.Element {
   })
 
   if (props.text) {
-    return jsx('hstack', {
-      gap: 1,
-      className: props.className,
-      children: [
-        jsx('text', {
-          style: spinnerStyle,
-          children: frames[frameIndex.value],
-        }),
-        jsx('text', {
-          children: props.text,
-        }),
-      ],
-    })
+    return (
+      <hstack gap={1} className={props.className} align="middle">
+        <text style={spinnerStyle}>{frames[frameIndex.value]}</text>
+        <text>{props.text}</text>
+      </hstack>
+    )
   }
 
-  return jsx('text', {
-    style: spinnerStyle,
-    className: props.className,
-    children: frames[frameIndex.value],
-  })
+  return (
+    <text style={spinnerStyle} className={props.className}>
+      {frames[frameIndex.value]}
+    </text>
+  )
 }
 
 // Factory functions for common spinner patterns
@@ -133,17 +124,12 @@ export function SpinnerWithMessage(
 ): JSX.Element {
   const { message, messageColor = colors.gray, ...spinnerProps } = props
 
-  return jsx('vstack', {
-    align: 'center',
-    gap: 1,
-    children: [
-      <Spinner {...spinnerProps} />,
-      jsx('text', {
-        style: style({ foreground: messageColor }),
-        children: message,
-      }),
-    ],
-  })
+  return (
+    <vstack align="center" gap={1}>
+      <Spinner {...spinnerProps} />
+      <text style={style({ foreground: messageColor })}>{message}</text>
+    </vstack>
+  )
 }
 
 // Full-screen loading overlay
@@ -154,32 +140,29 @@ export function LoadingOverlay(props: {
   children?: JSX.Element
 }): JSX.Element {
   if (!props.loading) {
-    return props.children || jsx('text', { children: '' })
+    return props.children ?? <text />
   }
 
-  return jsx('box', {
-    style: style({
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.7)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }),
-    children: jsx('vstack', {
-      align: 'center',
-      gap: 2,
-      children: [
-        <Spinner size="large" {...props.spinnerProps} />,
-        props.message &&
-          jsx('text', {
-            style: style({ foreground: colors.white }),
-            children: props.message,
-          }),
-      ].filter(Boolean),
-    }),
-  })
+  return (
+    <box
+      style={style({
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.7)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      })}
+    >
+      <vstack align="center" gap={2}>
+        <Spinner size="large" {...props.spinnerProps} />
+        {props.message && (
+          <text style={style({ foreground: colors.white })}>{props.message}</text>
+        )}
+      </vstack>
+    </box>
+  )
 }

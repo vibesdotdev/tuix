@@ -24,11 +24,13 @@ export class Runtime<Model, Msg> {
   private readonly timerManager: TimerManager<Msg>
   private readonly commandScheduler: CommandScheduler<Msg>
   private readonly subscriptionManager: SubscriptionManager<Model, Msg>
+  private readonly hooks?: import('../../hooks').RuntimeHooks<Model, Msg>
 
   // Fibers for concurrent operations
   private inputFiber?: Fiber.RuntimeFiber<void>
   private updateFiber?: Fiber.RuntimeFiber<void>
   private renderFiber?: Fiber.RuntimeFiber<void>
+  private hasRendered: boolean = false
 
   constructor(
     config: RuntimeConfig,
@@ -46,13 +48,16 @@ export class Runtime<Model, Msg> {
       commandTimeout: config.commandTimeout ?? Duration.seconds(30),
       maxConcurrentCommands: config.maxConcurrentCommands ?? 10,
       performanceMonitoring: config.performanceMonitoring ?? false,
+      exitAfterRender: config.exitAfterRender ?? false,
       onError: config.onError,
       onQuit: config.onQuit,
       context: config.context,
+      hooks: config.hooks,
     }
 
     this.state = state
     this.messageQueue = messageQueue
+    this.hooks = config.hooks
     this.frameScheduler = new FrameScheduler(this.config.fps)
     this.timerManager = new TimerManager(messageQueue)
     this.commandScheduler = new CommandScheduler(messageQueue, this.config.maxConcurrentCommands)
@@ -65,13 +70,7 @@ export class Runtime<Model, Msg> {
   run<E>(component: Component<Model, Msg, E>): Effect<void, E | RuntimeError> {
     return Effect.gen(
       function* (_) {
-        console.log('MVU Runtime: Attempting to get services...')
         const terminal = yield* _(TerminalService)
-        console.log(
-          'MVU Runtime: Got terminal service:',
-          typeof terminal,
-          Object.keys(terminal || {})
-        )
         const input = yield* _(InputService)
         const renderer = yield* _(RendererService)
 
@@ -87,6 +86,11 @@ export class Runtime<Model, Msg> {
             yield* _(input.enableMouse)
           }
 
+          // Call beforeInit hook
+          if (this.hooks?.beforeInit) {
+            yield* _(this.hooks.beforeInit())
+          }
+
           // Initialize component
           const [initialModel, initialCommands] = yield* _(component.init)
 
@@ -97,6 +101,11 @@ export class Runtime<Model, Msg> {
               isRunning: true,
             }))
           )
+
+          // Call afterInit hook
+          if (this.hooks?.afterInit) {
+            yield* _(this.hooks.afterInit(initialModel))
+          }
 
           // Execute initial commands
           yield* _(this.executeCommands(initialCommands))
@@ -254,13 +263,30 @@ export class Runtime<Model, Msg> {
           if (!state.isRunning) break
 
           try {
-            // Generate view
-            const viewResult = view(state.model)
+            // Call beforeRender hook
+            if (this.hooks?.beforeRender) {
+              yield* _(this.hooks.beforeRender(state.model))
+            }
+
+            // Generate view (may be async)
+            const viewResultOrPromise = view(state.model)
+
+            // Handle async views
+            const viewResult = viewResultOrPromise instanceof Promise
+              ? yield* _(Effect.promise(() => viewResultOrPromise))
+              : viewResultOrPromise
 
             // Render to terminal
             yield* _(terminal.clear)
             const rendered = yield* _(viewResult.render())
-            yield* _(terminal.write(rendered))
+            // Normalize rendered result - can be string or { content, width, height }
+            const content = typeof rendered === 'string' ? rendered : rendered.content
+            yield* _(terminal.write(content))
+
+            // Call afterRender hook
+            if (this.hooks?.afterRender) {
+              yield* _(this.hooks.afterRender(viewResult, state.model))
+            }
 
             // Track metrics
             const renderTime = Date.now() - startTime
@@ -279,6 +305,13 @@ export class Runtime<Model, Msg> {
                   duration: renderTime,
                 })
               )
+            }
+
+            // Exit after first render if configured (for CLI commands)
+            if (this.config.exitAfterRender && !this.hasRendered) {
+              this.hasRendered = true
+              yield* _(Ref.update(this.state, s => ({ ...s, isRunning: false })))
+              break
             }
           } catch (error) {
             yield* _(Effect.logError('Render error', error))
@@ -316,6 +349,13 @@ export class Runtime<Model, Msg> {
         switch (msg._tag) {
           case 'UserMsg': {
             const startTime = Date.now()
+
+            // Call beforeUpdate hook
+            if (this.hooks?.beforeUpdate) {
+              yield* _(this.hooks.beforeUpdate(msg.msg, state.model))
+            }
+
+            const oldModel = state.model
             const [newModel, commands] = yield* _(update(msg.msg, state.model))
 
             yield* _(
@@ -324,6 +364,11 @@ export class Runtime<Model, Msg> {
                 model: newModel,
               }))
             )
+
+            // Call afterUpdate hook
+            if (this.hooks?.afterUpdate) {
+              yield* _(this.hooks.afterUpdate(oldModel, newModel, msg.msg))
+            }
 
             yield* _(this.executeCommands(commands))
 
@@ -383,6 +428,11 @@ export class Runtime<Model, Msg> {
     return Effect.gen(
       function* (_) {
         for (const command of commands) {
+          // Call onCommand hook
+          if (this.hooks?.onCommand) {
+            yield* _(this.hooks.onCommand(command.execute))
+          }
+
           yield* _(
             this.commandScheduler.execute(command.execute, command.onComplete, command.onError)
           )
@@ -412,6 +462,11 @@ export class Runtime<Model, Msg> {
   private cleanup(terminal?: TerminalService): Effect<void> {
     return Effect.gen(
       function* (_) {
+        // Call onShutdown hook
+        if (this.hooks?.onShutdown) {
+          yield* _(this.hooks.onShutdown())
+        }
+
         // Stop all fibers
         const fibers = [this.inputFiber, this.updateFiber, this.renderFiber].filter(
           Boolean

@@ -29,8 +29,6 @@
  * ```
  */
 
-import { jsx } from '@tuix/jsx'
-import type { View } from '@tuix/view/primitives/view'
 import { Box, type BoxProps } from '../box'
 
 // Types
@@ -71,16 +69,31 @@ export function Flex(props: FlexProps): JSX.Element {
       : 'column-reverse'
     : direction
 
-  const container = direction === 'row' ? 'hstack' : 'vstack'
+  if (direction === 'row') {
+    return (
+      <hstack
+        gap={gap}
+        wrap={wrap === true ? true : wrap === 'reverse' ? 'reverse' : false}
+        align={align}
+        justify={justify}
+        {...boxProps}
+      >
+        {children}
+      </hstack>
+    )
+  }
 
-  return jsx(container, {
-    ...boxProps,
-    gap,
-    wrap: wrap === true ? true : wrap === 'reverse' ? 'reverse' : false,
-    align,
-    justify,
-    children,
-  })
+  return (
+    <vstack
+      gap={gap}
+      wrap={wrap === true ? true : wrap === 'reverse' ? 'reverse' : false}
+      align={align}
+      justify={justify}
+      {...boxProps}
+    >
+      {children}
+    </vstack>
+  )
 }
 
 /**

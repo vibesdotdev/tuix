@@ -30,19 +30,17 @@
  * ```
  */
 
-import { jsx } from '@tuix/jsx'
 import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
-import { style, Colors, type Style } from '@tuix/ansi'
+import { style, colors, color, parseColor, type Style, type Color } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view/string/width'
 
-// Types
 export interface TextProps {
   children: string | number | boolean
 
-  // Colors
-  color?: string
-  background?: string
-  gradient?: { from: string; to: string; direction?: 'horizontal' | 'vertical' }
+  // Colors (accept both Color objects and string shortcuts)
+  color?: Color | string
+  background?: Color | string
+  gradient?: { from: Color | string; to: Color | string; direction?: 'horizontal' | 'vertical' }
 
   // Styles
   bold?: boolean
@@ -86,10 +84,16 @@ export function Text(props: TextProps): JSX.Element {
       ...props.style,
     }
 
-    // Colors
-    if (props.color) baseStyle.color = props.color
-    if (props.background) baseStyle.background = props.background
-    if (props.gradient) baseStyle.gradient = props.gradient
+    // Colors - map to correct property names (foreground/background) and convert strings
+    if (props.color) baseStyle.foreground = parseColor(props.color)
+    if (props.background) baseStyle.background = parseColor(props.background)
+    if (props.gradient) {
+      baseStyle.gradient = {
+        from: parseColor(props.gradient.from)!,
+        to: parseColor(props.gradient.to)!,
+        direction: props.gradient.direction || 'horizontal',
+      }
+    }
 
     // Text styles
     if (props.bold) baseStyle.bold = true
@@ -147,16 +151,16 @@ export function Text(props: TextProps): JSX.Element {
     return <PulsingText {...props}>{content}</PulsingText>
   }
 
-  return jsx('text', {
-    style: textStyle(),
-    className: props.className,
-    children: processedText(),
-  })
+  return (
+    <text style={textStyle()} className={props.className}>
+      {processedText()}
+    </text>
+  )
 }
 
 // Effect components
 function RainbowText(props: TextProps): JSX.Element {
-  const colors = [color.red, color.yellow, color.green, color.cyan, color.blue, color.magenta]
+  const rainbowColors = [colors.red, colors.yellow, colors.green, colors.cyan, colors.blue, colors.magenta]
 
   const colorIndex = $state(0)
 
@@ -168,7 +172,7 @@ function RainbowText(props: TextProps): JSX.Element {
     return () => clearInterval(interval)
   })
 
-  return <Text {...props} color={colors[colorIndex()]} rainbow={false} />
+  return <Text {...props} color={rainbowColors[colorIndex()]} rainbow={false} />
 }
 
 function PulsingText(props: TextProps): JSX.Element {
@@ -189,23 +193,23 @@ function PulsingText(props: TextProps): JSX.Element {
 export function Heading(props: TextProps & { level?: 1 | 2 | 3 | 4 | 5 | 6 }): JSX.Element {
   const { level = 1, ...textProps } = props
 
-  const styles = {
-    1: { bold: true, color: color.white },
-    2: { bold: true, color: color.white },
-    3: { bold: true, color: color.gray },
-    4: { color: color.white },
-    5: { color: color.gray },
-    6: { color: color.gray, dim: true },
-  }
+  const palette = {
+    1: { bold: true, color: colors.white },
+    2: { bold: true, color: colors.white },
+    3: { bold: true, color: colors.gray },
+    4: { color: colors.white },
+    5: { color: colors.gray },
+    6: { color: colors.gray, dim: true },
+  } as const
 
-  return <Text {...styles[level]} {...textProps} />
+  return <Text {...palette[level]} {...textProps} />
 }
 
 export function Code(props: TextProps & { language?: string }): JSX.Element {
   return (
     <Text
-      color={color.green}
-      background={color.black}
+      color={colors.green}
+      background={colors.black}
       style={{ padding: { horizontal: 1 } }}
       {...props}
     />
@@ -215,36 +219,39 @@ export function Code(props: TextProps & { language?: string }): JSX.Element {
 export function Link(props: TextProps & { href?: string; onClick?: () => void }): JSX.Element {
   const hovering = $state(false)
 
-  return jsx('interactive', {
-    onMouseEnter: () => {
-      hovering.$set(true)
-    },
-    onMouseLeave: () => {
-      hovering.$set(false)
-    },
-    onClick: props.onClick,
-    children: <Text color={color.blue} underline={hovering()} bright={hovering()} {...props} />,
-  })
+  return (
+    <interactive
+      onMouseEnter={() => {
+        hovering.$set(true)
+      }}
+      onMouseLeave={() => {
+        hovering.$set(false)
+      }}
+      onClick={props.onClick}
+    >
+      <Text color={colors.blue} underline={hovering()} bright={hovering()} {...props} />
+    </interactive>
+  )
 }
 
 export function Label(props: TextProps): JSX.Element {
-  return <Text color={color.gray} {...props} />
+  return <Text color={colors.gray} {...props} />
 }
 
 export function Success(props: TextProps): JSX.Element {
-  return <Text color={color.green} {...props} />
+  return <Text color={colors.green} {...props} />
 }
 
 export function Error(props: TextProps): JSX.Element {
-  return <Text color={color.red} {...props} />
+  return <Text color={colors.red} {...props} />
 }
 
 export function Warning(props: TextProps): JSX.Element {
-  return <Text color={color.yellow} {...props} />
+  return <Text color={colors.yellow} {...props} />
 }
 
 export function Info(props: TextProps): JSX.Element {
-  return <Text color={color.blue} {...props} />
+  return <Text color={colors.blue} {...props} />
 }
 
 // Factory functions

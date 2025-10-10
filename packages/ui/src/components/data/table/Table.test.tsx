@@ -6,7 +6,6 @@ import { describe, it, expect, beforeEach } from 'bun:test'
 import { Table, DataTable, CompactTable } from './Table.js'
 import type { Column } from './Table.js'
 import { $state } from '../../../../core/update/reactivity/runes.js'
-import { jsx } from '@tuix/jsx'
 
 describe('Table Component', () => {
   const testData = [
@@ -48,11 +47,9 @@ describe('Table Component', () => {
         {
           key: 'name',
           label: 'Name',
-          render: value =>
-            jsx('text', {
-              children: `User: ${value}`,
-              style: { foreground: 'blue' },
-            }),
+          render: value => (
+            <text style={{ foreground: 'blue' }}>{`User: ${value}`}</text>
+          ),
         },
       ]
 

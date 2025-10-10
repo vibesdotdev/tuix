@@ -4,8 +4,18 @@
  * Flexible, hierarchical configuration management with multiple sources
  */
 
-export * from "./types";
-export type { TuixConfig } from "./types";
+// Types and service interfaces (export Config context tag explicitly)
+export type { Config, ConfigOptions, ConfigError, ConfigNotFoundError, ConfigValidationError, TuixConfig } from "./types";
+export { Config as ConfigTag } from "./types";
+
+// NEW: Storage-backed config (Phase 5)
+export * from "./storage";
+export * from "./context";
+
+// Plugin components (export with specific names to avoid conflicts)
+export { Config as ConfigPlugin, ConfigGet, ConfigSet, ConfigList, ConfigImport, ConfigExport } from "./plugin";
+
+// Legacy config implementation (kept for backwards compatibility)
 export * from "./sources/config";
 export * from "./core/loader";
 export * from "./sources/utils";
@@ -13,7 +23,7 @@ export * from "./jsxConfig";
 export * from "./core/module";
 
 import { Effect, Layer } from "effect";
-import { Config as IConfig, ConfigOptions } from "./types";
+import { Config as ConfigTag, ConfigOptions } from "./types";
 import { createConfig } from "./sources/config";
 
 /**
@@ -21,7 +31,7 @@ import { createConfig } from "./sources/config";
  */
 export const ConfigLayer = (options?: ConfigOptions) =>
   Layer.effect(
-    IConfig,
+    ConfigTag,
     Effect.gen(function* (_) {
       const builder = createConfig();
 
@@ -207,7 +217,7 @@ export function defineConfig<T extends Record<string, any>>(config: T): T {
 /**
  * Load configuration from standard locations
  */
-export async function loadConfig(appName: string = "tuix"): Promise<IConfig> {
+export async function loadConfig(appName: string = "tuix"): Promise<Config> {
   const configBuilder = createConfig()
     .name(appName)
     .withUserConfig()

@@ -6,7 +6,7 @@
  */
 
 import { Effect } from 'effect'
-import { ModuleBase, ModuleError } from '@tuix/runtime'
+import { ModuleBase, ModuleError } from '@tuix/core'
 import type { EventBus } from '@tuix/reactive/events/event-bus'
 import type {
   ConfigEvent,

@@ -155,6 +155,15 @@ export const border = {
   } as Border,
 } as const
 
+// Export individual borders for convenience (Borders.Rounded, Borders.Thin, etc.)
+export const Thin = border.thin
+export const Thick = border.thick
+export const Double = border.double
+export const Rounded = border.rounded
+export const Ascii = border.ascii
+export const Dotted = border.dotted
+export const Dashed = border.dashed
+
 // =============================================================================
 // Border Presets
 // =============================================================================

@@ -7,6 +7,7 @@
 import type { Effect, Duration, Context } from 'effect'
 import type { View, Component, Update, UpdateResult } from '../../../core/types'
 import type { KeyEvent } from '@tuix/input/keyboard'
+import type { RuntimeHooks } from '../../hooks'
 
 /**
  * System messages produced by the runtime
@@ -102,6 +103,21 @@ export interface RuntimeConfig {
    * Custom context for dependency injection
    */
   readonly context?: Context<unknown>
+
+  /**
+   * Runtime hooks for lifecycle integration
+   * Enables reactive systems, JSX compilation, and custom behaviors
+   * @default undefined
+   */
+  readonly hooks?: RuntimeHooks<any, any>
+
+  /**
+   * Exit after first render (for CLI commands)
+   * When true, app exits after one render cycle
+   * When false, app loops continuously (for TUI apps)
+   * @default false
+   */
+  readonly exitAfterRender?: boolean
 }
 
 /**

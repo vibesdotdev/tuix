@@ -48,8 +48,11 @@ export const joinHorizontal = (position: Position, ...views: View[]): View => {
         // Render all views
         const rendered = yield* _(Effect.forEach(views, v => v.render()))
 
-        // Split each into lines
-        const viewLines = rendered.map(content => content.split('\n'))
+        // Split each into lines - handle both string and {content} return types
+        const viewLines = rendered.map(content => {
+          const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+          return contentStr.split('\n')
+        })
 
         // Find max height
         const maxHeight = Math.max(...viewLines.map(lines => lines.length))
@@ -114,13 +117,28 @@ export const joinVertical = (position: Position, ...views: View[]): View => {
         // Render all views
         const rendered = yield* _(Effect.forEach(views, v => v.render()))
 
-        // Find max width
-        const maxWidth = Math.max(...views.map(v => v.width || 0))
+        // Filter out empty views to avoid blank lines
+        const nonEmptyViews: Array<{ content: any; view: View; index: number }> = []
+        rendered.forEach((content, index) => {
+          const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+          if (contentStr.trim().length > 0) {
+            nonEmptyViews.push({ content, view: views[index]!, index })
+          }
+        })
+
+        if (nonEmptyViews.length === 0) {
+          return ''
+        }
+
+        // Find max width from non-empty views
+        const maxWidth = Math.max(...nonEmptyViews.map(({ view }) => view.width || 0))
 
         // Align each view horizontally
-        const aligned = rendered.map((content, index) => {
-          const lines = content.split('\n')
-          const viewWidth = views[index]?.width || 0
+        const aligned = nonEmptyViews.map(({ content, view }) => {
+          // Handle both string and {content, width, height} return types
+          const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+          const lines = contentStr.split('\n')
+          const viewWidth = view.width || 0
 
           if (viewWidth >= maxWidth) return lines
 
@@ -181,7 +199,8 @@ export const place = (
     render: () =>
       Effect.gen(function* (_) {
         const content = yield* _(view.render())
-        const lines = content.split('\n')
+        const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+        const lines = contentStr.split('\n')
 
         // Horizontal alignment
         const alignedLines = lines.map(line => {
@@ -321,7 +340,8 @@ const joinVerticalWithSpacing = (position: Position, views: View[], spacing: num
         const rendered = yield* _(Effect.forEach(views, v => v.render()))
 
         const aligned = rendered.map((content, index) => {
-          const lines = content.split('\n')
+          const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+          const lines = contentStr.split('\n')
           const viewWidth = views[index]?.width || 0
 
           if (viewWidth >= maxWidth) return lines

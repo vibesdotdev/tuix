@@ -4,7 +4,8 @@
  */
 
 export * from './mvu/runtime'
-export { getGlobalRegistry, ModuleRegistry } from './module/registry'
-export { ModuleBase, ModuleError } from './module/base'
+export * from './hooks'
+export * from './cmd'
+export { getGlobalRegistry, ModuleRegistry, ModuleBase, ModuleError } from '@tuix/core'
 export * from './bootstrap'
 export * from './interactive'

@@ -37,9 +37,8 @@
  * ```
  */
 
-import { jsx } from '@tuix/jsx'
 import { $state, $derived, $effect, type StateRune, isStateRune } from '@tuix/reactive'
-import { style, Colors, type Style } from '@tuix/ansi'
+import { style, colors, type Style } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view'
 
 // Types
@@ -355,33 +354,35 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
       const width = columnWidths()[index]
       const isSorting = sortColumn() === col.key
 
-      return jsx('interactive', {
-        onClick: () => handleSort(col),
-        children: jsx('text', {
-          style: style()
-            .width(width)
-            .foreground(col.sortable ? color.cyan : color.white)
-            .bold(isSorting)
-            .align(col.align || 'left'),
-          children: col.label + (isSorting ? (sortDirection() === 'asc' ? ' ▲' : ' ▼') : ''),
-        }),
-      })
+      return (
+        <interactive key={col.key} onClick={() => handleSort(col)}>
+          <text
+            style={style()
+              .width(width)
+              .foreground(col.sortable ? colors.cyan : colors.white)
+              .bold(isSorting)
+              .align(col.align || 'left')}
+          >
+            {col.label}
+            {isSorting ? (sortDirection() === 'asc' ? ' ▲' : ' ▼') : ''}
+          </text>
+        </interactive>
+      )
     })
 
     if (showRowNumbers) {
       headerCells.unshift(
-        jsx('text', {
-          style: style().width(5).foreground(color.gray),
-          children: '#',
-        })
+        <text key="row-number" style={style().width(5).foreground(colors.gray)}>
+          #
+        </text>
       )
     }
 
-    return jsx('hstack', {
-      gap: 1,
-      style: props.headerStyle || style().borderBottom('single').marginBottom(1),
-      children: headerCells,
-    })
+    return (
+      <hstack gap={1} style={props.headerStyle || style().borderBottom('single').marginBottom(1)}>
+        {headerCells}
+      </hstack>
+    )
   }
 
   function renderRow(row: T, index: number): JSX.Element {
@@ -410,23 +411,26 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
 
       const colStyle = typeof col.style === 'function' ? col.style(value, row) : col.style
 
-      return jsx('text', {
-        style: style({
-          ...cellStyle,
-          ...colStyle,
-          width,
-          align: col.align || 'left',
-        }),
-        children: content,
-      })
+      return (
+        <text
+          key={String(col.key)}
+          style={style({
+            ...cellStyle,
+            ...colStyle,
+            width,
+            align: col.align || 'left',
+          })}
+        >
+          {content}
+        </text>
+      )
     })
 
     if (showRowNumbers) {
       cells.unshift(
-        jsx('text', {
-          style: style().width(5).foreground(color.gray),
-          children: (actualIndex + 1).toString(),
-        })
+        <text key="row-number" style={style().width(5).foreground(colors.gray)}>
+          {(actualIndex + 1).toString()}
+        </text>
       )
     }
 
@@ -435,67 +439,71 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
         ? props.rowStyle(row, actualIndex, isSelected)
         : props.rowStyle
 
-    return jsx('interactive', {
-      onClick: () => {
-        selectIndex(actualIndex)
-        if (selectionMode === 'single') {
-          props.onSelect?.(row, actualIndex)
-        } else if (selectionMode === 'multi') {
-          toggleMultiSelect(actualIndex)
-        }
-      },
-      onMouseEnter: () => {
-        if (selectionMode === 'single') {
+    return (
+      <interactive
+        key={String(actualIndex)}
+        onClick={() => {
           selectIndex(actualIndex)
-        }
-      },
-      children: jsx('hstack', {
-        gap: 1,
-        style: style({
-          ...rowStyle,
-          background: isSelected ? color.blue : 'transparent',
-          foreground: isSelected ? color.white : color.white,
-          bold: isFocused,
-        }),
-        children: cells,
-      }),
-    })
+          if (selectionMode === 'single') {
+            props.onSelect?.(row, actualIndex)
+          } else if (selectionMode === 'multi') {
+            toggleMultiSelect(actualIndex)
+          }
+        }}
+        onMouseEnter={() => {
+          if (selectionMode === 'single') {
+            selectIndex(actualIndex)
+          }
+        }}
+      >
+        <hstack
+          gap={1}
+          style={style({
+            ...rowStyle,
+            background: isSelected ? colors.blue : 'transparent',
+            foreground: isSelected ? colors.white : colors.white,
+            bold: isFocused,
+          })}
+        >
+          {cells}
+        </hstack>
+      </interactive>
+    )
   }
 
   function renderEmptyState(): JSX.Element {
     if (typeof props.emptyMessage === 'string') {
-      return jsx('text', {
-        style: style().foreground(color.gray).italic(),
-        children: props.emptyMessage || 'No data to display',
-      })
+      return (
+        <text style={style().foreground(colors.gray).italic()}>
+          {props.emptyMessage || 'No data to display'}
+        </text>
+      )
     }
     return (
-      props.emptyMessage ||
-      jsx('text', {
-        style: style().foreground(color.gray).italic(),
-        children: 'No data to display',
-      })
+      props.emptyMessage ?? (
+        <text style={style().foreground(colors.gray).italic()}>
+          No data to display
+        </text>
+      )
     )
   }
 
   function renderFilter(): JSX.Element | null {
     if (!props.showFilter) return null
 
-    return jsx('hstack', {
-      gap: 1,
-      style: style().marginBottom(1),
-      children: [
-        jsx('text', { children: '🔍' }),
-        jsx('text-input', {
-          value: filterValue,
-          placeholder: props.filterPlaceholder || 'Filter...',
-          onSubmit: value => {
+    return (
+      <hstack gap={1} style={style().marginBottom(1)}>
+        <text>🔍</text>
+        <text-input
+          value={filterValue}
+          placeholder={props.filterPlaceholder || 'Filter...'}
+          onSubmit={value => {
             filterValue.$set(value)
             props.onFilter?.(value)
-          },
-        }),
-      ],
-    })
+          }}
+        />
+      </hstack>
+    )
   }
 
   function renderScrollbar(): JSX.Element | null {
@@ -505,15 +513,15 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
     const scrollPercent = scrollOffset() / (sortedData().length - height)
     const thumbPosition = Math.floor(scrollPercent * (height - 1))
 
-    return jsx('vstack', {
-      style: style().position('absolute').right(0).top(0),
-      children: Array.from({ length: height }, (_, i) =>
-        jsx('text', {
-          children: i === thumbPosition ? '█' : '│',
-          style: style().foreground(i === thumbPosition ? color.white : color.gray),
-        })
-      ),
-    })
+    return (
+      <vstack style={style().position('absolute').right(0).top(0)}>
+        {Array.from({ length: height }, (_, i) => (
+          <text key={i} style={style().foreground(i === thumbPosition ? colors.white : colors.gray)}>
+            {i === thumbPosition ? '█' : '│'}
+          </text>
+        ))}
+      </vstack>
+    )
   }
 
   // Main render
@@ -530,41 +538,40 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
     })
   })
 
-  return jsx('interactive', {
-    onKeyPress: handleKeyPress,
-    onFocus: () => {
-      focused.$set(true)
-    },
-    onBlur: () => {
-      focused.$set(false)
-    },
-    onMouseEnter: () => {
-      hovering.$set(true)
-    },
-    onMouseLeave: () => {
-      hovering.$set(false)
-    },
-    focusable,
-    className: props.className,
-    children: jsx('vstack', {
-      style: tableStyle(),
-      children: [
-        renderFilter(),
-        renderHeader(),
-        sortedData().length === 0
-          ? renderEmptyState()
-          : jsx('box', {
-              style: style(),
-              children: [
-                jsx('vstack', {
-                  children: visibleRows().map((row, index) => renderRow(row, index)),
-                }),
-                renderScrollbar(),
-              ],
-            }),
-      ],
-    }),
-  })
+  return (
+    <interactive
+      onKeyPress={handleKeyPress}
+      onFocus={() => {
+        focused.$set(true)
+      }}
+      onBlur={() => {
+        focused.$set(false)
+      }}
+      onMouseEnter={() => {
+        hovering.$set(true)
+      }}
+      onMouseLeave={() => {
+        hovering.$set(false)
+      }}
+      focusable={focusable}
+      className={props.className}
+    >
+      <vstack style={tableStyle()}>
+        {renderFilter()}
+        {renderHeader()}
+        {sortedData().length === 0 ? (
+          renderEmptyState()
+        ) : (
+          <box>
+            <vstack>
+              {visibleRows().map((row, index) => renderRow(row, index))}
+            </vstack>
+            {renderScrollbar()}
+          </box>
+        )}
+      </vstack>
+    </interactive>
+  )
 }
 
 // Preset table styles
@@ -584,10 +591,10 @@ export function CompactTable<T = any>(props: TableProps<T>): JSX.Element {
     showHeader: true,
     showScrollbar: false,
     ...props,
-    headerStyle: style().foreground(color.gray).marginBottom(0),
+    headerStyle: style().foreground(colors.gray).marginBottom(0),
     rowStyle: (_, __, selected) =>
       style()
-        .background(selected ? color.blue : 'transparent')
-        .foreground(selected ? color.white : color.white),
+        .background(selected ? colors.blue : 'transparent')
+        .foreground(selected ? colors.white : colors.white),
   })
 }

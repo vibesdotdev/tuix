@@ -5,7 +5,6 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { Tabs, Tab, SimpleTabs, PillTabs, VerticalTabs } from './Tabs.js'
 import { $state } from '../../../../core/update/reactivity/runes.js'
-import { jsx } from '@tuix/jsx'
 
 describe('Tabs Component', () => {
   describe('Basic rendering', () => {
@@ -14,11 +13,11 @@ describe('Tabs Component', () => {
         children: [
           Tab({
             label: 'Tab 1',
-            children: jsx('text', { children: 'Content 1' }),
+            children: <text>Content 1</text>,
           }),
           Tab({
             label: 'Tab 2',
-            children: jsx('text', { children: 'Content 2' }),
+            children: <text>Content 2</text>,
           }),
         ],
       })
@@ -33,12 +32,12 @@ describe('Tabs Component', () => {
           Tab({
             label: 'Settings',
             icon: '⚙️',
-            children: jsx('text', { children: 'Settings content' }),
+            children: <text>Settings content</text>,
           }),
           Tab({
             label: 'Profile',
             icon: '👤',
-            children: jsx('text', { children: 'Profile content' }),
+            children: <text>Profile content</text>,
           }),
         ],
       })
@@ -52,12 +51,12 @@ describe('Tabs Component', () => {
           Tab({
             label: 'Messages',
             badge: 5,
-            children: jsx('text', { children: 'Messages content' }),
+            children: <text>Messages content</text>,
           }),
           Tab({
             label: 'Notifications',
             badge: 'New',
-            children: jsx('text', { children: 'Notifications content' }),
+            children: <text>Notifications content</text>,
           }),
         ],
       })
@@ -80,11 +79,11 @@ describe('Tabs Component', () => {
         children: [
           Tab({
             label: 'Tab 1',
-            children: jsx('text', { children: 'Content 1' }),
+            children: <text>Content 1</text>,
           }),
           Tab({
             label: 'Tab 2',
-            children: jsx('text', { children: 'Content 2' }),
+            children: <text>Content 2</text>,
           }),
         ],
       })
@@ -97,11 +96,11 @@ describe('Tabs Component', () => {
         children: [
           Tab({
             label: 'Tab 1',
-            children: jsx('text', { children: 'Content 1' }),
+            children: <text>Content 1</text>,
           }),
           Tab({
             label: 'Tab 2',
-            children: jsx('text', { children: 'Content 2' }),
+            children: <text>Content 2</text>,
           }),
         ],
       })
@@ -123,12 +122,12 @@ describe('Tabs Component', () => {
           Tab({
             label: 'Closeable Tab',
             closeable: true,
-            children: jsx('text', { children: 'Can be closed' }),
+            children: <text>Can be closed</text>,
           }),
           Tab({
             label: 'Fixed Tab',
             closeable: false,
-            children: jsx('text', { children: 'Cannot be closed' }),
+            children: <text>Cannot be closed</text>,
           }),
         ],
       })
@@ -142,12 +141,12 @@ describe('Tabs Component', () => {
           Tab({
             label: 'Active Tab',
             disabled: false,
-            children: jsx('text', { children: 'Active content' }),
+            children: <text>Active content</text>,
           }),
           Tab({
             label: 'Disabled Tab',
             disabled: true,
-            children: jsx('text', { children: 'Disabled content' }),
+            children: <text>Disabled content</text>,
           }),
         ],
       })
@@ -163,11 +162,11 @@ describe('Tabs Component', () => {
         children: [
           Tab({
             label: 'Tab 1',
-            children: jsx('text', { children: 'Content 1' }),
+            children: <text>Content 1</text>,
           }),
           Tab({
             label: 'Tab 2',
-            children: jsx('text', { children: 'Content 2' }),
+            children: <text>Content 2</text>,
           }),
         ],
       })
@@ -181,11 +180,11 @@ describe('Tabs Component', () => {
         children: [
           Tab({
             label: 'Tab 1',
-            children: jsx('text', { children: 'Content 1' }),
+            children: <text>Content 1</text>,
           }),
           Tab({
             label: 'Tab 2',
-            children: jsx('text', { children: 'Content 2' }),
+            children: <text>Content 2</text>,
           }),
         ],
       })
@@ -204,7 +203,7 @@ describe('Tabs Component', () => {
           children: [
             Tab({
               label: 'Tab',
-              children: jsx('text', { children: 'Content' }),
+              children: <text>Content</text>,
             }),
           ],
         })
@@ -220,11 +219,11 @@ describe('Tabs Component', () => {
         children: [
           Tab({
             label: 'Simple 1',
-            children: jsx('text', { children: 'Content 1' }),
+            children: <text>Content 1</text>,
           }),
           Tab({
             label: 'Simple 2',
-            children: jsx('text', { children: 'Content 2' }),
+            children: <text>Content 2</text>,
           }),
         ],
       })
@@ -238,11 +237,11 @@ describe('Tabs Component', () => {
         children: [
           Tab({
             label: 'Pill 1',
-            children: jsx('text', { children: 'Content 1' }),
+            children: <text>Content 1</text>,
           }),
           Tab({
             label: 'Pill 2',
-            children: jsx('text', { children: 'Content 2' }),
+            children: <text>Content 2</text>,
           }),
         ],
       })
@@ -256,11 +255,11 @@ describe('Tabs Component', () => {
         children: [
           Tab({
             label: 'Vertical 1',
-            children: jsx('text', { children: 'Content 1' }),
+            children: <text>Content 1</text>,
           }),
           Tab({
             label: 'Vertical 2',
-            children: jsx('text', { children: 'Content 2' }),
+            children: <text>Content 2</text>,
           }),
         ],
       })

@@ -30,11 +30,8 @@
  * ```
  */
 
-import { jsx } from '@tuix/jsx'
 import { $effect } from '@tuix/reactive/runes/runes'
-import type { View } from '@tuix/view/primitives/view'
-import { style, colors, border, Borders, type Style } from '@tuix/ansi'
-import { vstack, hstack, text, styledText } from '@tuix/view/primitives/view'
+import { style, colors, border, type Style } from '@tuix/ansi'
 import { createViewportStore, type ViewportStore } from '../../../stores/viewportStore'
 
 // Types
@@ -53,7 +50,7 @@ export interface ViewportProps {
 
   // Styling
   style?: Style
-  borderStyle?: keyof typeof Borders
+  borderStyle?: 'single' | 'double' | 'rounded' | 'thick' | 'none'
   scrollbarStyle?: Style
 
   // Callbacks
@@ -83,7 +80,6 @@ export const Viewport = (props: ViewportProps) => {
     onScrollDown,
     onScrollLeft,
     onScrollRight,
-    ...restProps
   } = props
 
   // Create viewport store
@@ -210,7 +206,6 @@ export const Viewport = (props: ViewportProps) => {
   // Combine content with scrollbars
   const lines: JSX.Element[] = []
 
-  // Main content area
   visibleLines.forEach((line, index) => {
     const contentLine = <text>{line}</text>
 
@@ -226,7 +221,6 @@ export const Viewport = (props: ViewportProps) => {
     }
   })
 
-  // Horizontal scrollbar
   if (showScrollbars && horizontalScrollbar) {
     const hScrollLine = <text>{horizontalScrollbar}</text>
 
@@ -242,9 +236,24 @@ export const Viewport = (props: ViewportProps) => {
     }
   }
 
-  // Apply styling
-  const viewportStyle = customStyle || style()
-  const styledViewport = <vstack style={viewportStyle}>{lines}</vstack>
+  const borderStyleValue =
+    borderStyle === 'none' ? undefined : border.borderStyle(borderStyle)
+
+  const viewportStyle = (customStyle || style())
+    .width(width)
+    .height(height)
+
+  const styledViewport = (
+    <vstack
+      style={
+        borderStyleValue
+          ? viewportStyle.border(borderStyleValue).borderForeground(colors.gray)
+          : viewportStyle
+      }
+    >
+      {lines}
+    </vstack>
+  )
 
   // Add keyboard handlers (simplified for JSX)
   // In a real implementation, this would integrate with the input system
@@ -281,7 +290,11 @@ export const Viewport = (props: ViewportProps) => {
     }
   }
 
-  return styledViewport
+  return (
+    <interactive onKeyPress={handleKeyPress}>
+      {styledViewport}
+    </interactive>
+  )
 }
 
 // Export types for external use

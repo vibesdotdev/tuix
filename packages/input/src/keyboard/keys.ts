@@ -517,6 +517,13 @@ export const KeyUtils = {
   }),
 
   /**
+   * Check if a key event is a quit key (Ctrl+C, Ctrl+D, or 'q')
+   */
+  isQuit: (event: KeyEvent): boolean => {
+    return (event.ctrl && (event.key === 'c' || event.key === 'd')) || event.key === 'q'
+  },
+
+  /**
    * Common key bindings
    */
   bindings: {

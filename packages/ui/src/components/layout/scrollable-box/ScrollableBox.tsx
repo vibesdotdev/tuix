@@ -1,91 +1,182 @@
 /**
  * ScrollableBox Component
  *
- * A reusable scrollable container with optional filtering and search
- * Perfect for displaying logs, process lists, and other scrollable content
+ * Modern, JSX-first scrollable container that wraps content in a themed panel
+ * and delegates scrolling to the Viewport component.
  */
 
-import { Effect } from 'effect'
-import type { View } from '@tuix/core/types'
-import { View as ViewUtils } from '@tuix/view'
-import { style, colors } from '@tuix/ansi'
+import type { JSX } from '@tuix/jsx'
+import { style, colors, border, type Style } from '@tuix/ansi'
+import { useUITheme } from '../../../theme'
+import { Box } from '../box'
+import { Viewport } from '../viewport'
 
-const { vstack, hstack, text, styledText } = ViewUtils
-
-export interface ScrollableBoxProps {
+export interface ScrollableBoxProps<T = unknown> {
   readonly title?: string
-  readonly items: ReadonlyArray<any>
-  readonly renderItem: (item: any, index: number) => View
+  readonly items: ReadonlyArray<T>
+  readonly renderItem: (item: T, index: number) => JSX.Element
   readonly height?: number
+  readonly width?: number
   readonly showScrollbar?: boolean
   readonly showFilter?: boolean
+  readonly filterLabel?: string
+  readonly filterValue?: string
   readonly filterPlaceholder?: string
-  readonly emptyMessage?: string
+  readonly emptyMessage?: string | JSX.Element
   readonly border?: 'single' | 'double' | 'rounded' | 'thick' | 'none'
   readonly showCount?: boolean
-  readonly footer?: View | string
+  readonly footer?: JSX.Element | string
+  readonly itemGap?: number
+  readonly className?: string
+  readonly contentStyle?: Style
+  readonly scrollbarStyle?: Style
 }
 
-/**
- * ScrollableBox component with virtual scrolling and filtering
- */
-export const ScrollableBox = (props: ScrollableBoxProps): View => {
-  const {
-    title,
-    items,
-    renderItem,
-    height = 20,
-    showScrollbar = true,
-    showFilter = false,
-    filterPlaceholder = 'Filter...',
-    emptyMessage = 'No items to display',
-    border = 'rounded',
-    showCount = true,
-    footer,
-  } = props
+export function ScrollableBox<T>(props: ScrollableBoxProps<T>): JSX.Element {
+  const { theme } = useUITheme()
 
-  // For now, we'll render all items (in a real implementation,
-  // we'd implement virtual scrolling based on viewport)
-  const visibleItems = items.slice(0, height)
-  const hasMore = items.length > height
+  const width = props.width ?? 80
+  const height = props.height ?? 12
+  const showScrollbar = props.showScrollbar ?? true
+  const showCount = props.showCount ?? true
+  const itemGap = props.itemGap ?? 0
 
-  const content = vstack(
-    // Header with count
-    showCount &&
-      hstack(
-        styledText(`Items: ${items.length}`, style().foreground(colors.gray)),
-        hasMore &&
-          styledText(` (showing ${visibleItems.length})`, style().foreground(colors.yellow))
-      ),
+  const borderStyle = resolveBorderStyle(props.border, theme.typography.borderStyle)
 
-    // Filter input (placeholder for now)
-    showFilter && vstack(text('🔍 ' + filterPlaceholder)),
+  const listChildren =
+    props.items.length === 0
+      ? [renderEmpty()]
+      : props.items.map((item, index) => (
+          <box key={String(index)} style={props.contentStyle}>
+            {props.renderItem(item, index)}
+          </box>
+        ))
 
-    // Items or empty message
-    items.length === 0
-      ? styledText(emptyMessage, style().foreground(colors.yellow))
-      : vstack(
-          ...visibleItems.map((item, index) => renderItem(item, index)),
-          hasMore &&
-            styledText(
-              `... and ${items.length - height} more`,
-              style().foreground(colors.gray).italic()
-            )
-        ),
+  return (
+    <Box
+      border={borderStyle}
+      borderColor={theme.colors.border ?? colors.gray}
+      padding={1}
+      className={props.className}
+    >
+      <vstack gap={1}>
+        {props.title && (
+          <text style={style().foreground(theme.colors.textBright ?? colors.white).bold()}>
+            {props.title}
+          </text>
+        )}
 
-    // Footer
-    footer &&
-      (typeof footer === 'string' ? styledText(footer, style().foreground(colors.gray)) : footer)
+        {showCount && renderCount()}
+        {props.showFilter && renderFilter()}
+
+        <Viewport
+          width={width}
+          height={height}
+          showScrollbars={showScrollbar}
+          scrollbarStyle={props.scrollbarStyle}
+        >
+          <vstack gap={itemGap}>{listChildren}</vstack>
+        </Viewport>
+
+        {renderFooter()}
+      </vstack>
+    </Box>
   )
 
-  // For now, return the content directly
-  // In a real implementation, we'd use the styledBox from layout
-  return content
+  function renderCount(): JSX.Element | null {
+    if (!showCount) return null
+
+    const countStyle = style().foreground(theme.colors.textDim ?? colors.gray)
+    return (
+      <text style={countStyle}>
+        Items: {props.items.length}
+      </text>
+    )
+  }
+
+  function renderFilter(): JSX.Element {
+    const hasValue = Boolean(props.filterValue && props.filterValue.length > 0)
+    const label = props.filterLabel ?? 'Filter'
+    const placeholder = props.filterPlaceholder ?? 'Type to filter...'
+
+    return (
+      <hstack gap={1} align="middle">
+        <text style={style().foreground(theme.colors.info ?? colors.cyan)}>🔍</text>
+        <text>{label}:</text>
+        {hasValue ? (
+          <text style={style().foreground(theme.colors.textBright ?? colors.white)}>
+            {props.filterValue}
+          </text>
+        ) : (
+          <text style={style().foreground(theme.colors.textDim ?? colors.gray).italic()}>
+            {placeholder}
+          </text>
+        )}
+      </hstack>
+    )
+  }
+
+  function renderFooter(): JSX.Element | null {
+    if (!props.footer) {
+      return null
+    }
+
+    if (typeof props.footer === 'string') {
+      return (
+        <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
+          {props.footer}
+        </text>
+      )
+    }
+
+    return props.footer
+  }
+
+  function renderEmpty(): JSX.Element {
+    if (!props.emptyMessage) {
+      return (
+        <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
+          No items to display
+        </text>
+      )
+    }
+
+    return typeof props.emptyMessage === 'string' ? (
+      <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
+        {props.emptyMessage}
+      </text>
+    ) : (
+      props.emptyMessage
+    )
+  }
 }
 
-/**
- * Specialized ScrollableLogBox for log entries
- */
+function resolveBorderStyle(
+  explicit: ScrollableBoxProps['border'],
+  themeBorder: 'single' | 'double' | 'rounded' | 'heavy' | 'light'
+) {
+  if (explicit === 'none') {
+    return undefined
+  }
+
+  const target = explicit ?? themeBorder
+
+  switch (target) {
+    case 'single':
+    case 'light':
+      return border.borderStyle('thin')
+    case 'double':
+      return border.borderStyle('double')
+    case 'rounded':
+      return border.borderStyle('rounded')
+    case 'thick':
+    case 'heavy':
+      return border.borderStyle('thick')
+    default:
+      return border.borderStyle('thin')
+  }
+}
+
 export interface LogEntry {
   timestamp: Date
   level: 'debug' | 'info' | 'warn' | 'error'
@@ -93,47 +184,62 @@ export interface LogEntry {
   message: string
 }
 
-export const ScrollableLogBox = (
-  props: Omit<ScrollableBoxProps, 'renderItem' | 'items'> & {
+export function ScrollableLogBox(
+  props: Omit<ScrollableBoxProps<LogEntry>, 'items' | 'renderItem'> & {
     logs: ReadonlyArray<LogEntry>
     colorize?: boolean
   }
-) => {
-  const { logs, colorize = true, ...rest } = props
+): JSX.Element {
+  const colorize = props.colorize ?? true
 
   const levelColors = {
-  debug: colors.gray,
-  info: colors.blue,
-  warn: colors.yellow,
-  error: colors.red,
-  }
+    debug: colors.gray,
+    info: colors.blue,
+    warn: colors.yellow,
+    error: colors.red,
+  } as const
 
   const levelIcons = {
     debug: '🔍',
     info: 'ℹ️',
     warn: '⚠️',
     error: '❌',
-  }
+  } as const
 
-  return ScrollableBox({
-    ...rest,
-    items: logs,
-    renderItem: (log: LogEntry) =>
-      hstack(
-        styledText(log.timestamp.toLocaleTimeString(), style().foreground(colors.gray)),
-        styledText(`[${log.source.padEnd(12)}]`, style().foreground(colors.cyan)),
-          `${levelIcons[log.level]} ${log.level.toUpperCase().padEnd(5)}`,
-          colorize ? style().foreground(levelColors[log.level]).bold() : style()
-        ),
-        styledText(`[${log.source.padEnd(12)}]`, style().foreground(colors.cyan)),
-        text(log.message)
-      ),
-  })
+  return (
+    <ScrollableBox
+      {...props}
+      items={props.logs}
+      renderItem={(log, index) => (
+        <vstack gap={0.5} key={String(index)}>
+          <hstack gap={1}>
+            <text style={style().foreground(colors.gray)}>
+              {log.timestamp.toLocaleTimeString()}
+            </text>
+            <text style={style().foreground(colors.cyan)}>
+              [{log.source}]
+            </text>
+            <text
+              style={
+                colorize
+                  ? style()
+                      .background(levelColors[log.level])
+                      .foreground(colors.black)
+                      .padding(0, 1)
+                      .bold()
+                  : style().bold()
+              }
+            >
+              {levelIcons[log.level]} {log.level.toUpperCase()}
+            </text>
+          </hstack>
+          <text>{log.message}</text>
+        </vstack>
+      )}
+    />
+  )
 }
 
-/**
- * ScrollableProcessList for process status displays
- */
 export interface ProcessInfo {
   name: string
   status: 'running' | 'stopped' | 'error' | 'starting'
@@ -142,47 +248,62 @@ export interface ProcessInfo {
   restarts?: number
 }
 
-export const ScrollableProcessList = (
-  props: Omit<ScrollableBoxProps, 'renderItem' | 'items'> & {
+export function ScrollableProcessList(
+  props: Omit<ScrollableBoxProps<ProcessInfo>, 'items' | 'renderItem'> & {
     processes: ReadonlyArray<ProcessInfo>
     detailed?: boolean
   }
-) => {
-  const { processes, detailed = false, ...rest } = props
+): JSX.Element {
+  const detailed = props.detailed ?? false
 
   const statusColors = {
     running: colors.green,
     stopped: colors.gray,
     error: colors.red,
     starting: colors.yellow,
-  }
+  } as const
 
   const statusIcons = {
     running: '🟢',
     stopped: '⚪',
     error: '🔴',
     starting: '🟡',
-  }
+  } as const
 
-  return ScrollableBox({
-    ...rest,
-    items: processes,
-    renderItem: (proc: ProcessInfo) =>
-      vstack(
-        hstack(
-          text(statusIcons[proc.status] || '⚫'),
-          styledText(proc.name.padEnd(20), style().foreground(colors.cyan).bold()),
-            styledText(`PID: ${proc.pid.toString().padEnd(8)}`, style().foreground(colors.gray)),
-          proc.uptime && styledText(`⏱️  ${proc.uptime}s`, style().foreground(colors.blue)),
-            styledText(`🔄 ${proc.restarts}`, style().foreground(colors.yellow))
-        detailed && styledText('└─ Additional details here...', style().foreground(colors.gray))
-          proc.pid &&
-            styledText(`PID: ${proc.pid.toString().padEnd(8)}`, style().foreground(colors.gray)),
-          proc.uptime && styledText(`⏱️  ${proc.uptime}s`, style().foreground(colors.blue)),
-            styledText(`🔄 ${proc.restarts}`, style().foreground(colors.yellow))
-        detailed && styledText('└─ Additional details here...', style().foreground(colors.gray))
-        ),
-        detailed && styledText('└─ Additional details here...', style().foreground(colors.gray))
-      ),
-  })
+  return (
+    <ScrollableBox
+      {...props}
+      items={props.processes}
+      renderItem={(proc, index) => (
+        <vstack gap={detailed ? 1 : 0} key={String(index)}>
+          <hstack gap={1} align="middle">
+            <text>{statusIcons[proc.status]}</text>
+            <text style={style().foreground(colors.cyan).bold()}>
+              {proc.name}
+            </text>
+            {proc.pid !== undefined && (
+              <text style={style().foreground(colors.gray)}>
+                PID: {proc.pid}
+              </text>
+            )}
+            {proc.uptime !== undefined && (
+              <text style={style().foreground(colors.blue)}>
+                ⏱ {proc.uptime}s
+              </text>
+            )}
+            {proc.restarts !== undefined && (
+              <text style={style().foreground(colors.yellow)}>
+                🔄 {proc.restarts}
+              </text>
+            )}
+          </hstack>
+          {detailed && (
+            <text style={style().foreground(statusColors[proc.status]).italic()}>
+              Status: {proc.status.toUpperCase()}
+            </text>
+          )}
+        </vstack>
+      )}
+    />
+  )
 }

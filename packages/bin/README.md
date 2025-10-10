@@ -1,92 +1,257 @@
-# @tuix/tuix
+# @tuix/bin - TUIX CLI
 
-Main TUIX framework package with React-like TUI development experience
+The official TUIX command-line interface showcasing the framework's capabilities with modern, clean UI.
+
+## Features
+
+- ✨ **Modern UI** - Clean panels with rounded borders, vibes theme (black, white, green)
+- 🎨 **Theme-aware** - All components use the vibes theme automatically
+- 📊 **Live Dashboard** - Real-time system metrics with progress bars
+- 📚 **Interactive Help** - Browse commands with keyboard navigation
+- 🔌 **Plugin Integration** - Config, Logger, Process Manager, Testing, and more
+- 🚀 **Fast** - Built with Bun for maximum performance
 
 ## Installation
 
 ```bash
-bun add @tuix/tuix
-# or
-npm install @tuix/tuix
+bun add @tuix/bin
 ```
 
-## Overview
+Or install globally:
 
-This package is part of the **TUIX** framework - a performant TUI framework for Bun with JSX and reactive state management.
-
-### Category: Ui
-
-UI packages contain components and utilities for building user interfaces.
+```bash
+bun add -g @tuix/bin
+```
 
 ## Usage
 
-```typescript
-import { /* exports */ } from '@tuix/tuix'
+### Welcome Screen
+
+```bash
+tuix
 ```
 
-## API Reference
+Shows the welcome screen with quick start guide.
 
-- **Default**: `./src/index.ts`
-- **./runtime**: `@tuix/core`
-- **./cli**: `@tuix/cli`
-- **./plugins**: `@tuix/plugins/index.ts`
-- **./jsx**: `@tuix/jsx-runtime`
-- **./jsx-runtime**: `@tuix/jsx-runtime`
-- **./jsx-dev-runtime**: `@tuix/jsx-runtime`
-- **./cli/jsx**: `@tuix/cli`
-- **./debug**: `@tuix/debug`
-- **./components**: `@tuix/ui/components/index.ts`
-- **./components/data**: `@tuix/ui/components/data/index.ts`
-- **./components/display**: `@tuix/ui/components/display/index.ts`
-- **./components/display/text**: `@tuix/ui/components/display/text/index.ts`
-- **./components/display/large-text**: `@tuix/ui/components/display/large-text/index.ts`
-- **./components/feedback**: `@tuix/ui/components/feedback/index.ts`
-- **./components/feedback/spinner**: `@tuix/ui/components/feedback/spinner/index.ts`
-- **./components/forms**: `@tuix/ui/components/forms/index.ts`
-- **./components/forms/text-input**: `@tuix/ui/components/forms/text-input/index.ts`
-- **./components/forms/button**: `@tuix/ui/components/forms/button/index.ts`
-- **./components/layout**: `@tuix/ui/components/layout/index.ts`
-- **./components/layout/box**: `@tuix/ui/components/layout/box/index.ts`
-- **./components/layout/flex**: `@tuix/ui/components/layout/flex/index.ts`
-- **./styling**: `@tuix/styling/index.ts`
-- **./process-manager**: `@tuix/process-manager`
-- **./logger**: `@tuix/logger`
-- **./testing**: `@tuix/testing`
-- **./core**: `@tuix/core`
-- **./config**: `@tuix/config`
+### Version Information
 
-## Examples
+```bash
+tuix version
+```
 
-See tests and documentation for usage examples.
+Displays version, build info, and system details in a beautiful panel.
+
+### Interactive Help
+
+```bash
+tuix help
+```
+
+Browse all available commands with keyboard navigation:
+- ↑/↓ or j/k: Navigate
+- Enter: View details
+- Esc/q: Back/Quit
+
+### System Dashboard
+
+```bash
+tuix dashboard
+```
+
+Live system status with:
+- Service health indicators
+- CPU and memory usage
+- Runtime information
+- Auto-updating metrics
+
+### Plugin Commands
+
+All plugin commands are available through the TUIX CLI:
+
+```bash
+# Config management
+tuix config get <key>
+tuix config set <key> <value>
+tuix config list
+
+# Logging
+tuix logs view
+tuix logs clear
+tuix logs export
+
+# Process management
+tuix pm list
+tuix pm start <name>
+tuix pm stop <name>
+tuix pm restart <name>
+
+# Testing
+tuix test
+tuix test dashboard
+tuix test watch
+```
+
+## Architecture
+
+The TUIX CLI dogfoods our own framework to demonstrate best practices:
+
+### Theme Integration
+
+```tsx
+<ThemeProvider config={{ defaultTheme: 'vibes' }}>
+  <YourApp />
+</ThemeProvider>
+```
+
+### Modern Components
+
+All commands use the new modern components:
+
+- **Panel** - Main containers with rounded borders
+- **Header** - Page headers with title/subtitle
+- **Badge** - Status indicators
+- **StatusIndicator** - Service health with pulse animation
+- **Divider** - Visual separators
+- **ProgressBar** - Resource usage meters
+
+### Plugin Composition
+
+```tsx
+<ConfigPlugin>
+  <LoggerPlugin>
+    <ProcessManagerPlugin>
+      <TestingPlugin>
+        <Command name="..." component={...} />
+      </TestingPlugin>
+    </ProcessManagerPlugin>
+  </LoggerPlugin>
+</ConfigPlugin>
+```
+
+## Vibes Theme
+
+The TUIX CLI uses the custom "vibes" theme:
+
+- **Background**: Almost black (`#0a0a0a`)
+- **Text**: Pure white (`#ffffff`)
+- **Primary**: Modern green (`#22c55e`)
+- **Borders**: Rounded, subtle dark gray
+- **Aesthetic**: Clean, modern, professional
 
 ## Development
 
-This package is part of the TUIX monorepo. For development:
+### Running from Source
 
 ```bash
-# Clone the monorepo
-git clone https://github.com/cinderlink/tuix.git
-cd tuix
-
-# Install dependencies
-bun install
-
-# Run tests for this package
-cd packages/tuix
-bun test
-
-# Run type checking
-bun run typecheck
+cd packages/bin
+bun run src/bin/tuix.ts
 ```
 
-## Related Packages
+### Adding Commands
 
-- [@tuix/core](packages/core/README.md) - Core TUIX framework with MVU architecture, reactivity, and coordination
-- [@tuix/config](packages/config/README.md) - Configuration management system with multiple sources and validation
-- [@tuix/jsx-runtime](packages/jsx-runtime/README.md) - Custom JSX runtime for TUIX applications with TypeScript support
-- [@tuix/runtime](packages/runtime/README.md) - Runtime system for TUIX applications with fiber scheduling
-- [@tuix/process-manager](packages/process-manager/README.md) - Process management and service coordination for development workflows
+1. Create command component in `src/commands/`
+2. Import and add to `src/app.tsx`
+3. Follow the existing patterns
+
+Example:
+
+```tsx
+// src/commands/mycommand.tsx
+import { Panel, Header } from '@tuix/ui'
+
+export function MyCommand(): JSX.Element {
+  return (
+    <Panel title="My Command" variant="primary" rounded>
+      <Header title="Hello!" subtitle="Custom command" />
+      <text>Command content here</text>
+    </Panel>
+  )
+}
+
+// src/app.tsx
+import { MyCommand } from './commands/mycommand'
+
+<Command 
+  name="mycommand"
+  description="My custom command"
+  component={MyCommand}
+/>
+```
+
+## Examples
+
+### Version Command
+
+```tsx
+<Panel title="TUIX Framework" variant="primary" rounded>
+  <Header 
+    title="TUIX v1.0.0"
+    subtitle="Modern Terminal UI Framework"
+    badge={<Badge variant="success" label="Stable" />}
+  />
+  
+  <Divider />
+  
+  <box flexDirection="column" gap={1}>
+    <text>Runtime: Bun {Bun.version}</text>
+    <text>Platform: {process.platform}</text>
+  </box>
+</Panel>
+```
+
+### Dashboard Command
+
+```tsx
+<StatusIndicator status="active" label="Service" pulse />
+
+<ProgressBar 
+  value={75} 
+  label="CPU Usage" 
+  showPercentage
+  variant="success"
+/>
+```
+
+## Best Practices
+
+1. **Use Theme Variants** - `variant="primary"` instead of hardcoded colors
+2. **Round All Borders** - Use `rounded` prop on panels
+3. **Consistent Spacing** - Use theme spacing values
+4. **Semantic Colors** - Use success/warning/error variants
+5. **Responsive Layout** - Use flexbox from @tuix/view
+
+## CLI Structure
+
+```
+packages/bin/
+├── src/
+│   ├── app.tsx           # Main app with plugin composition
+│   ├── index.ts          # Public exports
+│   ├── bin/
+│   │   └── tuix.ts       # CLI entry point
+│   └── commands/
+│       ├── welcome.tsx   # Welcome screen
+│       ├── version.tsx   # Version info
+│       ├── help.tsx      # Interactive help
+│       └── dashboard.tsx # Status dashboard
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+## Contributing
+
+The TUIX CLI is the perfect example of framework usage. When adding features:
+
+1. Follow the modern UI patterns
+2. Use theme-aware components
+3. Maintain clean, readable code
+4. Add comprehensive documentation
 
 ## License
 
 MIT
+
+---
+
+**Built with TUIX** - Showcasing the power of modern terminal UIs ✨

@@ -4,7 +4,7 @@
 
 import { Effect } from 'effect'
 import { getGlobalEventBus } from '@tuix/reactive/events/event-bus'
-import { getGlobalRegistry } from '@tuix/runtime/module/registry'
+import { getGlobalRegistry } from '@tuix/core'
 import { ReactivityModule } from './module'
 import { ReactivityEventChannels } from './events'
 

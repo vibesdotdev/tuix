@@ -1,54 +1,18 @@
 import { stripAnsi } from './strip'
 
-const isControl = (codepoint: number): boolean =>
-  (codepoint >= 0 && codepoint <= 0x1f) || (codepoint >= 0x7f && codepoint <= 0x9f)
-
-const isCombining = (codepoint: number): boolean =>
-  (codepoint >= 0x0300 && codepoint <= 0x036f) ||
-  (codepoint >= 0x1ab0 && codepoint <= 0x1aff) ||
-  (codepoint >= 0x1dc0 && codepoint <= 0x1dff) ||
-  (codepoint >= 0x20d0 && codepoint <= 0x20ff) ||
-  (codepoint >= 0xfe20 && codepoint <= 0xfe2f)
-
-const isFullWidth = (codepoint: number): boolean =>
-  codepoint >= 0x1100 &&
-  (
-    codepoint <= 0x115f ||
-    codepoint === 0x2329 ||
-    codepoint === 0x232a ||
-    (codepoint >= 0x2e80 && codepoint <= 0xa4cf && codepoint !== 0x303f) ||
-    (codepoint >= 0xac00 && codepoint <= 0xd7a3) ||
-    (codepoint >= 0xf900 && codepoint <= 0xfaff) ||
-    (codepoint >= 0xfe10 && codepoint <= 0xfe19) ||
-    (codepoint >= 0xfe30 && codepoint <= 0xfe6f) ||
-    (codepoint >= 0xff00 && codepoint <= 0xff60) ||
-    (codepoint >= 0xffe0 && codepoint <= 0xffe6) ||
-    (codepoint >= 0x1f300 && codepoint <= 0x1f64f) ||
-    (codepoint >= 0x1f900 && codepoint <= 0x1f9ff) ||
-    (codepoint >= 0x20000 && codepoint <= 0x3fffd)
-  )
-
-const charWidth = (char: string): number => {
-  const codepoint = char.codePointAt(0)
-  if (codepoint === undefined) return 0
-  if (isControl(codepoint) || isCombining(codepoint)) return 0
-  return isFullWidth(codepoint) ? 2 : 1
-}
-
+/**
+ * Calculate the visual width of a string in terminal columns
+ *
+ * Uses Bun's native stringWidth for accurate emoji and wide character detection.
+ * This ensures consistency across the codebase.
+ */
 export const visualWidth = (input: string): number => {
   if (!input) return 0
 
-  let width = 0
-  const normalized = stripAnsi(input).normalize('NFC')
-
-  for (const char of normalized) {
-    width += charWidth(char)
-  }
-
-  return width
+  // Strip ANSI codes and use Bun's native stringWidth
+  const cleaned = stripAnsi(input)
+  return Bun.stringWidth(cleaned)
 }
-
-const stringIterator = (input: string): string[] => [...stripAnsi(input).normalize('NFC')]
 
 export const truncate = (input: string, maxWidth: number, suffix = '...'): string => {
   if (maxWidth <= 0) return ''
@@ -61,11 +25,13 @@ export const truncate = (input: string, maxWidth: number, suffix = '...'): strin
 
   let width = 0
   let result = ''
+  const cleaned = stripAnsi(input)
 
-  for (const char of stringIterator(input)) {
-    const w = charWidth(char)
-    if (width + w > target) break
-    width += w
+  // Iterate through grapheme clusters for proper emoji/character handling
+  for (const char of cleaned) {
+    const charWidth = Bun.stringWidth(char)
+    if (width + charWidth > target) break
+    width += charWidth
     result += char
   }
 

@@ -15,8 +15,9 @@
 // Test utilities
 export * from './testUtils'
 
-// E2E testing harness
-export * from './e2eHarness'
+// E2E testing harness - only export if not in production
+// Skip node-pty import to avoid ABI version issues
+// export * from './e2eHarness'
 
 // Lightweight testing harness (no PTY dependency)
 export * from './harness'
@@ -26,3 +27,13 @@ export * from './inputAdapter'
 
 // Visual testing utilities
 export * from './visualTest'
+
+// Snapshot testing (Phase 6)
+export * from './snapshot'
+
+// Performance testing (Phase 6)
+export * from './perf'
+
+// Testing plugin (Phase 6)
+export * from './plugin'
+export { Testing as TestingPlugin } from './plugin'

@@ -83,6 +83,8 @@ export interface FlexboxProps {
   readonly gap?: number
   readonly rowGap?: number
   readonly columnGap?: number
+  readonly width?: number
+  readonly height?: number
   readonly padding?: {
     top?: number
     right?: number

@@ -1,16 +1,13 @@
 /**
  * FilterBox Component
  *
- * A reusable filtering UI component with preset filters and search
- * Can be used for logs, processes, and any filterable content
+ * Reusable filter ribbon with preset chips and search summary.
+ * Implemented with JSX primitives so it composes naturally with other @tuix/ui widgets.
  */
 
-import { Effect } from 'effect'
-import type { View } from '@tuix/view/primitives/view'
-import * as ViewUtils from '@tuix/view/primitives/view'
-import { style, colors } from '@tuix/ansi'
-
-const { vstack, hstack, text, styledText } = ViewUtils
+import type { JSX } from '@tuix/jsx'
+import { style, colors, border } from '@tuix/ansi'
+import { useUITheme } from '../../theme'
 
 export interface FilterPreset {
   readonly name: string
@@ -22,96 +19,167 @@ export interface FilterPreset {
 export interface FilterBoxProps {
   readonly title?: string
   readonly presets?: ReadonlyArray<FilterPreset>
-  readonly activePreset?: string
+  readonly activePreset?: string | null
   readonly searchTerm?: string
   readonly onPresetChange?: (preset: string | null) => void
-  readonly onSearchChange?: (term: string) => void
+  readonly onSearchClear?: () => void
   readonly showSearch?: boolean
   readonly searchPlaceholder?: string
   readonly compact?: boolean
+  readonly className?: string
 }
 
-/**
- * FilterBox component for filtering UI
- */
-export const FilterBox = (props: FilterBoxProps): View => {
-  const {
-    title = 'Filters',
-    presets = [],
-    activePreset,
-    searchTerm = '',
-    showSearch = true,
-    searchPlaceholder = 'Search...',
-    compact = false,
-  } = props
+export function FilterBox(props: FilterBoxProps): JSX.Element {
+  const { theme } = useUITheme()
+  const presets = props.presets ?? []
+  const activePreset = props.activePreset ?? null
+  const searchTerm = props.searchTerm ?? ''
+  const showSearch = props.showSearch ?? true
+  const compact = props.compact ?? false
 
-  const content = compact
-    ? // Compact horizontal layout
-      hstack(
-        // Presets
-        presets.length > 0 &&
-          hstack(
-            styledText('Filter: ', style().foreground(colors.gray)),
-            ...presets
-              .map(preset =>
-                styledText(
-                  `${preset.icon || '•'} ${preset.label}`,
-                  style()
-                    .foreground(activePreset === preset.name ? colors.cyan : colors.gray)
-                    .bold(activePreset === preset.name)
-                )
-              )
-              .reduce(
-                (acc, item, i) => (i === 0 ? [item] : [...acc, text(' | '), item]),
-                [] as View[]
-              )
-          ),
+  const presetChips =
+    presets.length > 0
+      ? presets.map(preset => renderPresetChip(preset))
+      : []
 
-        // Search
-        showSearch &&
-          hstack(
-            text('  '),
-            text('🔍 '),
-            searchTerm
-              ? styledText(searchTerm, style().foreground(colors.yellow))
-              : styledText(searchPlaceholder, style().foreground(colors.gray).italic())
-          )
+  const searchSummary =
+    showSearch && (searchTerm.length > 0 || props.searchPlaceholder)
+      ? renderSearchSummary()
+      : null
+
+  const layoutChildren: (JSX.Element | null)[] = [
+    props.title ? (
+      <text style={style().foreground(theme.colors.textBright ?? colors.white).bold()}>
+        {props.title}
+      </text>
+    ) : null,
+
+    presets.length > 0
+      ? compact
+        ? renderCompactRibbon()
+        : renderPresetSection()
+      : null,
+
+    searchSummary,
+  ]
+
+  return (
+    <vstack
+      gap={compact ? 0 : 1}
+      className={props.className}
+      data-component="filter-box"
+    >
+      {layoutChildren.filter(Boolean)}
+    </vstack>
+  )
+
+  function renderPresetChip(preset: FilterPreset): JSX.Element {
+    const isActive = preset.name === activePreset
+    const baseStyle = style()
+      .padding(0, 1)
+      .border(border.borderStyle('thin'))
+      .borderForeground(theme.colors.border ?? colors.gray)
+
+    const activeStyle = isActive
+      ? style()
+          .background(theme.colors.selection ?? colors.blue)
+          .foreground(theme.colors.textBright ?? colors.white)
+          .bold()
+      : style().foreground(theme.colors.fg ?? colors.white)
+
+    return (
+      <interactive
+        key={preset.name}
+        focusable
+        onClick={() => props.onPresetChange?.(preset.name)}
+      >
+        <hstack
+          gap={1}
+          style={baseStyle.merge(activeStyle)}
+          align="middle"
+        >
+          {preset.icon && (
+            <text aria-hidden="true">{preset.icon}</text>
+          )}
+          <text>{preset.label}</text>
+        </hstack>
+      </interactive>
+    )
+  }
+
+  function renderPresetSection(): JSX.Element {
+    return (
+      <vstack gap={1}>
+        <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
+          Quick Filters
+        </text>
+        <hstack gap={1} wrap>
+          {presetChips}
+          {activePreset && (
+            <interactive
+              focusable
+              onClick={() => props.onPresetChange?.(null)}
+            >
+              <text
+                style={style()
+                  .foreground(colors.red)
+                  .padding(0, 1)}
+              >
+                Clear
+              </text>
+            </interactive>
+          )}
+        </hstack>
+      </vstack>
+    )
+  }
+
+  function renderCompactRibbon(): JSX.Element {
+    return (
+      <hstack gap={1} wrap align="middle">
+        {presets.length > 0 && (
+          <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
+            Filter:
+          </text>
+        )}
+        {presetChips.length > 0 ? presetChips : null}
+        {activePreset && (
+          <interactive
+            focusable
+            onClick={() => props.onPresetChange?.(null)}
+          >
+            <text style={style().foreground(colors.red)}>✕</text>
+          </interactive>
+        )}
+      </hstack>
+    )
+  }
+
+  function renderSearchSummary(): JSX.Element {
+    const textStyle = style().foreground(theme.colors.textDim ?? colors.gray)
+
+    if (searchTerm.length === 0) {
+      return (
+        <text style={textStyle.italic()}>
+          {props.searchPlaceholder ?? 'Search...'}
+        </text>
       )
-    : // Full layout
-      vstack(
-        // Preset buttons
-        presets.length > 0 &&
-          vstack(
-            styledText('Quick Filters:', style().foreground(colors.cyan).bold()),
-            text(''),
-            ...presets.map(preset =>
-              hstack(
-                styledText(
-                  activePreset === preset.name ? '▶' : ' ',
-                  style().foreground(activePreset === preset.name ? colors.green : colors.gray)
-                ),
-                text(preset.icon || '•'),
-                styledText(
-                  preset.label,
-                  style()
-                    .foreground(activePreset === preset.name ? colors.cyan : colors.white)
-                    .bold(activePreset === preset.name)
-                )
-              )
-            )
-          ),
+    }
 
-        // Search box
-        showSearch &&
-          hstack(
-            text('🔍'),
-            searchTerm
-              ? styledText(searchTerm, style().foreground(colors.yellow))
-              : styledText(searchPlaceholder, style().foreground(colors.gray).italic())
-          )
-      )
-
-  return content
+    return (
+      <hstack gap={1} align="middle">
+        <text style={style().foreground(theme.colors.info ?? colors.cyan)}>
+          🔍
+        </text>
+        <text>{searchTerm}</text>
+        {props.onSearchClear && (
+          <interactive focusable onClick={() => props.onSearchClear?.()}>
+            <text style={style().foreground(colors.red)}>Clear</text>
+          </interactive>
+        )}
+      </hstack>
+    )
+  }
 }
 
 /**
@@ -171,58 +239,61 @@ export const PROCESS_FILTER_PRESETS: FilterPreset[] = [
   },
 ]
 
-/**
- * Combined filter and content display
- */
 export interface FilterableContentProps<T> {
   readonly items: ReadonlyArray<T>
-  readonly renderItem: (item: T, index: number) => View
+  readonly renderItem: (item: T, index: number) => JSX.Element
   readonly filters?: FilterPreset[]
-  readonly searchFields?: (keyof T)[]
+  readonly activePreset?: string | null
+  readonly searchTerm?: string
   readonly title?: string
-  readonly emptyMessage?: string
+  readonly emptyMessage?: string | JSX.Element
+  readonly className?: string
 }
 
-export const FilterableContent = <T extends Record<string, any>>(
+export function FilterableContent<T extends Record<string, any>>(
   props: FilterableContentProps<T>
-): View => {
-  const {
-    items,
-    renderItem,
-    filters = [],
-    searchFields = [],
-    title = 'Filterable Content',
-    emptyMessage = 'No items match the current filters',
-  } = props
+): JSX.Element {
+  const { theme } = useUITheme()
+  const activeFilter =
+    props.filters?.find(filter => filter.name === props.activePreset)?.filter ??
+    (() => true)
 
-  // In a real implementation, this would be stateful
-  // For now, we'll just show the UI structure
-  const filteredItems = items
+  const filteredItems = props.items.filter(activeFilter)
 
-  return vstack(
-    // Filter controls
-    FilterBox({
-      presets: filters,
-      compact: true,
-      showSearch: searchFields.length > 0,
-    }),
+  return (
+    <vstack gap={1} className={props.className}>
+      {props.title && (
+            <text style={style().foreground(theme.colors.textBright ?? colors.white).bold()}>
+          {props.title}
+        </text>
+      )}
 
-    text(''),
-    styledText('─'.repeat(80), style().foreground(colors.gray)),
-    text(''),
+      <FilterBox
+        presets={props.filters}
+        activePreset={props.activePreset}
+        searchTerm={props.searchTerm}
+        showSearch={Boolean(props.searchTerm)}
+      />
 
-    // Content
-    filteredItems.length === 0 || items.length === 0
-      ? styledText(emptyMessage, style().foreground(colors.yellow))
-      : text(''),
-
-    // Status bar
-    text(''),
-    hstack(
-      styledText(
-        `Showing ${filteredItems.length} of ${items.length} items`,
-        style().foreground(colors.gray)
-      )
-    )
+      {filteredItems.length === 0 ? (
+        typeof props.emptyMessage === 'string' ? (
+          <text
+            style={style().foreground(theme.colors.textDim ?? colors.gray)}
+          >
+            {props.emptyMessage}
+          </text>
+        ) : (
+          props.emptyMessage ?? (
+            <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
+              No items match the current filters
+            </text>
+          )
+        )
+      ) : (
+        <vstack gap={1}>
+          {filteredItems.map((item, index) => props.renderItem(item, index))}
+        </vstack>
+      )}
+    </vstack>
   )
 }

@@ -25,22 +25,19 @@ import { style, Style, color, border, type StyleProps } from "@tuix/ansi";
 import {
   isBindableRune,
   isStateRune,
-  scopeManager,
   getGlobalEventBus,
-  Scope,
-  ScopeContent,
-  ScopeFallback,
   type BindableRune,
   type StateRune,
-  type ScopeContext,
-  type ScopeDef,
 } from "@tuix/reactive";
+import { scopeManager } from "./scope/manager";
+import { Scope, ScopeContent, ScopeFallback } from "./scope/components";
+import type { ScopeContext, ScopeDef } from "./scope/types";
 import { config, templates } from "@tuix/config";
 import { mergeDeep } from "@tuix/config/utils";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { Effect } from "effect";
-import { getGlobalRegistry } from "@tuix/runtime";
+import { getGlobalRegistry } from "@tuix/core";
 // import { JSXModule } from "@tuix/jsx/module";
 import type { JSXPluginEvent, JSXCommandEvent } from "@tuix/jsx/events";
 // import { onMount } from '../../reactivity/jsx-lifecycle' // TODO: Fix jsx-lifecycle import
@@ -635,14 +632,12 @@ const buildStyle = (
 const toTextContent = (children: unknown[]): string | null => {
   const segments: string[] = [];
   for (const child of children) {
-    if (child == null) continue;
+    // Skip null, undefined, and booleans (like React does)
+    if (child == null || typeof child === 'boolean') continue;
+
     const type = typeof child;
     if (type === "string" || type === "number" || type === "bigint") {
       segments.push(String(child));
-      continue;
-    }
-    if (type === "boolean") {
-      segments.push(child ? "true" : "false");
       continue;
     }
     if (type === "object" && "toString" in (child as Record<string, unknown>)) {
@@ -658,6 +653,9 @@ const toTextContent = (children: unknown[]): string | null => {
 };
 
 const toView = (child: unknown): View | null => {
+  // Skip null, undefined, and booleans (like React does)
+  if (child == null || typeof child === 'boolean') return null;
+
   if (isView(child)) return child;
   if (child && typeof child === "object" && "render" in (child as Record<string, unknown>)) {
     const candidate = child as View;
@@ -775,6 +773,16 @@ const normalizePadding = (
 const resolveBorderPreset = (value: unknown) => {
   if (value === true || value === "true") return border.thin;
   if (!value || value === false || value === "false" || value === "none") return undefined;
+
+  // If it's already a Border object, return it directly
+  if (typeof value === "object" && value !== null) {
+    const borderObj = value as any;
+    if (borderObj.topLeft && borderObj.topRight && borderObj.bottomLeft &&
+        borderObj.bottomRight && borderObj.horizontal && borderObj.vertical) {
+      return borderObj;
+    }
+  }
+
   if (typeof value === "string") {
     const key = value.toLowerCase();
     switch (key) {
@@ -1736,12 +1744,24 @@ export namespace JSX {
   export interface Element extends View {}
 
   export interface IntrinsicElements {
-    text: { children?: unknown };
+    text: {
+      children?: unknown;
+      style?: Style;
+    };
     box: {
       children?: unknown;
       style?: Style;
-      padding?: number;
+      border?: string | boolean;
+      borderStyle?: string;
+      borderColor?: string;
+      padding?: number | { top?: number; right?: number; bottom?: number; left?: number };
       margin?: number;
+      width?: number;
+      height?: number;
+      minWidth?: number;
+      minHeight?: number;
+      background?: string;
+      variant?: string;
     };
     vstack: {
       children?: unknown;

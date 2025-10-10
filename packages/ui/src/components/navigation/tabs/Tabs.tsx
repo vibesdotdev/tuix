@@ -34,11 +34,10 @@
  * ```
  */
 
-import { jsx } from '@tuix/jsx'
 import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
 import type { StateRune } from '@tuix/reactive/runes/runes'
 import { isStateRune } from '@tuix/reactive/runes/runes'
-import { style, Colors, type Style } from '@tuix/ansi'
+import { style, colors, type Style } from '@tuix/ansi'
 
 // Types
 export interface TabProps {
@@ -73,8 +72,7 @@ export interface TabsProps {
  * Tab Component (used as child of Tabs)
  */
 export function Tab(props: TabProps): JSX.Element {
-  // Tab is just a container for props, rendering is handled by Tabs
-  return jsx('tab', props)
+  return <tab {...props} />
 }
 
 /**
@@ -218,20 +216,20 @@ export function Tabs(props: TabsProps): JSX.Element {
 
     const activeStyle = isActive
       ? style({
-          background: color.blue,
-          foreground: color.white,
+          background: colors.blue,
+          foreground: colors.white,
           bold: true,
         })
       : style({
           background: 'transparent',
-          foreground: color.gray,
+          foreground: colors.gray,
         })
 
     const focusStyle =
       isFocused && !isActive
         ? style({
-            background: color.gray,
-            foreground: color.white,
+            background: colors.gray,
+            foreground: colors.white,
           })
         : {}
 
@@ -239,62 +237,65 @@ export function Tabs(props: TabsProps): JSX.Element {
 
     // Icon
     if (tab.icon) {
-      content.push(typeof tab.icon === 'string' ? jsx('text', { children: tab.icon }) : tab.icon)
+      content.push(
+        typeof tab.icon === 'string' ? <text>{tab.icon}</text> : tab.icon
+      )
     }
 
     // Label
-    content.push(jsx('text', { children: tab.label }))
+    content.push(<text>{tab.label}</text>)
 
     // Badge
     if (tab.badge !== undefined) {
       content.push(
-        jsx('text', {
-          style: style()
-            .background(isActive ? color.white : color.blue)
-            .foreground(isActive ? color.blue : color.white)
+        <text
+          style={style()
+            .background(isActive ? colors.white : colors.blue)
+            .foreground(isActive ? colors.blue : colors.white)
             .padding({ horizontal: 1 })
-            .borderRadius(2),
-          children: String(tab.badge),
-        })
+            .borderRadius(2)}
+        >
+          {String(tab.badge)}
+        </text>
       )
     }
 
     // Close button
     if (tab.closeable) {
       content.push(
-        jsx('interactive', {
-          onClick: (e: any) => {
+        <interactive
+          onClick={(e: any) => {
             e.stopPropagation?.()
             closeTab(index)
-          },
-          children: jsx('text', {
-            style: style().foreground(color.red).marginLeft(1),
-            children: '×',
-          }),
-        })
+          }}
+        >
+          <text style={style().foreground(colors.red).marginLeft(1)}>×</text>
+        </interactive>
       )
     }
 
-    return jsx('interactive', {
-      onClick: () => !isDisabled && setActiveIndex(index),
-      onMouseEnter: () => {
-        if (!isDisabled) {
-          focusedTabIndex.$set(index)
-        }
-      },
-      children: jsx('box', {
-        style: style({
-          ...baseStyle,
-          ...activeStyle,
-          ...focusStyle,
-        }),
-        children: jsx('hstack', {
-          gap: 1,
-          align: 'middle',
-          children: content,
-        }),
-      }),
-    })
+    return (
+      <interactive
+        onClick={() => !isDisabled && setActiveIndex(index)}
+        onMouseEnter={() => {
+          if (!isDisabled) {
+            focusedTabIndex.$set(index)
+          }
+        }}
+      >
+        <box
+          style={style({
+            ...baseStyle,
+            ...activeStyle,
+            ...focusStyle,
+          })}
+        >
+          <hstack gap={1} align="middle">
+            {content}
+          </hstack>
+        </box>
+      </interactive>
+    )
   }
 
   function renderTabBar(): JSX.Element {
@@ -309,21 +310,26 @@ export function Tabs(props: TabsProps): JSX.Element {
       borderLeft: showBorder && tabPosition === 'right' ? 'single' : 'none',
     })
 
-    return jsx(orientation === 'horizontal' ? 'hstack' : 'vstack', {
-      style: barStyle,
-      gap: 0,
-      children: tabElements,
-    })
+    if (orientation === 'horizontal') {
+      return (
+        <hstack style={barStyle} gap={0}>
+          {tabElements}
+        </hstack>
+      )
+    }
+
+    return (
+      <vstack style={barStyle} gap={0}>
+        {tabElements}
+      </vstack>
+    )
   }
 
   function renderContent(): JSX.Element | null {
     const activeTab = tabs()[activeIndex()]
     if (!activeTab) return null
 
-    return jsx('box', {
-      style: props.contentStyle || style().padding(1),
-      children: activeTab.children,
-    })
+    return <box style={props.contentStyle || style().padding(1)}>{activeTab.children}</box>
   }
 
   // Main render
@@ -343,32 +349,42 @@ export function Tabs(props: TabsProps): JSX.Element {
       return tabPosition === 'top' ? [tabBar, content] : [content, tabBar]
     } else {
       return tabPosition === 'left'
-        ? jsx('hstack', { children: [tabBar, content] })
-        : jsx('hstack', { children: [content, tabBar] })
+        ? (
+            <hstack>
+              {tabBar}
+              {content}
+            </hstack>
+          )
+        : (
+            <hstack>
+              {content}
+              {tabBar}
+            </hstack>
+          )
     }
   }
 
-  return jsx('interactive', {
-    onKeyPress: handleKeyPress,
-    onFocus: () => {
-      focused.$set(true)
-    },
-    onBlur: () => {
-      focused.$set(false)
-    },
-    onMouseEnter: () => {
-      hovering.$set(true)
-    },
-    onMouseLeave: () => {
-      hovering.$set(false)
-    },
-    focusable,
-    className: props.className,
-    children: jsx('vstack', {
-      style: containerStyle(),
-      children: layout(),
-    }),
-  })
+  return (
+    <interactive
+      onKeyPress={handleKeyPress}
+      onFocus={() => {
+        focused.$set(true)
+      }}
+      onBlur={() => {
+        focused.$set(false)
+      }}
+      onMouseEnter={() => {
+        hovering.$set(true)
+      }}
+      onMouseLeave={() => {
+        hovering.$set(false)
+      }}
+      focusable={focusable}
+      className={props.className}
+    >
+      <vstack style={containerStyle()}>{layout()}</vstack>
+    </interactive>
+  )
 }
 
 // Preset tab styles
@@ -378,7 +394,7 @@ export function SimpleTabs(props: Omit<TabsProps, 'style'>): JSX.Element {
     tabStyle: (_, active) =>
       style()
         .padding({ horizontal: 2, vertical: 0 })
-        .foreground(active ? color.white : color.gray)
+        .foreground(active ? colors.white : colors.gray)
         .underline(active),
     ...props,
   })
@@ -390,8 +406,8 @@ export function PillTabs(props: TabsProps): JSX.Element {
     tabStyle: (_, active, focused) =>
       style()
         .padding({ horizontal: 3, vertical: 1 })
-        .background(active ? color.blue : focused ? color.gray : 'transparent')
-        .foreground(active || focused ? color.white : color.gray),
+        .background(active ? colors.blue : focused ? colors.gray : 'transparent')
+        .foreground(active || focused ? colors.white : colors.gray),
     tabBarStyle: style().padding(1),
     ...props,
   })

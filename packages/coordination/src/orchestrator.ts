@@ -8,9 +8,8 @@
 
 import { Effect, Fiber, Duration } from 'effect'
 import { EventBus } from '@tuix/reactive/events/event-bus'
-import { ModuleBase, ModuleError } from '@tuix/runtime'
+import { ModuleBase, ModuleError, getGlobalRegistry } from '@tuix/core'
 import { EventChoreographer } from './choreography'
-import { getGlobalRegistry } from '@tuix/runtime'
 import type { WorkflowConfig, WorkflowInstance, WorkflowResult } from './types'
 import { SUBMODULE_NAMES } from './constants'
 import { WorkflowError } from './errors'

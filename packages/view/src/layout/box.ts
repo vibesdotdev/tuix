@@ -16,6 +16,8 @@ import {
   Borders,
   renderBox,
   BorderSide,
+  renderStyledSync,
+  pad as padToWidth,
 } from '@tuix/ansi'
 import { joinVertical, Center } from './join'
 
@@ -74,9 +76,9 @@ const createPaddedLines = (
   // Top padding
   paddedLines.push(...Array(padding.top).fill(' '.repeat(paddedWidth)))
 
-  // Content with horizontal padding
+  // Content with horizontal padding - use ANSI-aware padding
   for (const line of contentLines) {
-    const padded = ' '.repeat(padding.left) + line.padEnd(contentWidth) + ' '.repeat(padding.right)
+    const padded = ' '.repeat(padding.left) + padToWidth(line, contentWidth) + ' '.repeat(padding.right)
     paddedLines.push(padded)
   }
 
@@ -121,30 +123,48 @@ export const styledBox = (content: View | View[], props: BoxProps = {}): View =>
       Effect.gen(function* (_) {
         // First render the inner content
         const innerContent = yield* _(innerView.render())
-        const innerLines = innerContent.split('\n')
+        let contentStr = typeof innerContent === 'string' ? innerContent : (innerContent as { content: string }).content
+
+        // Apply style to content if provided
+        if (props.style) {
+          contentStr = renderStyledSync(contentStr, props.style)
+        }
+
+        const innerLines = contentStr.split('\n')
 
         // Calculate inner dimensions using helper
         const { width: innerWidth } = getContentDimensions(innerLines)
 
-        // Create padded content using helper
-        const paddedLines = createPaddedLines(innerLines, innerWidth, padding)
-        const paddedWidth = innerWidth + padding.left + padding.right
-
-        // Apply min width and adjust if needed
-        const finalWidth = Math.max(paddedWidth, props.minWidth || 0)
-        const adjustedLines = adjustToFinalWidth(paddedLines, paddedWidth, finalWidth)
-
         // Apply border if specified
         if (props.border) {
-          const bordered = renderBox(
-            adjustedLines,
-            props.border,
-            props.borderSides || BorderSide.All,
-            finalWidth
-          )
-          return bordered.join('\n')
+          // Apply padding manually before passing to renderBox
+          const paddedLines = createPaddedLines(innerLines, innerWidth, padding)
+          const paddedWidth = innerWidth + padding.left + padding.right
+
+          // Apply minWidth after padding
+          const finalWidth = Math.max(paddedWidth, props.minWidth || 0)
+          const adjustedLines = adjustToFinalWidth(paddedLines, paddedWidth, finalWidth)
+
+          // renderBox expects width/height to include borders, and content to be pre-padded
+          const totalWidth = finalWidth + 2 // +2 for left/right borders
+          const totalHeight = adjustedLines.length + 2 // +2 for top/bottom borders
+
+          const bordered = renderBox({
+            width: totalWidth,
+            height: totalHeight,
+            border: props.border,
+            sides: props.borderSides || BorderSide.All,
+            content: adjustedLines,
+            padding: 0, // Padding already applied
+          })
+          return bordered
         }
 
+        // For non-bordered boxes, apply padding manually
+        const paddedLines = createPaddedLines(innerLines, innerWidth, padding)
+        const paddedWidth = innerWidth + padding.left + padding.right
+        const finalWidth = Math.max(paddedWidth, props.minWidth || 0)
+        const adjustedLines = adjustToFinalWidth(paddedLines, paddedWidth, finalWidth)
         return adjustedLines.join('\n')
       }),
     width: Math.max(
@@ -159,6 +179,11 @@ export const styledBox = (content: View | View[], props: BoxProps = {}): View =>
 }
 
 /**
+ * Create a simple box - alias for styledBox
+ */
+export const box = styledBox
+
+/**
  * Create a panel with rounded border and padding
  */
 export const panel = (
@@ -167,7 +192,7 @@ export const panel = (
 ): View => {
   return styledBox(content, {
     ...props,
-    border: border.Rounded,
+    border: Borders.Rounded,
     padding: props.padding || 2,
   })
 }

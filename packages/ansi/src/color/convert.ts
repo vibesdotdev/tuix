@@ -6,10 +6,35 @@ import { ColorProfile } from './profile';
 // Color Conversion
 // =============================================================================
 
+export type RGB = { r: number; g: number; b: number }
+
+/**
+ * ANSI 16-color palette RGB values
+ * Standard VGA colors used by terminals
+ */
+export const ANSI_16_RGB: Record<number, RGB> = {
+  0: { r: 0, g: 0, b: 0 },       // Black
+  1: { r: 128, g: 0, b: 0 },     // Red
+  2: { r: 0, g: 128, b: 0 },     // Green
+  3: { r: 128, g: 128, b: 0 },   // Yellow
+  4: { r: 0, g: 0, b: 128 },     // Blue
+  5: { r: 128, g: 0, b: 128 },   // Magenta
+  6: { r: 0, g: 128, b: 128 },   // Cyan
+  7: { r: 192, g: 192, b: 192 }, // White
+  8: { r: 128, g: 128, b: 128 }, // Bright Black (Gray)
+  9: { r: 255, g: 0, b: 0 },     // Bright Red
+  10: { r: 0, g: 255, b: 0 },    // Bright Green
+  11: { r: 255, g: 255, b: 0 },  // Bright Yellow
+  12: { r: 0, g: 0, b: 255 },    // Bright Blue
+  13: { r: 255, g: 0, b: 255 },  // Bright Magenta
+  14: { r: 0, g: 255, b: 255 },  // Bright Cyan
+  15: { r: 255, g: 255, b: 255 }, // Bright White
+}
+
 /**
  * Convert hex string to RGB components
  */
-export function hexToRgb(hex: string): Option.Option<{ r: number; g: number; b: number }> {
+export function hexToRgb(hex: string): Option.Option<RGB> {
   const cleaned = hex.replace('#', '')
   if (cleaned.length !== 6) return Option.none()
 
@@ -19,6 +44,52 @@ export function hexToRgb(hex: string): Option.Option<{ r: number; g: number; b: 
 
   if (isNaN(r) || isNaN(g) || isNaN(b)) return Option.none()
   return Option.some({ r, g, b })
+}
+
+/**
+ * Convert any Color to RGB
+ * Centralized function to avoid duplication
+ */
+export function colorToRgb(color: ColorDef): RGB {
+  switch (color.type) {
+    case 'rgb':
+      return { r: color.r, g: color.g, b: color.b }
+
+    case 'hex': {
+      const rgb = hexToRgb(color.value)
+      return Option.getOrElse(rgb, () => ({ r: 0, g: 0, b: 0 }))
+    }
+
+    case 'ansi':
+      return ANSI_16_RGB[color.code] ?? ANSI_16_RGB[7]!
+
+    case 'ansi256': {
+      const code = color.code
+      // Use ANSI 16 palette for codes 0-15
+      if (code < 16) {
+        return ANSI_16_RGB[code] ?? ANSI_16_RGB[7]!
+      }
+      // Grayscale ramp (232-255)
+      if (code >= 232) {
+        const gray = (code - 232) * 10 + 8
+        return { r: gray, g: gray, b: gray }
+      }
+      // 6x6x6 color cube (16-231)
+      const index = code - 16
+      const r = Math.floor(index / 36)
+      const g = Math.floor((index % 36) / 6)
+      const b = index % 6
+      return { r: r * 51, g: g * 51, b: b * 51 }
+    }
+
+    case 'adaptive':
+      // Recursively convert the dark variant (could also choose light based on terminal theme)
+      return colorToRgb(color.dark)
+
+    case 'none':
+    default:
+      return { r: 0, g: 0, b: 0 }
+  }
 }
 
 /**

@@ -64,8 +64,9 @@ export interface Component<Model, Msg> {
 
   /**
    * Render the component's view given its current model.
+   * Can be async - runtime will await the result.
    */
-  readonly view: (model: Model) => View
+  readonly view: (model: Model) => View | Promise<View>
 
   /**
    * Define subscriptions to external events that should be processed by this component.

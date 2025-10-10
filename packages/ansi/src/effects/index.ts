@@ -25,9 +25,8 @@ export { createGlow } from './glow'
 export type { PatternConfig } from './pattern'
 export { generatePattern, applyPattern } from './pattern'
 
-// Export border effects
-export type { BorderStyle } from './border'
-export { createStyledBorder } from './border'
+// Note: For border rendering, use the core border system:
+// import { renderBox, borderStyle } from '@tuix/ansi/border'
 
 // Export layer effects
 export type { LayerEffect } from './layer'

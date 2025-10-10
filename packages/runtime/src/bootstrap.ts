@@ -7,7 +7,7 @@
 
 import { Effect } from "effect";
 import { EventBus, getGlobalEventBus } from "@tuix/reactive/events/event-bus";
-import { ModuleRegistry, getGlobalRegistry } from "./module/registry";
+import { ModuleRegistry, getGlobalRegistry } from "@tuix/core";
 
 // Core modules
 // import { JSXModule } from "@tuix/jsx/module";
@@ -177,9 +177,12 @@ export function bootstrapWithModules(
         registry: getGlobalRegistry(),
         status: "failed" as const,
         modules: {
-          jsx: undefined as any,
-          cli: undefined as any,
-          reactivity: undefined as any,
+          reactivity: undefined,
+          services: undefined,
+          config: undefined,
+          processManager: undefined,
+          logger: undefined,
+          coordination: undefined,
         },
       };
     }

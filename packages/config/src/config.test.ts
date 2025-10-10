@@ -1,6 +1,6 @@
 import { test, expect, describe } from 'bun:test'
 import { Effect, Layer } from 'effect'
-import { config, createConfig, ConfigLayer, Config as IConfig } from './index'
+import { config, createConfig, ConfigLayer, ConfigTag } from './index'
 import type { Config } from './types'
 
 describe('Config', () => {
@@ -147,7 +147,7 @@ describe('Config', () => {
     test('should work with ConfigLayer', async () => {
       const result = await Effect.runPromise(
         Effect.gen(function* () {
-          const cfg = yield* IConfig
+          const cfg = yield* ConfigTag
           return cfg.get('test', 'default-value')
         }).pipe(
           Effect.provide(
@@ -172,7 +172,7 @@ describe('Config', () => {
 
       const result = await Effect.runPromise(
         Effect.gen(function* () {
-          const cfg = yield* IConfig
+          const cfg = yield* ConfigTag
           return cfg.get('port')
         }).pipe(
           Effect.provide(

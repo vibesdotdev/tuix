@@ -62,7 +62,8 @@
     "@tuix/input": "workspace:*",
     "@tuix/runtime": "workspace:*",
     "effect": "^3.16.9",
-    "@tuix/ansi": "workspace:*"
+    "@tuix/ansi": "workspace:*",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/bun": "latest",

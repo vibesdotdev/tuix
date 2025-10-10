@@ -5,7 +5,7 @@
  */
 
 import { Effect } from 'effect'
-import { ModuleBase, ModuleError } from '@tuix/runtime'
+import { ModuleBase, ModuleError } from '../module/base'
 import type { EventBus } from '@tuix/reactive/events/event-bus'
 import type {
   ServiceEvent,

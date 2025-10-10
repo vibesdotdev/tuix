@@ -5,6 +5,7 @@
  * for the runtime, view system, lifecycle management, and cross-module integration.
  */
 
+export * from './cli'
 export * from './errors'
 export * from './core'
 export * from './guards'

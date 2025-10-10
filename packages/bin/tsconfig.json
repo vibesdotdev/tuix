@@ -1,12 +1,10 @@
 {
   "extends": "../../tsconfig.json",
-  "include": [
-    "bin/**/*",
-    "index.ts",
-    "**/*.test.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["bun-types"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

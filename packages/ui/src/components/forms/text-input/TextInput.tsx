@@ -33,12 +33,9 @@
  * ```
  */
 
-import { jsx } from '@tuix/jsx'
 import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
 import type { StateRune, BindableRune } from '@tuix/reactive/runes/runes'
 import { isBindableRune, isStateRune } from '@tuix/reactive/runes/runes'
-import type { View } from '@tuix/view/primitives/view'
-import { text, hstack } from '@tuix/view/primitives/view'
 import { style, colors, border } from '@tuix/ansi'
 import { createTextInputStore, type TextInputStore } from '../../../stores/textInputStore'
 
@@ -208,37 +205,38 @@ export function TextInput(props: TextInputProps): JSX.Element {
 
   const cursorChar = getCursorChar(cursorStyle, store.showCursor())
 
-  return jsx('interactive', {
-    onKeyPress: handleKeyPress,
-    onFocus: () => {
-      store.focus()
-      props.onFocus?.()
-    },
-    onBlur: () => {
-      store.blur()
-      props.onBlur?.()
-    },
-    focusable: !props.disabled,
-    className: props.className,
-    children: jsx('box', {
-      style: inputStyle,
-      children: renderInputContent(),
-    }),
-  })
+  return (
+    <interactive
+      onKeyPress={handleKeyPress}
+      onFocus={() => {
+        store.focus()
+        props.onFocus?.()
+      }}
+      onBlur={() => {
+        store.blur()
+        props.onBlur?.()
+      }}
+      focusable={!props.disabled}
+      className={props.className}
+    >
+      <box style={inputStyle}>{renderInputContent()}</box>
+    </interactive>
+  )
 
   function renderInputContent(): JSX.Element {
     const visible = store.visibleText()
     const cursorPos = store.cursorPosition()
 
     if (!visible && placeholder) {
-      return jsx('text', {
-        style: style().fg(colors.gray).italic(),
-        children: placeholder,
-      })
+      return (
+        <text style={style().foreground(colors.gray).italic()}>
+          {placeholder}
+        </text>
+      )
     }
 
     if (!store.isFocused() || !store.showCursor()) {
-      return jsx('text', { children: visible })
+      return <text>{visible}</text>
     }
 
     // Handle selection rendering
@@ -248,16 +246,15 @@ export function TextInput(props: TextInputProps): JSX.Element {
       const selection = visible.slice(selStart - store.offset(), selEnd - store.offset())
       const afterSelection = visible.slice(selEnd - store.offset())
 
-      return jsx('hstack', {
-        children: [
-          beforeSelection && jsx('text', { children: beforeSelection }),
-          jsx('text', {
-            style: style().bg(colors.blue).fg(colors.white),
-            children: selection,
-          }),
-          afterSelection && jsx('text', { children: afterSelection }),
-        ].filter(Boolean),
-      })
+      return (
+        <hstack>
+          {beforeSelection ? <text>{beforeSelection}</text> : null}
+          <text style={style().background(colors.blue).foreground(colors.white)}>
+            {selection}
+          </text>
+          {afterSelection ? <text>{afterSelection}</text> : null}
+        </hstack>
+      )
     }
 
     // Render with cursor
@@ -265,16 +262,15 @@ export function TextInput(props: TextInputProps): JSX.Element {
     const atCursor = visible[cursorPos] || ' '
     const afterCursor = visible.slice(cursorPos + 1)
 
-    return jsx('hstack', {
-      children: [
-        beforeCursor && jsx('text', { children: beforeCursor }),
-        jsx('text', {
-          style: getCursorStyle(cursorStyle),
-          children: cursorChar || atCursor,
-        }),
-        afterCursor && jsx('text', { children: afterCursor }),
-      ].filter(Boolean),
-    })
+    return (
+      <hstack>
+        {beforeCursor ? <text>{beforeCursor}</text> : null}
+        <text style={getCursorStyle(cursorStyle)}>
+          {cursorChar || atCursor}
+        </text>
+        {afterCursor ? <text>{afterCursor}</text> : null}
+      </hstack>
+    )
   }
 
   function getCursorChar(style: CursorStyle, show: boolean): string {

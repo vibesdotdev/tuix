@@ -6,7 +6,13 @@
 
 export * from './box'
 export * from './flex'
+export * from './panel'
+export * from './static-layout/StaticLayout'
+export * from './interactive-layout/InteractiveLayout'
 
 // Re-export commonly used components
 export { Box, card, panel } from './box'
 export { Flex, Row, Column, Stack, Grid, Spacer } from './flex'
+export { Panel } from './panel'
+export { StaticLayout, staticLayout } from './static-layout/StaticLayout'
+export { InteractiveLayout, interactiveLayout } from './interactive-layout/InteractiveLayout'

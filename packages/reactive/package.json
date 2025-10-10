@@ -21,11 +21,6 @@
       "import": "./src/runes/index.ts",
       "default": "./src/runes/index.ts"
     },
-    "./scope": {
-      "types": "./src/scope/index.ts",
-      "import": "./src/scope/index.ts",
-      "default": "./src/scope/index.ts"
-    },
     "./events": {
       "types": "./src/events/index.ts",
       "import": "./src/events/index.ts",
@@ -41,20 +36,15 @@
       "import": "./src/runes/jsx-lifecycle.ts",
       "default": "./src/runes/jsx-lifecycle.ts"
     },
-    "./scope/manager": {
-      "types": "./src/scope/manager.ts",
-      "import": "./src/scope/manager.ts",
-      "default": "./src/scope/manager.ts"
-    },
-    "./scope/jsx/stores": {
-      "types": "./src/scope/jsx/stores/index.ts",
-      "import": "./src/scope/jsx/stores/index.ts",
-      "default": "./src/scope/jsx/stores/index.ts"
-    },
     "./runes/runes": {
       "types": "./src/runes/runes.ts",
       "import": "./src/runes/runes.ts",
       "default": "./src/runes/runes.ts"
+    },
+    "./state": {
+      "types": "./src/state/index.ts",
+      "import": "./src/state/index.ts",
+      "default": "./src/state/index.ts"
     },
     "./*": {
       "types": "./src/*",

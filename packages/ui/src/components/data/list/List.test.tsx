@@ -5,7 +5,6 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { List, SimpleList, CheckList, NumberedList } from './List.js'
 import { $state } from '../../../../core/update/reactivity/runes.js'
-import { jsx } from '@tuix/jsx'
 
 describe('List Component', () => {
   describe('Basic rendering', () => {
@@ -13,7 +12,7 @@ describe('List Component', () => {
       const items = ['Item 1', 'Item 2', 'Item 3']
       const component = List({
         items,
-        renderItem: item => jsx('text', { children: item }),
+        renderItem: item => <text>{item}</text>,
       })
 
       expect(component).toBeDefined()
@@ -23,7 +22,7 @@ describe('List Component', () => {
     it('should show empty message when no items', () => {
       const component = List({
         items: [],
-        renderItem: item => jsx('text', { children: item }),
+        renderItem: item => <text>{item}</text>,
         emptyMessage: 'No items',
       })
 
@@ -44,7 +43,7 @@ describe('List Component', () => {
           selectCalled = true
           expect(index).toBe(1)
         },
-        renderItem: item => jsx('text', { children: item }),
+        renderItem: item => <text>{item}</text>,
       })
 
       // Simulate selection
@@ -60,7 +59,7 @@ describe('List Component', () => {
         items,
         selectedIndices,
         selectionMode: 'multi',
-        renderItem: item => jsx('text', { children: item }),
+        renderItem: item => <text>{item}</text>,
       })
 
       expect(selectedIndices.value).toEqual([0])
@@ -75,7 +74,7 @@ describe('List Component', () => {
       const component = List({
         items,
         filter,
-        renderItem: item => jsx('text', { children: item }),
+        renderItem: item => <text>{item}</text>,
       })
 
       expect(component).toBeDefined()
@@ -91,7 +90,7 @@ describe('List Component', () => {
       const component = List({
         items,
         filter: item => item.type === 'fruit',
-        renderItem: item => jsx('text', { children: item.name }),
+        renderItem: item => <text>{item.name}</text>,
       })
 
       expect(component).toBeDefined()

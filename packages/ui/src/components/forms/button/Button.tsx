@@ -188,39 +188,39 @@ export function Button(props: ButtonProps): JSX.Element {
 function getVariantStyle(variant: ButtonVariant) {
   const variants = {
     primary: {
-      background: color.blue,
-      color: color.white,
-      borderColor: color.blue,
+      background: colors.blue,
+      color: colors.white,
+      borderColor: colors.blue,
     },
     secondary: {
-      background: color.gray,
-      color: color.white,
-      borderColor: color.gray,
+      background: colors.gray,
+      color: colors.white,
+      borderColor: colors.gray,
     },
     success: {
-      background: color.green,
-      color: color.white,
-      borderColor: color.green,
+      background: colors.green,
+      color: colors.white,
+      borderColor: colors.green,
     },
     danger: {
-      background: color.red,
-      color: color.white,
-      borderColor: color.red,
+      background: colors.red,
+      color: colors.white,
+      borderColor: colors.red,
     },
     warning: {
-      background: color.yellow,
-      color: color.black,
-      borderColor: color.yellow,
+      background: colors.yellow,
+      color: colors.black,
+      borderColor: colors.yellow,
     },
     info: {
-      background: color.cyan,
-      color: color.white,
-      borderColor: color.cyan,
+      background: colors.cyan,
+      color: colors.white,
+      borderColor: colors.cyan,
     },
     ghost: {
       background: "transparent",
-      color: color.white,
-      borderColor: color.gray,
+      color: colors.white,
+      borderColor: colors.gray,
     },
   };
 
@@ -263,7 +263,7 @@ function getStateStyle(
 
   if (focused) {
     stateStyle.borderStyle = "double";
-    stateStyle.borderColor = color.white;
+    stateStyle.borderColor = colors.white;
   }
 
   if (hovering && !disabled) {

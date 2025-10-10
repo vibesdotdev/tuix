@@ -1,17 +1,11 @@
-// Re-export everything from the new modular packages
-// TODO: Create @tuix/cli package or remove CLI functionality
-// export * from "@tuix/cli";
-export * from "@tuix/config";
-export * from "@tuix/core";
-export * from "@tuix/debug";
-export * from "@tuix/jsx";
-export * from "@tuix/logger";
-export * from "@tuix/process-manager";
-export * from "@tuix/testing";
-export * from "@tuix/ui";
-export * from "@tuix/runtime";
-export * from "@tuix/view";
-export * from "@tuix/input";
-export * from "@tuix/reactive";
-export * from "@tuix/coordination";
-export * from "@tuix/ansi";
+/**
+ * @tuix/bin - TUIX CLI
+ *
+ * The official TUIX command-line interface.
+ */
+
+export { TuixApp } from './app'
+export { WelcomeScreen } from './commands/welcome'
+export { VersionCommand } from './commands/version'
+export { HelpCommand } from './commands/help'
+export { DashboardCommand } from './commands/dashboard'

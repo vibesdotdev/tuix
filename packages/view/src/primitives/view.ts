@@ -58,6 +58,9 @@ import { stringWidth } from '@tuix/view/string/width'
 import type { View, RenderError } from './types'
 import { style as createStyle, renderStyledSync, type Style } from '@tuix/ansi'
 
+// Re-export types for convenience
+export type { View, RenderError } from './types'
+
 /**
  * Create a simple text view
  *
@@ -246,7 +249,10 @@ export const hstack = (...views: Array<View | View[]>): View => {
           typeof res === 'string' ? res : (res as { content: string }).content
         )
 
-        const lines = Array.from({ length: height }, (_, lineIndex) =>
+        // Calculate actual height from rendered content, not from View metadata
+        const actualHeight = Math.max(...contents.map(c => c.split('\n').length), 1)
+
+        const lines = Array.from({ length: actualHeight }, (_, lineIndex) =>
           items
             .map((view, viewIndex) => {
               const segments = contents[viewIndex]!.split('\n')
@@ -266,8 +272,9 @@ export const hstack = (...views: Array<View | View[]>): View => {
 /**
  * Create a box around a view using Unicode box-drawing characters
  *
- * Wraps the view content in a rectangular border using Unicode
- * box-drawing characters. Adds padding and increases dimensions.
+ * Simple convenience function that creates a basic box with rounded borders
+ * and padding. For more control over borders, padding, and styling, use
+ * styledBox from '@tuix/view/layout/box'.
  *
  * @param view - View to wrap with a box
  * @returns Boxed view with border and padding
@@ -277,33 +284,41 @@ export const hstack = (...views: Array<View | View[]>): View => {
  * const content = text('Hello\nWorld')
  * const boxed = box(content)
  * // Renders as:
- * // ┌───────┐
- * // │ Hello │
- * // │ World │
- * // └───────┘
+ * // ╭─────────╮
+ * // │ Hello   │
+ * // │ World   │
+ * // ╰─────────╯
  * ```
  */
-export const box = (view: View): View => ({
-  render: () =>
-    Effect.gen(function* (_) {
-      const content = yield* _(view.render())
-      const lines = content.split('\n')
-      const width = Math.max(...lines.map(l => stringWidth(l)))
+export const box = (view: View): View => {
+  const width = view.width || 0
+  const height = view.height || 1
 
-      const top = '┌' + '─'.repeat(width + 2) + '┐'
-      const bottom = '└' + '─'.repeat(width + 2) + '┘'
+  return {
+    render: () =>
+      Effect.gen(function* (_) {
+        const content = yield* _(view.render())
+        const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+        const lines = contentStr.split('\n')
 
-      const boxedLines = lines.map(line => {
-        const lineWidth = stringWidth(line)
-        const padding = width - lineWidth
-        return '│ ' + line + ' '.repeat(padding) + ' │'
-      })
+        // Create box with rounded borders
+        const boxWidth = width + 4 // +2 for padding, +2 for borders
+        const top = '╭' + '─'.repeat(width + 2) + '╮'
+        const bottom = '╰' + '─'.repeat(width + 2) + '╯'
 
-      return [top, ...boxedLines, bottom].join('\n')
-    }),
-  width: (view.width || 0) + 4,
-  height: (view.height || 0) + 2,
-})
+        const boxedLines = [top]
+        for (const line of lines) {
+          const padded = ' ' + line.padEnd(width) + ' '
+          boxedLines.push('│' + padded + '│')
+        }
+        boxedLines.push(bottom)
+
+        return boxedLines.join('\n')
+      }),
+    width: width + 4,
+    height: height + 2,
+  }
+}
 
 /**
  * Center a view within a given width

@@ -8,5 +8,6 @@ export const color = { ...colorUtils, ...colorPresets }
 export * from "./utils"
 export * from "./types"
 export { ColorProfile, detectColorProfile } from "./profile"
-export { toAnsiSequence, hexToRgb, rgbToAnsi256, rgbToAnsi } from "./convert"
+export { toAnsiSequence, hexToRgb, rgbToAnsi256, rgbToAnsi, colorToRgb, ANSI_16_RGB, type RGB } from "./convert"
+export { parseColor } from "./parse"
 export { Color } from "./def"
