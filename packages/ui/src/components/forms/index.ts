@@ -12,6 +12,7 @@ export * from './checkbox'
 export * from './radio'
 export * from './confirm'
 export * from './form'
+export * from './toggle'
 
 // Re-export for convenience
 export { TextInput, textInput, passwordInput, emailInput, numberInput } from './text-input'
@@ -22,3 +23,4 @@ export { Checkbox, checkbox } from './checkbox'
 export { Radio, radio } from './radio'
 export { Confirm, confirm } from './confirm'
 export { Form, form } from './form'
+export { Toggle, toggle } from './toggle'

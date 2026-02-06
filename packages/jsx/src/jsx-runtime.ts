@@ -38,15 +38,176 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import { Effect } from "effect";
 import { getGlobalRegistry } from "@tuix/core";
-// import { JSXModule } from "@tuix/jsx/module";
 import type { JSXPluginEvent, JSXCommandEvent } from "@tuix/jsx/events";
-// import { onMount } from '../../reactivity/jsx-lifecycle' // TODO: Fix jsx-lifecycle import
-
 import { jsxDebug } from "@tuix/debug";
 import { pluginStore } from "./plugins";
 
 // Debug logging that respects TUIX_DEBUG env var
 const debug = jsxDebug.debug;
+
+// =============================================================================
+// JSX Element Types
+// =============================================================================
+
+/**
+ * JSX Element - the object returned by jsx() function calls
+ * This represents a JSX element before it's rendered to a View
+ */
+export interface JSXElement {
+  /** Internal marker to identify Tuix JSX descriptors */
+  $$typeof: symbol;
+  /** Element type - either a string (intrinsic) or function (component) */
+  type: string | Function;
+  /** Element props */
+  props: Record<string, any>;
+  /** Element key for list reconciliation */
+  key: string | number | null;
+  /** Optional ref for imperative handles */
+  ref?: unknown;
+  /** Development metadata (source location) */
+  __source?: {
+    fileName: string;
+    lineNumber: number;
+    columnNumber: number;
+  };
+  /** Development metadata (self reference) */
+  __self?: unknown;
+}
+
+/**
+ * JSX Node - valid return types from JSX expressions
+ */
+export type JSXNode = JSXElement | string | number | boolean | null | undefined | JSXNode[]
+
+const JSX_ELEMENT_TYPE = Symbol.for("tuix.jsx.element");
+
+function isJSXElement(value: unknown): value is JSXElement {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as Record<string, unknown>).$$typeof === JSX_ELEMENT_TYPE
+  );
+}
+
+type DevInfo = {
+  source?: {
+    fileName: string;
+    lineNumber: number;
+    columnNumber: number;
+  };
+  self?: unknown;
+};
+
+const RESERVED_PROPS = new Set(["key", "ref", "__self", "__source", "children"]);
+
+const normalizeKey = (value: unknown): string | number | null => {
+  if (value == null || typeof value === "boolean") {
+    return null;
+  }
+  if (typeof value === "number" || typeof value === "string") {
+    return value;
+  }
+  return String(value);
+};
+
+const appendChild = (target: unknown[], value: unknown) => {
+  if (value === undefined) return;
+  target.push(value);
+};
+
+const createJSXElement = (
+  type: string | Function,
+  rawProps: Record<string, unknown> | null | undefined,
+  keyOverride: unknown,
+  additionalChildren: unknown[],
+  devInfo?: DevInfo
+): JSXElement => {
+  const props: Record<string, unknown> = {};
+  let key: string | number | null = null;
+  let ref: unknown = undefined;
+  const children: unknown[] = [];
+  const info: DevInfo = devInfo ?? {};
+
+  if (rawProps != null) {
+    for (const propName of Object.keys(rawProps)) {
+      const value = (rawProps as Record<string, unknown>)[propName];
+
+      if (propName === "key") {
+        const normalized = normalizeKey(value);
+        if (normalized !== null) {
+          key = normalized;
+        }
+        continue;
+      }
+
+      if (propName === "ref") {
+        ref = value;
+        continue;
+      }
+
+      if (propName === "children") {
+        appendChild(children, value);
+        continue;
+      }
+
+      if (propName === "__source") {
+        if (value && typeof value === "object") {
+          info.source = value as DevInfo["source"];
+        }
+        continue;
+      }
+
+      if (propName === "__self") {
+        info.self = value;
+        continue;
+      }
+
+      if (!RESERVED_PROPS.has(propName)) {
+        props[propName] = value;
+      }
+    }
+  }
+
+  if (keyOverride !== undefined && keyOverride !== null) {
+    const normalized = normalizeKey(keyOverride);
+    if (normalized !== null) {
+      key = normalized;
+    }
+  }
+
+  if (additionalChildren.length > 0) {
+    for (const child of additionalChildren) {
+      appendChild(children, child);
+    }
+  }
+
+  if (children.length === 1) {
+    props.children = children[0];
+  } else if (children.length > 1) {
+    props.children = children;
+  }
+
+  const element: JSXElement = {
+    $$typeof: JSX_ELEMENT_TYPE,
+    type,
+    props,
+    key,
+  };
+
+  if (ref !== undefined) {
+    (element as Record<string, unknown>).ref = ref;
+  }
+
+  if (info.source) {
+    element.__source = info.source;
+  }
+
+  if (info.self) {
+    element.__self = info.self;
+  }
+
+  return element;
+};
 
 // Global plugin registry for JSX components - now uses stores
 class JSXPluginRegistry {
@@ -303,16 +464,15 @@ class JSXPluginRegistry {
    * Get a loaded plugin
    */
   getPlugin(name: string): Record<string, unknown> | null {
-    // TODO: Implement plugin retrieval from store
-    return null;
+    const plugin = pluginStore.plugins().find(p => p.name === name);
+    return plugin?.component || null;
   }
 
   /**
    * List all loaded plugins
    */
   listPlugins(): string[] {
-    // TODO: Implement plugin listing from store
-    return [];
+    return pluginStore.plugins().map(p => p.name);
   }
 
   // --- Command Registration ---
@@ -652,29 +812,57 @@ const toTextContent = (children: unknown[]): string | null => {
   return segments.join("");
 };
 
-const toView = (child: unknown): View | null => {
-  // Skip null, undefined, and booleans (like React does)
-  if (child == null || typeof child === 'boolean') return null;
+function renderChild(child: unknown): View | null {
+  if (child == null || typeof child === "boolean") {
+    return null;
+  }
 
-  if (isView(child)) return child;
+  if (isView(child)) {
+    return child;
+  }
+
+  if (Array.isArray(child)) {
+    const collected: View[] = [];
+    for (const nested of child) {
+      const view = renderChild(nested);
+      if (view) {
+        collected.push(view);
+      }
+    }
+    if (collected.length === 0) return null;
+    if (collected.length === 1) return collected[0];
+    return vstack(...collected);
+  }
+
+  if (isJSXElement(child)) {
+    return renderJSX(child.type, child.props ?? null);
+  }
+
   if (child && typeof child === "object" && "render" in (child as Record<string, unknown>)) {
     const candidate = child as View;
     if (typeof candidate.render === "function") {
       return candidate;
     }
   }
+
   const content = toTextContent([child]);
   if (content !== null) {
     return text(content);
   }
-  return null;
-};
 
-const ensureViewArray = (children: unknown[]): View[] => {
-  return children
-    .map(toView)
-    .filter((child): child is View => child !== null);
-};
+  return null;
+}
+
+function ensureViewArray(children: unknown[]): View[] {
+  const views: View[] = [];
+  for (const child of children) {
+    const rendered = renderChild(child);
+    if (rendered) {
+      views.push(rendered);
+    }
+  }
+  return views;
+}
 
 const joinViews = (views: View[], gap: number = 1): View => {
   if (views.length === 0) return text("");
@@ -938,12 +1126,7 @@ const TOGGLE_MARKS = {
   off: "○",
 };
 
-const TOAST_VARIANTS: Record<string, Partial<StyleProps>> = {
-  info: { background: color.blue, foreground: color.white },
-  success: { background: color.green, foreground: color.black },
-  warning: { background: color.yellow, foreground: color.black },
-  danger: { background: color.red, foreground: color.white },
-};
+
 
 /**
  * JSX factory function for creating terminal UI elements
@@ -959,22 +1142,30 @@ const TOAST_VARIANTS: Record<string, Partial<StyleProps>> = {
  * @example
  * ```tsx
  * // Intrinsic element
- * const textElement = jsx('text', { style: { color: 'red' } }, 'Hello World')
+ * const textElement = jsx('text', {
+ *   style: { color: 'red' },
+ *   children: 'Hello World',
+ * })
  *
  * // Function component
- * const MyComponent = ({ name }: { name: string }) => jsx('text', null, `Hello ${name}`)
+ * const MyComponent = ({ name }: { name: string }) =>
+ *   jsx('text', { children: `Hello ${name}` })
  * const componentElement = jsx(MyComponent, { name: 'Drew' })
  * ```
  *
  * @throws Error if the element type is unknown and cannot be converted to a text node
  */
 // Export component registrations
-export const jsx = (
+/**
+ * Internal rendering function - converts JSX to Views
+ * This is the actual implementation that does all the work
+ */
+function renderJSX(
   type: string | Function,
   props: Record<string, unknown> | null,
   ...children: unknown[]
-): View => {
-  debug("[RUNTIME] Processing element type:", type, {
+): View {
+  debug("[JSX] Creating element:", type, {
     props: props ? Object.keys(props) : null,
     key: props?.key,
   });
@@ -1005,14 +1196,41 @@ export const jsx = (
     const componentProps = { ...safeProps, children: validChildren };
     const result = type(componentProps);
     debug("[RUNTIME] Function component returned:", typeof result);
-    if (result && typeof result === "object") {
-      debug("[RUNTIME] Result details:", {
-        render: typeof result.render,
-        width: result.width,
-        height: result.height,
-      });
+
+    if (result == null || typeof result === "boolean") {
+      return text("");
     }
-    return result;
+
+    if (isView(result)) {
+      return result;
+    }
+
+    if (isJSXElement(result)) {
+      debug("[RUNTIME] Recursively rendering JSXElement from component");
+      return renderJSX(result.type, result.props ?? null);
+    }
+
+    if (Array.isArray(result)) {
+      const renderedArray = ensureViewArray(result);
+      if (renderedArray.length === 0) {
+        return text("");
+      }
+      return renderedArray.length === 1 ? renderedArray[0] : vstack(...renderedArray);
+    }
+
+    if (result && typeof result === "object" && "render" in (result as Record<string, unknown>)) {
+      const candidate = result as View;
+      if (typeof candidate.render === "function") {
+        return candidate;
+      }
+    }
+
+    const rendered = renderChild(result);
+    if (rendered) {
+      return rendered;
+    }
+
+    return text(String(result));
   }
 
   // Handle built-in JSX intrinsics
@@ -1118,7 +1336,7 @@ export const jsx = (
         children: validChildren,
       };
       if (panelStyle) panelProps.style = panelStyle;
-      return jsx("box", panelProps);
+      return renderJSX("box", panelProps);
     }
 
     case "card": {
@@ -1140,7 +1358,7 @@ export const jsx = (
         children: validChildren,
       };
       if (cardStyle) cardProps.style = cardStyle;
-      return jsx("box", cardProps);
+      return renderJSX("box", cardProps);
     }
 
     case "vstack": {
@@ -1175,105 +1393,61 @@ export const jsx = (
       return flexbox(childrenViews, flexProps);
     }
 
-    case "button": {
-      const variant = typeof safeProps.variant === "string" ? safeProps.variant : "secondary";
-      const size = typeof safeProps.size === "string" ? safeProps.size : "medium";
+    case "interactive": {
+      const childrenViews = ensureViewArray(validChildren);
+      const contentView =
+        childrenViews.length === 0
+          ? text("")
+          : childrenViews.length === 1
+            ? childrenViews[0]
+            : vstack(...childrenViews);
+
       const disabled = safeProps.disabled === true || safeProps.disabled === "true";
-      const loading = safeProps.loading === true || safeProps.loading === "true";
-      const gap = toNumber(safeProps.gap) ?? 1;
-
-      const baseVariantStyle = BUTTON_VARIANTS[variant] ?? BUTTON_VARIANTS.secondary;
-      const sizePaddingPreset = BUTTON_SIZE_PADDING[size] ?? BUTTON_SIZE_PADDING.medium;
-      const paddingValue =
-        safeProps.padding ??
-        {
-          vertical: sizePaddingPreset.vertical,
-          horizontal: sizePaddingPreset.horizontal,
-        };
-      const padding = normalizePadding(paddingValue);
-
-      const stateStyle = disabled
-        ? {
-            foreground: color.gray,
-            background: color.black,
-            borderForeground: color.gray,
-          }
-        : undefined;
-
-      const buttonStyleProps = mergeStyleProps(
-        baseVariantStyle,
-        stateStyle,
-        extractStyleProps(safeProps.style)
-      );
-
-      const contentViews = ensureViewArray(validChildren);
-      if (contentViews.length === 0) {
-        const label = safeProps.label ?? safeProps.text ?? "Button";
-        contentViews.push(text(String(label)));
-      }
-
-      let iconView: View | null = null;
-      if (safeProps.icon !== undefined && safeProps.icon !== null) {
-        if (typeof safeProps.icon === "string") {
-          iconView = styledText(safeProps.icon, buildStyle(buttonStyleProps));
-        } else {
-          iconView = toView(safeProps.icon);
-        }
-      }
-
-      let spinnerView: View | null = null;
-      if (loading) {
-        spinnerView = styledText(
-          SPINNER_FRAMES.dots[0] ?? "",
-          buildStyle(buttonStyleProps)
-        );
-      }
-
-      const iconPosition = safeProps.iconPosition === "right" ? "right" : "left";
-      const orderedViews: View[] = [];
-      if (iconView && iconPosition === "left") orderedViews.push(iconView);
-      if (spinnerView) orderedViews.push(spinnerView);
-      orderedViews.push(...contentViews);
-      if (iconView && iconPosition === "right") orderedViews.push(iconView);
-
-      const contentView = joinViews(orderedViews, gap);
-
-      const buttonView = styledBox(contentView, {
-        border: resolveBorderPreset(safeProps.border ?? DEFAULT_BORDER),
-        padding,
-        minWidth: toNumber(safeProps.minWidth),
-        minHeight: toNumber(safeProps.minHeight),
-        style: buttonStyleProps ? buildStyle(buttonStyleProps) : undefined,
-      });
+      const focusable =
+        disabled
+          ? false
+          : safeProps.focusable === false || safeProps.focusable === "false"
+            ? false
+            : true;
 
       const interactiveProps: Record<string, unknown> = {
         disabled,
-        focusable: disabled ? false : safeProps.focusable,
-        className: safeProps.className,
-        role: safeProps.role ?? "button",
-        tooltip: safeProps.tooltip,
-        loading,
+        focusable,
       };
 
-      const forwardEvents = [
+      if (safeProps.className !== undefined) {
+        interactiveProps.className = safeProps.className;
+      }
+      if (safeProps.role !== undefined) {
+        interactiveProps.role = safeProps.role;
+      }
+      if (safeProps.tooltip !== undefined) {
+        interactiveProps.tooltip = safeProps.tooltip;
+      }
+
+      const possibleEvents = [
         "onClick",
         "onFocus",
         "onBlur",
         "onMouseEnter",
         "onMouseLeave",
         "onKeyPress",
+        "onSubmit",
+        "onChange",
         "onHover",
       ] as const;
 
-      for (const key of forwardEvents) {
+      for (const key of possibleEvents) {
         const handler = safeProps[key];
         if (typeof handler === "function") {
-          if (disabled && key === "onClick") continue;
+          if (disabled && key === "onClick") {
+            continue;
+          }
           interactiveProps[key] = handler;
         }
       }
 
-      return wrapInteractiveView(buttonView, interactiveProps);
+      return wrapInteractiveView(contentView, interactiveProps);
     }
 
     case "spacer": {
@@ -1282,384 +1456,19 @@ export const jsx = (
       return layoutSpacer({ size, flex });
     }
 
-    case "spinner": {
-      const type = typeof safeProps.type === "string" ? safeProps.type : "dots";
-      const frames = (SPINNER_FRAMES as Record<string, readonly string[]>)[type] ?? SPINNER_FRAMES.dots;
-      const frame = frames[0] ?? "";
-      const colorProp = safeProps.color as string | undefined;
-      const spinnerStyle = mergeStyleProps(
-        colorProp ? { foreground: colorProp as unknown as any } : undefined,
-        extractStyleProps(safeProps.style)
-      );
-      const spinnerView = styledText(frame, buildStyle(spinnerStyle));
 
-      if (safeProps.text) {
-        const textChild = toView(safeProps.text) ?? styledText(String(safeProps.text), buildStyle());
-        return hstack(spinnerView, textChild);
-      }
-      return spinnerView;
-    }
 
-    case "checkbox": {
-      const disabled = safeProps.disabled === true || safeProps.disabled === "true";
-      const bindChecked = (safeProps as Record<string, unknown>)["bind:checked"];
 
-      const resolveChecked = (): boolean => {
-        if (typeof safeProps.checked === "boolean") return safeProps.checked;
-        if (isBindableRune<boolean>(bindChecked)) return !!bindChecked();
-        if (isStateRune<boolean>(bindChecked)) return !!bindChecked();
-        return Boolean(safeProps.defaultChecked);
-      };
 
-      const CheckedRune =
-        (isBindableRune<boolean>(bindChecked) || isStateRune<boolean>(bindChecked)) && bindChecked
-          ? (bindChecked as BindableRune<boolean> | StateRune<boolean>)
-          : null;
 
-      const checked = resolveChecked();
 
-      const gap = toNumber((safeProps as Record<string, unknown>).gap) ?? 1;
 
-      const markStyle = mergeStyleProps(
-        {
-          foreground: checked ? color.green : color.gray,
-        },
-        extractStyleProps(safeProps.style)
-      );
 
-      const markView = styledText(
-        checked ? CHECKBOX_MARKS.checked : CHECKBOX_MARKS.unchecked,
-        buildStyle(markStyle)
-      );
 
-      const labelViews = ensureViewArray(validChildren);
-      if (labelViews.length === 0 && safeProps.label) {
-        labelViews.push(text(String(safeProps.label)));
-      }
 
-      const contentView = labelViews.length === 0 ? markView : joinViews([markView, ...labelViews], gap);
 
-      const handleToggle = () => {
-        if (disabled) return;
-        const current = resolveChecked();
-        const next = !current;
-        if (CheckedRune) {
-          CheckedRune.$set(next);
-        }
-        if (typeof safeProps.onChange === "function") {
-          (safeProps.onChange as (value: boolean) => void)(next);
-        }
-        if (typeof safeProps.onClick === "function") {
-          (safeProps.onClick as (value: boolean) => void)(next);
-        }
-      };
 
-      const interactiveProps: Record<string, unknown> = {
-        disabled,
-        checked,
-        focusable: disabled ? false : safeProps.focusable,
-        role: safeProps.role ?? "checkbox",
-        className: safeProps.className,
-        tooltip: safeProps.tooltip,
-        onClick: handleToggle,
-        onFocus: safeProps.onFocus,
-        onBlur: safeProps.onBlur,
-        onHover: safeProps.onHover,
-      };
 
-      return wrapInteractiveView(contentView, interactiveProps);
-    }
-
-    case "toggle": {
-      const disabled = safeProps.disabled === true || safeProps.disabled === "true";
-      const bindToggle = (safeProps as Record<string, unknown>)["bind:checked"] ??
-        (safeProps as Record<string, unknown>)["bind:value"];
-
-      const resolveToggle = (): boolean => {
-        if (typeof safeProps.on === "boolean") return safeProps.on;
-        if (typeof safeProps.checked === "boolean") return safeProps.checked;
-        if (isBindableRune<boolean>(bindToggle)) return !!bindToggle();
-        if (isStateRune<boolean>(bindToggle)) return !!bindToggle();
-        return Boolean(safeProps.defaultOn ?? safeProps.defaultChecked);
-      };
-
-      const ToggleRune =
-        (isBindableRune<boolean>(bindToggle) || isStateRune<boolean>(bindToggle)) && bindToggle
-          ? (bindToggle as BindableRune<boolean> | StateRune<boolean>)
-          : null;
-
-      const on = resolveToggle();
-      const gap = toNumber((safeProps as Record<string, unknown>).gap) ?? 1;
-
-      const baseStyle = mergeStyleProps(
-        {
-          foreground: on ? color.green : color.gray,
-          borderForeground: on ? color.green : color.gray,
-        },
-        extractStyleProps(safeProps.style)
-      );
-
-      const labelViews = ensureViewArray(validChildren);
-      if (labelViews.length === 0 && safeProps.label) {
-        labelViews.push(text(String(safeProps.label)));
-      }
-
-      const toggleBody = styledBox(text(on ? " ON " : " OFF "), {
-        border: resolveBorderPreset(safeProps.border ?? DEFAULT_BORDER),
-        padding: normalizePadding({ vertical: 0, horizontal: 1 }),
-        style: baseStyle ? buildStyle(baseStyle) : undefined,
-      });
-
-      const contentView = labelViews.length === 0 ? toggleBody : joinViews([toggleBody, ...labelViews], gap);
-
-      const handleToggle = () => {
-        if (disabled) return;
-        const current = resolveToggle();
-        const next = !current;
-        if (ToggleRune) {
-          ToggleRune.$set(next);
-        }
-        if (typeof safeProps.onChange === "function") {
-          (safeProps.onChange as (value: boolean) => void)(next);
-        }
-        if (typeof safeProps.onClick === "function") {
-          (safeProps.onClick as (value: boolean) => void)(next);
-        }
-      };
-
-      const interactiveProps: Record<string, unknown> = {
-        disabled,
-        on,
-        focusable: disabled ? false : safeProps.focusable,
-        role: safeProps.role ?? "switch",
-        className: safeProps.className,
-        tooltip: safeProps.tooltip,
-        onClick: handleToggle,
-        onFocus: safeProps.onFocus,
-        onBlur: safeProps.onBlur,
-        onHover: safeProps.onHover,
-      };
-
-      return wrapInteractiveView(contentView, interactiveProps);
-    }
-
-    case "modal": {
-      const open = safeProps.open !== false && safeProps.open !== "false";
-      if (!open) return text("");
-
-      const titleViews = safeProps.title ? ensureViewArray([safeProps.title]) : [];
-      const footerViews = safeProps.footer ? ensureViewArray([safeProps.footer]) : [];
-      const bodyViews = ensureViewArray(validChildren);
-
-      const sections: View[] = [];
-      if (titleViews.length > 0) {
-        sections.push(joinViews(titleViews, 1));
-      }
-      if (bodyViews.length > 0) {
-        const body = bodyViews.length === 1 ? bodyViews[0] : vstack(...bodyViews);
-        sections.push(body);
-      }
-      if (footerViews.length > 0) {
-        sections.push(joinViews(footerViews, 1));
-      }
-
-      const contentView = sections.length === 0 ? text("") : vstack(...sections);
-
-      const padding = normalizePadding(
-        safeProps.padding ?? {
-          vertical: 1,
-          horizontal: 2,
-        }
-      );
-
-      const modalStyle = mergeStyleProps(
-        {
-          background: color.black,
-          foreground: color.white,
-          borderForeground: color.gray,
-        },
-        extractStyleProps(safeProps.style)
-      );
-
-      const modalView = styledBox(contentView, {
-        border: resolveBorderPreset(safeProps.border ?? "double"),
-        padding,
-        minWidth: toNumber(safeProps.minWidth),
-        minHeight: toNumber(safeProps.minHeight),
-        style: modalStyle ? buildStyle(modalStyle) : undefined,
-      });
-
-      return modalView;
-    }
-
-    case "tooltip": {
-      const visible = safeProps.visible !== false && safeProps.visible !== "false";
-      if (!visible) return text("");
-
-      const contentSource = validChildren.length > 0 ? validChildren : [safeProps.content ?? ""];
-      const contentViews = ensureViewArray(contentSource);
-      const contentView = contentViews.length === 1 ? contentViews[0] : joinViews(contentViews, 1);
-
-      const tooltipStyle = mergeStyleProps(
-        {
-          background: color.gray,
-          foreground: color.black,
-          borderForeground: color.gray,
-        },
-        extractStyleProps(safeProps.style)
-      );
-
-      const tooltipView = styledBox(contentView, {
-        border: resolveBorderPreset(safeProps.border ?? DEFAULT_BORDER),
-        padding: normalizePadding(
-          safeProps.padding ?? {
-            vertical: 0,
-            horizontal: 1,
-          }
-        ),
-        style: tooltipStyle ? buildStyle(tooltipStyle) : undefined,
-      });
-
-      return tooltipView;
-    }
-
-    case "toast": {
-      const open = safeProps.open !== false && safeProps.open !== "false";
-      if (!open) return text("");
-
-      const kind = typeof safeProps.kind === "string" ? safeProps.kind : "info";
-      const baseStyle = TOAST_VARIANTS[kind] ?? TOAST_VARIANTS.info;
-      const toastStyle = mergeStyleProps(baseStyle, extractStyleProps(safeProps.style));
-
-      const iconView = safeProps.icon
-        ? toView(safeProps.icon) ?? styledText(String(safeProps.icon), buildStyle(toastStyle))
-        : null;
-      const messageSource = validChildren.length > 0 ? validChildren : [safeProps.message ?? ""];
-      const messageViews = ensureViewArray(messageSource);
-      const gap = toNumber((safeProps as Record<string, unknown>).gap) ?? 1;
-
-      const parts: View[] = [];
-      if (iconView) parts.push(iconView);
-      parts.push(...messageViews);
-
-      const contentView = joinViews(parts, gap);
-
-      const toastView = styledBox(contentView, {
-        border: resolveBorderPreset(safeProps.border ?? DEFAULT_BORDER),
-        padding: normalizePadding(
-          safeProps.padding ?? {
-            vertical: 0,
-            horizontal: 2,
-          }
-        ),
-        style: toastStyle ? buildStyle(toastStyle) : undefined,
-      });
-
-      return toastView;
-    }
-
-    case "text-input":
-    case "textarea": {
-      const disabled = safeProps.disabled === true || safeProps.disabled === "true";
-      const bindValue = (safeProps as Record<string, unknown>)["bind:value"];
-
-      const resolveValue = (): string => {
-        if (typeof safeProps.value === "string") return safeProps.value;
-        if (isBindableRune<string>(bindValue)) return bindValue() ?? "";
-        if (isStateRune<string>(bindValue)) return bindValue() ?? "";
-        if (typeof safeProps.defaultValue === "string") return safeProps.defaultValue;
-        return "";
-      };
-
-      const ValueRune =
-        (isBindableRune<string>(bindValue) || isStateRune<string>(bindValue)) && bindValue
-          ? (bindValue as BindableRune<string> | StateRune<string>)
-          : null;
-
-      const rawValue = resolveValue();
-      const placeholder = typeof safeProps.placeholder === "string" ? safeProps.placeholder : "";
-      const echoMode = typeof safeProps.echoMode === "string" ? safeProps.echoMode : "normal";
-
-      const maskedValue = (() => {
-        switch (echoMode) {
-          case "password":
-            return rawValue.length > 0 ? "•".repeat(rawValue.length) : "";
-          case "none":
-            return "";
-          default:
-            return rawValue;
-        }
-      })();
-
-      const isEmpty = maskedValue.length === 0;
-      const displayContent = isEmpty && placeholder ? placeholder : maskedValue;
-
-      const width = toNumber(safeProps.width);
-      const height = toNumber(safeProps.height);
-
-      const baseStyle = extractStyleProps(safeProps.style);
-      const placeholderStyle = isEmpty && placeholder
-        ? { foreground: color.gray, italic: true }
-        : undefined;
-
-      const inputStyleProps = mergeStyleProps(baseStyle, placeholderStyle, {
-        width,
-        height,
-      });
-      const inputStyle = buildStyle(inputStyleProps);
-
-      const valueText = styledText(displayContent, inputStyle);
-
-      const boxStyleProps = mergeStyleProps(baseStyle, {
-        width,
-        height,
-      });
-      const inputBox = styledBox(valueText, {
-        border: resolveBorderPreset(safeProps.border ?? DEFAULT_BORDER),
-        padding: normalizePadding(
-          safeProps.padding ?? {
-            vertical: 0,
-            horizontal: 1,
-          }
-        ),
-        style: boxStyleProps ? buildStyle(boxStyleProps) : undefined,
-      });
-
-      const handleChange = (next: string) => {
-        if (disabled) return;
-        if (ValueRune) {
-          ValueRune.$set(next);
-        }
-        if (typeof safeProps.onChange === "function") {
-          (safeProps.onChange as (value: string) => void)(next);
-        }
-      };
-
-      const handleSubmit = (next?: string) => {
-        if (typeof safeProps.onSubmit === "function") {
-          (safeProps.onSubmit as (value: string) => void)(next ?? rawValue);
-        }
-      };
-
-      const interactiveProps: Record<string, unknown> = {
-        disabled,
-        focusable: disabled ? false : safeProps.focusable !== false,
-        role: safeProps.role ?? (type === "textarea" ? "textbox" : "textbox"),
-        className: safeProps.className,
-        tooltip: safeProps.tooltip,
-        onFocus: safeProps.onFocus,
-        onBlur: safeProps.onBlur,
-        onHover: safeProps.onHover,
-        onChange: handleChange,
-        onSubmit: handleSubmit,
-        value: rawValue,
-        placeholder,
-        echoMode,
-        multiline: type === "textarea",
-      };
-
-      return wrapInteractiveView(inputBox, interactiveProps);
-    }
 
 
     // Scope Components
@@ -1678,6 +1487,41 @@ export const jsx = (
       return text(`[${type}]`);
   }
 };
+
+export function jsx(
+  type: string | Function,
+  props: Record<string, unknown> | null,
+  key?: string | number
+): JSXElement {
+  return createJSXElement(type, props, key, []);
+}
+
+export function jsxs(
+  type: string | Function,
+  props: Record<string, unknown> | null,
+  key?: string | number
+): JSXElement {
+  return createJSXElement(type, props, key, []);
+}
+
+export function jsxDEV(
+  type: string | Function,
+  props: Record<string, unknown> | null,
+  key?: string | number,
+  _isStaticChildren?: boolean,
+  source?: DevInfo["source"],
+  self?: unknown
+): JSXElement {
+  return createJSXElement(type, props, key, [], { source, self });
+}
+
+/**
+ * Render function - converts JSXNode or View into a concrete View ready for MVU runtime
+ */
+export function render(element: JSXNode | View): View {
+  const result = renderChild(element);
+  return result ?? text("");
+}
 
 /**
  * JSX Fragment component for grouping multiple elements without a wrapper
@@ -1736,12 +1580,17 @@ export const Fragment = ({ children }: { children?: React.ReactNode }) => {
  * const element = createElement('text', { style: { color: 'blue' } }, 'Hello')
  * ```
  */
-// Export createElement
-export const createElement = jsx;
+export function createElement(
+  type: string | Function,
+  props: Record<string, unknown> | null,
+  ...children: unknown[]
+): JSXElement {
+  return createJSXElement(type, props, null, children);
+}
 
 // Export JSX namespace types
 export namespace JSX {
-  export interface Element extends View {}
+  export interface Element extends JSXElement {}
 
   export interface IntrinsicElements {
     text: {
@@ -1786,9 +1635,6 @@ export namespace JSX {
     children: {};
   }
 }
-
-// Export jsx-runtime functions
-export { jsx as jsxs, jsx as jsxDEV };
 
 /**
  * Global JSX plugin registry instance

@@ -5,7 +5,7 @@
  * Perfect for showcasing content with clean aesthetics.
  */
 
-import { borderStyle, colors, style } from '@tuix/ansi'
+import { colors, style } from '@tuix/ansi'
 import { Box } from '../box'
 import { useUITheme, type ThemeVariant } from '../../../theme'
 
@@ -77,10 +77,8 @@ export function Panel(props: PanelProps): JSX.Element {
 
   const variant = props.variant || 'default'
   const borderColor = getColor(variant) ?? theme.colors.border ?? colors.gray
-  const borderStyleValue =
-    props.rounded !== false
-      ? borderStyle('rounded')
-      : borderStyle(theme.typography.borderStyle ?? 'thin')
+  const borderPreset =
+    props.rounded !== false ? 'rounded' : theme.typography.borderStyle ?? 'thin'
 
   const padding = props.padding ?? spacing.padding
   const margin = props.margin ?? spacing.margin
@@ -138,17 +136,15 @@ export function Panel(props: PanelProps): JSX.Element {
   }
 
   return (
-    <Box
-      border={borderStyleValue}
+    <box
+      border={borderPreset}
       borderColor={borderColor}
       width={props.width}
       height={props.height}
       padding={{ vertical: padding }}
-      margin={margin}
-      direction="vertical"
     >
       {content}
-    </Box>
+    </box>
   )
 }
 

@@ -1,0 +1,5270 @@
+# CURRENT STATE (2025-10-11)
+
+## Named Features
+- BorderSide [export] — @tuix/ansi/border/index.ts
+- BoxOptions [type] — @tuix/ansi/border/index.ts
+- border [export] — @tuix/ansi/border/index.ts
+- borderPresets [export] — @tuix/ansi/border/index.ts
+- borderStyle [export] — @tuix/ansi/border/index.ts
+- combineSides [export] — @tuix/ansi/border/index.ts
+- fromPattern [export] — @tuix/ansi/border/index.ts
+- getBorderFromStyle [export] — @tuix/ansi/border/index.ts
+- hasSide [export] — @tuix/ansi/border/index.ts
+- removeSide [export] — @tuix/ansi/border/index.ts
+- renderBox [export] — @tuix/ansi/border/index.ts
+- Ascii [const] — @tuix/ansi/border/presets.ts
+- Dashed [const] — @tuix/ansi/border/presets.ts
+- Dotted [const] — @tuix/ansi/border/presets.ts
+- Double [const] — @tuix/ansi/border/presets.ts
+- Rounded [const] — @tuix/ansi/border/presets.ts
+- Thick [const] — @tuix/ansi/border/presets.ts
+- Thin [const] — @tuix/ansi/border/presets.ts
+- border [const] — @tuix/ansi/border/presets.ts
+- borderPresets [const] — @tuix/ansi/border/presets.ts
+- Border [interface] — @tuix/ansi/border/types.ts
+- BorderSide [enum] — @tuix/ansi/border/types.ts
+- BorderStyle [interface] — @tuix/ansi/border/types.ts
+- BoxOptions [interface] — @tuix/ansi/border/utils.ts
+- borderStyle [const] — @tuix/ansi/border/utils.ts
+- combineSides [const] — @tuix/ansi/border/utils.ts
+- fromPattern [const] — @tuix/ansi/border/utils.ts
+- getBorderFromStyle [const] — @tuix/ansi/border/utils.ts
+- hasSide [const] — @tuix/ansi/border/utils.ts
+- removeSide [const] — @tuix/ansi/border/utils.ts
+- renderBox [const] — @tuix/ansi/border/utils.ts
+- ANSI_16_RGB [const] — @tuix/ansi/color/convert.ts
+- RGB [type] — @tuix/ansi/color/convert.ts
+- colorToRgb [function] — @tuix/ansi/color/convert.ts
+- hexToRgb [function] — @tuix/ansi/color/convert.ts
+- rgbToAnsi [function] — @tuix/ansi/color/convert.ts
+- rgbToAnsi256 [function] — @tuix/ansi/color/convert.ts
+- toAnsiSequence [function] — @tuix/ansi/color/convert.ts
+- Color [class] — @tuix/ansi/color/def.ts
+- ANSI_16_RGB [export] — @tuix/ansi/color/index.ts
+- Color [export] — @tuix/ansi/color/index.ts
+- ColorProfile [export] — @tuix/ansi/color/index.ts
+- Colors [const] — @tuix/ansi/color/index.ts
+- RGB [type] — @tuix/ansi/color/index.ts
+- color [const] — @tuix/ansi/color/index.ts
+- colorToRgb [export] — @tuix/ansi/color/index.ts
+- colors [const] — @tuix/ansi/color/index.ts
+- detectColorProfile [export] — @tuix/ansi/color/index.ts
+- hexToRgb [export] — @tuix/ansi/color/index.ts
+- parseColor [export] — @tuix/ansi/color/index.ts
+- rgbToAnsi [export] — @tuix/ansi/color/index.ts
+- rgbToAnsi256 [export] — @tuix/ansi/color/index.ts
+- toAnsiSequence [export] — @tuix/ansi/color/index.ts
+- parseColor [function] — @tuix/ansi/color/parse.ts
+- black [const] — @tuix/ansi/color/presets.ts
+- blue [const] — @tuix/ansi/color/presets.ts
+- brightBlue [const] — @tuix/ansi/color/presets.ts
+- brightCyan [const] — @tuix/ansi/color/presets.ts
+- brightGreen [const] — @tuix/ansi/color/presets.ts
+- brightMagenta [const] — @tuix/ansi/color/presets.ts
+- brightRed [const] — @tuix/ansi/color/presets.ts
+- brightWhite [const] — @tuix/ansi/color/presets.ts
+- brightYellow [const] — @tuix/ansi/color/presets.ts
+- cyan [const] — @tuix/ansi/color/presets.ts
+- gray [const] — @tuix/ansi/color/presets.ts
+- green [const] — @tuix/ansi/color/presets.ts
+- magenta [const] — @tuix/ansi/color/presets.ts
+- red [const] — @tuix/ansi/color/presets.ts
+- white [const] — @tuix/ansi/color/presets.ts
+- yellow [const] — @tuix/ansi/color/presets.ts
+- ColorProfile [enum] — @tuix/ansi/color/profile.ts
+- detectColorProfile [const] — @tuix/ansi/color/profile.ts
+- ColorDefAdaptiveSchema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefAnsi15Schema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefAnsi256Schema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefAnsiSchema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefAutoAnsiSchema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefHexSchema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefNoneSchema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefRGBSchema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefRawSchema [const] — @tuix/ansi/color/schemas.ts
+- ColorDefSchema [const] — @tuix/ansi/color/schemas.ts
+- Color [type] — @tuix/ansi/color/types.ts
+- ColorDef [type] — @tuix/ansi/color/types.ts
+- ColorDefAdaptive [type] — @tuix/ansi/color/types.ts
+- ColorDefAnsi [type] — @tuix/ansi/color/types.ts
+- ColorDefHex [type] — @tuix/ansi/color/types.ts
+- ColorDefNone [type] — @tuix/ansi/color/types.ts
+- ColorDefRGB [type] — @tuix/ansi/color/types.ts
+- ColorRaw [type] — @tuix/ansi/color/types.ts
+- adaptive [const] — @tuix/ansi/color/utils.ts
+- ansi [const] — @tuix/ansi/color/utils.ts
+- ansi256 [const] — @tuix/ansi/color/utils.ts
+- blend [const] — @tuix/ansi/color/utils.ts
+- darken [const] — @tuix/ansi/color/utils.ts
+- gradient [const] — @tuix/ansi/color/utils.ts
+- hex [const] — @tuix/ansi/color/utils.ts
+- isVisible [const] — @tuix/ansi/color/utils.ts
+- lighten [const] — @tuix/ansi/color/utils.ts
+- none [const] — @tuix/ansi/color/utils.ts
+- rgb [const] — @tuix/ansi/color/utils.ts
+- ANSICode [type] — @tuix/ansi/core/codes.ts
+- ANSISequence [type] — @tuix/ansi/core/codes.ts
+- ANSI_CODES [const] — @tuix/ansi/core/codes.ts
+- bg256 [function] — @tuix/ansi/core/codes.ts
+- bgRgb [function] — @tuix/ansi/core/codes.ts
+- fg256 [function] — @tuix/ansi/core/codes.ts
+- fgRgb [function] — @tuix/ansi/core/codes.ts
+- getCode [function] — @tuix/ansi/core/codes.ts
+- isValidCode [function] — @tuix/ansi/core/codes.ts
+- ANSI_CODES [export] — @tuix/ansi/core/escape.ts
+- colorize [const] — @tuix/ansi/core/escape.ts
+- escape [const] — @tuix/ansi/core/escape.ts
+- sequence [const] — @tuix/ansi/core/escape.ts
+- ANSI_CODES [export] — @tuix/ansi/core/index.ts
+- bg256 [export] — @tuix/ansi/core/index.ts
+- bgRgb [export] — @tuix/ansi/core/index.ts
+- colorize [export] — @tuix/ansi/core/index.ts
+- countAnsi [export] — @tuix/ansi/core/index.ts
+- escape [export] — @tuix/ansi/core/index.ts
+- extractAnsi [export] — @tuix/ansi/core/index.ts
+- fg256 [export] — @tuix/ansi/core/index.ts
+- fgRgb [export] — @tuix/ansi/core/index.ts
+- getCode [export] — @tuix/ansi/core/index.ts
+- hasAnsi [export] — @tuix/ansi/core/index.ts
+- isValidCode [export] — @tuix/ansi/core/index.ts
+- pad [export] — @tuix/ansi/core/index.ts
+- sequence [export] — @tuix/ansi/core/index.ts
+- splitAnsiSegments [export] — @tuix/ansi/core/index.ts
+- stripAnsi [export] — @tuix/ansi/core/index.ts
+- truncate [export] — @tuix/ansi/core/index.ts
+- visualWidth [export] — @tuix/ansi/core/index.ts
+- countAnsi [const] — @tuix/ansi/core/strip.ts
+- extractAnsi [const] — @tuix/ansi/core/strip.ts
+- hasAnsi [const] — @tuix/ansi/core/strip.ts
+- splitAnsiSegments [const] — @tuix/ansi/core/strip.ts
+- stripAnsi [const] — @tuix/ansi/core/strip.ts
+- pad [const] — @tuix/ansi/core/width.ts
+- truncate [const] — @tuix/ansi/core/width.ts
+- visualWidth [const] — @tuix/ansi/core/width.ts
+- createBounce [const] — @tuix/ansi/effects/bounce.ts
+- GlowConfig [interface] — @tuix/ansi/effects/glow.ts
+- createGlow [const] — @tuix/ansi/effects/glow.ts
+- createHologramEffect [const] — @tuix/ansi/effects/hologram.ts
+- applyLayerEffect [export] — @tuix/ansi/effects/index.ts
+- applyPattern [export] — @tuix/ansi/effects/index.ts
+- createBounce [export] — @tuix/ansi/effects/index.ts
+- createDropShadow [export] — @tuix/ansi/effects/index.ts
+- createGlow [export] — @tuix/ansi/effects/index.ts
+- createHologramEffect [export] — @tuix/ansi/effects/index.ts
+- createInnerShadow [export] — @tuix/ansi/effects/index.ts
+- createMatrixEffect [export] — @tuix/ansi/effects/index.ts
+- createNeonEffect [export] — @tuix/ansi/effects/index.ts
+- createPulse [export] — @tuix/ansi/effects/index.ts
+- createRainbowText [export] — @tuix/ansi/effects/index.ts
+- createShake [export] — @tuix/ansi/effects/index.ts
+- createTypewriter [export] — @tuix/ansi/effects/index.ts
+- createWaveText [export] — @tuix/ansi/effects/index.ts
+- generatePattern [export] — @tuix/ansi/effects/index.ts
+- LayerEffect [interface] — @tuix/ansi/effects/layer.ts
+- applyLayerEffect [const] — @tuix/ansi/effects/layer.ts
+- createMatrixEffect [const] — @tuix/ansi/effects/matrix.ts
+- createNeonEffect [const] — @tuix/ansi/effects/neon.ts
+- PatternConfig [interface] — @tuix/ansi/effects/pattern.ts
+- applyPattern [const] — @tuix/ansi/effects/pattern.ts
+- generatePattern [const] — @tuix/ansi/effects/pattern.ts
+- createPulse [const] — @tuix/ansi/effects/pulse.ts
+- createRainbowText [const] — @tuix/ansi/effects/rainbow.ts
+- ShadowConfig [interface] — @tuix/ansi/effects/shadow.ts
+- createDropShadow [const] — @tuix/ansi/effects/shadow.ts
+- createInnerShadow [const] — @tuix/ansi/effects/shadow.ts
+- createShake [const] — @tuix/ansi/effects/shake.ts
+- createTypewriter [const] — @tuix/ansi/effects/typewriter.ts
+- createWaveText [const] — @tuix/ansi/effects/wave.ts
+- BackgroundGradientOptions [interface] — @tuix/ansi/gradient/index.ts
+- TextGradientOptions [interface] — @tuix/ansi/gradient/index.ts
+- backgroundGradient [const] — @tuix/ansi/gradient/index.ts
+- createGradient [const] — @tuix/ansi/gradient/index.ts
+- getGradientColor [const] — @tuix/ansi/gradient/index.ts
+- oceanGradient [const] — @tuix/ansi/gradient/index.ts
+- rainbowGradient [const] — @tuix/ansi/gradient/index.ts
+- reverseGradient [const] — @tuix/ansi/gradient/index.ts
+- sunsetGradient [const] — @tuix/ansi/gradient/index.ts
+- textGradient [const] — @tuix/ansi/gradient/index.ts
+- GradientConfig [interface] — @tuix/ansi/gradient/types.ts
+- GradientStop [interface] — @tuix/ansi/gradient/types.ts
+- AnsiToken [interface] — @tuix/ansi/parser/index.ts
+- StyledSegment [interface] — @tuix/ansi/parser/index.ts
+- parseStyledText [const] — @tuix/ansi/parser/index.ts
+- tokenizeAnsi [const] — @tuix/ansi/parser/index.ts
+- buildDecorationSequence [const] — @tuix/ansi/render/index.ts
+- renderLines [const] — @tuix/ansi/render/index.ts
+- renderStyled [const] — @tuix/ansi/render/index.ts
+- renderStyledSync [const] — @tuix/ansi/render/index.ts
+- toAnsiStyleCode [const] — @tuix/ansi/render/index.ts
+- RenderOptions [interface] — @tuix/ansi/render/types.ts
+- Style [class] — @tuix/ansi/style/index.ts
+- fromProps [const] — @tuix/ansi/style/index.ts
+- style [const] — @tuix/ansi/style/index.ts
+- styles [const] — @tuix/ansi/style/index.ts
+- HorizontalAlign [type] — @tuix/ansi/style/types.ts
+- StyleProps [interface] — @tuix/ansi/style/types.ts
+- StyleTransform [type] — @tuix/ansi/style/types.ts
+- VerticalAlign [type] — @tuix/ansi/style/types.ts
+- TuixApp [function] — @tuix/bin/app.tsx
+- DashboardCommand [function] — @tuix/bin/commands/dashboard.tsx
+- HelpCommand [function] — @tuix/bin/commands/help.tsx
+- VersionCommand [function] — @tuix/bin/commands/version.tsx
+- WelcomeScreen [function] — @tuix/bin/commands/welcome.tsx
+- DashboardCommand [export] — @tuix/bin/index.ts
+- HelpCommand [export] — @tuix/bin/index.ts
+- TuixApp [export] — @tuix/bin/index.ts
+- VersionCommand [export] — @tuix/bin/index.ts
+- WelcomeScreen [export] — @tuix/bin/index.ts
+- CONFIG_FILE_CONSTANTS [const] — @tuix/config/constants.ts
+- DEBUG_CONSTANTS [const] — @tuix/config/constants.ts
+- ENV_CONSTANTS [const] — @tuix/config/constants.ts
+- ERROR_CONSTANTS [const] — @tuix/config/constants.ts
+- JSX_CONFIG_CONSTANTS [const] — @tuix/config/constants.ts
+- LOADING_CONSTANTS [const] — @tuix/config/constants.ts
+- MERGE_CONSTANTS [const] — @tuix/config/constants.ts
+- PERFORMANCE_CONSTANTS [const] — @tuix/config/constants.ts
+- SCHEMA_CONSTANTS [const] — @tuix/config/constants.ts
+- SOURCE_CONSTANTS [const] — @tuix/config/constants.ts
+- TRANSFORM_CONSTANTS [const] — @tuix/config/constants.ts
+- VALIDATION_CONSTANTS [const] — @tuix/config/constants.ts
+- ConfigContext [interface] — @tuix/config/context/extension.ts
+- createConfigContext [function] — @tuix/config/context/extension.ts
+- ConfigDomainEvent [type] — @tuix/config/core/events.ts
+- ConfigEvent [interface] — @tuix/config/core/events.ts
+- ConfigEventChannel [type] — @tuix/config/core/events.ts
+- ConfigEventChannels [const] — @tuix/config/core/events.ts
+- ConfigSchemaEvent [interface] — @tuix/config/core/events.ts
+- ConfigValidationEvent [interface] — @tuix/config/core/events.ts
+- ValidationError [interface] — @tuix/config/core/events.ts
+- EnvLoader [class] — @tuix/config/core/loader.ts
+- JSONLoader [class] — @tuix/config/core/loader.ts
+- TOMLLoader [class] — @tuix/config/core/loader.ts
+- TypeScriptLoader [class] — @tuix/config/core/loader.ts
+- YAMLLoader [class] — @tuix/config/core/loader.ts
+- default [default] — @tuix/config/core/loader.ts
+- ConfigData [interface] — @tuix/config/core/module.ts
+- ConfigError [class] — @tuix/config/core/module.ts
+- ConfigModule [class] — @tuix/config/core/module.ts
+- ConfigExport [export] — @tuix/config/index.ts
+- ConfigGet [export] — @tuix/config/index.ts
+- ConfigImport [export] — @tuix/config/index.ts
+- ConfigLayer [const] — @tuix/config/index.ts
+- ConfigList [export] — @tuix/config/index.ts
+- ConfigPlugin [export] — @tuix/config/index.ts
+- ConfigSet [export] — @tuix/config/index.ts
+- ConfigTag [export] — @tuix/config/index.ts
+- config [const] — @tuix/config/index.ts
+- defineConfig [function] — @tuix/config/index.ts
+- templates [const] — @tuix/config/index.ts
+- Config [default] — @tuix/config/plugin/Config.tsx
+- ConfigProps [interface] — @tuix/config/plugin/Config.tsx
+- ConfigExportProps [interface] — @tuix/config/plugin/commands/export.tsx
+- async [default] — @tuix/config/plugin/commands/export.tsx
+- ConfigGetProps [interface] — @tuix/config/plugin/commands/get.tsx
+- async [default] — @tuix/config/plugin/commands/get.tsx
+- ConfigImportProps [interface] — @tuix/config/plugin/commands/import.tsx
+- async [default] — @tuix/config/plugin/commands/import.tsx
+- ConfigListProps [interface] — @tuix/config/plugin/commands/list.tsx
+- async [default] — @tuix/config/plugin/commands/list.tsx
+- ConfigSetProps [interface] — @tuix/config/plugin/commands/set.tsx
+- async [default] — @tuix/config/plugin/commands/set.tsx
+- Config [export] — @tuix/config/plugin/index.ts
+- ConfigExport [export] — @tuix/config/plugin/index.ts
+- ConfigGet [export] — @tuix/config/plugin/index.ts
+- ConfigImport [export] — @tuix/config/plugin/index.ts
+- ConfigList [export] — @tuix/config/plugin/index.ts
+- ConfigSet [export] — @tuix/config/plugin/index.ts
+- Config [interface] — @tuix/config/schema.ts
+- ConfigArray [type] — @tuix/config/schema.ts
+- ConfigBuilder [interface] — @tuix/config/schema.ts
+- ConfigChangeEvent [interface] — @tuix/config/schema.ts
+- ConfigEntry [interface] — @tuix/config/schema.ts
+- ConfigFile [interface] — @tuix/config/schema.ts
+- ConfigLoader [interface] — @tuix/config/schema.ts
+- ConfigObject [type] — @tuix/config/schema.ts
+- ConfigOptions [interface] — @tuix/config/schema.ts
+- ConfigSchema [interface] — @tuix/config/schema.ts
+- ConfigSource [type] — @tuix/config/schema.ts
+- ConfigValue [type] — @tuix/config/schema.ts
+- PluginConfig [interface] — @tuix/config/schema.ts
+- TuixConfig [interface] — @tuix/config/schema.ts
+- TuixConfig [class] — @tuix/config/sources/config.ts
+- TuixConfigBuilder [class] — @tuix/config/sources/config.ts
+- createConfig [function] — @tuix/config/sources/config.ts
+- ConfigObject [type] — @tuix/config/sources/utils.ts
+- ConfigValue [type] — @tuix/config/sources/utils.ts
+- deleteValueByPath [function] — @tuix/config/sources/utils.ts
+- expandEnvVars [function] — @tuix/config/sources/utils.ts
+- getValueByPath [function] — @tuix/config/sources/utils.ts
+- mergeDeep [function] — @tuix/config/sources/utils.ts
+- parseValue [function] — @tuix/config/sources/utils.ts
+- setValueByPath [function] — @tuix/config/sources/utils.ts
+- toEnvFormat [function] — @tuix/config/sources/utils.ts
+- validateConfig [function] — @tuix/config/sources/utils.ts
+- StorageConfigAdapter [class] — @tuix/config/storage/adapter.ts
+- StorageConfigLayer [const] — @tuix/config/storage/adapter.ts
+- makeStorageConfig [const] — @tuix/config/storage/adapter.ts
+- ConfigFormat [type] — @tuix/config/storage/formats.ts
+- detectFormat [function] — @tuix/config/storage/formats.ts
+- loadConfigFile [function] — @tuix/config/storage/formats.ts
+- parseJSON [function] — @tuix/config/storage/formats.ts
+- parseTOML [function] — @tuix/config/storage/formats.ts
+- parseTypeScript [function] — @tuix/config/storage/formats.ts
+- parseYAML [function] — @tuix/config/storage/formats.ts
+- saveConfigFile [function] — @tuix/config/storage/formats.ts
+- serializeJSON [function] — @tuix/config/storage/formats.ts
+- serializeTOML [function] — @tuix/config/storage/formats.ts
+- serializeYAML [function] — @tuix/config/storage/formats.ts
+- Config [interface] — @tuix/config/types.ts
+- ConfigError [class] — @tuix/config/types.ts
+- ConfigFormat [type] — @tuix/config/types.ts
+- ConfigLoader [interface] — @tuix/config/types.ts
+- ConfigNotFoundError [class] — @tuix/config/types.ts
+- ConfigOptions [interface] — @tuix/config/types.ts
+- ConfigSource [interface] — @tuix/config/types.ts
+- ConfigValidationError [class] — @tuix/config/types.ts
+- TuixConfig [interface] — @tuix/config/types.ts
+- EventChoreographer [class] — @tuix/coordination/choreography.ts
+- AUDIT_LOG_BATCH_SIZE [const] — @tuix/coordination/constants.ts
+- AUDIT_LOG_BATCH_WINDOW [const] — @tuix/coordination/constants.ts
+- CIRCUIT_BREAKER_CHECK_INTERVAL [const] — @tuix/coordination/constants.ts
+- CLI_PREDICTION_DEBOUNCE [const] — @tuix/coordination/constants.ts
+- DASHBOARD_UPDATE_INTERVAL [const] — @tuix/coordination/constants.ts
+- DEFAULT_CIRCUIT_BREAKER_HALF_OPEN_REQUESTS [const] — @tuix/coordination/constants.ts
+- DEFAULT_CIRCUIT_BREAKER_RESET_TIMEOUT [const] — @tuix/coordination/constants.ts
+- DEFAULT_CIRCUIT_BREAKER_THRESHOLD [const] — @tuix/coordination/constants.ts
+- DEFAULT_REPORTING_INTERVAL [const] — @tuix/coordination/constants.ts
+- DEFAULT_RETRY_BASE_DELAY [const] — @tuix/coordination/constants.ts
+- DEFAULT_RETRY_MAX_ATTEMPTS [const] — @tuix/coordination/constants.ts
+- DEFAULT_RETRY_MAX_DELAY [const] — @tuix/coordination/constants.ts
+- DEFAULT_STEP_TIMEOUT [const] — @tuix/coordination/constants.ts
+- DEFAULT_WORKFLOW_TIMEOUT [const] — @tuix/coordination/constants.ts
+- EVENT_TYPES [const] — @tuix/coordination/constants.ts
+- MAX_CONCURRENT_WORKFLOWS [const] — @tuix/coordination/constants.ts
+- MEMORY_METRICS_INTERVAL [const] — @tuix/coordination/constants.ts
+- METRICS_HISTORY_SIZE [const] — @tuix/coordination/constants.ts
+- MODULE_NAME [const] — @tuix/coordination/constants.ts
+- PERCENTILE_VALUES [const] — @tuix/coordination/constants.ts
+- STREAM_BATCH_SIZE [const] — @tuix/coordination/constants.ts
+- STREAM_BATCH_WINDOW [const] — @tuix/coordination/constants.ts
+- STREAM_DEBOUNCE_DELAY [const] — @tuix/coordination/constants.ts
+- STREAM_THROTTLE_RATE [const] — @tuix/coordination/constants.ts
+- STREAM_THROTTLE_UNITS [const] — @tuix/coordination/constants.ts
+- SUBMODULE_NAMES [const] — @tuix/coordination/constants.ts
+- UI_UPDATE_BATCH_SIZE [const] — @tuix/coordination/constants.ts
+- UI_UPDATE_BATCH_WINDOW [const] — @tuix/coordination/constants.ts
+- WORKFLOW_CLEANUP_INTERVAL [const] — @tuix/coordination/constants.ts
+- ErrorRecoveryManager [class] — @tuix/coordination/errorRecovery.ts
+- ChoreographyError [class] — @tuix/coordination/errors.ts
+- CoordinationError [class] — @tuix/coordination/errors.ts
+- PatternError [class] — @tuix/coordination/errors.ts
+- PerformanceMonitorError [class] — @tuix/coordination/errors.ts
+- RecoveryError [class] — @tuix/coordination/errors.ts
+- StreamOptimizationError [class] — @tuix/coordination/errors.ts
+- WorkflowError [class] — @tuix/coordination/errors.ts
+- CoordinationModule [export] — @tuix/coordination/index.ts
+- ErrorRecoveryManager [export] — @tuix/coordination/index.ts
+- EventChoreographer [export] — @tuix/coordination/index.ts
+- EventStreamOptimizer [export] — @tuix/coordination/index.ts
+- IntegrationPatterns [export] — @tuix/coordination/index.ts
+- PerformanceMonitor [export] — @tuix/coordination/index.ts
+- WorkflowOrchestrator [export] — @tuix/coordination/index.ts
+- AuditLogEvent [interface] — @tuix/coordination/integrationPatterns.ts
+- CLIPredictionEvent [interface] — @tuix/coordination/integrationPatterns.ts
+- DashboardUpdateEvent [interface] — @tuix/coordination/integrationPatterns.ts
+- IntegrationPatterns [class] — @tuix/coordination/integrationPatterns.ts
+- PatternError [class] — @tuix/coordination/integrationPatterns.ts
+- CoordinationConfig [interface] — @tuix/coordination/module.ts
+- CoordinationError [class] — @tuix/coordination/module.ts
+- CoordinationModule [class] — @tuix/coordination/module.ts
+- SystemHealth [interface] — @tuix/coordination/module.ts
+- WorkflowOrchestrator [class] — @tuix/coordination/orchestrator.ts
+- PerformanceMonitor [class] — @tuix/coordination/performanceMonitor.ts
+- PerformanceReportEvent [interface] — @tuix/coordination/performanceMonitor.ts
+- EventStreamOptimizer [class] — @tuix/coordination/streamOptimizer.ts
+- OptimizationStats [interface] — @tuix/coordination/streamOptimizer.ts
+- RelevanceCriteria [interface] — @tuix/coordination/streamOptimizer.ts
+- StreamOptimizationError [class] — @tuix/coordination/streamOptimizer.ts
+- UIUpdateEvent [interface] — @tuix/coordination/streamOptimizer.ts
+- AuditLogEvent [interface] — @tuix/coordination/types.ts
+- CLIPredictionEvent [interface] — @tuix/coordination/types.ts
+- CircuitBreakConfig [interface] — @tuix/coordination/types.ts
+- CircuitBreaker [interface] — @tuix/coordination/types.ts
+- ConfigChangeNotificationEvent [interface] — @tuix/coordination/types.ts
+- CoordinationConfig [interface] — @tuix/coordination/types.ts
+- DashboardUpdateEvent [interface] — @tuix/coordination/types.ts
+- ErrorCondition [interface] — @tuix/coordination/types.ts
+- ErrorDetectionEvent [interface] — @tuix/coordination/types.ts
+- ErrorIndicator [interface] — @tuix/coordination/types.ts
+- ErrorPattern [interface] — @tuix/coordination/types.ts
+- ErrorRecoveryEvent [interface] — @tuix/coordination/types.ts
+- ErrorStatistics [interface] — @tuix/coordination/types.ts
+- FallbackConfig [interface] — @tuix/coordination/types.ts
+- MemoryUsageMetric [interface] — @tuix/coordination/types.ts
+- NotificationEvent [interface] — @tuix/coordination/types.ts
+- NotifyConfig [interface] — @tuix/coordination/types.ts
+- OptimizationStats [interface] — @tuix/coordination/types.ts
+- PatternHandle [interface] — @tuix/coordination/types.ts
+- PerformanceMetric [interface] — @tuix/coordination/types.ts
+- PerformanceReport [interface] — @tuix/coordination/types.ts
+- PerformanceReportEvent [interface] — @tuix/coordination/types.ts
+- RecoveryConfig [type] — @tuix/coordination/types.ts
+- RecoveryStrategy [interface] — @tuix/coordination/types.ts
+- RelevanceCriteria [interface] — @tuix/coordination/types.ts
+- ResponseTimeMetric [interface] — @tuix/coordination/types.ts
+- RetryConfig [interface] — @tuix/coordination/types.ts
+- RetryPolicy [interface] — @tuix/coordination/types.ts
+- SystemHealth [interface] — @tuix/coordination/types.ts
+- ThroughputMetric [interface] — @tuix/coordination/types.ts
+- UIUpdateEvent [interface] — @tuix/coordination/types.ts
+- WorkflowConfig [interface] — @tuix/coordination/types.ts
+- WorkflowInstance [interface] — @tuix/coordination/types.ts
+- WorkflowMetrics [interface] — @tuix/coordination/types.ts
+- WorkflowResult [interface] — @tuix/coordination/types.ts
+- WorkflowStep [interface] — @tuix/coordination/types.ts
+- WorkflowStepInstance [interface] — @tuix/coordination/types.ts
+- CORE_CONSTANTS [const] — @tuix/core/constants.ts
+- DEBUG_CONSTANTS [const] — @tuix/core/constants.ts
+- ERROR_CONSTANTS [const] — @tuix/core/constants.ts
+- EVENT_CONSTANTS [const] — @tuix/core/constants.ts
+- SERVICE_CONSTANTS [const] — @tuix/core/constants.ts
+- TERMINAL_CONSTANTS [const] — @tuix/core/constants.ts
+- VIEW_CONSTANTS [const] — @tuix/core/constants.ts
+- ComponentContext [const] — @tuix/core/context/component.ts
+- ComponentContextRef [const] — @tuix/core/context/component.ts
+- ComponentContextValue [interface] — @tuix/core/context/component.ts
+- useComponentContext [const] — @tuix/core/context/component.ts
+- withComponentContext [function] — @tuix/core/context/component.ts
+- ComponentContext [export] — @tuix/core/context/index.ts
+- ComponentContextRef [export] — @tuix/core/context/index.ts
+- ComponentContextValue [type] — @tuix/core/context/index.ts
+- useComponentContext [export] — @tuix/core/context/index.ts
+- withComponentContext [export] — @tuix/core/context/index.ts
+- CoreErrorType [type] — @tuix/core/errors.ts
+- CoreErrors [const] — @tuix/core/errors.ts
+- EventSystemError [class] — @tuix/core/errors.ts
+- LifecycleError [class] — @tuix/core/errors.ts
+- RuntimeInitializationError [class] — @tuix/core/errors.ts
+- ServiceIntegrationError [class] — @tuix/core/errors.ts
+- ViewSystemError [class] — @tuix/core/errors.ts
+- catchCoreError [const] — @tuix/core/errors.ts
+- failWithCoreError [const] — @tuix/core/errors.ts
+- ApplicationError [export] — @tuix/core/index.ts
+- ComponentContext [export] — @tuix/core/index.ts
+- ComponentContextRef [export] — @tuix/core/index.ts
+- ComponentContextValue [type] — @tuix/core/index.ts
+- ComponentError [export] — @tuix/core/index.ts
+- ConfigError [export] — @tuix/core/index.ts
+- Context [export] — @tuix/core/index.ts
+- Effect [export] — @tuix/core/index.ts
+- ErrorUtils [export] — @tuix/core/index.ts
+- InputError [export] — @tuix/core/index.ts
+- Layer [export] — @tuix/core/index.ts
+- Queue [export] — @tuix/core/index.ts
+- RecoveryStrategies [export] — @tuix/core/index.ts
+- Ref [export] — @tuix/core/index.ts
+- RenderError [export] — @tuix/core/index.ts
+- Schema [export] — @tuix/core/index.ts
+- StorageError [export] — @tuix/core/index.ts
+- Stream [export] — @tuix/core/index.ts
+- TerminalError [export] — @tuix/core/index.ts
+- ValidationError [export] — @tuix/core/index.ts
+- useComponentContext [export] — @tuix/core/index.ts
+- withComponentContext [export] — @tuix/core/index.ts
+- withErrorBoundary [export] — @tuix/core/index.ts
+- withRecovery [export] — @tuix/core/index.ts
+- ModuleError [class] — @tuix/core/module/base.ts
+- ModuleState [type] — @tuix/core/module/base.ts
+- ModuleRegistry [class] — @tuix/core/module/registry.ts
+- RegistryStats [interface] — @tuix/core/module/registry.ts
+- getGlobalRegistry [function] — @tuix/core/module/registry.ts
+- resetGlobalRegistry [function] — @tuix/core/module/registry.ts
+- InputEvent [interface] — @tuix/core/services/events/types.ts
+- RenderEvent [interface] — @tuix/core/services/events/types.ts
+- ServiceEvent [interface] — @tuix/core/services/events/types.ts
+- ServiceEventChannel [type] — @tuix/core/services/events/types.ts
+- ServiceEventChannels [const] — @tuix/core/services/events/types.ts
+- ServiceLayerEvent [type] — @tuix/core/services/events/types.ts
+- StorageEvent [interface] — @tuix/core/services/events/types.ts
+- TerminalEvent [interface] — @tuix/core/services/events/types.ts
+- InputService [class] — @tuix/core/services/input.ts
+- KeyUtils [const] — @tuix/core/services/input.ts
+- MouseUtils [const] — @tuix/core/services/input.ts
+- InputServiceLive [export] — @tuix/core/services/live/index.ts
+- LiveServices [const] — @tuix/core/services/live/index.ts
+- RendererServiceLive [export] — @tuix/core/services/live/index.ts
+- StorageServiceLive [export] — @tuix/core/services/live/index.ts
+- TerminalServiceLive [export] — @tuix/core/services/live/index.ts
+- InputServiceLive [const] — @tuix/core/services/live/input.ts
+- RendererServiceLive [const] — @tuix/core/services/live/renderer.ts
+- CacheStorage [class] — @tuix/core/services/live/storage/cache.ts
+- ConfigStorage [class] — @tuix/core/services/live/storage/config.ts
+- FileStorage [class] — @tuix/core/services/live/storage/file.ts
+- StorageServiceLive [const] — @tuix/core/services/live/storage/index.ts
+- StateStorage [class] — @tuix/core/services/live/storage/state.ts
+- TransactionStorage [class] — @tuix/core/services/live/storage/transaction.ts
+- TerminalServiceLive [const] — @tuix/core/services/live/terminal.ts
+- TerminalServiceTest [const] — @tuix/core/services/live/terminal.ts
+- ServiceError [class] — @tuix/core/services/module.ts
+- ServiceModule [class] — @tuix/core/services/module.ts
+- RenderUtils [const] — @tuix/core/services/renderer.ts
+- RendererService [class] — @tuix/core/services/renderer.ts
+- StorageService [class] — @tuix/core/services/storage.ts
+- StorageUtils [const] — @tuix/core/services/storage.ts
+- TerminalService [class] — @tuix/core/services/terminal.ts
+- CLIConfig [interface] — @tuix/core/types/cli.ts
+- CommandConfig [interface] — @tuix/core/types/cli.ts
+- ParsedArgs [interface] — @tuix/core/types/cli.ts
+- Align [type] — @tuix/core/types/common.ts
+- AlignSchema [const] — @tuix/core/types/common.ts
+- AppErrorSchema [const] — @tuix/core/types/common.ts
+- AppOptionsSchema [const] — @tuix/core/types/common.ts
+- BorderCharacters [type] — @tuix/core/types/common.ts
+- BorderCharactersSchema [const] — @tuix/core/types/common.ts
+- Bounds [type] — @tuix/core/types/common.ts
+- BoundsSchema [const] — @tuix/core/types/common.ts
+- CLICommand [type] — @tuix/core/types/common.ts
+- CLICommandSchema [const] — @tuix/core/types/common.ts
+- CLIConfig [type] — @tuix/core/types/common.ts
+- CLIConfigSchema [const] — @tuix/core/types/common.ts
+- CLIOption [type] — @tuix/core/types/common.ts
+- CLIOptionSchema [const] — @tuix/core/types/common.ts
+- Color [type] — @tuix/core/types/common.ts
+- ColorSchema [const] — @tuix/core/types/common.ts
+- ComponentSchema [const] — @tuix/core/types/common.ts
+- ErrorCode [type] — @tuix/core/types/common.ts
+- ErrorCodeSchema [const] — @tuix/core/types/common.ts
+- IPCChannelType [type] — @tuix/core/types/common.ts
+- IPCChannelTypeSchema [const] — @tuix/core/types/common.ts
+- KeyEvent [type] — @tuix/core/types/common.ts
+- KeyEventSchema [const] — @tuix/core/types/common.ts
+- KeyType [type] — @tuix/core/types/common.ts
+- KeyTypeSchema [const] — @tuix/core/types/common.ts
+- MouseButton [type] — @tuix/core/types/common.ts
+- MouseButtonSchema [const] — @tuix/core/types/common.ts
+- MouseEvent [type] — @tuix/core/types/common.ts
+- MouseEventSchema [const] — @tuix/core/types/common.ts
+- MouseEventType [type] — @tuix/core/types/common.ts
+- MouseEventTypeSchema [const] — @tuix/core/types/common.ts
+- Padding [type] — @tuix/core/types/common.ts
+- PaddingSchema [const] — @tuix/core/types/common.ts
+- Position [type] — @tuix/core/types/common.ts
+- PositionSchema [const] — @tuix/core/types/common.ts
+- ProcessConfig [type] — @tuix/core/types/common.ts
+- ProcessConfigSchema [const] — @tuix/core/types/common.ts
+- ProcessLog [type] — @tuix/core/types/common.ts
+- ProcessLogSchema [const] — @tuix/core/types/common.ts
+- ProcessStatus [type] — @tuix/core/types/common.ts
+- ProcessStatusSchema [const] — @tuix/core/types/common.ts
+- Size [type] — @tuix/core/types/common.ts
+- SizeSchema [const] — @tuix/core/types/common.ts
+- Style [type] — @tuix/core/types/common.ts
+- StyleSchema [const] — @tuix/core/types/common.ts
+- TerminalCapabilities [type] — @tuix/core/types/common.ts
+- TerminalCapabilitiesSchema [const] — @tuix/core/types/common.ts
+- VerticalAlign [type] — @tuix/core/types/common.ts
+- VerticalAlignSchema [const] — @tuix/core/types/common.ts
+- ViewSchema [const] — @tuix/core/types/common.ts
+- Viewport [type] — @tuix/core/types/common.ts
+- ViewportSchema [const] — @tuix/core/types/common.ts
+- WindowSize [type] — @tuix/core/types/common.ts
+- WindowSizeSchema [const] — @tuix/core/types/common.ts
+- parseCLIConfig [const] — @tuix/core/types/common.ts
+- parseKeyEvent [const] — @tuix/core/types/common.ts
+- parseMouseEvent [const] — @tuix/core/types/common.ts
+- parseProcessConfig [const] — @tuix/core/types/common.ts
+- parseStyle [const] — @tuix/core/types/common.ts
+- validateCLIConfig [const] — @tuix/core/types/common.ts
+- validateKeyEvent [const] — @tuix/core/types/common.ts
+- validateMouseEvent [const] — @tuix/core/types/common.ts
+- validateProcessConfig [const] — @tuix/core/types/common.ts
+- validateStyle [const] — @tuix/core/types/common.ts
+- AppOptions [interface] — @tuix/core/types/core.ts
+- AppServices [type] — @tuix/core/types/core.ts
+- Cmd [type] — @tuix/core/types/core.ts
+- Component [interface] — @tuix/core/types/core.ts
+- InputService [interface] — @tuix/core/types/core.ts
+- ModelOf [type] — @tuix/core/types/core.ts
+- MsgOf [type] — @tuix/core/types/core.ts
+- Program [interface] — @tuix/core/types/core.ts
+- RendererService [interface] — @tuix/core/types/core.ts
+- RuntimeState [interface] — @tuix/core/types/core.ts
+- StorageService [interface] — @tuix/core/types/core.ts
+- Sub [type] — @tuix/core/types/core.ts
+- TerminalService [interface] — @tuix/core/types/core.ts
+- View [interface] — @tuix/core/types/core.ts
+- ApplicationError [class] — @tuix/core/types/errors/base.ts
+- ComponentError [class] — @tuix/core/types/errors/base.ts
+- ConfigError [class] — @tuix/core/types/errors/base.ts
+- InputError [class] — @tuix/core/types/errors/base.ts
+- RenderError [class] — @tuix/core/types/errors/base.ts
+- StorageError [class] — @tuix/core/types/errors/base.ts
+- TerminalError [class] — @tuix/core/types/errors/base.ts
+- ValidationError [class] — @tuix/core/types/errors/base.ts
+- ErrorBoundaryConfig [interface] — @tuix/core/types/errors/boundary.ts
+- createComponentBoundary [const] — @tuix/core/types/errors/boundary.ts
+- withErrorBoundary [const] — @tuix/core/types/errors/boundary.ts
+- ErrorRecoveryStrategy [interface] — @tuix/core/types/errors/recovery.ts
+- RecoveryStrategies [const] — @tuix/core/types/errors/recovery.ts
+- withRecovery [const] — @tuix/core/types/errors/recovery.ts
+- AppError [type] — @tuix/core/types/errors/types.ts
+- CriticalError [type] — @tuix/core/types/errors/types.ts
+- ErrorCategories [const] — @tuix/core/types/errors/types.ts
+- RecoverableError [type] — @tuix/core/types/errors/types.ts
+- getErrorCategory [function] — @tuix/core/types/errors/types.ts
+- isAppError [function] — @tuix/core/types/errors/types.ts
+- isCriticalError [function] — @tuix/core/types/errors/types.ts
+- isRecoverableError [function] — @tuix/core/types/errors/types.ts
+- ErrorUtils [const] — @tuix/core/types/errors/utils.ts
+- UnknownAsyncFunction [type] — @tuix/core/types/guards.ts
+- UnknownFunction [type] — @tuix/core/types/guards.ts
+- UnknownRecord [type] — @tuix/core/types/guards.ts
+- hasProperty [function] — @tuix/core/types/guards.ts
+- isArray [function] — @tuix/core/types/guards.ts
+- isAsyncFunction [function] — @tuix/core/types/guards.ts
+- isBoolean [function] — @tuix/core/types/guards.ts
+- isFunction [function] — @tuix/core/types/guards.ts
+- isNullish [function] — @tuix/core/types/guards.ts
+- isNumber [function] — @tuix/core/types/guards.ts
+- isPlainObject [function] — @tuix/core/types/guards.ts
+- isString [function] — @tuix/core/types/guards.ts
+- ComponentMsg [type] — @tuix/core/types/messages.ts
+- SystemMsg [type] — @tuix/core/types/messages.ts
+- Align [type] — @tuix/core/types/schemas.ts
+- AlignSchema [const] — @tuix/core/types/schemas.ts
+- AppErrorSchema [const] — @tuix/core/types/schemas.ts
+- AppOptionsSchema [const] — @tuix/core/types/schemas.ts
+- BorderCharacters [type] — @tuix/core/types/schemas.ts
+- BorderCharactersSchema [const] — @tuix/core/types/schemas.ts
+- Bounds [type] — @tuix/core/types/schemas.ts
+- BoundsSchema [const] — @tuix/core/types/schemas.ts
+- CLICommand [type] — @tuix/core/types/schemas.ts
+- CLICommandSchema [const] — @tuix/core/types/schemas.ts
+- CLIConfig [type] — @tuix/core/types/schemas.ts
+- CLIConfigSchema [const] — @tuix/core/types/schemas.ts
+- CLIOption [type] — @tuix/core/types/schemas.ts
+- CLIOptionSchema [const] — @tuix/core/types/schemas.ts
+- Color [type] — @tuix/core/types/schemas.ts
+- ColorSchema [const] — @tuix/core/types/schemas.ts
+- ComponentSchema [const] — @tuix/core/types/schemas.ts
+- ErrorCode [type] — @tuix/core/types/schemas.ts
+- ErrorCodeSchema [const] — @tuix/core/types/schemas.ts
+- IPCChannelType [type] — @tuix/core/types/schemas.ts
+- IPCChannelTypeSchema [const] — @tuix/core/types/schemas.ts
+- KeyEvent [type] — @tuix/core/types/schemas.ts
+- KeyEventSchema [const] — @tuix/core/types/schemas.ts
+- KeyType [type] — @tuix/core/types/schemas.ts
+- KeyTypeSchema [const] — @tuix/core/types/schemas.ts
+- MouseButton [type] — @tuix/core/types/schemas.ts
+- MouseButtonSchema [const] — @tuix/core/types/schemas.ts
+- MouseEvent [type] — @tuix/core/types/schemas.ts
+- MouseEventSchema [const] — @tuix/core/types/schemas.ts
+- MouseEventType [type] — @tuix/core/types/schemas.ts
+- MouseEventTypeSchema [const] — @tuix/core/types/schemas.ts
+- Padding [type] — @tuix/core/types/schemas.ts
+- PaddingSchema [const] — @tuix/core/types/schemas.ts
+- Position [type] — @tuix/core/types/schemas.ts
+- PositionSchema [const] — @tuix/core/types/schemas.ts
+- ProcessConfig [type] — @tuix/core/types/schemas.ts
+- ProcessConfigSchema [const] — @tuix/core/types/schemas.ts
+- ProcessLog [type] — @tuix/core/types/schemas.ts
+- ProcessLogSchema [const] — @tuix/core/types/schemas.ts
+- ProcessStatus [type] — @tuix/core/types/schemas.ts
+- ProcessStatusSchema [const] — @tuix/core/types/schemas.ts
+- Size [type] — @tuix/core/types/schemas.ts
+- SizeSchema [const] — @tuix/core/types/schemas.ts
+- Style [type] — @tuix/core/types/schemas.ts
+- StyleSchema [const] — @tuix/core/types/schemas.ts
+- TerminalCapabilities [type] — @tuix/core/types/schemas.ts
+- TerminalCapabilitiesSchema [const] — @tuix/core/types/schemas.ts
+- VerticalAlign [type] — @tuix/core/types/schemas.ts
+- VerticalAlignSchema [const] — @tuix/core/types/schemas.ts
+- ViewSchema [const] — @tuix/core/types/schemas.ts
+- Viewport [type] — @tuix/core/types/schemas.ts
+- ViewportSchema [const] — @tuix/core/types/schemas.ts
+- WindowSize [type] — @tuix/core/types/schemas.ts
+- WindowSizeSchema [const] — @tuix/core/types/schemas.ts
+- parseCLIConfig [const] — @tuix/core/types/schemas.ts
+- parseKeyEvent [const] — @tuix/core/types/schemas.ts
+- parseMouseEvent [const] — @tuix/core/types/schemas.ts
+- parseProcessConfig [const] — @tuix/core/types/schemas.ts
+- parseStyle [const] — @tuix/core/types/schemas.ts
+- validateCLIConfig [const] — @tuix/core/types/schemas.ts
+- validateKeyEvent [const] — @tuix/core/types/schemas.ts
+- validateMouseEvent [const] — @tuix/core/types/schemas.ts
+- validateProcessConfig [const] — @tuix/core/types/schemas.ts
+- validateStyle [const] — @tuix/core/types/schemas.ts
+- ComponentProps [interface] — @tuix/core/types/values.ts
+- EventEmitter [interface] — @tuix/core/types/values.ts
+- EventHandler [type] — @tuix/core/types/values.ts
+- JSONValue [type] — @tuix/core/types/values.ts
+- Ref [interface] — @tuix/core/types/values.ts
+- createEventEmitter [function] — @tuix/core/types/values.ts
+- createRef [function] — @tuix/core/types/values.ts
+- getProperty [function] — @tuix/core/types/values.ts
+- memoize [function] — @tuix/core/types/values.ts
+- safeJsonParse [function] — @tuix/core/types/values.ts
+- CATEGORY_ICONS [const] — @tuix/debug/constants.ts
+- DEBUG_CATEGORIES [const] — @tuix/debug/constants.ts
+- DEBUG_DEFAULTS [const] — @tuix/debug/constants.ts
+- DEBUG_LEVELS [const] — @tuix/debug/constants.ts
+- LEVEL_COLORS [const] — @tuix/debug/constants.ts
+- DebugCategory [interface] — @tuix/debug/core.ts
+- DebugEntry [interface] — @tuix/debug/core.ts
+- clearDebugEntries [function] — @tuix/debug/core.ts
+- cliDebug [const] — @tuix/debug/core.ts
+- createDebugLogger [function] — @tuix/debug/core.ts
+- getDebugCategories [function] — @tuix/debug/core.ts
+- getDebugEntries [function] — @tuix/debug/core.ts
+- isDebugEnabled [function] — @tuix/debug/core.ts
+- jsxDebug [const] — @tuix/debug/core.ts
+- renderDebug [const] — @tuix/debug/core.ts
+- scopeDebug [const] — @tuix/debug/core.ts
+- setDebugEnabled [function] — @tuix/debug/core.ts
+- enableDebugMode [function] — @tuix/debug/core/enabler.ts
+- isDebugEnabled [function] — @tuix/debug/core/enabler.ts
+- applyDebugPatches [export] — @tuix/debug/core/index.ts
+- debug [export] — @tuix/debug/core/index.ts
+- debugStore [export] — @tuix/debug/core/index.ts
+- enableDebugMode [export] — @tuix/debug/core/index.ts
+- PatchOptions [interface] — @tuix/debug/core/patcher.ts
+- applyDebugPatches [function] — @tuix/debug/core/patcher.ts
+- debug [const] — @tuix/debug/core/store.ts
+- debugStore [const] — @tuix/debug/core/store.ts
+- DEBUG_DEFAULTS [export] — @tuix/debug/index.ts
+- debug [export] — @tuix/debug/index.ts
+- debugStore [export] — @tuix/debug/index.ts
+- DebugLogs [function] — @tuix/debug/jsx/components/DebugLogs.tsx
+- DebugLogsProps [interface] — @tuix/debug/jsx/components/DebugLogs.tsx
+- createDebugLog [function] — @tuix/debug/jsx/components/DebugLogs.tsx
+- DebugToolbar [function] — @tuix/debug/jsx/components/DebugToolbar.tsx
+- DebugWrapper [function] — @tuix/debug/jsx/components/DebugWrapper.tsx
+- EventList [export] — @tuix/debug/jsx/components/EventList.tsx
+- LogsView [function] — @tuix/debug/jsx/components/LogsView.tsx
+- OutputView [function] — @tuix/debug/jsx/components/OutputView.tsx
+- PerformanceView [export] — @tuix/debug/jsx/components/PerformanceView.tsx
+- RichDebugInterface [function] — @tuix/debug/jsx/components/RichDebugInterface.tsx
+- ScopeExplorer [export] — @tuix/debug/jsx/components/ScopeExplorer.tsx
+- StateInspector [function] — @tuix/debug/jsx/components/StateInspector.tsx
+- DebugConsole [function] — @tuix/debug/jsx/components/tabs/DebugConsole.tsx
+- DebugEvents [function] — @tuix/debug/jsx/components/tabs/DebugEvents.tsx
+- DebugOverview [function] — @tuix/debug/jsx/components/tabs/DebugOverview.tsx
+- DebugPerformance [function] — @tuix/debug/jsx/components/tabs/DebugPerformance.tsx
+- DebugRender [function] — @tuix/debug/jsx/components/tabs/DebugRender.tsx
+- DebugScopes [function] — @tuix/debug/jsx/components/tabs/DebugScopes.tsx
+- DebugLogs [export] — @tuix/debug/jsx/index.ts
+- DebugWrapper [export] — @tuix/debug/jsx/index.ts
+- createDebugLog [export] — @tuix/debug/jsx/index.ts
+- DebugWrapperState [interface] — @tuix/debug/jsx/stores/debugWrapperStore.ts
+- ExtendedDebugTab [type] — @tuix/debug/jsx/stores/debugWrapperStore.ts
+- debugWrapperStore [const] — @tuix/debug/jsx/stores/debugWrapperStore.ts
+- DebugTransport [class] — @tuix/debug/logger/transport.ts
+- DebugModel [interface] — @tuix/debug/mvu/integration.ts
+- DebugMsg [type] — @tuix/debug/mvu/integration.ts
+- DebugWrappedModel [interface] — @tuix/debug/mvu/integration.ts
+- DebugWrappedMsg [type] — @tuix/debug/mvu/integration.ts
+- enableDebugIfNeeded [const] — @tuix/debug/mvu/integration.ts
+- initDebugModel [const] — @tuix/debug/mvu/integration.ts
+- isDebugMsg [const] — @tuix/debug/mvu/integration.ts
+- updateDebug [const] — @tuix/debug/mvu/integration.ts
+- wrapWithDebug [const] — @tuix/debug/mvu/integration.ts
+- ComponentInfo [interface] — @tuix/debug/tea/DebugApp.ts
+- DebugCommand [type] — @tuix/debug/tea/DebugApp.ts
+- DebugLog [interface] — @tuix/debug/tea/DebugApp.ts
+- DebugModel [interface] — @tuix/debug/tea/DebugApp.ts
+- DebugMsg [type] — @tuix/debug/tea/DebugApp.ts
+- PerformanceMetrics [interface] — @tuix/debug/tea/DebugApp.ts
+- ScopeInfo [interface] — @tuix/debug/tea/DebugApp.ts
+- UpdateEvent [interface] — @tuix/debug/tea/DebugApp.ts
+- ViewTreeNode [interface] — @tuix/debug/tea/DebugApp.ts
+- createDebugComponent [const] — @tuix/debug/tea/DebugApp.ts
+- debugSubscriptions [const] — @tuix/debug/tea/DebugApp.ts
+- initDebugModel [const] — @tuix/debug/tea/DebugApp.ts
+- updateDebugModel [const] — @tuix/debug/tea/DebugApp.ts
+- viewDebugModel [const] — @tuix/debug/tea/DebugApp.ts
+- DebugConfig [interface] — @tuix/debug/types.ts
+- DebugEvent [interface] — @tuix/debug/types.ts
+- DebugHooks [interface] — @tuix/debug/types.ts
+- DebugState [interface] — @tuix/debug/types.ts
+- DebugTab [type] — @tuix/debug/types.ts
+- PerformanceMetric [interface] — @tuix/debug/types.ts
+- RenderTreeNode [interface] — @tuix/debug/types.ts
+- HelpExplorer [function] — @tuix/docs/explorer/HelpExplorer.tsx
+- HelpExplorerProps [interface] — @tuix/docs/explorer/HelpExplorer.tsx
+- HelpExplorer [export] — @tuix/docs/explorer/index.ts
+- extractAppDoc [function] — @tuix/docs/generator/from-jsx.ts
+- extractCommandDoc [function] — @tuix/docs/generator/from-jsx.ts
+- extractPluginDoc [function] — @tuix/docs/generator/from-jsx.ts
+- generateAppHelp [function] — @tuix/docs/generator/help-text.ts
+- generateCommandHelp [function] — @tuix/docs/generator/help-text.ts
+- extractAppDoc [export] — @tuix/docs/generator/index.ts
+- extractCommandDoc [export] — @tuix/docs/generator/index.ts
+- extractPluginDoc [export] — @tuix/docs/generator/index.ts
+- generateAppHelp [export] — @tuix/docs/generator/index.ts
+- generateAppMarkdown [export] — @tuix/docs/generator/index.ts
+- generateCommandHelp [export] — @tuix/docs/generator/index.ts
+- generateCommandMarkdown [export] — @tuix/docs/generator/index.ts
+- generatePluginMarkdown [export] — @tuix/docs/generator/index.ts
+- generateAppMarkdown [function] — @tuix/docs/generator/markdown.ts
+- generateCommandMarkdown [function] — @tuix/docs/generator/markdown.ts
+- generatePluginMarkdown [function] — @tuix/docs/generator/markdown.ts
+- HelpExplorer [export] — @tuix/docs/index.ts
+- extractAppDoc [export] — @tuix/docs/index.ts
+- extractCommandDoc [export] — @tuix/docs/index.ts
+- extractPluginDoc [export] — @tuix/docs/index.ts
+- generateAppHelp [export] — @tuix/docs/index.ts
+- generateAppMarkdown [export] — @tuix/docs/index.ts
+- generateCommandHelp [export] — @tuix/docs/index.ts
+- generateCommandMarkdown [export] — @tuix/docs/index.ts
+- generatePluginMarkdown [export] — @tuix/docs/index.ts
+- AppDoc [interface] — @tuix/docs/types.ts
+- ArgDoc [interface] — @tuix/docs/types.ts
+- CommandDoc [interface] — @tuix/docs/types.ts
+- DocError [interface] — @tuix/docs/types.ts
+- DocGeneratorOptions [interface] — @tuix/docs/types.ts
+- ExampleDoc [interface] — @tuix/docs/types.ts
+- OptionDoc [interface] — @tuix/docs/types.ts
+- PluginDoc [interface] — @tuix/docs/types.ts
+- COMMON_SHORTCUTS [const] — @tuix/input/constants.ts
+- DEFAULT_TAB_INDEX [const] — @tuix/input/constants.ts
+- DEFAULT_Z_INDEX [const] — @tuix/input/constants.ts
+- DOUBLE_CLICK_THRESHOLD [const] — @tuix/input/constants.ts
+- DRAG_THRESHOLD [const] — @tuix/input/constants.ts
+- FOCUS_ANNOUNCEMENT_DELAY [const] — @tuix/input/constants.ts
+- INPUT_EVENT_QUEUE_SIZE [const] — @tuix/input/constants.ts
+- INPUT_PROCESSING_BUDGET [const] — @tuix/input/constants.ts
+- KEY_REPEAT_INITIAL_DELAY [const] — @tuix/input/constants.ts
+- KEY_REPEAT_INTERVAL [const] — @tuix/input/constants.ts
+- MAX_FOCUS_TRAP_DEPTH [const] — @tuix/input/constants.ts
+- MAX_MOUSE_HISTORY [const] — @tuix/input/constants.ts
+- MAX_PRESSED_KEYS [const] — @tuix/input/constants.ts
+- MOUSE_MOVE_THROTTLE [const] — @tuix/input/constants.ts
+- PROGRAMMATIC_FOCUS_TAB_INDEX [const] — @tuix/input/constants.ts
+- RESIZE_DEBOUNCE [const] — @tuix/input/constants.ts
+- SPECIAL_KEYS [const] — @tuix/input/constants.ts
+- WHEEL_DELTA_MULTIPLIER [const] — @tuix/input/constants.ts
+- ComponentNotFocusableError [class] — @tuix/input/errors.ts
+- ComponentNotFoundError [class] — @tuix/input/errors.ts
+- FocusError [type] — @tuix/input/errors.ts
+- FocusTrapError [class] — @tuix/input/errors.ts
+- HitTestError [class] — @tuix/input/errors.ts
+- InputError [type] — @tuix/input/errors.ts
+- InputStateError [class] — @tuix/input/errors.ts
+- InputValidationError [class] — @tuix/input/errors.ts
+- InvalidMouseCoordinatesError [class] — @tuix/input/errors.ts
+- KeyEventParseError [class] — @tuix/input/errors.ts
+- KeyboardError [type] — @tuix/input/errors.ts
+- MouseError [type] — @tuix/input/errors.ts
+- ShortcutConflictError [class] — @tuix/input/errors.ts
+- FocusService [interface] — @tuix/input/focus/manager.ts
+- FocusServiceLive [const] — @tuix/input/focus/manager.ts
+- FocusableComponent [interface] — @tuix/input/focus/manager.ts
+- focusable [const] — @tuix/input/focus/manager.ts
+- withFocus [const] — @tuix/input/focus/manager.ts
+- // Focus errors
+  ComponentNotFoundError [export] — @tuix/input/index.ts
+- // General errors
+  InputValidationError [export] — @tuix/input/index.ts
+- // Keyboard errors
+  KeyEventParseError [export] — @tuix/input/index.ts
+- // Mouse errors
+  InvalidMouseCoordinatesError [export] — @tuix/input/index.ts
+- ComponentNotFocusableError [export] — @tuix/input/index.ts
+- FocusService [export] — @tuix/input/index.ts
+- FocusServiceLive [export] — @tuix/input/index.ts
+- FocusTrapError [export] — @tuix/input/index.ts
+- HitTestError [export] — @tuix/input/index.ts
+- HitTestService [export] — @tuix/input/index.ts
+- HitTestServiceLive [export] — @tuix/input/index.ts
+- InputStateError [export] — @tuix/input/index.ts
+- MouseRouterService [export] — @tuix/input/index.ts
+- MouseRouterServiceLive [export] — @tuix/input/index.ts
+- ShortcutConflictError [export] — @tuix/input/index.ts
+- clickHandler [export] — @tuix/input/index.ts
+- coordinateHandler [export] — @tuix/input/index.ts
+- createBounds [export] — @tuix/input/index.ts
+- createHitTestService [export] — @tuix/input/index.ts
+- focusable [export] — @tuix/input/index.ts
+- mouseEventHitsComponent [export] — @tuix/input/index.ts
+- pressReleaseHandler [export] — @tuix/input/index.ts
+- withFocus [export] — @tuix/input/index.ts
+- ANSI_SEQUENCES [const] — @tuix/input/keyboard/keys.ts
+- KeyEvent [interface] — @tuix/input/keyboard/keys.ts
+- KeyType [enum] — @tuix/input/keyboard/keys.ts
+- KeyUtils [const] — @tuix/input/keyboard/keys.ts
+- getKeyName [function] — @tuix/input/keyboard/keys.ts
+- parseChar [function] — @tuix/input/keyboard/keys.ts
+- ComponentBounds [interface] — @tuix/input/mouse/hitTest.ts
+- HitTestResult [interface] — @tuix/input/mouse/hitTest.ts
+- HitTestService [const] — @tuix/input/mouse/hitTest.ts
+- HitTestServiceInterface [interface] — @tuix/input/mouse/hitTest.ts
+- HitTestServiceLive [const] — @tuix/input/mouse/hitTest.ts
+- MouseRegion [type] — @tuix/input/mouse/hitTest.ts
+- createBounds [const] — @tuix/input/mouse/hitTest.ts
+- createHitTestService [const] — @tuix/input/mouse/hitTest.ts
+- mouseEventHitsComponent [const] — @tuix/input/mouse/hitTest.ts
+- ComponentMouseHandler [interface] — @tuix/input/mouse/router.ts
+- MouseRouterService [const] — @tuix/input/mouse/router.ts
+- MouseRouterServiceInterface [interface] — @tuix/input/mouse/router.ts
+- MouseRouterServiceLive [const] — @tuix/input/mouse/router.ts
+- MouseRoutingResult [interface] — @tuix/input/mouse/router.ts
+- clickHandler [const] — @tuix/input/mouse/router.ts
+- coordinateHandler [const] — @tuix/input/mouse/router.ts
+- pressReleaseHandler [const] — @tuix/input/mouse/router.ts
+- FocusDirection [type] — @tuix/input/types.ts
+- FocusEventType [type] — @tuix/input/types.ts
+- FocusTrapMode [type] — @tuix/input/types.ts
+- InputState [interface] — @tuix/input/types.ts
+- KeyEvent [type] — @tuix/input/types.ts
+- KeyEventSchema [const] — @tuix/input/types.ts
+- KeyEventType [type] — @tuix/input/types.ts
+- KeyEventTypeSchema [const] — @tuix/input/types.ts
+- MouseButton [type] — @tuix/input/types.ts
+- MouseButtonSchema [const] — @tuix/input/types.ts
+- MouseEvent [type] — @tuix/input/types.ts
+- MouseEventSchema [const] — @tuix/input/types.ts
+- MouseEventType [type] — @tuix/input/types.ts
+- MouseEventTypeSchema [const] — @tuix/input/types.ts
+- Command [function] — @tuix/jsx/app/Command.tsx
+- CommandProps [interface] — @tuix/jsx/app/Command.tsx
+- Fallback [function] — @tuix/jsx/app/Fallback.tsx
+- FallbackProps [interface] — @tuix/jsx/app/Fallback.tsx
+- Plugin [function] — @tuix/jsx/app/Plugin.tsx
+- PluginProps [interface] — @tuix/jsx/app/Plugin.tsx
+- Command [export] — @tuix/jsx/app/index.ts
+- CommandProps [type] — @tuix/jsx/app/index.ts
+- Fallback [export] — @tuix/jsx/app/index.ts
+- FallbackProps [type] — @tuix/jsx/app/index.ts
+- JSXComponent [type] — @tuix/jsx/app/index.ts
+- JSXRunConfig [type] — @tuix/jsx/app/index.ts
+- Plugin [export] — @tuix/jsx/app/index.ts
+- PluginProps [type] — @tuix/jsx/app/index.ts
+- runApp [export] — @tuix/jsx/app/index.ts
+- JSXComponent [type] — @tuix/jsx/app/runApp.ts
+- JSXRunConfig [interface] — @tuix/jsx/app/runApp.ts
+- runApp [const] — @tuix/jsx/app/runApp.ts
+- CompileOptions [interface] — @tuix/jsx/compiler/jsx-to-component.ts
+- CompiledComponent [interface] — @tuix/jsx/compiler/jsx-to-component.ts
+- JSXComponent [type] — @tuix/jsx/compiler/jsx-to-component.ts
+- compileToComponent [function] — @tuix/jsx/compiler/jsx-to-component.ts
+- createStatelessComponent [function] — @tuix/jsx/compiler/jsx-to-component.ts
+- detectInteractive [function] — @tuix/jsx/compiler/jsx-to-component.ts
+- extractModel [function] — @tuix/jsx/compiler/jsx-to-component.ts
+- JSXRunConfig [interface] — @tuix/jsx/compiler/runApp.ts
+- InteractiveEventMap [interface] — @tuix/jsx/events.ts
+- InteractiveMetadata [interface] — @tuix/jsx/events.ts
+- ViewEvent [interface] — @tuix/jsx/events.ts
+- attachMetadata [const] — @tuix/jsx/events.ts
+- emitEvent [const] — @tuix/jsx/events.ts
+- getMetadata [const] — @tuix/jsx/events.ts
+- Command [export] — @tuix/jsx/index.ts
+- CommandProps [type] — @tuix/jsx/index.ts
+- Effect [export] — @tuix/jsx/index.ts
+- Fallback [export] — @tuix/jsx/index.ts
+- FallbackProps [type] — @tuix/jsx/index.ts
+- JSXComponent [type] — @tuix/jsx/index.ts
+- JSXRunConfig [type] — @tuix/jsx/index.ts
+- Plugin [export] — @tuix/jsx/index.ts
+- PluginProps [type] — @tuix/jsx/index.ts
+- Scope [export] — @tuix/jsx/index.ts
+- ScopeContent [export] — @tuix/jsx/index.ts
+- ScopeContentProps [type] — @tuix/jsx/index.ts
+- ScopeFallback [export] — @tuix/jsx/index.ts
+- ScopeFallbackProps [type] — @tuix/jsx/index.ts
+- ScopeProps [type] — @tuix/jsx/index.ts
+- runApp [export] — @tuix/jsx/index.ts
+- Element [interface] — @tuix/jsx/jsx-runtime.ts
+- ElementChildrenAttribute [interface] — @tuix/jsx/jsx-runtime.ts
+- Fragment [const] — @tuix/jsx/jsx-runtime.ts
+- IntrinsicElements [interface] — @tuix/jsx/jsx-runtime.ts
+- JSXContext [const] — @tuix/jsx/jsx-runtime.ts
+- JSXElement [interface] — @tuix/jsx/jsx-runtime.ts
+- JSXNode [type] — @tuix/jsx/jsx-runtime.ts
+- config [export] — @tuix/jsx/jsx-runtime.ts
+- createElement [function] — @tuix/jsx/jsx-runtime.ts
+- executeCommand [const] — @tuix/jsx/jsx-runtime.ts
+- getScopeManager [const] — @tuix/jsx/jsx-runtime.ts
+- jsx [function] — @tuix/jsx/jsx-runtime.ts
+- jsxDEV [function] — @tuix/jsx/jsx-runtime.ts
+- jsxs [function] — @tuix/jsx/jsx-runtime.ts
+- pluginRegistry [const] — @tuix/jsx/jsx-runtime.ts
+- registerCommand [const] — @tuix/jsx/jsx-runtime.ts
+- registerPlugin [const] — @tuix/jsx/jsx-runtime.ts
+- render [function] — @tuix/jsx/jsx-runtime.ts
+- templates [export] — @tuix/jsx/jsx-runtime.ts
+- findCommand [function] — @tuix/jsx/parser/command.ts
+- getCommandArgSchemas [function] — @tuix/jsx/parser/command.ts
+- getCommandOptionSchemas [function] — @tuix/jsx/parser/command.ts
+- CLIParser [export] — @tuix/jsx/parser/index.ts
+- addOptionValue [export] — @tuix/jsx/parser/index.ts
+- findCommand [export] — @tuix/jsx/parser/index.ts
+- getCommandArgSchemas [export] — @tuix/jsx/parser/index.ts
+- getCommandOptionSchemas [export] — @tuix/jsx/parser/index.ts
+- parseLongOption [export] — @tuix/jsx/parser/index.ts
+- parseShortOptions [export] — @tuix/jsx/parser/index.ts
+- parseValue [export] — @tuix/jsx/parser/index.ts
+- validateAndTransform [export] — @tuix/jsx/parser/index.ts
+- parseLongOption [function] — @tuix/jsx/parser/options.ts
+- parseShortOptions [function] — @tuix/jsx/parser/options.ts
+- CLIParser [class] — @tuix/jsx/parser/parser.ts
+- validateAndTransform [function] — @tuix/jsx/parser/schema.ts
+- ParsedArgs [interface] — @tuix/jsx/parser/types.ts
+- ParserOptions [interface] — @tuix/jsx/parser/types.ts
+- addOptionValue [function] — @tuix/jsx/parser/value.ts
+- parseValue [function] — @tuix/jsx/parser/value.ts
+- PluginRegistry [interface] — @tuix/jsx/plugins/index.ts
+- PluginStore [const] — @tuix/jsx/plugins/index.ts
+- pluginStore [const] — @tuix/jsx/plugins/index.ts
+- Command [function] — @tuix/jsx/scope/components/Command.tsx
+- CommandProps [interface] — @tuix/jsx/scope/components/Command.tsx
+- Plugin [function] — @tuix/jsx/scope/components/Plugin.tsx
+- PluginProps [interface] — @tuix/jsx/scope/components/Plugin.tsx
+- Scope [function] — @tuix/jsx/scope/components/Scope.tsx
+- ScopeProps [interface] — @tuix/jsx/scope/components/Scope.tsx
+- ScopeContent [function] — @tuix/jsx/scope/components/ScopeContent.tsx
+- ScopeContentProps [interface] — @tuix/jsx/scope/components/ScopeContent.tsx
+- renderScopeDebugOverlay [function] — @tuix/jsx/scope/components/ScopeDebugOverlay.tsx
+- withScopeDebugOverlay [function] — @tuix/jsx/scope/components/ScopeDebugOverlay.tsx
+- ScopeDebugView [function] — @tuix/jsx/scope/components/ScopeDebugView.tsx
+- ScopeFallback [function] — @tuix/jsx/scope/components/ScopeFallback.tsx
+- ScopeFallbackProps [interface] — @tuix/jsx/scope/components/ScopeFallback.tsx
+- ScopeProvider [function] — @tuix/jsx/scope/components/ScopeProvider.tsx
+- ScopeProviderProps [interface] — @tuix/jsx/scope/components/ScopeProvider.tsx
+- Scoped [function] — @tuix/jsx/scope/components/Scoped.tsx
+- ScopedProps [interface] — @tuix/jsx/scope/components/Scoped.tsx
+- Unscoped [function] — @tuix/jsx/scope/components/Unscoped.tsx
+- UnscopedProps [interface] — @tuix/jsx/scope/components/Unscoped.tsx
+- Command [export] — @tuix/jsx/scope/components/index.ts
+- CommandProps [type] — @tuix/jsx/scope/components/index.ts
+- Plugin [export] — @tuix/jsx/scope/components/index.ts
+- PluginProps [type] — @tuix/jsx/scope/components/index.ts
+- Scope [export] — @tuix/jsx/scope/components/index.ts
+- ScopeContent [export] — @tuix/jsx/scope/components/index.ts
+- ScopeContentProps [type] — @tuix/jsx/scope/components/index.ts
+- ScopeFallback [export] — @tuix/jsx/scope/components/index.ts
+- ScopeFallbackProps [type] — @tuix/jsx/scope/components/index.ts
+- ScopeProps [type] — @tuix/jsx/scope/components/index.ts
+- Scoped [export] — @tuix/jsx/scope/components/index.ts
+- ScopedProps [type] — @tuix/jsx/scope/components/index.ts
+- Unscoped [export] — @tuix/jsx/scope/components/index.ts
+- UnscopedProps [type] — @tuix/jsx/scope/components/index.ts
+- scopeStack [const] — @tuix/jsx/scope/hooks/use-scope.ts
+- useActivateScope [function] — @tuix/jsx/scope/hooks/use-scope.ts
+- useChildScopes [function] — @tuix/jsx/scope/hooks/use-scope.ts
+- useCurrentScope [function] — @tuix/jsx/scope/hooks/use-scope.ts
+- useDeactivateScope [function] — @tuix/jsx/scope/hooks/use-scope.ts
+- useIsScopeActive [function] — @tuix/jsx/scope/hooks/use-scope.ts
+- useParentScope [function] — @tuix/jsx/scope/hooks/use-scope.ts
+- useScope [function] — @tuix/jsx/scope/hooks/use-scope.ts
+- useScopeLifecycle [function] — @tuix/jsx/scope/hooks/use-scope.ts
+- ScopeError [class] — @tuix/jsx/scope/manager.ts
+- ScopeManager [class] — @tuix/jsx/scope/manager.ts
+- hasRenderedContent [const] — @tuix/jsx/scope/manager.ts
+- markScopeRendered [const] — @tuix/jsx/scope/manager.ts
+- scopeManager [const] — @tuix/jsx/scope/manager.ts
+- setScopeDef [const] — @tuix/jsx/scope/manager.ts
+- ActiveRoute [interface] — @tuix/jsx/scope/stores/activeRoute.store.ts
+- activeRouteStore [const] — @tuix/jsx/scope/stores/activeRoute.store.ts
+- useActiveRoute [function] — @tuix/jsx/scope/stores/activeRoute.store.ts
+- useNavigate [function] — @tuix/jsx/scope/stores/activeRoute.store.ts
+- useRouteMatch [function] — @tuix/jsx/scope/stores/activeRoute.store.ts
+- currentScopeStore [const] — @tuix/jsx/scope/stores/currentScope.store.ts
+- useCurrentScope [function] — @tuix/jsx/scope/stores/currentScope.store.ts
+- parentScopeStore [const] — @tuix/jsx/scope/stores/parentScope.store.ts
+- useParentScope [function] — @tuix/jsx/scope/stores/parentScope.store.ts
+- rootScopeStore [const] — @tuix/jsx/scope/stores/rootScope.store.ts
+- useRootScope [function] — @tuix/jsx/scope/stores/rootScope.store.ts
+- scopeStackStore [const] — @tuix/jsx/scope/stores/scopeStack.store.ts
+- ArgDef [interface] — @tuix/jsx/scope/types.ts
+- CommandNode [interface] — @tuix/jsx/scope/types.ts
+- CommandTree [interface] — @tuix/jsx/scope/types.ts
+- Effect [export] — @tuix/jsx/scope/types.ts
+- ExecutionError [class] — @tuix/jsx/scope/types.ts
+- ExitCode [type] — @tuix/jsx/scope/types.ts
+- FlagDef [interface] — @tuix/jsx/scope/types.ts
+- Handler [interface] — @tuix/jsx/scope/types.ts
+- OptionDef [interface] — @tuix/jsx/scope/types.ts
+- ParsedArgs [interface] — @tuix/jsx/scope/types.ts
+- ScopeContext [interface] — @tuix/jsx/scope/types.ts
+- ScopeDef [interface] — @tuix/jsx/scope/types.ts
+- ScopeError [class] — @tuix/jsx/scope/types.ts
+- ScopeExistsError [class] — @tuix/jsx/scope/types.ts
+- ScopeNotFoundError [class] — @tuix/jsx/scope/types.ts
+- ScopeState [interface] — @tuix/jsx/scope/types.ts
+- ScopeStatus [type] — @tuix/jsx/scope/types.ts
+- LiveLogDashboard [function] — @tuix/logger/components/LiveLogDashboard.ts
+- ProcessLogView [function] — @tuix/logger/components/LiveLogDashboard.ts
+- ANSI [const] — @tuix/logger/components/LogComponents.ts
+- LEVEL_ANSI [const] — @tuix/logger/components/LogComponents.ts
+- LEVEL_COLORS [const] — @tuix/logger/components/LogComponents.ts
+- LEVEL_EMOJIS [const] — @tuix/logger/components/LogComponents.ts
+- LogError [function] — @tuix/logger/components/LogComponents.ts
+- LogLevelText [function] — @tuix/logger/components/LogComponents.ts
+- LogMessage [function] — @tuix/logger/components/LogComponents.ts
+- LogMetadata [function] — @tuix/logger/components/LogComponents.ts
+- PrettyLogEntry [function] — @tuix/logger/components/LogComponents.ts
+- logUtils [const] — @tuix/logger/components/LogComponents.ts
+- LogExplorer [function] — @tuix/logger/components/LogExplorer.ts
+- BUN_CONSTANTS [const] — @tuix/logger/constants.ts
+- COMPONENT_CONSTANTS [const] — @tuix/logger/constants.ts
+- CONSOLE_TRANSPORT_CONSTANTS [const] — @tuix/logger/constants.ts
+- CONTEXT_CONSTANTS [const] — @tuix/logger/constants.ts
+- DEBUG_CONSTANTS [const] — @tuix/logger/constants.ts
+- ERROR_CONSTANTS [const] — @tuix/logger/constants.ts
+- FILE_TRANSPORT_CONSTANTS [const] — @tuix/logger/constants.ts
+- FORMATTER_CONSTANTS [const] — @tuix/logger/constants.ts
+- HTTP_TRANSPORT_CONSTANTS [const] — @tuix/logger/constants.ts
+- LOG_LEVEL_CONSTANTS [const] — @tuix/logger/constants.ts
+- PERFORMANCE_CONSTANTS [const] — @tuix/logger/constants.ts
+- SECURITY_CONSTANTS [const] — @tuix/logger/constants.ts
+- STRUCTURED_LOG_CONSTANTS [const] — @tuix/logger/constants.ts
+- TRANSPORT_CONSTANTS [const] — @tuix/logger/constants.ts
+- BunLogger [interface] — @tuix/logger/core/bun-logger.ts
+- createBunConsoleLogger [const] — @tuix/logger/core/bun-logger.ts
+- createBunDevelopmentLogger [const] — @tuix/logger/core/bun-logger.ts
+- createBunProductionLogger [const] — @tuix/logger/core/bun-logger.ts
+- LogEvent [interface] — @tuix/logger/core/events.ts
+- LogFilterCriteria [interface] — @tuix/logger/core/events.ts
+- LogFilterEvent [interface] — @tuix/logger/core/events.ts
+- LogRotationEvent [interface] — @tuix/logger/core/events.ts
+- LogTransportEvent [interface] — @tuix/logger/core/events.ts
+- LoggerEvent [type] — @tuix/logger/core/events.ts
+- LoggerEventChannel [type] — @tuix/logger/core/events.ts
+- LoggerEventChannels [const] — @tuix/logger/core/events.ts
+- LoggerQueue [interface] — @tuix/logger/core/logger.ts
+- TuixLogger [class] — @tuix/logger/core/logger.ts
+- getGlobalLogger [const] — @tuix/logger/core/logger.ts
+- log [const] — @tuix/logger/core/logger.ts
+- makeLoggerLayer [const] — @tuix/logger/core/logger.ts
+- makeQueuedLoggerLayer [const] — @tuix/logger/core/logger.ts
+- setGlobalLogger [const] — @tuix/logger/core/logger.ts
+- withLoggerContext [const] — @tuix/logger/core/logger.ts
+- LogEntry [interface] — @tuix/logger/core/module.ts
+- LogTransport [interface] — @tuix/logger/core/module.ts
+- LoggerError [class] — @tuix/logger/core/module.ts
+- LoggerModule [class] — @tuix/logger/core/module.ts
+- LOG_PRESETS [const] — @tuix/logger/core/presets.ts
+- LogFilter [interface] — @tuix/logger/core/presets.ts
+- applyPreset [function] — @tuix/logger/core/presets.ts
+- createFilter [function] — @tuix/logger/core/presets.ts
+- getAvailablePresets [function] — @tuix/logger/core/presets.ts
+- matchesFilter [function] — @tuix/logger/core/presets.ts
+- quickFilters [const] — @tuix/logger/core/presets.ts
+- CLIFormatter [class] — @tuix/logger/formatters/formatters.ts
+- CompactFormatter [class] — @tuix/logger/formatters/formatters.ts
+- JSONFormatter [class] — @tuix/logger/formatters/formatters.ts
+- PrettyFormatter [class] — @tuix/logger/formatters/formatters.ts
+- LiveLogDashboard [export] — @tuix/logger/index.ts
+- LogExplorer [export] — @tuix/logger/index.ts
+- LoggerPlugin [export] — @tuix/logger/index.ts
+- LoggerUtils [const] — @tuix/logger/index.ts
+- ProcessLogView [export] — @tuix/logger/index.ts
+- createCLILogger [const] — @tuix/logger/index.ts
+- createConsoleLogger [const] — @tuix/logger/index.ts
+- createDevelopmentLogger [const] — @tuix/logger/index.ts
+- createProductionLogger [const] — @tuix/logger/index.ts
+- createRemoteLogger [const] — @tuix/logger/index.ts
+- getGlobalLogger [export] — @tuix/logger/index.ts
+- log [export] — @tuix/logger/index.ts
+- setGlobalLogger [export] — @tuix/logger/index.ts
+- withLoggerContext [export] — @tuix/logger/index.ts
+- Logger [function] — @tuix/logger/plugin/Logger.tsx
+- LoggerProps [interface] — @tuix/logger/plugin/Logger.tsx
+- Logger [export] — @tuix/logger/plugin/index.ts
+- default [export] — @tuix/logger/plugin/index.ts
+- BunConsoleTransport [class] — @tuix/logger/transports/bun-transports.ts
+- BunFileTransport [class] — @tuix/logger/transports/bun-transports.ts
+- BunHttpTransport [class] — @tuix/logger/transports/bun-transports.ts
+- BunStreamTransport [class] — @tuix/logger/transports/bun-transports.ts
+- createBunTransport [const] — @tuix/logger/transports/bun-transports.ts
+- ConsoleTransport [class] — @tuix/logger/transports/transports.ts
+- FileTransport [class] — @tuix/logger/transports/transports.ts
+- HttpTransport [class] — @tuix/logger/transports/transports.ts
+- StreamTransport [class] — @tuix/logger/transports/transports.ts
+- TUITransport [class] — @tuix/logger/transports/transports.ts
+- ConsoleTransportOptions [interface] — @tuix/logger/types.ts
+- FileTransportOptions [interface] — @tuix/logger/types.ts
+- HttpTransportOptions [interface] — @tuix/logger/types.ts
+- InteractiveLogEntry [interface] — @tuix/logger/types.ts
+- InteractiveLogRenderer [interface] — @tuix/logger/types.ts
+- LogEntry [interface] — @tuix/logger/types.ts
+- LogFormatter [interface] — @tuix/logger/types.ts
+- LogLevel [type] — @tuix/logger/types.ts
+- LogLevels [const] — @tuix/logger/types.ts
+- LogRotationConfig [interface] — @tuix/logger/types.ts
+- LogTransport [interface] — @tuix/logger/types.ts
+- Logger [interface] — @tuix/logger/types.ts
+- LoggerConfig [interface] — @tuix/logger/types.ts
+- Serializers [type] — @tuix/logger/types.ts
+- SpanContext [interface] — @tuix/logger/types.ts
+- StreamTransportOptions [interface] — @tuix/logger/types.ts
+- StructuredLogFormat [interface] — @tuix/logger/types.ts
+- TransportOptions [interface] — @tuix/logger/types.ts
+- defaultSerializers [const] — @tuix/logger/types.ts
+- PLATFORM_VERSION [const] — @tuix/platform/index.ts
+- appendText [const] — @tuix/process-manager/bun-fs.ts
+- ensureDir [const] — @tuix/process-manager/bun-fs.ts
+- exists [const] — @tuix/process-manager/bun-fs.ts
+- getAbsolutePath [const] — @tuix/process-manager/bun-fs.ts
+- killProcess [const] — @tuix/process-manager/bun-fs.ts
+- listDir [const] — @tuix/process-manager/bun-fs.ts
+- processExists [const] — @tuix/process-manager/bun-fs.ts
+- readJSON [const] — @tuix/process-manager/bun-fs.ts
+- readText [const] — @tuix/process-manager/bun-fs.ts
+- remove [const] — @tuix/process-manager/bun-fs.ts
+- removeDir [const] — @tuix/process-manager/bun-fs.ts
+- resolvePath [const] — @tuix/process-manager/bun-fs.ts
+- writeJSON [const] — @tuix/process-manager/bun-fs.ts
+- writeText [const] — @tuix/process-manager/bun-fs.ts
+- ProcessMonitor [function] — @tuix/process-manager/components/ProcessMonitor.ts
+- ProcessStatusView [const] — @tuix/process-manager/components/ProcessStatusView.tsx
+- ProcessStatusViewProps [interface] — @tuix/process-manager/components/ProcessStatusView.tsx
+- Pipe [const] — @tuix/process-manager/components/streams/index.ts
+- PipeComponent [function] — @tuix/process-manager/components/streams/index.ts
+- PipeProps [interface] — @tuix/process-manager/components/streams/index.ts
+- Stream [const] — @tuix/process-manager/components/streams/index.ts
+- StreamBox [const] — @tuix/process-manager/components/streams/index.ts
+- StreamBoxComponent [function] — @tuix/process-manager/components/streams/index.ts
+- StreamBoxProps [interface] — @tuix/process-manager/components/streams/index.ts
+- StreamComponent [function] — @tuix/process-manager/components/streams/index.ts
+- StreamProps [interface] — @tuix/process-manager/components/streams/index.ts
+- Transform [const] — @tuix/process-manager/components/streams/index.ts
+- TransformComponent [function] — @tuix/process-manager/components/streams/index.ts
+- TransformProps [interface] — @tuix/process-manager/components/streams/index.ts
+- fromArray [function] — @tuix/process-manager/components/streams/index.ts
+- fromEventEmitter [function] — @tuix/process-manager/components/streams/index.ts
+- poll [function] — @tuix/process-manager/components/streams/index.ts
+- random [function] — @tuix/process-manager/components/streams/index.ts
+- timer [function] — @tuix/process-manager/components/streams/index.ts
+- CommandPipeline [const] — @tuix/process-manager/components/streams/spawn.ts
+- CommandPipelineComponent [function] — @tuix/process-manager/components/streams/spawn.ts
+- CommandPipelineProps [interface] — @tuix/process-manager/components/streams/spawn.ts
+- ManagedSpawn [const] — @tuix/process-manager/components/streams/spawn.ts
+- ManagedSpawnComponent [function] — @tuix/process-manager/components/streams/spawn.ts
+- ManagedSpawnProps [interface] — @tuix/process-manager/components/streams/spawn.ts
+- Spawn [const] — @tuix/process-manager/components/streams/spawn.ts
+- SpawnComponent [function] — @tuix/process-manager/components/streams/spawn.ts
+- SpawnProps [interface] — @tuix/process-manager/components/streams/spawn.ts
+- BUN_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- COMPONENT_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- DEBUG_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- ENVIRONMENT_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- ERROR_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- FILE_SYSTEM_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- IPC_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- MONITORING_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- PERFORMANCE_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- PROCESS_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- SECURITY_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- SIGNAL_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- STREAM_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- TEMPLATE_CONSTANTS [const] — @tuix/process-manager/constants.ts
+- ProcessDoctor [class] — @tuix/process-manager/doctor.ts
+- HealthMetrics [interface] — @tuix/process-manager/events.ts
+- ProcessConfig [interface] — @tuix/process-manager/events.ts
+- ProcessEvent [interface] — @tuix/process-manager/events.ts
+- ProcessEventChannel [type] — @tuix/process-manager/events.ts
+- ProcessEventChannels [const] — @tuix/process-manager/events.ts
+- ProcessGroupEvent [interface] — @tuix/process-manager/events.ts
+- ProcessHealthEvent [interface] — @tuix/process-manager/events.ts
+- ProcessManagerEvent [type] — @tuix/process-manager/events.ts
+- ProcessOutputEvent [interface] — @tuix/process-manager/events.ts
+- ProcessHandle [interface] — @tuix/process-manager/index.ts
+- ProcessLogs [interface] — @tuix/process-manager/index.ts
+- ProcessManager [const] — @tuix/process-manager/index.ts
+- ProcessManagerClass [export] — @tuix/process-manager/index.ts
+- ProcessManagerLive [const] — @tuix/process-manager/index.ts
+- ProcessManagerModule [export] — @tuix/process-manager/index.ts
+- ProcessManagerPlugin [export] — @tuix/process-manager/index.ts
+- ProcessManagerService [interface] — @tuix/process-manager/index.ts
+- ProcessMetrics [interface] — @tuix/process-manager/index.ts
+- ProcessMonitor [export] — @tuix/process-manager/index.ts
+- setupManagedProcess [export] — @tuix/process-manager/index.ts
+- ProcessManager [class] — @tuix/process-manager/manager.ts
+- setupManagedProcess [function] — @tuix/process-manager/manager.ts
+- ProcessError [class] — @tuix/process-manager/module.ts
+- ProcessHandle [interface] — @tuix/process-manager/module.ts
+- ProcessManagerModule [class] — @tuix/process-manager/module.ts
+- ProcessManager [function] — @tuix/process-manager/plugin/ProcessManager.tsx
+- ProcessManagerProps [interface] — @tuix/process-manager/plugin/ProcessManager.tsx
+- PMList [export] — @tuix/process-manager/plugin/commands/index.ts
+- PMStatus [export] — @tuix/process-manager/plugin/commands/index.ts
+- PMList [function] — @tuix/process-manager/plugin/commands/list.tsx
+- PMListProps [interface] — @tuix/process-manager/plugin/commands/list.tsx
+- PMStatus [function] — @tuix/process-manager/plugin/commands/status.tsx
+- PMStatusProps [interface] — @tuix/process-manager/plugin/commands/status.tsx
+- ProcessManager [export] — @tuix/process-manager/plugin/index.ts
+- default [export] — @tuix/process-manager/plugin/index.ts
+- apiServerTemplate [const] — @tuix/process-manager/templates.ts
+- buildWatcherTemplate [const] — @tuix/process-manager/templates.ts
+- createConfig [function] — @tuix/process-manager/templates.ts
+- databaseTemplate [const] — @tuix/process-manager/templates.ts
+- devServerTemplate [const] — @tuix/process-manager/templates.ts
+- scheduledJobTemplate [const] — @tuix/process-manager/templates.ts
+- testRunnerTemplate [const] — @tuix/process-manager/templates.ts
+- websocketTemplate [const] — @tuix/process-manager/templates.ts
+- workerTemplate [const] — @tuix/process-manager/templates.ts
+- DoctorFix [interface] — @tuix/process-manager/types.ts
+- DoctorIssue [interface] — @tuix/process-manager/types.ts
+- DoctorReport [interface] — @tuix/process-manager/types.ts
+- HealthCheckConfig [interface] — @tuix/process-manager/types.ts
+- HealthStatus [interface] — @tuix/process-manager/types.ts
+- OrphanedProcess [interface] — @tuix/process-manager/types.ts
+- ProcessConfig [interface] — @tuix/process-manager/types.ts
+- ProcessDependency [interface] — @tuix/process-manager/types.ts
+- ProcessEvent [interface] — @tuix/process-manager/types.ts
+- ProcessGroup [interface] — @tuix/process-manager/types.ts
+- ProcessLog [interface] — @tuix/process-manager/types.ts
+- ProcessManager [const] — @tuix/process-manager/types.ts
+- ProcessManagerConfig [interface] — @tuix/process-manager/types.ts
+- ProcessManagerStats [interface] — @tuix/process-manager/types.ts
+- ProcessState [interface] — @tuix/process-manager/types.ts
+- ProcessStats [interface] — @tuix/process-manager/types.ts
+- ProcessStatus [type] — @tuix/process-manager/types.ts
+- RunawayProcess [interface] — @tuix/process-manager/types.ts
+- CLIEventChannels [const] — @tuix/reactive/events/channels.ts
+- CoreEventChannels [const] — @tuix/reactive/events/channels.ts
+- EventChannel [type] — @tuix/reactive/events/channels.ts
+- JSXEventChannels [const] — @tuix/reactive/events/channels.ts
+- ServiceEventChannels [const] — @tuix/reactive/events/channels.ts
+- BaseEvent [interface] — @tuix/reactive/events/event-bus.ts
+- EventBus [class] — @tuix/reactive/events/event-bus.ts
+- EventBusStats [interface] — @tuix/reactive/events/event-bus.ts
+- EventHandler [type] — @tuix/reactive/events/event-bus.ts
+- createEventChannel [function] — @tuix/reactive/events/event-bus.ts
+- generateId [function] — @tuix/reactive/events/event-bus.ts
+- getGlobalEventBus [function] — @tuix/reactive/events/event-bus.ts
+- resetGlobalEventBus [function] — @tuix/reactive/events/event-bus.ts
+- $derived [export] — @tuix/reactive/index.ts
+- $effect [export] — @tuix/reactive/index.ts
+- $state [export] — @tuix/reactive/index.ts
+- isBindableRune [export] — @tuix/reactive/index.ts
+- isStateRune [export] — @tuix/reactive/index.ts
+- ReactiveComponent [interface] — @tuix/reactive/runes/components/reactive-component.ts
+- ReactiveComponentManager [class] — @tuix/reactive/runes/components/reactive-component.ts
+- createReactiveComponent [function] — @tuix/reactive/runes/components/reactive-component.ts
+- useEventEmitter [function] — @tuix/reactive/runes/components/reactive-component.ts
+- useReactiveDerived [function] — @tuix/reactive/runes/components/reactive-component.ts
+- useReactiveState [function] — @tuix/reactive/runes/components/reactive-component.ts
+- BaseReactivityEvent [interface] — @tuix/reactive/runes/events.ts
+- DerivedEvent [interface] — @tuix/reactive/runes/events.ts
+- EffectEvent [interface] — @tuix/reactive/runes/events.ts
+- LifecycleEvent [interface] — @tuix/reactive/runes/events.ts
+- ReactivityEvent [type] — @tuix/reactive/runes/events.ts
+- ReactivityEventChannel [type] — @tuix/reactive/runes/events.ts
+- ReactivityEventChannels [const] — @tuix/reactive/runes/events.ts
+- RuneEvent [interface] — @tuix/reactive/runes/events.ts
+- RuneHandle [interface] — @tuix/reactive/runes/events.ts
+- StateEvent [interface] — @tuix/reactive/runes/events.ts
+- afterUpdate [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- beforeUpdate [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- cleanupComponent [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- getLifecyclePhases [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- initComponent [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- onDestroy [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- onMount [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- untrack [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- withLifecycle [function] — @tuix/reactive/runes/jsx-lifecycle.ts
+- ReactivityModule [class] — @tuix/reactive/runes/module.ts
+- RuneError [class] — @tuix/reactive/runes/module.ts
+- $effect [export] — @tuix/reactive/runes/runes.ts
+- BindableOptions [interface] — @tuix/reactive/runes/runes.ts
+- BindableRune [interface] — @tuix/reactive/runes/runes.ts
+- DerivedRune [interface] — @tuix/reactive/runes/runes.ts
+- Rune [interface] — @tuix/reactive/runes/runes.ts
+- StateRune [interface] — @tuix/reactive/runes/runes.ts
+- afterUpdate [export] — @tuix/reactive/runes/runes.ts
+- beforeUpdate [export] — @tuix/reactive/runes/runes.ts
+- getValue [function] — @tuix/reactive/runes/runes.ts
+- isBindableRune [function] — @tuix/reactive/runes/runes.ts
+- isDerivedRune [function] — @tuix/reactive/runes/runes.ts
+- isRune [function] — @tuix/reactive/runes/runes.ts
+- isStateRune [function] — @tuix/reactive/runes/runes.ts
+- onDestroy [export] — @tuix/reactive/runes/runes.ts
+- onMount [export] — @tuix/reactive/runes/runes.ts
+- tick [export] — @tuix/reactive/runes/runes.ts
+- toBindable [function] — @tuix/reactive/runes/runes.ts
+- untrack [export] — @tuix/reactive/runes/runes.ts
+- ReactiveContext [class] — @tuix/reactive/runtime/hooks.ts
+- createDefaultReactiveHooks [function] — @tuix/reactive/runtime/hooks.ts
+- createReactiveHooks [function] — @tuix/reactive/runtime/hooks.ts
+- getGlobalReactiveContext [function] — @tuix/reactive/runtime/hooks.ts
+- useReactiveState [function] — @tuix/reactive/runtime/hooks.ts
+- MyCommand [function] — @tuix/reactive/state/index.ts
+- app [const] — @tuix/reactive/state/index.ts
+- context [const] — @tuix/reactive/state/index.ts
+- BootstrapConfig [interface] — @tuix/runtime/bootstrap.ts
+- BootstrapResult [interface] — @tuix/runtime/bootstrap.ts
+- bootstrap [function] — @tuix/runtime/bootstrap.ts
+- bootstrapFull [function] — @tuix/runtime/bootstrap.ts
+- bootstrapMinimal [function] — @tuix/runtime/bootstrap.ts
+- bootstrapWithModules [function] — @tuix/runtime/bootstrap.ts
+- Cmd [type] — @tuix/runtime/cmd/index.ts
+- Sub [type] — @tuix/runtime/cmd/index.ts
+- RuntimeHooks [interface] — @tuix/runtime/hooks/types.ts
+- composeHooks [const] — @tuix/runtime/hooks/types.ts
+- createHooks [const] — @tuix/runtime/hooks/types.ts
+- ModuleBase [export] — @tuix/runtime/index.ts
+- ModuleError [export] — @tuix/runtime/index.ts
+- ModuleRegistry [export] — @tuix/runtime/index.ts
+- getGlobalRegistry [export] — @tuix/runtime/index.ts
+- resetGlobalRegistry [export] — @tuix/runtime/index.ts
+- Interactive [const] — @tuix/runtime/interactive.ts
+- InteractiveConfig [interface] — @tuix/runtime/interactive.ts
+- InteractiveContext [class] — @tuix/runtime/interactive.ts
+- InteractiveContextLive [const] — @tuix/runtime/interactive.ts
+- InteractiveFiberRef [const] — @tuix/runtime/interactive.ts
+- exitInteractive [const] — @tuix/runtime/interactive.ts
+- isInteractive [const] — @tuix/runtime/interactive.ts
+- maybeInteractive [const] — @tuix/runtime/interactive.ts
+- runInteractive [const] — @tuix/runtime/interactive.ts
+- runViewInteractive [const] — @tuix/runtime/interactive.ts
+- Runtime [class] — @tuix/runtime/mvu/runtime/core.ts
+- createRuntime [const] — @tuix/runtime/mvu/runtime/factory.ts
+- runApp [const] — @tuix/runtime/mvu/runtime/factory.ts
+- Runtime [export] — @tuix/runtime/mvu/runtime/index.ts
+- createRuntime [export] — @tuix/runtime/mvu/runtime/index.ts
+- runApp [export] — @tuix/runtime/mvu/runtime/index.ts
+- CommandScheduler [class] — @tuix/runtime/mvu/runtime/scheduler.ts
+- FrameScheduler [class] — @tuix/runtime/mvu/runtime/scheduler.ts
+- TimerManager [class] — @tuix/runtime/mvu/runtime/scheduler.ts
+- SubscriptionManager [class] — @tuix/runtime/mvu/runtime/subscriptions.ts
+- RuntimeConfig [interface] — @tuix/runtime/mvu/runtime/types.ts
+- RuntimeError [class] — @tuix/runtime/mvu/runtime/types.ts
+- RuntimeMetrics [interface] — @tuix/runtime/mvu/runtime/types.ts
+- RuntimeState [interface] — @tuix/runtime/mvu/runtime/types.ts
+- SystemMsg [type] — @tuix/runtime/mvu/runtime/types.ts
+- FilesystemStorage [class] — @tuix/storage/filesystem.ts
+- makeFilesystemStorage [const] — @tuix/storage/filesystem.ts
+- DefaultStorageLayer [const] — @tuix/storage/layer.ts
+- FilesystemStorageLayer [const] — @tuix/storage/layer.ts
+- MemoryStorageLayer [const] — @tuix/storage/layer.ts
+- MemoryStorage [class] — @tuix/storage/memory.ts
+- makeMemoryStorage [const] — @tuix/storage/memory.ts
+- Storage [function] — @tuix/storage/plugin/index.tsx
+- StorageContext [interface] — @tuix/storage/plugin/index.tsx
+- createStorageContext [const] — @tuix/storage/plugin/index.tsx
+- useStorage [function] — @tuix/storage/plugin/index.tsx
+- Storage [interface] — @tuix/storage/types.ts
+- StorageEntry [interface] — @tuix/storage/types.ts
+- StorageError [class] — @tuix/storage/types.ts
+- StorageOptions [interface] — @tuix/storage/types.ts
+- StorageService [class] — @tuix/storage/types.ts
+- ErrorCollector [class] — @tuix/telemetry/collectors/errors.ts
+- EventCollector [class] — @tuix/telemetry/collectors/events.ts
+- ErrorCollector [export] — @tuix/telemetry/collectors/index.ts
+- EventCollector [export] — @tuix/telemetry/collectors/index.ts
+- PerformanceCollector [export] — @tuix/telemetry/collectors/index.ts
+- PerformanceCollector [class] — @tuix/telemetry/collectors/performance.ts
+- ErrorCollector [export] — @tuix/telemetry/index.ts
+- EventCollector [export] — @tuix/telemetry/index.ts
+- FileTransport [export] — @tuix/telemetry/index.ts
+- HttpTransport [export] — @tuix/telemetry/index.ts
+- PerformanceCollector [export] — @tuix/telemetry/index.ts
+- Telemetry [export] — @tuix/telemetry/index.ts
+- createFileTransport [export] — @tuix/telemetry/index.ts
+- createHttpTransport [export] — @tuix/telemetry/index.ts
+- Telemetry [const] — @tuix/telemetry/plugin/Telemetry.tsx
+- TelemetryModel [interface] — @tuix/telemetry/plugin/Telemetry.tsx
+- TelemetryMsg [type] — @tuix/telemetry/plugin/Telemetry.tsx
+- TelemetryProps [interface] — @tuix/telemetry/plugin/Telemetry.tsx
+- Telemetry [export] — @tuix/telemetry/plugin/index.ts
+- FileTransport [class] — @tuix/telemetry/transports/file.ts
+- createFileTransport [function] — @tuix/telemetry/transports/file.ts
+- HttpTransport [class] — @tuix/telemetry/transports/http.ts
+- createHttpTransport [function] — @tuix/telemetry/transports/http.ts
+- FileTransport [export] — @tuix/telemetry/transports/index.ts
+- HttpTransport [export] — @tuix/telemetry/transports/index.ts
+- createFileTransport [export] — @tuix/telemetry/transports/index.ts
+- createHttpTransport [export] — @tuix/telemetry/transports/index.ts
+- FileTransportConfig [interface] — @tuix/telemetry/types.ts
+- HttpTransportConfig [interface] — @tuix/telemetry/types.ts
+- TelemetryCollector [interface] — @tuix/telemetry/types.ts
+- TelemetryConfig [interface] — @tuix/telemetry/types.ts
+- TelemetryError [interface] — @tuix/telemetry/types.ts
+- TelemetryEvent [interface] — @tuix/telemetry/types.ts
+- TelemetryPerformance [interface] — @tuix/telemetry/types.ts
+- TelemetryTransport [interface] — @tuix/telemetry/types.ts
+- TransportError [class] — @tuix/telemetry/types.ts
+- KeySequence [interface] — @tuix/testing/e2eHarness.ts
+- TerminalSnapshot [interface] — @tuix/testing/e2eHarness.ts
+- TestHarnessOptions [interface] — @tuix/testing/e2eHarness.ts
+- TestSession [interface] — @tuix/testing/e2eHarness.ts
+- captureScreenshots [const] — @tuix/testing/e2eHarness.ts
+- createTestHarness [const] — @tuix/testing/e2eHarness.ts
+- recordScript [const] — @tuix/testing/e2eHarness.ts
+- runTest [const] — @tuix/testing/e2eHarness.ts
+- HarnessOptions [interface] — @tuix/testing/harness.ts
+- TestSession [interface] — @tuix/testing/harness.ts
+- createHarness [const] — @tuix/testing/harness.ts
+- runSimpleTest [const] — @tuix/testing/harness.ts
+- TestingPlugin [export] — @tuix/testing/index.ts
+- TestInputAdapter [class] — @tuix/testing/inputAdapter.ts
+- createTestInputService [const] — @tuix/testing/inputAdapter.ts
+- getTestInputAdapter [const] — @tuix/testing/inputAdapter.ts
+- runTestApp [const] — @tuix/testing/inputAdapter.ts
+- BenchmarkOptions [interface] — @tuix/testing/perf/benchmark.ts
+- BenchmarkResult [interface] — @tuix/testing/perf/benchmark.ts
+- compareBenchmarks [function] — @tuix/testing/perf/benchmark.ts
+- formatBenchmarkResult [function] — @tuix/testing/perf/benchmark.ts
+- PerformanceMetrics [interface] — @tuix/testing/perf/metrics.ts
+- PerformanceStats [interface] — @tuix/testing/perf/metrics.ts
+- calculateStats [function] — @tuix/testing/perf/metrics.ts
+- compareMetrics [function] — @tuix/testing/perf/metrics.ts
+- formatMetrics [function] — @tuix/testing/perf/metrics.ts
+- formatStats [function] — @tuix/testing/perf/metrics.ts
+- meetsThreshold [function] — @tuix/testing/perf/metrics.ts
+- ProfileEvent [interface] — @tuix/testing/perf/profiler.ts
+- ProfileSession [interface] — @tuix/testing/perf/profiler.ts
+- Profiler [class] — @tuix/testing/perf/profiler.ts
+- analyzeSession [function] — @tuix/testing/perf/profiler.ts
+- formatSession [function] — @tuix/testing/perf/profiler.ts
+- globalProfiler [const] — @tuix/testing/perf/profiler.ts
+- Testing [function] — @tuix/testing/plugin/Testing.tsx
+- Benchmark [const] — @tuix/testing/plugin/commands/benchmark.tsx
+- BenchmarkProps [interface] — @tuix/testing/plugin/commands/benchmark.tsx
+- TestDashboard [const] — @tuix/testing/plugin/commands/dashboard.tsx
+- Profile [const] — @tuix/testing/plugin/commands/profile.tsx
+- ProfileProps [interface] — @tuix/testing/plugin/commands/profile.tsx
+- Snapshot [const] — @tuix/testing/plugin/commands/snapshot.tsx
+- SnapshotProps [interface] — @tuix/testing/plugin/commands/snapshot.tsx
+- Benchmark [export] — @tuix/testing/plugin/index.ts
+- Profile [export] — @tuix/testing/plugin/index.ts
+- Snapshot [export] — @tuix/testing/plugin/index.ts
+- TestDashboard [export] — @tuix/testing/plugin/index.ts
+- Testing [export] — @tuix/testing/plugin/index.ts
+- default [export] — @tuix/testing/plugin/index.ts
+- SnapshotConfig [interface] — @tuix/testing/snapshot/matcher.ts
+- configureSnapshots [function] — @tuix/testing/snapshot/matcher.ts
+- extendExpect [function] — @tuix/testing/snapshot/matcher.ts
+- getSnapshotConfig [function] — @tuix/testing/snapshot/matcher.ts
+- setCurrentTestName [function] — @tuix/testing/snapshot/matcher.ts
+- ObjectSerializer [const] — @tuix/testing/snapshot/serializer.ts
+- Serializer [interface] — @tuix/testing/snapshot/serializer.ts
+- StringSerializer [const] — @tuix/testing/snapshot/serializer.ts
+- ViewSerializer [const] — @tuix/testing/snapshot/serializer.ts
+- defaultSerializers [const] — @tuix/testing/snapshot/serializer.ts
+- normalizeOutput [function] — @tuix/testing/snapshot/serializer.ts
+- stripAnsiCodes [function] — @tuix/testing/snapshot/serializer.ts
+- FileSnapshotStorage [class] — @tuix/testing/snapshot/storage.ts
+- SnapshotStorage [interface] — @tuix/testing/snapshot/storage.ts
+- createSnapshotStorage [const] — @tuix/testing/snapshot/storage.ts
+- InteractionTest [interface] — @tuix/testing/testUtils.ts
+- LifecycleTest [interface] — @tuix/testing/testUtils.ts
+- MockInputService [interface] — @tuix/testing/testUtils.ts
+- MockRendererService [interface] — @tuix/testing/testUtils.ts
+- MockStorageService [interface] — @tuix/testing/testUtils.ts
+- MockTerminalService [interface] — @tuix/testing/testUtils.ts
+- TUIAssert [const] — @tuix/testing/testUtils.ts
+- TestEnvironment [interface] — @tuix/testing/testUtils.ts
+- TestHarness [interface] — @tuix/testing/testUtils.ts
+- createMockAppServices [const] — @tuix/testing/testUtils.ts
+- createMockInputService [const] — @tuix/testing/testUtils.ts
+- createMockRendererService [const] — @tuix/testing/testUtils.ts
+- createMockStorageService [const] — @tuix/testing/testUtils.ts
+- createMockTerminalService [const] — @tuix/testing/testUtils.ts
+- createTestEnvironment [const] — @tuix/testing/testUtils.ts
+- createTestHarness [function] — @tuix/testing/testUtils.ts
+- createTestLayer [const] — @tuix/testing/testUtils.ts
+- testComponent [const] — @tuix/testing/testUtils.ts
+- withMockServices [const] — @tuix/testing/testUtils.ts
+- App [default] — @tuix/themes/ThemeProvider.tsx
+- ThemeProvider [function] — @tuix/themes/ThemeProvider.tsx
+- ThemeProviderProps [interface] — @tuix/themes/ThemeProvider.tsx
+- withTheme [function] — @tuix/themes/ThemeProvider.tsx
+- ThemeContext [interface] — @tuix/themes/context.ts
+- ThemeContextLive [const] — @tuix/themes/context.ts
+- createThemeLayer [function] — @tuix/themes/context.ts
+- App [default] — @tuix/themes/index.ts
+- ThemeContext [export] — @tuix/themes/index.ts
+- ThemeContextLive [export] — @tuix/themes/index.ts
+- ThemeProvider [export] — @tuix/themes/index.ts
+- createThemeLayer [export] — @tuix/themes/index.ts
+- darkTheme [export] — @tuix/themes/index.ts
+- draculaTheme [export] — @tuix/themes/index.ts
+- lightTheme [export] — @tuix/themes/index.ts
+- nordTheme [export] — @tuix/themes/index.ts
+- useTheme [export] — @tuix/themes/index.ts
+- vibesTheme [export] — @tuix/themes/index.ts
+- withTheme [export] — @tuix/themes/index.ts
+- darkTheme [const] — @tuix/themes/themes/dark.ts
+- draculaTheme [const] — @tuix/themes/themes/dracula.ts
+- darkTheme [export] — @tuix/themes/themes/index.ts
+- draculaTheme [export] — @tuix/themes/themes/index.ts
+- lightTheme [export] — @tuix/themes/themes/index.ts
+- nordTheme [export] — @tuix/themes/themes/index.ts
+- vibesTheme [export] — @tuix/themes/themes/index.ts
+- lightTheme [const] — @tuix/themes/themes/light.ts
+- nordTheme [const] — @tuix/themes/themes/nord.ts
+- vibesTheme [const] — @tuix/themes/themes/vibes.ts
+- Theme [interface] — @tuix/themes/types.ts
+- ThemeColors [interface] — @tuix/themes/types.ts
+- ThemeConfig [interface] — @tuix/themes/types.ts
+- ThemeError [interface] — @tuix/themes/types.ts
+- ThemeSpacing [interface] — @tuix/themes/types.ts
+- ThemeTypography [interface] — @tuix/themes/types.ts
+- UseThemeResult [interface] — @tuix/themes/useTheme.ts
+- useTheme [function] — @tuix/themes/useTheme.ts
+- FilterBox [function] — @tuix/ui/components/data/FilterBox.tsx
+- FilterBoxProps [interface] — @tuix/ui/components/data/FilterBox.tsx
+- FilterPreset [interface] — @tuix/ui/components/data/FilterBox.tsx
+- FilterableContent [function] — @tuix/ui/components/data/FilterBox.tsx
+- FilterableContentProps [interface] — @tuix/ui/components/data/FilterBox.tsx
+- LOG_FILTER_PRESETS [const] — @tuix/ui/components/data/FilterBox.tsx
+- PROCESS_FILTER_PRESETS [const] — @tuix/ui/components/data/FilterBox.tsx
+- CheckList [function] — @tuix/ui/components/data/list/List.tsx
+- List [function] — @tuix/ui/components/data/list/List.tsx
+- ListProps [interface] — @tuix/ui/components/data/list/List.tsx
+- NumberedList [function] — @tuix/ui/components/data/list/List.tsx
+- SelectionMode [type] — @tuix/ui/components/data/list/List.tsx
+- SimpleList [function] — @tuix/ui/components/data/list/List.tsx
+- CheckList [export] — @tuix/ui/components/data/list/index.ts
+- List [export] — @tuix/ui/components/data/list/index.ts
+- NumberedList [export] — @tuix/ui/components/data/list/index.ts
+- SimpleList [export] — @tuix/ui/components/data/list/index.ts
+- Column [interface] — @tuix/ui/components/data/table/Table.tsx
+- CompactTable [function] — @tuix/ui/components/data/table/Table.tsx
+- DataTable [function] — @tuix/ui/components/data/table/Table.tsx
+- Table [function] — @tuix/ui/components/data/table/Table.tsx
+- TableProps [interface] — @tuix/ui/components/data/table/Table.tsx
+- CompactTable [export] — @tuix/ui/components/data/table/index.ts
+- DataTable [export] — @tuix/ui/components/data/table/index.ts
+- Table [export] — @tuix/ui/components/data/table/index.ts
+- Badge [function] — @tuix/ui/components/display/badge/Badge.tsx
+- BadgeProps [interface] — @tuix/ui/components/display/badge/Badge.tsx
+- badge [function] — @tuix/ui/components/display/badge/Badge.tsx
+- Badge [export] — @tuix/ui/components/display/badge/index.ts
+- badge [export] — @tuix/ui/components/display/badge/index.ts
+- Divider [function] — @tuix/ui/components/display/divider/Divider.tsx
+- DividerProps [interface] — @tuix/ui/components/display/divider/Divider.tsx
+- divider [function] — @tuix/ui/components/display/divider/Divider.tsx
+- Divider [export] — @tuix/ui/components/display/divider/index.ts
+- divider [export] — @tuix/ui/components/display/divider/index.ts
+- Header [function] — @tuix/ui/components/display/header/Header.tsx
+- HeaderProps [interface] — @tuix/ui/components/display/header/Header.tsx
+- header [function] — @tuix/ui/components/display/header/Header.tsx
+- Header [export] — @tuix/ui/components/display/header/index.ts
+- header [export] — @tuix/ui/components/display/header/index.ts
+- Badge [export] — @tuix/ui/components/display/index.ts
+- Code [export] — @tuix/ui/components/display/index.ts
+- Divider [export] — @tuix/ui/components/display/index.ts
+- Error [export] — @tuix/ui/components/display/index.ts
+- Header [export] — @tuix/ui/components/display/index.ts
+- Heading [export] — @tuix/ui/components/display/index.ts
+- Info [export] — @tuix/ui/components/display/index.ts
+- StatusIndicator [export] — @tuix/ui/components/display/index.ts
+- Success [export] — @tuix/ui/components/display/index.ts
+- Text [export] — @tuix/ui/components/display/index.ts
+- Warning [export] — @tuix/ui/components/display/index.ts
+- Status [type] — @tuix/ui/components/display/status-indicator/StatusIndicator.tsx
+- StatusIndicator [function] — @tuix/ui/components/display/status-indicator/StatusIndicator.tsx
+- StatusIndicatorProps [interface] — @tuix/ui/components/display/status-indicator/StatusIndicator.tsx
+- statusIndicator [function] — @tuix/ui/components/display/status-indicator/StatusIndicator.tsx
+- StatusIndicator [export] — @tuix/ui/components/display/status-indicator/index.ts
+- statusIndicator [export] — @tuix/ui/components/display/status-indicator/index.ts
+- Code [function] — @tuix/ui/components/display/text/Text.tsx
+- Error [function] — @tuix/ui/components/display/text/Text.tsx
+- Heading [function] — @tuix/ui/components/display/text/Text.tsx
+- Info [function] — @tuix/ui/components/display/text/Text.tsx
+- Label [function] — @tuix/ui/components/display/text/Text.tsx
+- Link [function] — @tuix/ui/components/display/text/Text.tsx
+- Success [function] — @tuix/ui/components/display/text/Text.tsx
+- Text [function] — @tuix/ui/components/display/text/Text.tsx
+- TextProps [interface] — @tuix/ui/components/display/text/Text.tsx
+- Warning [function] — @tuix/ui/components/display/text/Text.tsx
+- code [const] — @tuix/ui/components/display/text/Text.tsx
+- heading [const] — @tuix/ui/components/display/text/Text.tsx
+- link [const] — @tuix/ui/components/display/text/Text.tsx
+- text [const] — @tuix/ui/components/display/text/Text.tsx
+- Code [export] — @tuix/ui/components/display/text/index.ts
+- Error [export] — @tuix/ui/components/display/text/index.ts
+- Heading [export] — @tuix/ui/components/display/text/index.ts
+- Info [export] — @tuix/ui/components/display/text/index.ts
+- Label [export] — @tuix/ui/components/display/text/index.ts
+- Link [export] — @tuix/ui/components/display/text/index.ts
+- Success [export] — @tuix/ui/components/display/text/index.ts
+- Text [export] — @tuix/ui/components/display/text/index.ts
+- TextProps [type] — @tuix/ui/components/display/text/index.ts
+- Warning [export] — @tuix/ui/components/display/text/index.ts
+- code [export] — @tuix/ui/components/display/text/index.ts
+- heading [export] — @tuix/ui/components/display/text/index.ts
+- link [export] — @tuix/ui/components/display/text/index.ts
+- text [export] — @tuix/ui/components/display/text/index.ts
+- ProgressBar [export] — @tuix/ui/components/feedback/index.ts
+- Toast [export] — @tuix/ui/components/feedback/index.ts
+- Tooltip [export] — @tuix/ui/components/feedback/index.ts
+- dangerToast [export] — @tuix/ui/components/feedback/index.ts
+- errorToast [export] — @tuix/ui/components/feedback/index.ts
+- infoToast [export] — @tuix/ui/components/feedback/index.ts
+- successToast [export] — @tuix/ui/components/feedback/index.ts
+- tooltip [export] — @tuix/ui/components/feedback/index.ts
+- warningToast [export] — @tuix/ui/components/feedback/index.ts
+- ConfirmModal [function] — @tuix/ui/components/feedback/modal/ConfirmModal.tsx
+- ConfirmModalProps [interface] — @tuix/ui/components/feedback/modal/ConfirmModal.tsx
+- ErrorModal [function] — @tuix/ui/components/feedback/modal/ErrorModal.tsx
+- ErrorModalProps [interface] — @tuix/ui/components/feedback/modal/ErrorModal.tsx
+- InfoModal [function] — @tuix/ui/components/feedback/modal/InfoModal.tsx
+- InfoModalProps [interface] — @tuix/ui/components/feedback/modal/InfoModal.tsx
+- LoadingModal [function] — @tuix/ui/components/feedback/modal/LoadingModal.tsx
+- LoadingModalProps [interface] — @tuix/ui/components/feedback/modal/LoadingModal.tsx
+- Modal [function] — @tuix/ui/components/feedback/modal/Modal.tsx
+- ModalProps [interface] — @tuix/ui/components/feedback/modal/Modal.tsx
+- ConfirmModal [export] — @tuix/ui/components/feedback/modal/index.ts
+- ErrorModal [export] — @tuix/ui/components/feedback/modal/index.ts
+- InfoModal [export] — @tuix/ui/components/feedback/modal/index.ts
+- LoadingModal [export] — @tuix/ui/components/feedback/modal/index.ts
+- Modal [export] — @tuix/ui/components/feedback/modal/index.ts
+- ProgressBar [function] — @tuix/ui/components/feedback/progress-bar/ProgressBar.tsx
+- ProgressBarProps [interface] — @tuix/ui/components/feedback/progress-bar/ProgressBar.tsx
+- progressBar [function] — @tuix/ui/components/feedback/progress-bar/ProgressBar.tsx
+- ProgressBar [export] — @tuix/ui/components/feedback/progress-bar/index.ts
+- progressBar [export] — @tuix/ui/components/feedback/progress-bar/index.ts
+- LoadingOverlay [function] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- Spinner [function] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- SpinnerProps [interface] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- SpinnerSize [type] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- SpinnerType [type] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- SpinnerWithMessage [function] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- loadingSpinner [const] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- processingSpinner [const] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- savingSpinner [const] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- spinner [const] — @tuix/ui/components/feedback/spinner/Spinner.tsx
+- LoadingOverlay [export] — @tuix/ui/components/feedback/spinner/index.ts
+- Spinner [export] — @tuix/ui/components/feedback/spinner/index.ts
+- SpinnerProps [type] — @tuix/ui/components/feedback/spinner/index.ts
+- SpinnerSize [type] — @tuix/ui/components/feedback/spinner/index.ts
+- SpinnerType [type] — @tuix/ui/components/feedback/spinner/index.ts
+- SpinnerWithMessage [export] — @tuix/ui/components/feedback/spinner/index.ts
+- loadingSpinner [export] — @tuix/ui/components/feedback/spinner/index.ts
+- processingSpinner [export] — @tuix/ui/components/feedback/spinner/index.ts
+- savingSpinner [export] — @tuix/ui/components/feedback/spinner/index.ts
+- spinner [export] — @tuix/ui/components/feedback/spinner/index.ts
+- Toast [function] — @tuix/ui/components/feedback/toast/Toast.tsx
+- ToastKind [type] — @tuix/ui/components/feedback/toast/Toast.tsx
+- ToastProps [interface] — @tuix/ui/components/feedback/toast/Toast.tsx
+- dangerToast [const] — @tuix/ui/components/feedback/toast/Toast.tsx
+- errorToast [const] — @tuix/ui/components/feedback/toast/Toast.tsx
+- infoToast [const] — @tuix/ui/components/feedback/toast/Toast.tsx
+- successToast [const] — @tuix/ui/components/feedback/toast/Toast.tsx
+- toast [const] — @tuix/ui/components/feedback/toast/Toast.tsx
+- warningToast [const] — @tuix/ui/components/feedback/toast/Toast.tsx
+- Toast [export] — @tuix/ui/components/feedback/toast/index.ts
+- ToastKind [type] — @tuix/ui/components/feedback/toast/index.ts
+- ToastProps [type] — @tuix/ui/components/feedback/toast/index.ts
+- dangerToast [export] — @tuix/ui/components/feedback/toast/index.ts
+- errorToast [export] — @tuix/ui/components/feedback/toast/index.ts
+- infoToast [export] — @tuix/ui/components/feedback/toast/index.ts
+- successToast [export] — @tuix/ui/components/feedback/toast/index.ts
+- toast [export] — @tuix/ui/components/feedback/toast/index.ts
+- warningToast [export] — @tuix/ui/components/feedback/toast/index.ts
+- Tooltip [function] — @tuix/ui/components/feedback/tooltip/Tooltip.tsx
+- TooltipProps [interface] — @tuix/ui/components/feedback/tooltip/Tooltip.tsx
+- tooltip [const] — @tuix/ui/components/feedback/tooltip/Tooltip.tsx
+- Tooltip [export] — @tuix/ui/components/feedback/tooltip/index.ts
+- TooltipProps [type] — @tuix/ui/components/feedback/tooltip/index.ts
+- tooltip [export] — @tuix/ui/components/feedback/tooltip/index.ts
+- Button [function] — @tuix/ui/components/forms/button/Button.tsx
+- ButtonGroup [function] — @tuix/ui/components/forms/button/Button.tsx
+- ButtonProps [interface] — @tuix/ui/components/forms/button/Button.tsx
+- ButtonSize [type] — @tuix/ui/components/forms/button/Button.tsx
+- ButtonVariant [type] — @tuix/ui/components/forms/button/Button.tsx
+- SubmitCancelButtons [function] — @tuix/ui/components/forms/button/Button.tsx
+- button [const] — @tuix/ui/components/forms/button/Button.tsx
+- dangerButton [const] — @tuix/ui/components/forms/button/Button.tsx
+- ghostButton [const] — @tuix/ui/components/forms/button/Button.tsx
+- infoButton [const] — @tuix/ui/components/forms/button/Button.tsx
+- primaryButton [const] — @tuix/ui/components/forms/button/Button.tsx
+- secondaryButton [const] — @tuix/ui/components/forms/button/Button.tsx
+- successButton [const] — @tuix/ui/components/forms/button/Button.tsx
+- warningButton [const] — @tuix/ui/components/forms/button/Button.tsx
+- Button [export] — @tuix/ui/components/forms/button/index.ts
+- ButtonGroup [export] — @tuix/ui/components/forms/button/index.ts
+- ButtonProps [type] — @tuix/ui/components/forms/button/index.ts
+- ButtonSize [type] — @tuix/ui/components/forms/button/index.ts
+- ButtonVariant [type] — @tuix/ui/components/forms/button/index.ts
+- SubmitCancelButtons [export] — @tuix/ui/components/forms/button/index.ts
+- button [export] — @tuix/ui/components/forms/button/index.ts
+- dangerButton [export] — @tuix/ui/components/forms/button/index.ts
+- ghostButton [export] — @tuix/ui/components/forms/button/index.ts
+- infoButton [export] — @tuix/ui/components/forms/button/index.ts
+- primaryButton [export] — @tuix/ui/components/forms/button/index.ts
+- secondaryButton [export] — @tuix/ui/components/forms/button/index.ts
+- successButton [export] — @tuix/ui/components/forms/button/index.ts
+- warningButton [export] — @tuix/ui/components/forms/button/index.ts
+- Checkbox [function] — @tuix/ui/components/forms/checkbox/Checkbox.tsx
+- CheckboxProps [interface] — @tuix/ui/components/forms/checkbox/Checkbox.tsx
+- checkbox [const] — @tuix/ui/components/forms/checkbox/Checkbox.tsx
+- Checkbox [export] — @tuix/ui/components/forms/checkbox/index.ts
+- checkbox [export] — @tuix/ui/components/forms/checkbox/index.ts
+- Confirm [function] — @tuix/ui/components/forms/confirm/Confirm.tsx
+- ConfirmProps [interface] — @tuix/ui/components/forms/confirm/Confirm.tsx
+- confirm [const] — @tuix/ui/components/forms/confirm/Confirm.tsx
+- Confirm [export] — @tuix/ui/components/forms/confirm/index.ts
+- confirm [export] — @tuix/ui/components/forms/confirm/index.ts
+- FileItem [interface] — @tuix/ui/components/forms/file-picker/FilePicker.tsx
+- FilePicker [const] — @tuix/ui/components/forms/file-picker/FilePicker.tsx
+- FilePickerModel [interface] — @tuix/ui/components/forms/file-picker/FilePicker.tsx
+- FilePickerMsg [type] — @tuix/ui/components/forms/file-picker/FilePicker.tsx
+- FilePickerProps [interface] — @tuix/ui/components/forms/file-picker/FilePicker.tsx
+- FileSystemService [interface] — @tuix/ui/components/forms/file-picker/FilePicker.tsx
+- FilePicker [export] — @tuix/ui/components/forms/file-picker/index.ts
+- Form [function] — @tuix/ui/components/forms/form/Form.tsx
+- FormField [interface] — @tuix/ui/components/forms/form/Form.tsx
+- FormProps [interface] — @tuix/ui/components/forms/form/Form.tsx
+- form [const] — @tuix/ui/components/forms/form/Form.tsx
+- Form [export] — @tuix/ui/components/forms/form/index.ts
+- form [export] — @tuix/ui/components/forms/form/index.ts
+- Button [export] — @tuix/ui/components/forms/index.ts
+- ButtonGroup [export] — @tuix/ui/components/forms/index.ts
+- Checkbox [export] — @tuix/ui/components/forms/index.ts
+- Confirm [export] — @tuix/ui/components/forms/index.ts
+- FilePicker [export] — @tuix/ui/components/forms/index.ts
+- Form [export] — @tuix/ui/components/forms/index.ts
+- Radio [export] — @tuix/ui/components/forms/index.ts
+- Select [export] — @tuix/ui/components/forms/index.ts
+- TextInput [export] — @tuix/ui/components/forms/index.ts
+- Toggle [export] — @tuix/ui/components/forms/index.ts
+- checkbox [export] — @tuix/ui/components/forms/index.ts
+- confirm [export] — @tuix/ui/components/forms/index.ts
+- emailInput [export] — @tuix/ui/components/forms/index.ts
+- form [export] — @tuix/ui/components/forms/index.ts
+- numberInput [export] — @tuix/ui/components/forms/index.ts
+- passwordInput [export] — @tuix/ui/components/forms/index.ts
+- primaryButton [export] — @tuix/ui/components/forms/index.ts
+- radio [export] — @tuix/ui/components/forms/index.ts
+- secondaryButton [export] — @tuix/ui/components/forms/index.ts
+- select [export] — @tuix/ui/components/forms/index.ts
+- textInput [export] — @tuix/ui/components/forms/index.ts
+- toggle [export] — @tuix/ui/components/forms/index.ts
+- Radio [function] — @tuix/ui/components/forms/radio/Radio.tsx
+- RadioOption [interface] — @tuix/ui/components/forms/radio/Radio.tsx
+- RadioProps [interface] — @tuix/ui/components/forms/radio/Radio.tsx
+- radio [function] — @tuix/ui/components/forms/radio/Radio.tsx
+- Radio [export] — @tuix/ui/components/forms/radio/index.ts
+- radio [export] — @tuix/ui/components/forms/radio/index.ts
+- Select [function] — @tuix/ui/components/forms/select/Select.tsx
+- SelectOption [interface] — @tuix/ui/components/forms/select/Select.tsx
+- SelectProps [interface] — @tuix/ui/components/forms/select/Select.tsx
+- select [function] — @tuix/ui/components/forms/select/Select.tsx
+- Select [export] — @tuix/ui/components/forms/select/index.ts
+- select [export] — @tuix/ui/components/forms/select/index.ts
+- CursorStyle [type] — @tuix/ui/components/forms/text-input/TextInput.tsx
+- EchoMode [type] — @tuix/ui/components/forms/text-input/TextInput.tsx
+- TextInput [function] — @tuix/ui/components/forms/text-input/TextInput.tsx
+- TextInputProps [interface] — @tuix/ui/components/forms/text-input/TextInput.tsx
+- emailInput [const] — @tuix/ui/components/forms/text-input/TextInput.tsx
+- numberInput [const] — @tuix/ui/components/forms/text-input/TextInput.tsx
+- passwordInput [const] — @tuix/ui/components/forms/text-input/TextInput.tsx
+- textInput [const] — @tuix/ui/components/forms/text-input/TextInput.tsx
+- CursorStyle [type] — @tuix/ui/components/forms/text-input/index.ts
+- EchoMode [type] — @tuix/ui/components/forms/text-input/index.ts
+- TextInput [export] — @tuix/ui/components/forms/text-input/index.ts
+- TextInputProps [type] — @tuix/ui/components/forms/text-input/index.ts
+- emailInput [export] — @tuix/ui/components/forms/text-input/index.ts
+- numberInput [export] — @tuix/ui/components/forms/text-input/index.ts
+- passwordInput [export] — @tuix/ui/components/forms/text-input/index.ts
+- textInput [export] — @tuix/ui/components/forms/text-input/index.ts
+- Toggle [function] — @tuix/ui/components/forms/toggle/Toggle.tsx
+- ToggleProps [interface] — @tuix/ui/components/forms/toggle/Toggle.tsx
+- toggle [const] — @tuix/ui/components/forms/toggle/Toggle.tsx
+- Toggle [export] — @tuix/ui/components/forms/toggle/index.ts
+- ToggleProps [type] — @tuix/ui/components/forms/toggle/index.ts
+- toggle [export] — @tuix/ui/components/forms/toggle/index.ts
+- Box [function] — @tuix/ui/components/layout/box/Box.tsx
+- BoxProps [interface] — @tuix/ui/components/layout/box/Box.tsx
+- box [const] — @tuix/ui/components/layout/box/Box.tsx
+- card [const] — @tuix/ui/components/layout/box/Box.tsx
+- centerBox [const] — @tuix/ui/components/layout/box/Box.tsx
+- panel [const] — @tuix/ui/components/layout/box/Box.tsx
+- scrollBox [const] — @tuix/ui/components/layout/box/Box.tsx
+- Box [export] — @tuix/ui/components/layout/box/index.ts
+- BoxProps [type] — @tuix/ui/components/layout/box/index.ts
+- box [export] — @tuix/ui/components/layout/box/index.ts
+- card [export] — @tuix/ui/components/layout/box/index.ts
+- centerBox [export] — @tuix/ui/components/layout/box/index.ts
+- panel [export] — @tuix/ui/components/layout/box/index.ts
+- scrollBox [export] — @tuix/ui/components/layout/box/index.ts
+- Center [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- Column [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- Flex [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- FlexItem [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- FlexItemProps [interface] — @tuix/ui/components/layout/flex/Flex.tsx
+- FlexProps [interface] — @tuix/ui/components/layout/flex/Flex.tsx
+- Grid [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- Header [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- Row [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- Sidebar [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- SpaceBetween [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- Spacer [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- Stack [function] — @tuix/ui/components/layout/flex/Flex.tsx
+- Center [export] — @tuix/ui/components/layout/flex/index.ts
+- Column [export] — @tuix/ui/components/layout/flex/index.ts
+- Flex [export] — @tuix/ui/components/layout/flex/index.ts
+- FlexItem [export] — @tuix/ui/components/layout/flex/index.ts
+- FlexItemProps [type] — @tuix/ui/components/layout/flex/index.ts
+- FlexProps [type] — @tuix/ui/components/layout/flex/index.ts
+- Grid [export] — @tuix/ui/components/layout/flex/index.ts
+- Header [export] — @tuix/ui/components/layout/flex/index.ts
+- Row [export] — @tuix/ui/components/layout/flex/index.ts
+- Sidebar [export] — @tuix/ui/components/layout/flex/index.ts
+- SpaceBetween [export] — @tuix/ui/components/layout/flex/index.ts
+- Spacer [export] — @tuix/ui/components/layout/flex/index.ts
+- Stack [export] — @tuix/ui/components/layout/flex/index.ts
+- Box [export] — @tuix/ui/components/layout/index.ts
+- Column [export] — @tuix/ui/components/layout/index.ts
+- Flex [export] — @tuix/ui/components/layout/index.ts
+- Grid [export] — @tuix/ui/components/layout/index.ts
+- InteractiveLayout [export] — @tuix/ui/components/layout/index.ts
+- Panel [export] — @tuix/ui/components/layout/index.ts
+- Row [export] — @tuix/ui/components/layout/index.ts
+- Spacer [export] — @tuix/ui/components/layout/index.ts
+- Stack [export] — @tuix/ui/components/layout/index.ts
+- StaticLayout [export] — @tuix/ui/components/layout/index.ts
+- card [export] — @tuix/ui/components/layout/index.ts
+- interactiveLayout [export] — @tuix/ui/components/layout/index.ts
+- panel [export] — @tuix/ui/components/layout/index.ts
+- staticLayout [export] — @tuix/ui/components/layout/index.ts
+- InteractiveLayout [function] — @tuix/ui/components/layout/interactive-layout/InteractiveLayout.tsx
+- InteractiveLayoutProps [interface] — @tuix/ui/components/layout/interactive-layout/InteractiveLayout.tsx
+- interactiveLayout [function] — @tuix/ui/components/layout/interactive-layout/InteractiveLayout.tsx
+- Panel [function] — @tuix/ui/components/layout/panel/Panel.tsx
+- PanelProps [interface] — @tuix/ui/components/layout/panel/Panel.tsx
+- panel [function] — @tuix/ui/components/layout/panel/Panel.tsx
+- Panel [export] — @tuix/ui/components/layout/panel/index.ts
+- panel [export] — @tuix/ui/components/layout/panel/index.ts
+- LogEntry [interface] — @tuix/ui/components/layout/scrollable-box/ScrollableBox.tsx
+- ProcessInfo [interface] — @tuix/ui/components/layout/scrollable-box/ScrollableBox.tsx
+- ScrollableBox [function] — @tuix/ui/components/layout/scrollable-box/ScrollableBox.tsx
+- ScrollableBoxProps [interface] — @tuix/ui/components/layout/scrollable-box/ScrollableBox.tsx
+- ScrollableLogBox [function] — @tuix/ui/components/layout/scrollable-box/ScrollableBox.tsx
+- ScrollableProcessList [function] — @tuix/ui/components/layout/scrollable-box/ScrollableBox.tsx
+- LogEntry [type] — @tuix/ui/components/layout/scrollable-box/index.ts
+- ProcessInfo [type] — @tuix/ui/components/layout/scrollable-box/index.ts
+- ScrollableBox [export] — @tuix/ui/components/layout/scrollable-box/index.ts
+- ScrollableBoxProps [type] — @tuix/ui/components/layout/scrollable-box/index.ts
+- ScrollableLogBox [export] — @tuix/ui/components/layout/scrollable-box/index.ts
+- ScrollableProcessList [export] — @tuix/ui/components/layout/scrollable-box/index.ts
+- StaticLayout [function] — @tuix/ui/components/layout/static-layout/StaticLayout.tsx
+- StaticLayoutProps [interface] — @tuix/ui/components/layout/static-layout/StaticLayout.tsx
+- staticLayout [function] — @tuix/ui/components/layout/static-layout/StaticLayout.tsx
+- Viewport [const] — @tuix/ui/components/layout/viewport/Viewport.tsx
+- ViewportProps [interface] — @tuix/ui/components/layout/viewport/Viewport.tsx
+- Viewport [export] — @tuix/ui/components/layout/viewport/index.ts
+- ViewportProps [type] — @tuix/ui/components/layout/viewport/index.ts
+- ViewportState [type] — @tuix/ui/components/layout/viewport/index.ts
+- PillTabs [function] — @tuix/ui/components/navigation/tabs/Tabs.tsx
+- SimpleTabs [function] — @tuix/ui/components/navigation/tabs/Tabs.tsx
+- Tab [function] — @tuix/ui/components/navigation/tabs/Tabs.tsx
+- TabProps [interface] — @tuix/ui/components/navigation/tabs/Tabs.tsx
+- Tabs [function] — @tuix/ui/components/navigation/tabs/Tabs.tsx
+- TabsProps [interface] — @tuix/ui/components/navigation/tabs/Tabs.tsx
+- VerticalTabs [function] — @tuix/ui/components/navigation/tabs/Tabs.tsx
+- PillTabs [export] — @tuix/ui/components/navigation/tabs/index.ts
+- SimpleTabs [export] — @tuix/ui/components/navigation/tabs/index.ts
+- Tab [export] — @tuix/ui/components/navigation/tabs/index.ts
+- Tabs [export] — @tuix/ui/components/navigation/tabs/index.ts
+- VerticalTabs [export] — @tuix/ui/components/navigation/tabs/index.ts
+- ExitComponent [function] — @tuix/ui/components/system/exit/Exit.tsx
+- ExitProps [interface] — @tuix/ui/components/system/exit/Exit.tsx
+- Exit [export] — @tuix/ui/components/system/exit/index.ts
+- Badge [export] — @tuix/ui/index.ts
+- Box [export] — @tuix/ui/index.ts
+- Button [export] — @tuix/ui/index.ts
+- Checkbox [export] — @tuix/ui/index.ts
+- Confirm [export] — @tuix/ui/index.ts
+- Divider [export] — @tuix/ui/index.ts
+- Flex [export] — @tuix/ui/index.ts
+- Form [export] — @tuix/ui/index.ts
+- Header [export] — @tuix/ui/index.ts
+- InteractiveLayout [export] — @tuix/ui/index.ts
+- Modal [export] — @tuix/ui/index.ts
+- Panel [export] — @tuix/ui/index.ts
+- ProgressBar [export] — @tuix/ui/index.ts
+- Radio [export] — @tuix/ui/index.ts
+- Select [export] — @tuix/ui/index.ts
+- StaticLayout [export] — @tuix/ui/index.ts
+- StatusIndicator [export] — @tuix/ui/index.ts
+- Table [export] — @tuix/ui/index.ts
+- Text [export] — @tuix/ui/index.ts
+- FieldConfig [interface] — @tuix/ui/stores/formStore.ts
+- FieldState [interface] — @tuix/ui/stores/formStore.ts
+- FormConfig [type] — @tuix/ui/stores/formStore.ts
+- FormErrors [type] — @tuix/ui/stores/formStore.ts
+- FormFields [type] — @tuix/ui/stores/formStore.ts
+- FormStore [interface] — @tuix/ui/stores/formStore.ts
+- FormValues [type] — @tuix/ui/stores/formStore.ts
+- Transformer [type] — @tuix/ui/stores/formStore.ts
+- Validator [type] — @tuix/ui/stores/formStore.ts
+- createFormStore [function] — @tuix/ui/stores/formStore.ts
+- formTransformers [const] — @tuix/ui/stores/formStore.ts
+- formValidators [const] — @tuix/ui/stores/formStore.ts
+- TextInputStore [interface] — @tuix/ui/stores/textInputStore.ts
+- TextInputStoreOptions [interface] — @tuix/ui/stores/textInputStore.ts
+- createTextInputStore [function] — @tuix/ui/stores/textInputStore.ts
+- transformers [const] — @tuix/ui/stores/textInputStore.ts
+- validators [const] — @tuix/ui/stores/textInputStore.ts
+- ScrollPosition [interface] — @tuix/ui/stores/viewportStore.ts
+- ViewportDimensions [interface] — @tuix/ui/stores/viewportStore.ts
+- ViewportStore [interface] — @tuix/ui/stores/viewportStore.ts
+- ViewportStoreOptions [interface] — @tuix/ui/stores/viewportStore.ts
+- createViewportStore [function] — @tuix/ui/stores/viewportStore.ts
+- scrollBehaviors [const] — @tuix/ui/stores/viewportStore.ts
+- getBackgroundColor [export] — @tuix/ui/theme/index.ts
+- getTextColor [export] — @tuix/ui/theme/index.ts
+- useUITheme [export] — @tuix/ui/theme/index.ts
+- ThemeVariant [type] — @tuix/ui/theme/useUITheme.ts
+- UITheme [interface] — @tuix/ui/theme/useUITheme.ts
+- getBackgroundColor [function] — @tuix/ui/theme/useUITheme.ts
+- getTextColor [function] — @tuix/ui/theme/useUITheme.ts
+- useUITheme [function] — @tuix/ui/theme/useUITheme.ts
+- clearError [function] — @tuix/ui/validation/helpers.ts
+- combine [function] — @tuix/ui/validation/helpers.ts
+- debounce [function] — @tuix/ui/validation/helpers.ts
+- getError [function] — @tuix/ui/validation/helpers.ts
+- hasErrors [function] — @tuix/ui/validation/helpers.ts
+- setError [function] — @tuix/ui/validation/helpers.ts
+- validate [function] — @tuix/ui/validation/helpers.ts
+- validateFields [function] — @tuix/ui/validation/helpers.ts
+- when [function] — @tuix/ui/validation/helpers.ts
+- ValidationRule [type] — @tuix/ui/validation/rules.ts
+- custom [function] — @tuix/ui/validation/rules.ts
+- email [function] — @tuix/ui/validation/rules.ts
+- integer [function] — @tuix/ui/validation/rules.ts
+- matches [function] — @tuix/ui/validation/rules.ts
+- max [function] — @tuix/ui/validation/rules.ts
+- maxLength [function] — @tuix/ui/validation/rules.ts
+- min [function] — @tuix/ui/validation/rules.ts
+- minLength [function] — @tuix/ui/validation/rules.ts
+- number [function] — @tuix/ui/validation/rules.ts
+- oneOf [function] — @tuix/ui/validation/rules.ts
+- pattern [function] — @tuix/ui/validation/rules.ts
+- required [function] — @tuix/ui/validation/rules.ts
+- url [function] — @tuix/ui/validation/rules.ts
+- CustomUpdateChecker [class] — @tuix/update/checker/custom.ts
+- createCustomChecker [function] — @tuix/update/checker/custom.ts
+- GitHubUpdateChecker [class] — @tuix/update/checker/github.ts
+- createGitHubChecker [function] — @tuix/update/checker/github.ts
+- NpmUpdateChecker [class] — @tuix/update/checker/npm.ts
+- createNpmChecker [function] — @tuix/update/checker/npm.ts
+- UpdateBanner [export] — @tuix/update/index.ts
+- Updater [export] — @tuix/update/index.ts
+- createCustomChecker [export] — @tuix/update/index.ts
+- createGitHubChecker [export] — @tuix/update/index.ts
+- createNpmChecker [export] — @tuix/update/index.ts
+- Updater [const] — @tuix/update/plugin/Updater.tsx
+- UpdaterModel [interface] — @tuix/update/plugin/Updater.tsx
+- UpdaterMsg [type] — @tuix/update/plugin/Updater.tsx
+- UpdaterProps [interface] — @tuix/update/plugin/Updater.tsx
+- BannerModel [interface] — @tuix/update/plugin/banner.tsx
+- BannerMsg [type] — @tuix/update/plugin/banner.tsx
+- BannerProps [interface] — @tuix/update/plugin/banner.tsx
+- UpdateBanner [const] — @tuix/update/plugin/banner.tsx
+- UpdateBanner [export] — @tuix/update/plugin/index.ts
+- Updater [export] — @tuix/update/plugin/index.ts
+- UpdateCheckResult [interface] — @tuix/update/types.ts
+- UpdateChecker [interface] — @tuix/update/types.ts
+- UpdateCheckerConfig [interface] — @tuix/update/types.ts
+- UpdateError [class] — @tuix/update/types.ts
+- UpdateNotificationConfig [interface] — @tuix/update/types.ts
+- VersionInfo [interface] — @tuix/update/types.ts
+- ComponentCoordinator [class] — @tuix/view/coordination/component-coordinator.ts
+- CoordinationError [class] — @tuix/view/coordination/component-coordinator.ts
+- CoordinationPattern [interface] — @tuix/view/coordination/component-coordinator.ts
+- CoordinationPatternNotFoundError [class] — @tuix/view/coordination/component-coordinator.ts
+- DataFlowPattern [const] — @tuix/view/coordination/component-coordinator.ts
+- MasterDetailPattern [const] — @tuix/view/coordination/component-coordinator.ts
+- spacer [export] — @tuix/view/index.ts
+- stringWidth [export] — @tuix/view/index.ts
+- BoxProps [interface] — @tuix/view/layout/box.ts
+- box [const] — @tuix/view/layout/box.ts
+- hbox [const] — @tuix/view/layout/box.ts
+- panel [const] — @tuix/view/layout/box.ts
+- styledBox [const] — @tuix/view/layout/box.ts
+- vbox [const] — @tuix/view/layout/box.ts
+- ConditionalSpacerOptions [interface] — @tuix/view/layout/dynamic-layout.ts
+- DynamicViewProps [interface] — @tuix/view/layout/dynamic-layout.ts
+- SpacerOptions [interface] — @tuix/view/layout/dynamic-layout.ts
+- conditionalSpacer [const] — @tuix/view/layout/dynamic-layout.ts
+- dynamicSpacer [const] — @tuix/view/layout/dynamic-layout.ts
+- dynamicVBox [const] — @tuix/view/layout/dynamic-layout.ts
+- fixedSpacer [const] — @tuix/view/layout/dynamic-layout.ts
+- formField [const] — @tuix/view/layout/dynamic-layout.ts
+- formSection [const] — @tuix/view/layout/dynamic-layout.ts
+- heightAwareContainer [const] — @tuix/view/layout/dynamic-layout.ts
+- paddedContainer [const] — @tuix/view/layout/dynamic-layout.ts
+- responsiveLayout [const] — @tuix/view/layout/dynamic-layout.ts
+- scrollableView [const] — @tuix/view/layout/dynamic-layout.ts
+- center [const] — @tuix/view/layout/flexbox.ts
+- flexbox [const] — @tuix/view/layout/flexbox.ts
+- hbox [const] — @tuix/view/layout/flexbox.ts
+- spread [const] — @tuix/view/layout/flexbox.ts
+- vbox [const] — @tuix/view/layout/flexbox.ts
+- columns [const] — @tuix/view/layout/grid.ts
+- grid [const] — @tuix/view/layout/grid.ts
+- gridItem [const] — @tuix/view/layout/grid.ts
+- span [const] — @tuix/view/layout/grid.ts
+- template [const] — @tuix/view/layout/grid.ts
+- hbox [export] — @tuix/view/layout/index.ts
+- panel [export] — @tuix/view/layout/index.ts
+- styledBox [export] — @tuix/view/layout/index.ts
+- vbox [export] — @tuix/view/layout/index.ts
+- Bottom [const] — @tuix/view/layout/join.ts
+- Center [const] — @tuix/view/layout/join.ts
+- JoinOptions [interface] — @tuix/view/layout/join.ts
+- Left [const] — @tuix/view/layout/join.ts
+- Position [type] — @tuix/view/layout/join.ts
+- Right [const] — @tuix/view/layout/join.ts
+- Top [const] — @tuix/view/layout/join.ts
+- joinGrid [const] — @tuix/view/layout/join.ts
+- joinHorizontal [const] — @tuix/view/layout/join.ts
+- joinHorizontalWithOptions [const] — @tuix/view/layout/join.ts
+- joinVertical [const] — @tuix/view/layout/join.ts
+- joinVerticalWithOptions [const] — @tuix/view/layout/join.ts
+- place [const] — @tuix/view/layout/join.ts
+- hbox [export] — @tuix/view/layout/positioning.ts
+- layered [const] — @tuix/view/layout/positioning.ts
+- positionedLayout [const] — @tuix/view/layout/positioning.ts
+- vbox [export] — @tuix/view/layout/positioning.ts
+- dashedDivider [const] — @tuix/view/layout/spacer.ts
+- divider [const] — @tuix/view/layout/spacer.ts
+- dottedDivider [const] — @tuix/view/layout/spacer.ts
+- doubleDivider [const] — @tuix/view/layout/spacer.ts
+- flexSpacer [const] — @tuix/view/layout/spacer.ts
+- hdivider [const] — @tuix/view/layout/spacer.ts
+- hspace [const] — @tuix/view/layout/spacer.ts
+- separated [const] — @tuix/view/layout/spacer.ts
+- spaced [const] — @tuix/view/layout/spacer.ts
+- spacer [const] — @tuix/view/layout/spacer.ts
+- thickDivider [const] — @tuix/view/layout/spacer.ts
+- vdivider [const] — @tuix/view/layout/spacer.ts
+- vspace [const] — @tuix/view/layout/spacer.ts
+- AlignItems [enum] — @tuix/view/layout/types.ts
+- DividerOrientation [enum] — @tuix/view/layout/types.ts
+- DividerProps [interface] — @tuix/view/layout/types.ts
+- FlexDirection [enum] — @tuix/view/layout/types.ts
+- FlexItem [interface] — @tuix/view/layout/types.ts
+- FlexWrap [enum] — @tuix/view/layout/types.ts
+- FlexboxProps [interface] — @tuix/view/layout/types.ts
+- GridItem [interface] — @tuix/view/layout/types.ts
+- GridPlacement [interface] — @tuix/view/layout/types.ts
+- GridProps [interface] — @tuix/view/layout/types.ts
+- GridTemplate [interface] — @tuix/view/layout/types.ts
+- GridTrack [type] — @tuix/view/layout/types.ts
+- JustifyContent [enum] — @tuix/view/layout/types.ts
+- LayoutRect [interface] — @tuix/view/layout/types.ts
+- LayoutResult [interface] — @tuix/view/layout/types.ts
+- SizeConstraints [interface] — @tuix/view/layout/types.ts
+- SpacerProps [interface] — @tuix/view/layout/types.ts
+- ComponentConfig [interface] — @tuix/view/lifecycle/lifecycle-manager.ts
+- ComponentError [class] — @tuix/view/lifecycle/lifecycle-manager.ts
+- ComponentLifecycleManager [class] — @tuix/view/lifecycle/lifecycle-manager.ts
+- ComponentMetrics [interface] — @tuix/view/lifecycle/lifecycle-manager.ts
+- ComponentNotFoundError [class] — @tuix/view/lifecycle/lifecycle-manager.ts
+- OptimizedRenderer [class] — @tuix/view/performance/optimized-renderer.ts
+- RenderError [class] — @tuix/view/performance/optimized-renderer.ts
+- RenderResult [interface] — @tuix/view/performance/optimized-renderer.ts
+- RenderingStats [interface] — @tuix/view/performance/optimized-renderer.ts
+- AppServices [interface] — @tuix/view/primitives/types.ts
+- RenderError [class] — @tuix/view/primitives/types.ts
+- View [interface] — @tuix/view/primitives/types.ts
+- blue [const] — @tuix/view/primitives/view.ts
+- bold [const] — @tuix/view/primitives/view.ts
+- box [const] — @tuix/view/primitives/view.ts
+- center [const] — @tuix/view/primitives/view.ts
+- createView [const] — @tuix/view/primitives/view.ts
+- cyan [const] — @tuix/view/primitives/view.ts
+- dim [const] — @tuix/view/primitives/view.ts
+- empty [const] — @tuix/view/primitives/view.ts
+- green [const] — @tuix/view/primitives/view.ts
+- hstack [const] — @tuix/view/primitives/view.ts
+- isView [const] — @tuix/view/primitives/view.ts
+- italic [const] — @tuix/view/primitives/view.ts
+- magenta [const] — @tuix/view/primitives/view.ts
+- measureView [const] — @tuix/view/primitives/view.ts
+- red [const] — @tuix/view/primitives/view.ts
+- renderView [const] — @tuix/view/primitives/view.ts
+- styled [const] — @tuix/view/primitives/view.ts
+- styledText [const] — @tuix/view/primitives/view.ts
+- text [const] — @tuix/view/primitives/view.ts
+- underline [const] — @tuix/view/primitives/view.ts
+- vstack [const] — @tuix/view/primitives/view.ts
+- white [const] — @tuix/view/primitives/view.ts
+- yellow [const] — @tuix/view/primitives/view.ts
+- padString [const] — @tuix/view/string/width.ts
+- stringWidth [const] — @tuix/view/string/width.ts
+- truncateString [const] — @tuix/view/string/width.ts
+- CacheEntry [interface] — @tuix/view/view-cache.ts
+- ViewCache [class] — @tuix/view/view-cache.ts
+- globalViewCache [const] — @tuix/view/view-cache.ts
+- memoizeRender [function] — @tuix/view/view-cache.ts
+
+## Files
+- @tuix/ansi/border/border.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./presets, ../types
+  - Summary: @ts-expect-error Testing invalid type
+- @tuix/ansi/border/index.ts
+  - Package: ansi
+  - Exports: border [named], borderPresets [named], borderStyle [named], getBorderFromStyle [named], hasSide [named], combineSides [named], removeSide [named], fromPattern [named], renderBox [named], BoxOptions [type], BorderSide [named]
+  - Imports: (none)
+  - Summary: Border System - Box drawing characters and utilities * * Provides various border styles and utilities for drawing boxes * and frames in the terminal.
+- @tuix/ansi/border/presets.ts
+  - Package: ansi
+  - Exports: border [const], Thin [const], Thick [const], Double [const], Rounded [const], Ascii [const], Dotted [const], Dashed [const], borderPresets [const]
+  - Imports: ../types, ../types
+  - Summary: Border Preset Definitions * * Pre-defined border styles and configurations.
+- @tuix/ansi/border/types.ts
+  - Package: ansi
+  - Exports: Border [interface], BorderSide [enum], BorderStyle [interface]
+  - Imports: ../color/types
+  - Summary: Border character set for drawing boxes
+- @tuix/ansi/border/utils.ts
+  - Package: ansi
+  - Exports: borderStyle [const], getBorderFromStyle [const], hasSide [const], combineSides [const], removeSide [const], fromPattern [const], BoxOptions [interface], renderBox [const]
+  - Imports: ../types, ../types, ./presets, ../core/width
+  - Summary: Border Utility Functions * * Helper functions for working with borders and border styles.
+- @tuix/ansi/color/color.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./def
+  - Summary: Color Class Tests
+- @tuix/ansi/color/convert.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./profile, ./utils
+  - Summary: Color Conversion Tests
+- @tuix/ansi/color/convert.ts
+  - Package: ansi
+  - Exports: RGB [type], ANSI_16_RGB [const], hexToRgb [function], colorToRgb [function], rgbToAnsi256 [function], rgbToAnsi [function], toAnsiSequence [function]
+  - Imports: effect, ./types, ./profile
+  - Summary: ANSI 16-color palette RGB values * Standard VGA colors used by terminals
+- @tuix/ansi/color/def.ts
+  - Package: ansi
+  - Exports: Color [class]
+  - Imports: ./utils, ./types
+  - Summary: Create a color from an ANSI code (0-15)
+- @tuix/ansi/color/index.ts
+  - Package: ansi
+  - Exports: colors [const], Colors [const], color [const], ColorProfile [named], detectColorProfile [named], toAnsiSequence [named], hexToRgb [named], rgbToAnsi256 [named], rgbToAnsi [named], colorToRgb [named], ANSI_16_RGB [named], RGB [type], parseColor [named], Color [named]
+  - Imports: ./utils, ./presets
+  - Summary: Defines colors, Colors, color, ColorProfile, detectColorProfile, toAnsiSequence, hexToRgb, rgbToAnsi256, rgbToAnsi, colorToRgb, ANSI_16_RGB, RGB, parseColor, Color.
+- @tuix/ansi/color/parse.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./parse, ./presets
+  - Summary: Color Parsing Tests
+- @tuix/ansi/color/parse.ts
+  - Package: ansi
+  - Exports: parseColor [function]
+  - Imports: ./types, ./presets, ./utils
+  - Summary: Color parsing utilities * Centralized place for parsing color values from various formats
+- @tuix/ansi/color/presets.ts
+  - Package: ansi
+  - Exports: black [const], red [const], green [const], yellow [const], blue [const], magenta [const], cyan [const], white [const], gray [const], brightRed [const], brightGreen [const], brightYellow [const], brightBlue [const], brightMagenta [const], brightCyan [const], brightWhite [const]
+  - Imports: ./utils
+  - Summary: Defines black, red, green, yellow, blue, magenta, cyan, white, gray, brightRed, brightGreen, brightYellow, brightBlue, brightMagenta, brightCyan, brightWhite.
+- @tuix/ansi/color/profile.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./profile
+  - Summary: Color Profile Detection Tests
+- @tuix/ansi/color/profile.ts
+  - Package: ansi
+  - Exports: ColorProfile [enum], detectColorProfile [const]
+  - Imports: (none)
+  - Summary: Terminal color profile enumeration
+- @tuix/ansi/color/schemas.ts
+  - Package: ansi
+  - Exports: ColorDefNoneSchema [const], ColorDefAnsi15Schema [const], ColorDefAnsi256Schema [const], ColorDefAnsiSchema [const], ColorDefHexSchema [const], ColorDefRGBSchema [const], ColorDefRawSchema [const], ColorDefAdaptiveSchema [const], ColorDefSchema [const], ColorDefAutoAnsiSchema [const]
+  - Imports: zod/v4
+  - Summary: Defines ColorDefNoneSchema, ColorDefAnsi15Schema, ColorDefAnsi256Schema, ColorDefAnsiSchema, ColorDefHexSchema, ColorDefRGBSchema, ColorDefRawSchema, ColorDefAdaptiveSchema, ColorDefSchema, ColorDefAutoAnsiSchema.
+- @tuix/ansi/color/types.ts
+  - Package: ansi
+  - Exports: ColorDefAnsi [type], ColorDefHex [type], ColorDefRGB [type], ColorDefNone [type], ColorDef [type], ColorRaw [type], ColorDefAdaptive [type], Color [type]
+  - Imports: zod/v4
+  - Summary: Defines ColorDefAnsi, ColorDefHex, ColorDefRGB, ColorDefNone, ColorDef, ColorRaw, ColorDefAdaptive, Color.
+- @tuix/ansi/color/utils.ts
+  - Package: ansi
+  - Exports: none [const], ansi [const], ansi256 [const], hex [const], rgb [const], adaptive [const], isVisible [const], blend [const], lighten [const], darken [const], gradient [const]
+  - Imports: ./schemas, ./types
+  - Summary: No color (transparent/default)
+- @tuix/ansi/core/codes.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./escape
+  - Summary: ANSI Codes Tests
+- @tuix/ansi/core/codes.ts
+  - Package: ansi
+  - Exports: ANSI_CODES [const], ANSICode [type], ANSISequence [type], getCode [function], isValidCode [function], fg256 [function], bg256 [function], fgRgb [function], bgRgb [function]
+  - Imports: (none)
+  - Summary: ANSI Escape Code Constants * * Comprehensive collection of ANSI SGR (Select Graphic Rendition) codes * for terminal text styling and control.
+- @tuix/ansi/core/core.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Test suite covering @tuix/ansi/core/core
+- @tuix/ansi/core/escape.ts
+  - Package: ansi
+  - Exports: escape [const], sequence [const], colorize [const], ANSI_CODES [named]
+  - Imports: ./codes
+  - Summary: Apply ANSI styling to text with automatic reset * * @param text - Text to colorize * @param code - ANSI code to apply * @param reset - ANSI code to reset with (defaults to 'reset') * @returns Styled text with ANSI codes * * @example * ```ts * colorize('Hello', 'bold') // '\u001b[1mHello\u001b[0m' * colorize('Error', 'red', 'reset') // '\u001b[31mError\u001b[0m' * ```
+- @tuix/ansi/core/index.ts
+  - Package: ansi
+  - Exports: stripAnsi [named], hasAnsi [named], countAnsi [named], extractAnsi [named], splitAnsiSegments [named], visualWidth [named], truncate [named], pad [named], escape [named], sequence [named], colorize [named], ANSI_CODES [named], getCode [named], isValidCode [named], fg256 [named], bg256 [named], fgRgb [named], bgRgb [named]
+  - Imports: (none)
+  - Summary: Defines stripAnsi, hasAnsi, countAnsi, extractAnsi, splitAnsiSegments, visualWidth, truncate, pad, escape, sequence, colorize, ANSI_CODES, getCode, isValidCode, fg256, bg256, fgRgb, bgRgb.
+- @tuix/ansi/core/strip.ts
+  - Package: ansi
+  - Exports: stripAnsi [const], hasAnsi [const], countAnsi [const], extractAnsi [const], splitAnsiSegments [const]
+  - Imports: (none)
+  - Summary: Defines stripAnsi, hasAnsi, countAnsi, extractAnsi, splitAnsiSegments.
+- @tuix/ansi/core/width.ts
+  - Package: ansi
+  - Exports: visualWidth [const], truncate [const], pad [const]
+  - Imports: ./strip
+  - Summary: Calculate the visual width of a string in terminal columns * * Uses Bun's native stringWidth for accurate emoji and wide character detection. * This ensures consistency across the codebase.
+- @tuix/ansi/effects/animations.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./pulse, ./shake, ./typewriter, ./wave, ./bounce, ../style
+  - Summary: Animation Effects Tests
+- @tuix/ansi/effects/bounce.ts
+  - Package: ansi
+  - Exports: createBounce [const]
+  - Imports: (none)
+  - Summary: Bounce Effects - Terminal UI bounce animation utilities * * Provides bounce effects for terminal UI applications.
+- @tuix/ansi/effects/glow.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./glow, ../color
+  - Summary: Glow Effects Tests
+- @tuix/ansi/effects/glow.ts
+  - Package: ansi
+  - Exports: GlowConfig [interface], createGlow [const]
+  - Imports: ../color
+  - Summary: Glow Effects - Terminal UI glow styling utilities * * Provides glow effects for terminal UI applications.
+- @tuix/ansi/effects/hologram.ts
+  - Package: ansi
+  - Exports: createHologramEffect [const]
+  - Imports: (none)
+  - Summary: Hologram Effects - Terminal UI hologram styling utilities * * Provides hologram effects for terminal UI applications.
+- @tuix/ansi/effects/index.ts
+  - Package: ansi
+  - Exports: createDropShadow [named], createInnerShadow [named], createGlow [named], generatePattern [named], applyPattern [named], applyLayerEffect [named], createPulse [named], createShake [named], createTypewriter [named], createWaveText [named], createRainbowText [named], createBounce [named], createNeonEffect [named], createMatrixEffect [named], createHologramEffect [named]
+  - Imports: (none)
+  - Summary: Advanced Styling Utilities - Extended styling capabilities * * Provides advanced styling effects for terminal UI applications including * shadows, glows, patterns, and special text effects. These utilities * complement the core styling system with visual enhancements. * * Key features: * - Shadow effects (drop shadow, inner shadow) * - Glow and highlight effects * - Pattern generation (dots, stripes, checkerboard) * - Complex border styles * - Special text effects
+- @tuix/ansi/effects/layer.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./layer
+  - Summary: Layer Effects Tests
+- @tuix/ansi/effects/layer.ts
+  - Package: ansi
+  - Exports: LayerEffect [interface], applyLayerEffect [const]
+  - Imports: ../color
+  - Summary: Layer Effects - Terminal UI layer compositing utilities * * Provides layer blending modes for terminal UI applications.
+- @tuix/ansi/effects/matrix.ts
+  - Package: ansi
+  - Exports: createMatrixEffect [const]
+  - Imports: (none)
+  - Summary: Matrix Effects - Terminal UI matrix animation utilities * * Provides matrix-style effects for terminal UI applications.
+- @tuix/ansi/effects/neon.ts
+  - Package: ansi
+  - Exports: createNeonEffect [const]
+  - Imports: ../color, ../style, ../color
+  - Summary: Neon Effects - Terminal UI neon styling utilities * * Provides neon effects for terminal UI applications.
+- @tuix/ansi/effects/pattern.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./pattern, ../color
+  - Summary: Pattern Effects Tests
+- @tuix/ansi/effects/pattern.ts
+  - Package: ansi
+  - Exports: PatternConfig [interface], generatePattern [const], applyPattern [const]
+  - Imports: ../color
+  - Summary: Pattern Effects - Terminal UI pattern styling utilities * * Provides pattern generation for terminal UI applications including * dots, stripes, checkerboard, and other patterns.
+- @tuix/ansi/effects/pulse.ts
+  - Package: ansi
+  - Exports: createPulse [const]
+  - Imports: ../style
+  - Summary: Pulse Effects - Terminal UI pulse animation utilities * * Provides pulse animation effects for terminal UI applications.
+- @tuix/ansi/effects/rainbow.ts
+  - Package: ansi
+  - Exports: createRainbowText [const]
+  - Imports: ../style, ../color
+  - Summary: Rainbow Text Effects - Terminal UI rainbow text styling utilities * * Provides rainbow text effects for terminal UI applications.
+- @tuix/ansi/effects/shadow.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./shadow, ../color
+  - Summary: Shadow Effects Tests
+- @tuix/ansi/effects/shadow.ts
+  - Package: ansi
+  - Exports: ShadowConfig [interface], createDropShadow [const], createInnerShadow [const]
+  - Imports: ../color
+  - Summary: Shadow Effects - Terminal UI shadow styling utilities * * Provides shadow effects for terminal UI applications including * drop shadows and inner shadows.
+- @tuix/ansi/effects/shake.ts
+  - Package: ansi
+  - Exports: createShake [const]
+  - Imports: (none)
+  - Summary: Shake Effects - Terminal UI shake animation utilities * * Provides shake effects for terminal UI applications.
+- @tuix/ansi/effects/special.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./rainbow, ./neon, ./matrix, ./hologram, ../color
+  - Summary: Special Effects Tests
+- @tuix/ansi/effects/typewriter.ts
+  - Package: ansi
+  - Exports: createTypewriter [const]
+  - Imports: (none)
+  - Summary: Typewriter Effects - Terminal UI typewriter animation utilities * * Provides typewriter effects for terminal UI applications.
+- @tuix/ansi/effects/wave.ts
+  - Package: ansi
+  - Exports: createWaveText [const]
+  - Imports: (none)
+  - Summary: Wave Text Effects - Terminal UI wave text animation utilities * * Provides wave text effects for terminal UI applications.
+- @tuix/ansi/gradient/gradient.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Test suite covering @tuix/ansi/gradient/gradient
+- @tuix/ansi/gradient/index.ts
+  - Package: ansi
+  - Exports: getGradientColor [const], TextGradientOptions [interface], textGradient [const], BackgroundGradientOptions [interface], backgroundGradient [const], createGradient [const], reverseGradient [const], rainbowGradient [const], sunsetGradient [const], oceanGradient [const]
+  - Imports: ../types, ../color/profile, ../color/convert
+  - Summary: Defines getGradientColor, TextGradientOptions, textGradient, BackgroundGradientOptions, backgroundGradient, createGradient, reverseGradient, rainbowGradient, sunsetGradient, oceanGradient.
+- @tuix/ansi/gradient/types.ts
+  - Package: ansi
+  - Exports: GradientStop [interface], GradientConfig [interface]
+  - Imports: ../color/types
+  - Summary: Gradient stop for color transitions
+- @tuix/ansi/index.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: (none)
+  - Summary: No description available.
+- @tuix/ansi/parser/index.ts
+  - Package: ansi
+  - Exports: StyledSegment [interface], parseStyledText [const], AnsiToken [interface], tokenizeAnsi [const]
+  - Imports: ../core/strip
+  - Summary: Defines StyledSegment, parseStyledText, AnsiToken, tokenizeAnsi.
+- @tuix/ansi/parser/parser.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./index
+  - Summary: Test suite covering @tuix/ansi/parser/parser
+- @tuix/ansi/render/index.ts
+  - Package: ansi
+  - Exports: buildDecorationSequence [const], renderStyled [const], renderStyledSync [const], renderLines [const], toAnsiStyleCode [const]
+  - Imports: ../types, ../types, ../border/utils, ../color/profile, ../color/convert, ../style, ../core/width, ../core/strip
+  - Summary: Convert style props to ANSI escape sequence
+- @tuix/ansi/render/render.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./index, ../style, ../color, ../color/profile
+  - Summary: Test suite covering @tuix/ansi/render/render
+- @tuix/ansi/render/types.ts
+  - Package: ansi
+  - Exports: RenderOptions [interface]
+  - Imports: ../color/profile
+  - Summary: Rendering options for styled content
+- @tuix/ansi/style/index.ts
+  - Package: ansi
+  - Exports: Style [class], style [const], fromProps [const], styles [const]
+  - Imports: effect
+  - Summary: Defines Style, style, fromProps, styles.
+- @tuix/ansi/style/style.test.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: bun:test, ./index, ../color
+  - Summary: Test suite covering @tuix/ansi/style/style
+- @tuix/ansi/style/types.ts
+  - Package: ansi
+  - Exports: StyleTransform [type], HorizontalAlign [type], VerticalAlign [type], StyleProps [interface]
+  - Imports: ../border/types, ../color/types
+  - Summary: Text transform function
+- @tuix/ansi/types.ts
+  - Package: ansi
+  - Exports: None
+  - Imports: (none)
+  - Summary: export * from "./core/types" // TODO: Create core/types.ts with ANSI_CODES
+- @tuix/bin/app.tsx
+  - Package: bin
+  - Exports: TuixApp [function]
+  - Imports: @tuix/jsx, ./commands/welcome, ./commands/version, ./commands/help, ./commands/dashboard
+  - Summary: TUIX CLI - Main application * * Dogfooding our own framework! 🐕
+- @tuix/bin/bin/tuix.ts
+  - Package: bin
+  - Exports: None
+  - Imports: @tuix/jsx, ../app
+  - Summary: TUIX CLI - Entry point * * The main entry point for the TUIX command-line interface.
+- @tuix/bin/commands/dashboard.tsx
+  - Package: bin
+  - Exports: DashboardCommand [function]
+  - Imports: @tuix/ui, @tuix/reactive, @tuix/themes
+  - Summary: TUIX CLI - Dashboard command * * System status dashboard with modern UI.
+- @tuix/bin/commands/help.tsx
+  - Package: bin
+  - Exports: HelpCommand [function]
+  - Imports: @tuix/docs, @tuix/docs, effect, ../app
+  - Summary: TUIX CLI - Help command * * Interactive help explorer using @tuix/docs.
+- @tuix/bin/commands/version.tsx
+  - Package: bin
+  - Exports: VersionCommand [function]
+  - Imports: @tuix/ui, @tuix/themes
+  - Summary: TUIX CLI - Version command * * Shows version information with modern UI.
+- @tuix/bin/commands/welcome.tsx
+  - Package: bin
+  - Exports: WelcomeScreen [function]
+  - Imports: @tuix/ui, @tuix/themes
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/bin/index.ts
+  - Package: bin
+  - Exports: TuixApp [named], WelcomeScreen [named], VersionCommand [named], HelpCommand [named], DashboardCommand [named]
+  - Imports: (none)
+  - Summary: @tuix/bin - TUIX CLI * * The official TUIX command-line interface.
+- @tuix/config/config.test.ts
+  - Package: config
+  - Exports: None
+  - Imports: bun:test, effect, ./index, ./types
+  - Summary: Set environment variable for testing
+- @tuix/config/constants.ts
+  - Package: config
+  - Exports: CONFIG_FILE_CONSTANTS [const], ENV_CONSTANTS [const], VALIDATION_CONSTANTS [const], LOADING_CONSTANTS [const], MERGE_CONSTANTS [const], SOURCE_CONSTANTS [const], TRANSFORM_CONSTANTS [const], JSX_CONFIG_CONSTANTS [const], ERROR_CONSTANTS [const], DEBUG_CONSTANTS [const], SCHEMA_CONSTANTS [const], PERFORMANCE_CONSTANTS [const]
+  - Imports: (none)
+  - Summary: Config module constants * * This file contains all constant values used throughout the config module. * Constants are grouped by functionality and follow the naming convention * of SCREAMING_SNAKE_CASE for immutable values.
+- @tuix/config/context/extension.ts
+  - Package: config
+  - Exports: ConfigContext [interface], createConfigContext [function]
+  - Imports: effect, ../types
+  - Summary: Context Extension for Config * * Extends the runtime context to include config API
+- @tuix/config/context/index.ts
+  - Package: config
+  - Exports: None
+  - Imports: (none)
+  - Summary: Config Context
+- @tuix/config/core/events.ts
+  - Package: config
+  - Exports: ConfigEvent [interface], ConfigValidationEvent [interface], ValidationError [interface], ConfigSchemaEvent [interface], ConfigDomainEvent [type], ConfigEventChannels [const], ConfigEventChannel [type]
+  - Imports: @tuix/reactive/events/event-bus
+  - Summary: Config Domain Event System * * Defines events for configuration loading, validation, and updates. * Enables reactive configuration management across the application.
+- @tuix/config/core/loader.ts
+  - Package: config
+  - Exports: JSONLoader [class], TypeScriptLoader [class], YAMLLoader [class], TOMLLoader [class], EnvLoader [class], default [default]
+  - Imports: path, ../types
+  - Summary: Configuration File Loaders * * Support for various configuration file formats
+- @tuix/config/core/module.ts
+  - Package: config
+  - Exports: ConfigData [interface], ConfigError [class], ConfigModule [class]
+  - Imports: effect, @tuix/core, @tuix/reactive/events/event-bus, ./events, ../../core/model/scope/types, ../../core/model/events/event-bus
+  - Summary: Config Module - Domain module for configuration management * * Manages application configuration with validation, schema support, * and reactive updates through the event system.
+- @tuix/config/index.ts
+  - Package: config
+  - Exports: ConfigLayer [const], config [const], templates [const], defineConfig [function], defineConfig [default], ConfigTag [named], ConfigPlugin [named], ConfigGet [named], ConfigSet [named], ConfigList [named], ConfigImport [named], ConfigExport [named]
+  - Imports: effect, ./types, ./sources/config, @tuix/config
+  - Summary: Tuix Configuration System * * Flexible, hierarchical configuration management with multiple sources
+- @tuix/config/jsxConfig.ts
+  - Package: config
+  - Exports: None
+  - Imports: (none)
+  - Summary: JSX Configuration Integration * * This file re-exports JSX config functionality from the jsx module * for backwards compatibility. New code should import directly from * '../jsx/config' instead. * * @deprecated Import from '../jsx/config' instead
+- @tuix/config/module.ts
+  - Package: config
+  - Exports: None
+  - Imports: (none)
+  - Summary: Config Module - Main export for config module * * Re-exports the config module implementation from the impl directory * following the established module structure pattern.
+- @tuix/config/plugin/Config.tsx
+  - Package: config
+  - Exports: ConfigProps [interface], Config [default]
+  - Imports: @tuix/jsx, ./commands/get, ./commands/set, ./commands/list, ./commands/import, ./commands/export
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/config/plugin/commands/export.tsx
+  - Package: config
+  - Exports: ConfigExportProps [interface], async [default]
+  - Imports: @tuix/jsx, effect, @tuix/storage, @tuix/core/services/live, ../../storage/formats
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/config/plugin/commands/get.tsx
+  - Package: config
+  - Exports: ConfigGetProps [interface], async [default]
+  - Imports: @tuix/jsx, effect, @tuix/storage, @tuix/core/services/live
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/config/plugin/commands/import.tsx
+  - Package: config
+  - Exports: ConfigImportProps [interface], async [default]
+  - Imports: @tuix/jsx, effect, @tuix/storage, @tuix/core/services/live, ../../storage/formats
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/config/plugin/commands/list.tsx
+  - Package: config
+  - Exports: ConfigListProps [interface], async [default]
+  - Imports: @tuix/jsx, effect, @tuix/storage, @tuix/core/services/live
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/config/plugin/commands/set.tsx
+  - Package: config
+  - Exports: ConfigSetProps [interface], async [default]
+  - Imports: @tuix/jsx, effect, @tuix/storage, @tuix/core/services/live
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/config/plugin/index.ts
+  - Package: config
+  - Exports: Config [named], ConfigGet [named], ConfigSet [named], ConfigList [named], ConfigImport [named], ConfigExport [named]
+  - Imports: (none)
+  - Summary: Config Plugin * * JSX plugin for configuration management
+- @tuix/config/schema.ts
+  - Package: config
+  - Exports: ConfigValue [type], ConfigObject [type], ConfigArray [type], ConfigSource [type], ConfigEntry [interface], ConfigSchema [interface], TuixConfig [interface], ConfigOptions [interface], Config [interface], ConfigFile [interface], PluginConfig [interface], ConfigLoader [interface], ConfigChangeEvent [interface], Config [const], ConfigBuilder [interface]
+  - Imports: zod, effect
+  - Summary: Configuration System Types * * Flexible configuration management with inheritance and validation
+- @tuix/config/sources/config.test.ts
+  - Package: config
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for config.ts
+- @tuix/config/sources/config.ts
+  - Package: config
+  - Exports: TuixConfig [class], TuixConfigBuilder [class], createConfig [function]
+  - Imports: zod, path, os, ../core/loader, ./utils
+  - Summary: Core Configuration Implementation * * Handles configuration loading, merging, and inheritance
+- @tuix/config/sources/utils.test.ts
+  - Package: config
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for utils.ts
+- @tuix/config/sources/utils.ts
+  - Package: config
+  - Exports: ConfigValue [type], ConfigObject [type], getValueByPath [function], setValueByPath [function], deleteValueByPath [function], mergeDeep [function], expandEnvVars [function], parseValue [function], toEnvFormat [function], validateConfig [function]
+  - Imports: path, fs
+  - Summary: Configuration Utilities * * Helper functions for configuration management
+- @tuix/config/storage/adapter.test.ts
+  - Package: config
+  - Exports: None
+  - Imports: bun:test, effect, ./adapter, @tuix/storage
+  - Summary: Storage Config Adapter Tests
+- @tuix/config/storage/adapter.ts
+  - Package: config
+  - Exports: StorageConfigAdapter [class], makeStorageConfig [const], StorageConfigLayer [const]
+  - Imports: effect, @tuix/storage, ../types
+  - Summary: Storage Adapter for Config * * Adapts @tuix/storage to provide configuration management
+- @tuix/config/storage/formats.ts
+  - Package: config
+  - Exports: ConfigFormat [type], detectFormat [function], parseJSON [function], serializeJSON [function], parseYAML [function], serializeYAML [function], parseTOML [function], serializeTOML [function], parseTypeScript [function], loadConfigFile [function], saveConfigFile [function]
+  - Imports: effect, ../types
+  - Summary: Configuration File Formats * * Parsers and serializers for different config file formats
+- @tuix/config/storage/index.ts
+  - Package: config
+  - Exports: None
+  - Imports: (none)
+  - Summary: Storage-backed Config * * Configuration management built on @tuix/storage
+- @tuix/config/types.ts
+  - Package: config
+  - Exports: Config [interface], Config [const], ConfigError [class], ConfigNotFoundError [class], ConfigValidationError [class], ConfigOptions [interface], ConfigSource [interface], TuixConfig [interface], ConfigFormat [type], ConfigLoader [interface]
+  - Imports: effect, zod
+  - Summary: Configuration System Types * * Type definitions for the configuration system
+- @tuix/coordination/choreography.test.ts
+  - Package: coordination
+  - Exports: None
+  - Imports: bun:test, effect, ./choreography, @tuix/process-manager/events, @tuix/logger/core/events
+  - Summary: Event Choreography Tests * * Tests for event choreography patterns and cross-module coordination
+- @tuix/coordination/choreography.ts
+  - Package: coordination
+  - Exports: EventChoreographer [class]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/runtime, @tuix/process-manager/events, @tuix/config/core/events, @tuix/logger/core/events, ./constants
+  - Summary: Event Choreography Patterns - Complex multi-module workflows * * Implements choreography patterns for coordinating events across * multiple domain modules without tight coupling.
+- @tuix/coordination/constants.ts
+  - Package: coordination
+  - Exports: STREAM_BATCH_SIZE [const], STREAM_BATCH_WINDOW [const], STREAM_THROTTLE_RATE [const], STREAM_THROTTLE_UNITS [const], STREAM_DEBOUNCE_DELAY [const], UI_UPDATE_BATCH_SIZE [const], UI_UPDATE_BATCH_WINDOW [const], DEFAULT_REPORTING_INTERVAL [const], MEMORY_METRICS_INTERVAL [const], METRICS_HISTORY_SIZE [const], PERCENTILE_VALUES [const], CIRCUIT_BREAKER_CHECK_INTERVAL [const], DEFAULT_CIRCUIT_BREAKER_THRESHOLD [const], DEFAULT_CIRCUIT_BREAKER_RESET_TIMEOUT [const], DEFAULT_CIRCUIT_BREAKER_HALF_OPEN_REQUESTS [const], DEFAULT_RETRY_MAX_ATTEMPTS [const], DEFAULT_RETRY_BASE_DELAY [const], DEFAULT_RETRY_MAX_DELAY [const], DEFAULT_WORKFLOW_TIMEOUT [const], DEFAULT_STEP_TIMEOUT [const], MAX_CONCURRENT_WORKFLOWS [const], WORKFLOW_CLEANUP_INTERVAL [const], DASHBOARD_UPDATE_INTERVAL [const], CLI_PREDICTION_DEBOUNCE [const], AUDIT_LOG_BATCH_SIZE [const], AUDIT_LOG_BATCH_WINDOW [const], EVENT_TYPES [const], MODULE_NAME [const], SUBMODULE_NAMES [const]
+  - Imports: effect
+  - Summary: Coordination Module Constants * * This file contains all constants used across the coordination module
+- @tuix/coordination/errorRecovery.test.ts
+  - Package: coordination
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/reactive/events/event-bus, @tuix/runtime, ./errorRecovery, ./types
+  - Summary: Error Recovery Tests * * Tests for error detection, pattern matching, and recovery strategies
+- @tuix/coordination/errorRecovery.ts
+  - Package: coordination
+  - Exports: ErrorRecoveryManager [class]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/runtime, @tuix/reactive/events/event-bus
+  - Summary: Error Recovery Manager - Advanced error handling and recovery * * Implements cross-module error detection, pattern matching, recovery * strategies, and circuit breakers for resilient system operation.
+- @tuix/coordination/errors.ts
+  - Package: coordination
+  - Exports: ChoreographyError [class], WorkflowError [class], StreamOptimizationError [class], CoordinationError [class], PatternError [class], PerformanceMonitorError [class], RecoveryError [class]
+  - Imports: (none)
+  - Summary: Coordination Module Error Definitions * * This file contains all error classes for the coordination module
+- @tuix/coordination/index.ts
+  - Package: coordination
+  - Exports: EventChoreographer [named], WorkflowOrchestrator [named], EventStreamOptimizer [named], PerformanceMonitor [named], ErrorRecoveryManager [named], IntegrationPatterns [named], CoordinationModule [named]
+  - Imports: (none)
+  - Summary: Coordination Module Exports * * Re-exports all coordination components for easy importing
+- @tuix/coordination/integrationPatterns.test.ts
+  - Package: coordination
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/reactive/events/event-bus, @tuix/runtime, ./integrationPatterns
+  - Summary: Integration Patterns Tests * * Tests for pre-built integration patterns
+- @tuix/coordination/integrationPatterns.ts
+  - Package: coordination
+  - Exports: PatternError [class], DashboardUpdateEvent [interface], CLIPredictionEvent [interface], AuditLogEvent [interface], IntegrationPatterns [class]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/reactive/events/event-bus, ./types
+  - Summary: Integration Patterns - Pre-built patterns for common integration scenarios * * Provides ready-to-use integration patterns for process monitoring, * interactive CLI, dynamic UI updates, and audit trails.
+- @tuix/coordination/module.ts
+  - Package: coordination
+  - Exports: CoordinationError [class], CoordinationConfig [interface], SystemHealth [interface], CoordinationModule [class]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/core, ./choreography, ./orchestrator, ./streamOptimizer, ./performanceMonitor, ./errorRecovery, ./integrationPatterns, ./errors
+  - Summary: Coordination Module - Main coordination module that brings everything together * * Integrates event choreography, workflow orchestration, stream optimization, * performance monitoring, error recovery, and integration patterns.
+- @tuix/coordination/orchestrator.test.ts
+  - Package: coordination
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/reactive/events/event-bus, @tuix/runtime, ./orchestrator, ./types
+  - Summary: Workflow Orchestration Tests * * Tests for workflow orchestration and step management
+- @tuix/coordination/orchestrator.ts
+  - Package: coordination
+  - Exports: WorkflowOrchestrator [class]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/core, ./choreography, ./types, ./constants, ./errors
+  - Summary: Workflow Orchestrator - High-level orchestration for complex workflows * * Manages complex multi-step workflows that span multiple modules, * with proper error handling, rollback, and state management.
+- @tuix/coordination/performanceMonitor.test.ts
+  - Package: coordination
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/reactive/events/event-bus, @tuix/runtime, ./performanceMonitor
+  - Summary: Performance Monitoring Tests * * Tests for performance metrics collection and reporting
+- @tuix/coordination/performanceMonitor.ts
+  - Package: coordination
+  - Exports: PerformanceReportEvent [interface], PerformanceMonitor [class]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/runtime, @tuix/reactive/events/event-bus
+  - Summary: Performance Monitor - Cross-module performance monitoring and metrics * * Tracks event throughput, response times, memory usage, and generates * comprehensive performance reports across all modules.
+- @tuix/coordination/streamOptimizer.test.ts
+  - Package: coordination
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/reactive/events/event-bus, @tuix/runtime, ./streamOptimizer
+  - Summary: Event Stream Optimization Tests * * Tests for event stream optimization techniques
+- @tuix/coordination/streamOptimizer.ts
+  - Package: coordination
+  - Exports: StreamOptimizationError [class], UIUpdateEvent [interface], RelevanceCriteria [interface], EventStreamOptimizer [class], OptimizationStats [interface]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/reactive/events/event-bus
+  - Summary: Event Stream Optimizer - Performance optimization for event streams * * Provides stream optimization techniques including buffering, batching, * throttling, deduplication, and smart filtering for high-frequency events.
+- @tuix/coordination/types.ts
+  - Package: coordination
+  - Exports: UIUpdateEvent [interface], NotificationEvent [interface], ConfigChangeNotificationEvent [interface], WorkflowConfig [interface], WorkflowStep [interface], RetryPolicy [interface], WorkflowInstance [interface], WorkflowStepInstance [interface], WorkflowResult [interface], RelevanceCriteria [interface], OptimizationStats [interface], PerformanceMetric [interface], ThroughputMetric [interface], ResponseTimeMetric [interface], MemoryUsageMetric [interface], PerformanceReport [interface], PerformanceReportEvent [interface], WorkflowMetrics [interface], ErrorPattern [interface], ErrorCondition [interface], ErrorIndicator [interface], RecoveryStrategy [interface], RecoveryConfig [type], RetryConfig [interface], FallbackConfig [interface], CircuitBreakConfig [interface], NotifyConfig [interface], CircuitBreaker [interface], ErrorStatistics [interface], ErrorDetectionEvent [interface], ErrorRecoveryEvent [interface], PatternHandle [interface], DashboardUpdateEvent [interface], CLIPredictionEvent [interface], AuditLogEvent [interface], CoordinationConfig [interface], SystemHealth [interface]
+  - Imports: effect, @tuix/reactive/events/event-bus
+  - Summary: Coordination Module Type Definitions * * This file contains all type definitions for the coordination module
+- @tuix/core/constants.ts
+  - Package: core
+  - Exports: CORE_CONSTANTS [const], VIEW_CONSTANTS [const], EVENT_CONSTANTS [const], SERVICE_CONSTANTS [const], TERMINAL_CONSTANTS [const], ERROR_CONSTANTS [const], DEBUG_CONSTANTS [const]
+  - Imports: (none)
+  - Summary: Core module constants * * This file contains all constant values used throughout the core module. * Constants are grouped by functionality and follow the naming convention * of SCREAMING_SNAKE_CASE for immutable values.
+- @tuix/core/context/component.test.ts
+  - Package: core
+  - Exports: None
+  - Imports: bun:test, effect
+  - Summary: Tests for Core Component Context
+- @tuix/core/context/component.ts
+  - Package: core
+  - Exports: ComponentContextValue [interface], ComponentContext [const], ComponentContextRef [const], useComponentContext [const], withComponentContext [function]
+  - Imports: effect
+  - Summary: Core Component Context * * Provides context for components to access MVU model and dispatch. * This is a core abstraction used by both JSX and CLI modules.
+- @tuix/core/context/index.ts
+  - Package: core
+  - Exports: ComponentContext [named], ComponentContextRef [named], useComponentContext [named], withComponentContext [named], ComponentContextValue [type]
+  - Imports: (none)
+  - Summary: Core Context Module * * Provides context abstractions for cross-cutting concerns * that need to be shared between different parts of the framework.
+- @tuix/core/errors.ts
+  - Package: core
+  - Exports: RuntimeInitializationError [class], ViewSystemError [class], LifecycleError [class], ServiceIntegrationError [class], EventSystemError [class], CoreErrors [const], CoreErrorType [type], failWithCoreError [const], catchCoreError [const]
+  - Imports: effect
+  - Summary: Core Module Error Definitions * * Centralized error types and factories for the core module. * All errors use tagged error patterns for proper Effect.ts integration.
+- @tuix/core/index.ts
+  - Package: core
+  - Exports: TerminalError [named], InputError [named], RenderError [named], StorageError [named], ConfigError [named], ComponentError [named], ApplicationError [named], ValidationError [named], ErrorUtils [named], withErrorBoundary [named], withRecovery [named], RecoveryStrategies [named], Effect [named], Context [named], Layer [named], Stream [named], Queue [named], Ref [named], Schema [named], ComponentContext [named], ComponentContextRef [named], useComponentContext [named], withComponentContext [named], ComponentContextValue [type]
+  - Imports: (none)
+  - Summary: @tuix/core - Foundation types, errors, constants, services, and context * * Provides the foundational building blocks for TUIX applications. * * @module core
+- @tuix/core/integration.test.ts
+  - Package: core
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/reactive/events/event-bus, @tuix/runtime
+  - Summary: Core Module Integration Tests * * Tests module boundaries and integration between core subsystems * according to STANDARDS.md requirements.
+- @tuix/core/module/base.ts
+  - Package: core
+  - Exports: ModuleState [type], ModuleError [class]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/reactive/events/event-bus, uuid
+  - Summary: @fileoverview This file defines the base class for all modules in the application. * It provides a common interface for module initialization, shutdown, and event handling, * ensuring a consistent lifecycle and interaction pattern across different parts of the system. * The `ModuleBase` class encapsulates common functionalities such as state management, * event emission, subscription management, and lifecycle hooks.
+- @tuix/core/module/registry.ts
+  - Package: core
+  - Exports: ModuleRegistry [class], RegistryStats [interface], getGlobalRegistry [function], resetGlobalRegistry [function]
+  - Imports: effect, ./base, @tuix/reactive/events/event-bus
+  - Summary: Module Registry - Central coordination for domain modules * * Manages the lifecycle and coordination of all domain modules * in the system, providing a unified interface for module interaction.
+- @tuix/core/services/events/types.ts
+  - Package: core
+  - Exports: ServiceEvent [interface], TerminalEvent [interface], InputEvent [interface], RenderEvent [interface], StorageEvent [interface], ServiceLayerEvent [type], ServiceEventChannels [const], ServiceEventChannel [type]
+  - Imports: @tuix/reactive/events/event-bus
+  - Summary: Service Layer Event System * * Defines events for service-level operations including terminal, input, * renderer, and storage services. These events enable coordination between * low-level services and higher-level modules.
+- @tuix/core/services/index.ts
+  - Package: core
+  - Exports: None
+  - Imports: (none)
+  - Summary: Core service interfaces and implementations * @module core/services
+- @tuix/core/services/input.ts
+  - Package: core
+  - Exports: InputService [class], KeyUtils [const], MouseUtils [const]
+  - Imports: effect, ../core/types
+  - Summary: Input Service - Keyboard, mouse, and terminal event handling * * This service manages all input events from the terminal, including keyboard * input with modifier keys, mouse events, and terminal resize events.
+- @tuix/core/services/live/index.ts
+  - Package: core
+  - Exports: LiveServices [const], TerminalServiceLive [named], InputServiceLive [named], RendererServiceLive [named], StorageServiceLive [named]
+  - Imports: effect, ./terminal, ./input, ./renderer, ./storage
+  - Summary: Live service layers for the tuix runtime. * * Provides ready-to-use Effect Layers that implement the core runtime services * (terminal, input, renderer, storage) and a convenience bundle that merges * them into a single layer for application bootstrap.
+- @tuix/core/services/live/input.test.ts
+  - Package: core
+  - Exports: None
+  - Imports: bun:test, effect, ./input, @tuix/input/keyboard
+  - Summary: Input Service Implementation Tests * * Tests for the BubbleTea-inspired input handling system
+- @tuix/core/services/live/input.ts
+  - Package: core
+  - Exports: InputServiceLive [const]
+  - Imports: effect, ../input, ../../types/errors, ../../types, @tuix/input/keyboard/keys
+  - Summary: Input Service Implementation V2 - Using BubbleTea-inspired key handling
+- @tuix/core/services/live/renderer.test.ts
+  - Package: core
+  - Exports: None
+  - Imports: bun:test, effect, ./renderer, ./terminal, @tuix/view/primitives/view
+  - Summary: Renderer Service Implementation Tests * * Tests for the double-buffered renderer with diff algorithm
+- @tuix/core/services/live/renderer.ts
+  - Package: core
+  - Exports: RendererServiceLive [const]
+  - Imports: effect, @tuix/ansi, @tuix/view/string/width, ../renderer, ../terminal, ../../../types/core, ../../types/errors, ../../../types/schemas, @tuix/ansi
+  - Summary: @since 1.0.0
+- @tuix/core/services/live/storage.ts
+  - Package: core
+  - Exports: None
+  - Imports: (none)
+  - Summary: Storage Service Implementation - Configuration and state persistence * * This module provides a comprehensive storage service for TUIX applications, * handling configuration files, application state, caching, and file operations. * * ## Features: * * ### State Management * - Persistent state storage with schema validation * - In-memory caching for performance * - Atomic state updates * * ### Configuration * - Application configuration with defaults * - Schema validation and type safety * - File watching for live updates * * ### Caching * - In-memory cache with TTL support * - Automatic expiration handling * - Cache statistics and monitoring * * ### File Operations * - Safe file reading/writing with backups * - JSON file handling with validation * - Directory management * * ### Transactions * - Atomic multi-file operations * - Rollback support on failure * - Backup and restore capabilities * * @module
+- @tuix/core/services/live/storage/cache.ts
+  - Package: core
+  - Exports: CacheStorage [class]
+  - Imports: effect, ../../../types/errors/base, zod
+  - Summary: Cache Storage Implementation * * Manages in-memory cache with TTL support
+- @tuix/core/services/live/storage/config.ts
+  - Package: core
+  - Exports: ConfigStorage [class]
+  - Imports: effect, ../../../types/errors/base, ../../storage, node:fs/promises, node:path, zod
+  - Summary: Configuration Storage Implementation * * Manages application configuration files
+- @tuix/core/services/live/storage/file.ts
+  - Package: core
+  - Exports: FileStorage [class]
+  - Imports: effect, ../../../types/errors/base, node:fs/promises, node:path, zod
+  - Summary: File Storage Operations * * Low-level file system operations
+- @tuix/core/services/live/storage/index.ts
+  - Package: core
+  - Exports: StorageServiceLive [const]
+  - Imports: effect, ../../storage, ./state, ./config, ./cache, ./file, ./transaction, node:path
+  - Summary: Storage Service Implementation * * Main storage service that combines all storage subsystems
+- @tuix/core/services/live/storage/state.ts
+  - Package: core
+  - Exports: StateStorage [class]
+  - Imports: effect, ../../../types/errors/base, node:fs/promises, node:path, zod
+  - Summary: State Storage Implementation * * Manages persistent state storage for applications
+- @tuix/core/services/live/storage/transaction.ts
+  - Package: core
+  - Exports: TransactionStorage [class]
+  - Imports: effect, ../../../types/errors/base, node:fs/promises
+  - Summary: Transaction Storage Implementation * * Manages atomic file operations with rollback support
+- @tuix/core/services/live/terminal.test.ts
+  - Package: core
+  - Exports: None
+  - Imports: bun:test, effect, ./terminal, ../terminal
+  - Summary: Terminal Service Implementation Tests * * Tests for the terminal service that handles low-level terminal operations
+- @tuix/core/services/live/terminal.ts
+  - Package: core
+  - Exports: TerminalServiceLive [const], TerminalServiceTest [const]
+  - Imports: effect, ../terminal, ../../types/errors, ../../types/schemas
+  - Summary: Terminal Service Implementation - Real terminal operations using Bun APIs
+- @tuix/core/services/module.ts
+  - Package: core
+  - Exports: ServiceError [class], ServiceModule [class]
+  - Imports: effect, ../module/base, @tuix/reactive/events/event-bus, ./events/types, @tuix/reactive/events/event-bus
+  - Summary: Service Module - Domain module for low-level service coordination * * Manages terminal, input, renderer, and storage services with event integration.
+- @tuix/core/services/renderer.ts
+  - Package: core
+  - Exports: RendererService [class], RenderUtils [const]
+  - Imports: effect, ../core/types
+  - Summary: Renderer Service - High-performance terminal rendering * * This service manages the rendering pipeline, including double buffering, * dirty region tracking, and efficient screen updates.
+- @tuix/core/services/storage.ts
+  - Package: core
+  - Exports: StorageService [class], StorageUtils [const]
+  - Imports: effect, zod, ../core/types
+  - Summary: Storage Service - Configuration and state persistence * * This service handles saving and loading application state, configuration, * and other persistent data using Bun's optimized file operations.
+- @tuix/core/services/terminal.ts
+  - Package: core
+  - Exports: TerminalService [class]
+  - Imports: effect, ../types
+  - Summary: Terminal Service - Low-level terminal operations and state management * * This service provides an abstraction over terminal operations, handling * ANSI escape sequences, terminal state, and cross-platform compatibility.
+- @tuix/core/types.ts
+  - Package: core
+  - Exports: None
+  - Imports: (none)
+  - Summary: Core Module Type Definitions * * Centralized type definitions for the core module, providing shared types * for the runtime, view system, lifecycle management, and cross-module integration.
+- @tuix/core/types/cli.ts
+  - Package: core
+  - Exports: CommandConfig [interface], CLIConfig [interface], ParsedArgs [interface]
+  - Imports: zod
+  - Summary: Core CLI Type definitions for TUIX framework
+- @tuix/core/types/common.ts
+  - Package: core
+  - Exports: ColorSchema [const], PositionSchema [const], SizeSchema [const], BoundsSchema [const], KeyTypeSchema [const], KeyEventSchema [const], MouseButtonSchema [const], MouseEventTypeSchema [const], MouseEventSchema [const], WindowSizeSchema [const], PaddingSchema [const], AlignSchema [const], VerticalAlignSchema [const], StyleSchema [const], BorderCharactersSchema [const], ViewSchema [const], ComponentSchema [const], AppOptionsSchema [const], ViewportSchema [const], TerminalCapabilitiesSchema [const], CLIOptionSchema [const], CLICommandSchema [const], CLIConfigSchema [const], ErrorCodeSchema [const], AppErrorSchema [const], ProcessStatusSchema [const], IPCChannelTypeSchema [const], ProcessConfigSchema [const], ProcessLogSchema [const], Color [type], Position [type], Size [type], Bounds [type], KeyType [type], MouseButton [type], MouseEventType [type], MouseEvent [type], WindowSize [type], Viewport [type], Padding [type], Align [type], VerticalAlign [type], Style [type], BorderCharacters [type], TerminalCapabilities [type], CLIOption [type], CLICommand [type], CLIConfig [type], ErrorCode [type], ProcessStatus [type], IPCChannelType [type], ProcessConfig [type], ProcessLog [type], validateKeyEvent [const], validateMouseEvent [const], validateStyle [const], validateCLIConfig [const], validateProcessConfig [const], parseKeyEvent [const], parseMouseEvent [const], parseStyle [const], parseCLIConfig [const], parseProcessConfig [const], KeyEvent [type]
+  - Imports: zod
+  - Summary: Common TUIX Core Types - Basic data structures and validation schemas * * This module provides fundamental data types used throughout the TUIX framework. * These are primarily for validation purposes but also serve as common interfaces * that can be shared between different parts of the system.
+- @tuix/core/types/core.ts
+  - Package: core
+  - Exports: Cmd [type], Sub [type], View [interface], Component [interface], AppOptions [interface], TerminalService [interface], InputService [interface], RendererService [interface], StorageService [interface], AppServices [type], ModelOf [type], MsgOf [type], Program [interface], RuntimeState [interface]
+  - Imports: effect, ./errors
+  - Summary: TUIX Core Types - Framework interfaces and definitions * * This module provides the core framework interfaces that define how * the TUIX application system works. These are the primary contracts * for components, services, and runtime state.
+- @tuix/core/types/errors/base.ts
+  - Package: core
+  - Exports: TerminalError [class], InputError [class], RenderError [class], StorageError [class], ConfigError [class], ComponentError [class], ApplicationError [class], ValidationError [class]
+  - Imports: effect
+  - Summary: Base Error Classes * * Core error types for the TUIX framework
+- @tuix/core/types/errors/boundary.ts
+  - Package: core
+  - Exports: ErrorBoundaryConfig [interface], withErrorBoundary [const], createComponentBoundary [const]
+  - Imports: effect, ./types, ./types
+  - Summary: Error Boundaries * * Component-level error isolation and fallback rendering
+- @tuix/core/types/errors/index.ts
+  - Package: core
+  - Exports: None
+  - Imports: (none)
+  - Summary: Error System * * Comprehensive error handling for TUIX applications
+- @tuix/core/types/errors/recovery.ts
+  - Package: core
+  - Exports: ErrorRecoveryStrategy [interface], RecoveryStrategies [const], withRecovery [const]
+  - Imports: effect, ./types
+  - Summary: Error Recovery Strategies * * Configurable strategies for handling and recovering from errors
+- @tuix/core/types/errors/types.ts
+  - Package: core
+  - Exports: AppError [type], isAppError [function], CriticalError [type], RecoverableError [type], isCriticalError [function], isRecoverableError [function], ErrorCategories [const], getErrorCategory [function]
+  - Imports: (none)
+  - Summary: Error Type Definitions and Guards * * Type aliases and utility functions for error handling
+- @tuix/core/types/errors/utils.ts
+  - Package: core
+  - Exports: ErrorUtils [const]
+  - Imports: effect, ./types, ./types, ./base
+  - Summary: Error Utilities * * Helper functions for error handling and debugging
+- @tuix/core/types/guards.ts
+  - Package: core
+  - Exports: UnknownRecord [type], UnknownFunction [type], UnknownAsyncFunction [type], hasProperty [function], isFunction [function], isAsyncFunction [function], isPlainObject [function], isArray [function], isString [function], isNumber [function], isBoolean [function], isNullish [function]
+  - Imports: (none)
+  - Summary: Type Guards for TUIX * * Provides type guard functions for runtime type checking
+- @tuix/core/types/index.ts
+  - Package: core
+  - Exports: None
+  - Imports: (none)
+  - Summary: Core Module Type Definitions * * Centralized type definitions for the core module, providing shared types * for the runtime, view system, lifecycle management, and cross-module integration.
+- @tuix/core/types/messages.ts
+  - Package: core
+  - Exports: SystemMsg [type], ComponentMsg [type]
+  - Imports: ./schemas
+  - Summary: Message Types for TUIX * * Defines system-level and component message types for the MVU pattern
+- @tuix/core/types/schemas.ts
+  - Package: core
+  - Exports: ColorSchema [const], PositionSchema [const], SizeSchema [const], BoundsSchema [const], KeyTypeSchema [const], KeyEventSchema [const], MouseButtonSchema [const], MouseEventTypeSchema [const], MouseEventSchema [const], WindowSizeSchema [const], PaddingSchema [const], AlignSchema [const], VerticalAlignSchema [const], StyleSchema [const], BorderCharactersSchema [const], ViewSchema [const], ComponentSchema [const], AppOptionsSchema [const], ViewportSchema [const], TerminalCapabilitiesSchema [const], CLIOptionSchema [const], CLICommandSchema [const], CLIConfigSchema [const], ErrorCodeSchema [const], AppErrorSchema [const], ProcessStatusSchema [const], IPCChannelTypeSchema [const], ProcessConfigSchema [const], ProcessLogSchema [const], Color [type], Position [type], Size [type], Bounds [type], KeyType [type], MouseButton [type], MouseEventType [type], MouseEvent [type], WindowSize [type], Viewport [type], Padding [type], Align [type], VerticalAlign [type], Style [type], BorderCharacters [type], TerminalCapabilities [type], CLIOption [type], CLICommand [type], CLIConfig [type], ErrorCode [type], ProcessStatus [type], IPCChannelType [type], ProcessConfig [type], ProcessLog [type], validateKeyEvent [const], validateMouseEvent [const], validateStyle [const], validateCLIConfig [const], validateProcessConfig [const], parseKeyEvent [const], parseMouseEvent [const], parseStyle [const], parseCLIConfig [const], parseProcessConfig [const], KeyEvent [type]
+  - Imports: zod
+  - Summary: Zod Schemas for TUIX Core Types - Comprehensive validation system * * This module provides a complete set of Zod schemas for runtime validation * and type inference across the TUIX framework. The schemas ensure data integrity * at runtime while providing excellent TypeScript integration through inference. * * ## Key Features: * * ### Type-Safe Validation * - Runtime validation with compile-time type inference * - Comprehensive input sanitization and constraint checking * - Composable schema definitions for complex data structures * * ### Framework Integration * - Schemas for all core TUIX types (views, components, styles) * - Input event validation (keyboard, mouse, resize) * - Configuration and error handling schemas * * ### CLI and Process Management * - Command-line interface configuration schemas * - Process management and IPC type definitions * - Plugin and hook system validation * * ### Validation Utilities * - Type guards for safe runtime checks * - Parse functions with detailed error reporting * - Utility functions for common validation patterns * * @example * ```typescript * import { KeyEventSchema, validateKeyEvent, parseKeyEvent } from './schemas' * * // Type guard usage * if (validateKeyEvent(unknownData)) { * // Now TypeScript knows it's a KeyEvent * console.log('Key pressed:', unknownData.key) * } * * // Parse with error handling * try { * const keyEvent = parseKeyEvent(rawInput) * handleKeyPress(keyEvent) * } catch (error) { * console.error('Invalid key event:', error.message) * } * * // Schema composition * const CustomComponentSchema = ComponentSchema.extend({ * customProp: z.string() * }) * ``` * * @module core/schemas
+- @tuix/core/types/values.ts
+  - Package: core
+  - Exports: JSONValue [type], EventHandler [type], EventEmitter [interface], ComponentProps [interface], Ref [interface], safeJsonParse [function], getProperty [function], createRef [function], memoize [function], createEventEmitter [function]
+  - Imports: ./guards
+  - Summary: Value Utilities for TUIX * * Provides utility types and functions for working with values
+- @tuix/debug/cli/index.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for cli/index.ts
+- @tuix/debug/cli/index.ts
+  - Package: debug
+  - Exports: None
+  - Imports: ../core/store
+  - Summary: Debug CLI Integration * * Provides debug mode support for CLI applications
+- @tuix/debug/constants.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for constants.ts
+- @tuix/debug/constants.ts
+  - Package: debug
+  - Exports: DEBUG_DEFAULTS [const], DEBUG_CATEGORIES [const], DEBUG_LEVELS [const], CATEGORY_ICONS [const], LEVEL_COLORS [const]
+  - Imports: (none)
+  - Summary: Debug Module Constants
+- @tuix/debug/core.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Store initial categories to restore after tests
+- @tuix/debug/core.ts
+  - Package: debug
+  - Exports: DebugEntry [interface], DebugCategory [interface], createDebugLogger [function], getDebugEntries [function], clearDebugEntries [function], getDebugCategories [function], setDebugEnabled [function], isDebugEnabled [function], scopeDebug [const], jsxDebug [const], cliDebug [const], renderDebug [const]
+  - Imports: effect
+  - Summary: Debug System * * Centralized debug logging that collects information for structured display
+- @tuix/debug/core/enabler.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for enabler.ts
+- @tuix/debug/core/enabler.ts
+  - Package: debug
+  - Exports: enableDebugMode [function], isDebugEnabled [function]
+  - Imports: ./patcher, ./store, ../constants
+  - Summary: Debug Mode Enabler
+- @tuix/debug/core/index.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for core/index.ts
+- @tuix/debug/core/index.ts
+  - Package: debug
+  - Exports: debugStore [named], debug [named], applyDebugPatches [named], enableDebugMode [named]
+  - Imports: (none)
+  - Summary: Core Debug Functionality
+- @tuix/debug/core/patcher.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for patcher.ts
+- @tuix/debug/core/patcher.ts
+  - Package: debug
+  - Exports: PatchOptions [interface], applyDebugPatches [function]
+  - Imports: ./store, @tuix/jsx/scope/manager, @tuix/jsx/scope/types, @tuix/core/types, @tuix/jsx/types, @tuix/logger/types, @tuix/logger/core/logger, ../constants
+  - Summary: Framework Patcher * * Patches framework internals to capture debug information
+- @tuix/debug/core/store.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for store.ts
+- @tuix/debug/core/store.ts
+  - Package: debug
+  - Exports: debugStore [const], debug [const]
+  - Imports: effect, ../types, ../constants
+  - Summary: Debug Store - Core state management
+- @tuix/debug/debug.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test, ./core/store
+  - Summary: includes "Debug events cleared" message
+- @tuix/debug/index.ts
+  - Package: debug
+  - Exports: debugStore [named], debug [named], DEBUG_DEFAULTS [named]
+  - Imports: (none)
+  - Summary: Debug Module * * Interactive debugging tools for tuix applications
+- @tuix/debug/jsx/components/DebugLogs.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugLogs.tsx
+- @tuix/debug/jsx/components/DebugLogs.tsx
+  - Package: debug
+  - Exports: DebugLogsProps [interface], DebugLogs [function], createDebugLog [function]
+  - Imports: @tuix/core, @tuix/ui, ../../core/store, ../../types, ../../constants, @tuix/jsx
+  - Summary: Create a filtered debug log view
+- @tuix/debug/jsx/components/DebugToolbar.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugToolbar.tsx
+- @tuix/debug/jsx/components/DebugToolbar.tsx
+  - Package: debug
+  - Exports: DebugToolbar [function]
+  - Imports: @tuix/ui, ../../types, @tuix/jsx
+  - Summary: Debug Toolbar Component * * Tab navigation toolbar
+- @tuix/debug/jsx/components/DebugWrapper.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugWrapper.tsx
+- @tuix/debug/jsx/components/DebugWrapper.tsx
+  - Package: debug
+  - Exports: DebugWrapper [function]
+  - Imports: @tuix/core, ../../core/store, ../stores/debugWrapperStore, effect, @tuix/ui, @tuix/jsx
+  - Summary: Use debug wrapper store for state management
+- @tuix/debug/jsx/components/EventList.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for EventList.tsx
+- @tuix/debug/jsx/components/EventList.tsx
+  - Package: debug
+  - Exports: EventList [named]
+  - Imports: (none)
+  - Summary: Event List Component * * Displays debug events in a scrollable list
+- @tuix/debug/jsx/components/LogsView.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for LogsView.tsx
+- @tuix/debug/jsx/components/LogsView.tsx
+  - Package: debug
+  - Exports: LogsView [function]
+  - Imports: @tuix/ui, @tuix/jsx
+  - Summary: Logs View Component * * Displays intercepted console logs in a scrollable view
+- @tuix/debug/jsx/components/OutputView.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for OutputView.tsx
+- @tuix/debug/jsx/components/OutputView.tsx
+  - Package: debug
+  - Exports: OutputView [function]
+  - Imports: @tuix/core
+  - Summary: Output View Component * * Displays intercepted stdout/stderr output
+- @tuix/debug/jsx/components/PerformanceView.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for PerformanceView.tsx
+- @tuix/debug/jsx/components/PerformanceView.tsx
+  - Package: debug
+  - Exports: PerformanceView [named]
+  - Imports: (none)
+  - Summary: Performance View Component * * Displays performance metrics
+- @tuix/debug/jsx/components/RichDebugInterface.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for RichDebugInterface.tsx
+- @tuix/debug/jsx/components/RichDebugInterface.tsx
+  - Package: debug
+  - Exports: RichDebugInterface [function]
+  - Imports: @tuix/core, @tuix/ui, ../../tea/DebugApp
+  - Summary: @ts-ignore
+- @tuix/debug/jsx/components/ScopeExplorer.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for ScopeExplorer.tsx
+- @tuix/debug/jsx/components/ScopeExplorer.tsx
+  - Package: debug
+  - Exports: ScopeExplorer [named]
+  - Imports: (none)
+  - Summary: Scope Explorer Component * * Displays registered scopes
+- @tuix/debug/jsx/components/StateInspector.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for StateInspector.tsx
+- @tuix/debug/jsx/components/StateInspector.tsx
+  - Package: debug
+  - Exports: StateInspector [function]
+  - Imports: @tuix/ui, @tuix/jsx
+  - Summary: State Inspector Component * * Displays application state
+- @tuix/debug/jsx/components/tabs/DebugConsole.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugConsole.tsx
+- @tuix/debug/jsx/components/tabs/DebugConsole.tsx
+  - Package: debug
+  - Exports: DebugConsole [function]
+  - Imports: @tuix/core, @tuix/ui, ../../../core/store, @tuix/jsx
+  - Summary: Debug Console Tab
+- @tuix/debug/jsx/components/tabs/DebugEvents.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugEvents.tsx
+- @tuix/debug/jsx/components/tabs/DebugEvents.tsx
+  - Package: debug
+  - Exports: DebugEvents [function]
+  - Imports: @tuix/core, @tuix/ui, ../../../core/store, ../../../constants, ../../../types, @tuix/jsx
+  - Summary: Debug Events Tab
+- @tuix/debug/jsx/components/tabs/DebugOverview.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugOverview.tsx
+- @tuix/debug/jsx/components/tabs/DebugOverview.tsx
+  - Package: debug
+  - Exports: DebugOverview [function]
+  - Imports: @tuix/core, @tuix/ui, ../../../core/store, @tuix/core, @tuix/jsx
+  - Summary: Debug Overview Tab
+- @tuix/debug/jsx/components/tabs/DebugPerformance.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugPerformance.tsx
+- @tuix/debug/jsx/components/tabs/DebugPerformance.tsx
+  - Package: debug
+  - Exports: DebugPerformance [function]
+  - Imports: @tuix/core, @tuix/ui, ../../../core/store, @tuix/jsx
+  - Summary: Debug Performance Tab
+- @tuix/debug/jsx/components/tabs/DebugRender.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugRender.tsx
+- @tuix/debug/jsx/components/tabs/DebugRender.tsx
+  - Package: debug
+  - Exports: DebugRender [function]
+  - Imports: @tuix/core, @tuix/ui, ../../../core/store, @tuix/jsx
+  - Summary: Debug Render Tab
+- @tuix/debug/jsx/components/tabs/DebugScopes.test.tsx
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugScopes.tsx
+- @tuix/debug/jsx/components/tabs/DebugScopes.tsx
+  - Package: debug
+  - Exports: DebugScopes [function]
+  - Imports: @tuix/core, @tuix/ui, ../../../core/store, @tuix/core, @tuix/jsx
+  - Summary: Debug Scopes Tab
+- @tuix/debug/jsx/index.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for jsx/index.ts
+- @tuix/debug/jsx/index.ts
+  - Package: debug
+  - Exports: DebugWrapper [named], DebugLogs [named], createDebugLog [named]
+  - Imports: (none)
+  - Summary: Debug JSX Components and Integration
+- @tuix/debug/jsx/stores/debugWrapperStore.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for debugWrapperStore.ts
+- @tuix/debug/jsx/stores/debugWrapperStore.ts
+  - Package: debug
+  - Exports: ExtendedDebugTab [type], DebugWrapperState [interface], debugWrapperStore [const]
+  - Imports: @tuix/reactive/runes, ../../types
+  - Summary: Debug Wrapper Store * * Manages state for the debug wrapper component including tabs, logs, and output
+- @tuix/debug/logger/transport.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for transport.ts
+- @tuix/debug/logger/transport.ts
+  - Package: debug
+  - Exports: DebugTransport [class]
+  - Imports: @tuix/logger/types, ../core/store, ../constants
+  - Summary: Debug Logger Transport * * Captures logger output for display in debug console
+- @tuix/debug/mvu/integration.ts
+  - Package: debug
+  - Exports: DebugModel [interface], DebugMsg [type], initDebugModel [const], updateDebug [const], DebugWrappedModel [interface], DebugWrappedMsg [type], isDebugMsg [const], wrapWithDebug [const], enableDebugIfNeeded [const]
+  - Imports: effect, @tuix/core/types, @tuix/view
+  - Summary: Debug MVU Integration * * Provides MVU-aware debug wrapping for applications
+- @tuix/debug/tea/DebugApp.test.ts
+  - Package: debug
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for DebugApp.ts
+- @tuix/debug/tea/DebugApp.ts
+  - Package: debug
+  - Exports: DebugModel [interface], DebugLog [interface], ViewTreeNode [interface], UpdateEvent [interface], ScopeInfo [interface], ComponentInfo [interface], PerformanceMetrics [interface], DebugMsg [type], DebugCommand [type], initDebugModel [const], updateDebugModel [const], viewDebugModel [const], debugSubscriptions [const], createDebugComponent [const]
+  - Imports: effect, @tuix/jsx/scope/manager, @tuix/reactive/events/event-bus, @tuix/core/types, @tuix/core/types, @tuix/jsx/types, ../jsx/components/RichDebugInterface
+  - Summary: TEA-based Debug Application * * Proper MVU architecture for the debug interface following TUIX patterns
+- @tuix/debug/types.ts
+  - Package: debug
+  - Exports: RenderTreeNode [interface], DebugEvent [interface], DebugState [interface], PerformanceMetric [interface], DebugConfig [interface], DebugTab [type], DebugHooks [interface]
+  - Imports: (none)
+  - Summary: Debug Module Type Definitions
+- @tuix/docs/explorer/HelpExplorer.tsx
+  - Package: docs
+  - Exports: HelpExplorerProps [interface], HelpExplorer [function]
+  - Imports: @tuix/reactive, ../types, ../generator/help-text, effect
+  - Summary: @tuix/docs - Interactive help explorer component * * Provides an interactive TUI for browsing command documentation.
+- @tuix/docs/explorer/index.ts
+  - Package: docs
+  - Exports: HelpExplorer [named]
+  - Imports: (none)
+  - Summary: @tuix/docs - Interactive help explorer
+- @tuix/docs/generator/from-jsx.test.ts
+  - Package: docs
+  - Exports: None
+  - Imports: bun:test, effect, ./from-jsx, ../types
+  - Summary: @tuix/docs - JSX extraction tests
+- @tuix/docs/generator/from-jsx.ts
+  - Package: docs
+  - Exports: extractCommandDoc [function], extractPluginDoc [function], extractAppDoc [function]
+  - Imports: effect, ../types
+  - Summary: @tuix/docs - Generate documentation from JSX components * * Extracts documentation from JSX Command and Plugin components.
+- @tuix/docs/generator/help-text.test.ts
+  - Package: docs
+  - Exports: None
+  - Imports: bun:test, effect, ./help-text, ../types
+  - Summary: @tuix/docs - Help text generation tests
+- @tuix/docs/generator/help-text.ts
+  - Package: docs
+  - Exports: generateCommandHelp [function], generateAppHelp [function]
+  - Imports: effect, ../types
+  - Summary: @tuix/docs - Help text generator * * Generate terminal help text from doc structures.
+- @tuix/docs/generator/index.ts
+  - Package: docs
+  - Exports: extractCommandDoc [named], extractPluginDoc [named], extractAppDoc [named], generateCommandMarkdown [named], generatePluginMarkdown [named], generateAppMarkdown [named], generateCommandHelp [named], generateAppHelp [named]
+  - Imports: (none)
+  - Summary: @tuix/docs - Documentation generators
+- @tuix/docs/generator/markdown.test.ts
+  - Package: docs
+  - Exports: None
+  - Imports: bun:test, effect, ./markdown, ../types
+  - Summary: @tuix/docs - Markdown generation tests
+- @tuix/docs/generator/markdown.ts
+  - Package: docs
+  - Exports: generateCommandMarkdown [function], generatePluginMarkdown [function], generateAppMarkdown [function]
+  - Imports: effect, ../types
+  - Summary: @tuix/docs - Markdown generator * * Generate markdown documentation from doc structures.
+- @tuix/docs/index.ts
+  - Package: docs
+  - Exports: extractCommandDoc [named], extractPluginDoc [named], extractAppDoc [named], generateCommandMarkdown [named], generatePluginMarkdown [named], generateAppMarkdown [named], generateCommandHelp [named], generateAppHelp [named], HelpExplorer [named]
+  - Imports: (none)
+  - Summary: @tuix/docs - Documentation generation and interactive help system * * Provides tools for generating documentation from JSX components * and an interactive help explorer for browsing commands. * * @example * ```tsx * import { extractAppDoc, generateAppMarkdown, HelpExplorer } from '@tuix/docs' * * // Extract docs from app * const docs = extractAppDoc(MyApp, 'myapp', '1.0.0') * * // Generate markdown * const markdown = generateAppMarkdown(docs) * * // Or use interactive explorer * function HelpCommand() { * return <HelpExplorer docs={docs} /> * } * ```
+- @tuix/docs/types.ts
+  - Package: docs
+  - Exports: CommandDoc [interface], ArgDoc [interface], OptionDoc [interface], ExampleDoc [interface], PluginDoc [interface], AppDoc [interface], DocGeneratorOptions [interface], DocError [interface]
+  - Imports: (none)
+  - Summary: @tuix/docs - Documentation types * * Types for documentation generation and help system.
+- @tuix/input/constants.ts
+  - Package: input
+  - Exports: DEFAULT_TAB_INDEX [const], PROGRAMMATIC_FOCUS_TAB_INDEX [const], MAX_FOCUS_TRAP_DEPTH [const], FOCUS_ANNOUNCEMENT_DELAY [const], DOUBLE_CLICK_THRESHOLD [const], DRAG_THRESHOLD [const], WHEEL_DELTA_MULTIPLIER [const], DEFAULT_Z_INDEX [const], KEY_REPEAT_INITIAL_DELAY [const], KEY_REPEAT_INTERVAL [const], COMMON_SHORTCUTS [const], SPECIAL_KEYS [const], MAX_MOUSE_HISTORY [const], MAX_PRESSED_KEYS [const], INPUT_EVENT_QUEUE_SIZE [const], MOUSE_MOVE_THROTTLE [const], RESIZE_DEBOUNCE [const], INPUT_PROCESSING_BUDGET [const]
+  - Imports: (none)
+  - Summary: Input Module Constants * * Shared constants for keyboard, mouse, and focus management.
+- @tuix/input/errors.ts
+  - Package: input
+  - Exports: ComponentNotFoundError [class], ComponentNotFocusableError [class], FocusTrapError [class], InvalidMouseCoordinatesError [class], HitTestError [class], KeyEventParseError [class], ShortcutConflictError [class], InputValidationError [class], InputStateError [class], FocusError [type], MouseError [type], KeyboardError [type], InputError [type]
+  - Imports: effect
+  - Summary: Input Module Error Definitions * * Error types and factories for the input module.
+- @tuix/input/focus/manager.test.ts
+  - Package: input
+  - Exports: None
+  - Imports: bun:test, effect, ./manager
+  - Summary: Focus Manager Tests
+- @tuix/input/focus/manager.ts
+  - Package: input
+  - Exports: FocusableComponent [interface], FocusService [interface], FocusService [const], FocusServiceLive [const], focusable [const], withFocus [const]
+  - Imports: effect
+  - Summary: Focus Service - Manages focus state and keyboard navigation * * Provides: * - Focus tracking across components * - Tab order management * - Focus trapping for modals/dialogs * - Keyboard shortcut registry * - Focus restoration
+- @tuix/input/index.ts
+  - Package: input
+  - Exports: // Focus errors
+  ComponentNotFoundError [named], ComponentNotFocusableError [named], FocusTrapError [named], // Mouse errors
+  InvalidMouseCoordinatesError [named], HitTestError [named], // Keyboard errors
+  KeyEventParseError [named], ShortcutConflictError [named], // General errors
+  InputValidationError [named], InputStateError [named], FocusService [named], FocusServiceLive [named], focusable [named], withFocus [named], HitTestService [named], HitTestServiceLive [named], createBounds [named], mouseEventHitsComponent [named], createHitTestService [named], MouseRouterService [named], MouseRouterServiceLive [named], clickHandler [named], pressReleaseHandler [named], coordinateHandler [named]
+  - Imports: (none)
+  - Summary: Core Input Module * * Provides comprehensive input handling for terminal applications, including * keyboard focus management, mouse interaction, and keyboard event processing. * * @module core/input
+- @tuix/input/keyboard/index.ts
+  - Package: input
+  - Exports: None
+  - Imports: (none)
+  - Summary: Keyboard handling * @module input/keyboard
+- @tuix/input/keyboard/keys.ts
+  - Package: input
+  - Exports: KeyType [enum], KeyEvent [interface], ANSI_SEQUENCES [const], getKeyName [function], parseChar [function], KeyUtils [const]
+  - Imports: (none)
+  - Summary: Key Types and Utilities - Comprehensive keyboard handling system * * This module provides a complete keyboard input handling system inspired by * BubbleTea's proven approach to terminal input processing. It handles ANSI * escape sequences, modifier keys, and provides utilities for key matching * and binding. * * ## Key Features: * * ### Comprehensive Key Coverage * - Regular characters (letters, numbers, symbols) * - Special keys (arrows, function keys, navigation) * - Modifier combinations (Ctrl, Alt, Shift, Meta) * - ANSI escape sequence parsing * * ### Cross-Platform Compatibility * - Handles various terminal emulator differences * - Consistent key naming across platforms * - Proper Unicode character support * * ### Developer-Friendly API * - Simple key matching utilities * - Pre-defined common key bindings * - Normalized key event structure * - Easy-to-use binding helpers * * ### Performance Optimized * - Fast ANSI sequence lookup with Map * - Efficient key name generation * - Minimal string allocations * * @example * ```typescript * import { KeyUtils, KeyType, parseChar } from './keys' * * // Key matching * if (KeyUtils.matches(event, 'ctrl+c', 'q')) { * // Handle quit * } * * // Create custom bindings * const saveBinding = KeyUtils.binding(['ctrl+s'], { * key: 'ctrl+s', * desc: 'save file' * }) * * // Parse character input * const keyEvent = parseChar('a', false, false, true) // Shift+A * ``` * * @module core/keys
+- @tuix/input/mouse/hitTest.test.ts
+  - Package: input
+  - Exports: None
+  - Imports: bun:test, effect, ../types
+  - Summary: Hit Test Service Tests
+- @tuix/input/mouse/hitTest.ts
+  - Package: input
+  - Exports: ComponentBounds [interface], MouseRegion [type], HitTestResult [interface], HitTestServiceInterface [interface], HitTestService [const], HitTestServiceLive [const], createBounds [const], mouseEventHitsComponent [const], createHitTestService [const]
+  - Imports: effect, ../types
+  - Summary: Hit Testing Service - Maps mouse coordinates to components * * This service maintains a registry of component bounds and provides * hit testing functionality to determine which component is at a given * mouse coordinate.
+- @tuix/input/mouse/router.test.ts
+  - Package: input
+  - Exports: None
+  - Imports: bun:test, effect, ./hitTest, ../types
+  - Summary: Mouse Router Service Tests
+- @tuix/input/mouse/router.ts
+  - Package: input
+  - Exports: ComponentMouseHandler [interface], MouseRoutingResult [interface], MouseRouterServiceInterface [interface], MouseRouterService [const], MouseRouterServiceLive [const], clickHandler [const], pressReleaseHandler [const], coordinateHandler [const]
+  - Imports: effect, ../types, ./hitTest
+  - Summary: Mouse Router Service - Routes mouse events to components * * This service coordinates between hit testing and component message routing. * It maintains a registry of components and their mouse handlers, performs * hit testing, and converts mouse events to component messages.
+- @tuix/input/types.ts
+  - Package: input
+  - Exports: MouseEventTypeSchema [const], MouseEventType [type], MouseButtonSchema [const], MouseButton [type], MouseEventSchema [const], MouseEvent [type], KeyEventTypeSchema [const], KeyEventType [type], KeyEventSchema [const], KeyEvent [type], FocusEventType [type], FocusDirection [type], FocusTrapMode [type], InputState [interface]
+  - Imports: zod
+  - Summary: Input Module Type Definitions * * Centralized type definitions for the input module, providing types * for keyboard, mouse, and focus management.
+- @tuix/jsx/app/Command.tsx
+  - Package: jsx
+  - Exports: CommandProps [interface], Command [function]
+  - Imports: ../scope/components, ../jsx-runtime, ../scope/types
+  - Summary: Command Component * * High-level component that creates a command scope for CLI commands
+- @tuix/jsx/app/Fallback.tsx
+  - Package: jsx
+  - Exports: FallbackProps [interface], Fallback [function]
+  - Imports: (none)
+  - Summary: Fallback Component * * Renders when no command matches the route. * If not provided, auto-generated help is shown instead.
+- @tuix/jsx/app/Plugin.tsx
+  - Package: jsx
+  - Exports: PluginProps [interface], Plugin [function]
+  - Imports: ../scope/components, ../jsx-runtime
+  - Summary: Plugin Component * * High-level component that creates a plugin scope for organizing related commands
+- @tuix/jsx/app/index.ts
+  - Package: jsx
+  - Exports: Command [named], CommandProps [type], Plugin [named], PluginProps [type], Fallback [named], FallbackProps [type], runApp [named], JSXComponent [type], JSXRunConfig [type]
+  - Imports: (none)
+  - Summary: @tuix/jsx/app - JSX components for CLI application structure * * This module provides the JSX versions of runtime primitives for building CLI apps. * * @module jsx/app
+- @tuix/jsx/app/runApp.ts
+  - Package: jsx
+  - Exports: JSXComponent [type], JSXRunConfig [interface], runApp [const]
+  - Imports: effect, @tuix/core/services, @tuix/view
+  - Summary: JSX Runtime Wrapper * * Provides a simple runApp function that wraps JSX components * into the MVU Component interface expected by the runtime.
+- @tuix/jsx/compiler/index.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: (none)
+  - Summary: JSX Compiler Module * * Compiles JSX components to MVU Components
+- @tuix/jsx/compiler/jsx-to-component.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test, effect
+  - Summary: Tests for JSX to MVU Component Compiler
+- @tuix/jsx/compiler/jsx-to-component.ts
+  - Package: jsx
+  - Exports: JSXComponent [type], CompiledComponent [interface], CompileOptions [interface], detectInteractive [function], extractModel [function], compileToComponent [function], createStatelessComponent [function]
+  - Imports: effect, @tuix/core/types
+  - Summary: JSX to MVU Component Compiler * * Converts JSX components into proper Component<Model, Msg> instances * that can be run by the MVU runtime
+- @tuix/jsx/compiler/runApp.ts
+  - Package: jsx
+  - Exports: JSXRunConfig [interface]
+  - Imports: effect, @tuix/runtime, @tuix/reactive, ./jsx-to-component, ./jsx-to-component
+  - Summary: New JSX runApp - Uses MVU Runtime * * This replaces the old direct-rendering runApp with one that: * 1. Compiles JSX to Component<Model, Msg> * 2. Detects if interactive (CLI vs TUI) * 3. Uses MVU runtime with hooks * 4. Integrates reactive state
+- @tuix/jsx/dev.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for dev.ts
+- @tuix/jsx/dev.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: (none)
+  - Summary: JSX Dev Runtime for src/ directory * * Re-exports the main runtime from the same directory
+- @tuix/jsx/events.ts
+  - Package: jsx
+  - Exports: InteractiveEventMap [interface], InteractiveMetadata [interface], ViewEvent [interface], attachMetadata [const], getMetadata [const], emitEvent [const]
+  - Imports: @tuix/core/types, effect
+  - Summary: Event bridge utilities for JSX interactive primitives
+- @tuix/jsx/index.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test, effect, ./index, ./scope/manager, @tuix/view/primitives/view
+  - Summary: JSX Runtime Tests * * Comprehensive tests for the JSX runtime system
+- @tuix/jsx/index.ts
+  - Package: jsx
+  - Exports: Command [named], Plugin [named], Fallback [named], CommandProps [type], PluginProps [type], FallbackProps [type], runApp [named], JSXComponent [type], JSXRunConfig [type], Scope [named], ScopeContent [named], ScopeFallback [named], ScopeProps [type], ScopeContentProps [type], ScopeFallbackProps [type], Effect [named]
+  - Imports: (none)
+  - Summary: @tuix/jsx - JSX Runtime for Terminal UIs * * Main exports for the JSX runtime system. * * @module jsx
+- @tuix/jsx/jsx-runtime.ts
+  - Package: jsx
+  - Exports: JSXElement [interface], JSXNode [type], jsx [function], jsxs [function], jsxDEV [function], render [function], Fragment [const], createElement [function], Element [interface], IntrinsicElements [interface], ElementChildrenAttribute [interface], pluginRegistry [const], registerPlugin [const], registerCommand [const], executeCommand [const], getScopeManager [const], JSXContext [const], config [named], templates [named]
+  - Imports: @tuix/core/types, @tuix/ansi, ./scope/manager, ./scope/components, ./scope/types, @tuix/config, @tuix/config/utils, fs/promises, path, effect, @tuix/core, @tuix/jsx/events, @tuix/debug, ./plugins
+  - Summary: JSX Runtime for CLI-KIT * * Enables JSX/TSX syntax for building terminal UIs * Uses React JSX transform with Svelte-inspired binding support
+- @tuix/jsx/parser/command.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test, ./command, zod, @tuix/core/types
+  - Summary: Command Parsing Tests
+- @tuix/jsx/parser/command.ts
+  - Package: jsx
+  - Exports: findCommand [function], getCommandOptionSchemas [function], getCommandArgSchemas [function]
+  - Imports: @tuix/core/types, zod
+  - Summary: Command Parsing Utilities
+- @tuix/jsx/parser/index.ts
+  - Package: jsx
+  - Exports: CLIParser [named], parseValue [named], addOptionValue [named], parseLongOption [named], parseShortOptions [named], findCommand [named], getCommandOptionSchemas [named], getCommandArgSchemas [named], validateAndTransform [named]
+  - Imports: (none)
+  - Summary: CLI Parser Module * * Type-safe command line argument parsing with Zod validation
+- @tuix/jsx/parser/options.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test, ./options
+  - Summary: Option Parsing Tests
+- @tuix/jsx/parser/options.ts
+  - Package: jsx
+  - Exports: parseLongOption [function], parseShortOptions [function]
+  - Imports: ./value
+  - Summary: Option Parsing Utilities
+- @tuix/jsx/parser/parser.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test, ./parser, zod, @tuix/core/types
+  - Summary: CLI Parser Tests
+- @tuix/jsx/parser/parser.ts
+  - Package: jsx
+  - Exports: CLIParser [class]
+  - Imports: zod, @tuix/core/types, ./types, ./value, ./options, ./command, ./schema
+  - Summary: Main CLI Parser Implementation
+- @tuix/jsx/parser/schema.ts
+  - Package: jsx
+  - Exports: validateAndTransform [function]
+  - Imports: zod, ./types
+  - Summary: Schema Validation for Parser
+- @tuix/jsx/parser/types.ts
+  - Package: jsx
+  - Exports: ParsedArgs [interface], ParserOptions [interface]
+  - Imports: @tuix/core/types
+  - Summary: Parser Types
+- @tuix/jsx/parser/value.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test, ./value
+  - Summary: Value Parsing Tests
+- @tuix/jsx/parser/value.ts
+  - Package: jsx
+  - Exports: parseValue [function], addOptionValue [function]
+  - Imports: (none)
+  - Summary: Value Parsing Utilities
+- @tuix/jsx/plugins/index.ts
+  - Package: jsx
+  - Exports: PluginRegistry [interface], PluginStore [const], pluginStore [const]
+  - Imports: effect
+  - Summary: Plugin Store for JSX Runtime * * Centralized management of declarative plugins and command registrations.
+- @tuix/jsx/scope/components/Command.tsx
+  - Package: jsx
+  - Exports: CommandProps [interface], Command [function]
+  - Imports: ./Scope, ../stores, @tuix/jsx, ../types
+  - Summary: Command Component * * High-level component that creates a command scope for CLI commands
+- @tuix/jsx/scope/components/Plugin.tsx
+  - Package: jsx
+  - Exports: PluginProps [interface], Plugin [function]
+  - Imports: ./Scope, ../stores, @tuix/jsx
+  - Summary: Plugin Component * * High-level component that creates a plugin scope for organizing related commands
+- @tuix/jsx/scope/components/Scope.tsx
+  - Package: jsx
+  - Exports: ScopeProps [interface], Scope [function]
+  - Imports: effect, @tuix/jsx, @tuix/reactive/jsx-lifecycle, @tuix/reactive/runes, ../manager, ../types, ../stores, @tuix/jsx, ./ScopeFallback
+  - Summary: Scope Component * * Core component that manages scope lifecycle and determines what to render
+- @tuix/jsx/scope/components/ScopeContent.tsx
+  - Package: jsx
+  - Exports: ScopeContentProps [interface], ScopeContent [function]
+  - Imports: effect, @tuix/reactive/jsx-lifecycle, ../manager, ../stores, @tuix/jsx
+  - Summary: ScopeContent Component * * Renders content when the parent scope is active. * Marks the scope as having rendered content.
+- @tuix/jsx/scope/components/ScopeDebugOverlay.tsx
+  - Package: jsx
+  - Exports: renderScopeDebugOverlay [function], withScopeDebugOverlay [function]
+  - Imports: effect, ../../manager, @tuix/view/primitives/view, @tuix/ansi, @tuix/core/types, ../../../../services, ../../../../services
+  - Summary: ScopeDebugOverlay Component * * Renders a visual overlay showing the scope tree and execution path * Designed to be superimposed on top of the actual command output
+- @tuix/jsx/scope/components/ScopeDebugView.tsx
+  - Package: jsx
+  - Exports: ScopeDebugView [function]
+  - Imports: effect, ../../manager, @tuix/view/primitives/view, @tuix/ansi, @tuix/core/types, ../types, @tuix/core/debug, @tuix/core/services, @tuix/core/services
+  - Summary: ScopeDebugView Component * * Renders a tree view of all registered scopes for debugging purposes. * Shows activation status, render status, and hierarchy.
+- @tuix/jsx/scope/components/ScopeFallback.tsx
+  - Package: jsx
+  - Exports: ScopeFallbackProps [interface], ScopeFallback [function]
+  - Imports: ../../manager, @tuix/jsx, @tuix/jsx
+  - Summary: ScopeFallback Component * * Renders when scope is active but no ScopeContent will render. * This is where help text typically appears.
+- @tuix/jsx/scope/components/ScopeProvider.tsx
+  - Package: jsx
+  - Exports: ScopeProviderProps [interface], ScopeProvider [function]
+  - Imports: @tuix/jsx, ../stores, ../types
+  - Summary: ScopeProvider Component * * Internal component that provides scope context to children. * This allows children to know their parent scope even though they're evaluated first.
+- @tuix/jsx/scope/components/Scoped.tsx
+  - Package: jsx
+  - Exports: ScopedProps [interface], Scoped [function]
+  - Imports: ../stores, ../manager, @tuix/jsx
+  - Summary: Scoped Component * * Wrapper that only renders children if within an active scope
+- @tuix/jsx/scope/components/Unscoped.tsx
+  - Package: jsx
+  - Exports: UnscopedProps [interface], Unscoped [function]
+  - Imports: ../../../jsx/runtime
+  - Summary: Unscoped Component * * Wrapper that renders children outside of scope tracking. * Useful for content that should always render regardless of scope.
+- @tuix/jsx/scope/components/index.ts
+  - Package: jsx
+  - Exports: Scope [named], ScopeProps [type], ScopeContent [named], ScopeContentProps [type], ScopeFallback [named], ScopeFallbackProps [type], Scoped [named], ScopedProps [type], Unscoped [named], UnscopedProps [type], Plugin [named], PluginProps [type], Command [named], CommandProps [type]
+  - Imports: (none)
+  - Summary: Scope JSX Components * * Components for scope management and lifecycle
+- @tuix/jsx/scope/hooks/index.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: (none)
+  - Summary: Scope Hooks * * Re-exports all scope-related hooks for JSX components
+- @tuix/jsx/scope/hooks/use-scope.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test, effect, ../../manager, @tuix/reactive/jsx-lifecycle, ../types
+  - Summary: Scope JSX Hooks Tests * * Tests for the scope system JSX integration hooks including: * - useScope hook for registering scopes in components * - useActiveScope for tracking active scope * - useScopeContext for accessing scope context * - Lifecycle integration with onMount/onDestroy * - Reactive scope updates * - Parent-child scope relationships * - Error handling in hooks
+- @tuix/jsx/scope/hooks/use-scope.ts
+  - Package: jsx
+  - Exports: useScope [function], useCurrentScope [function], useParentScope [function], useScopeLifecycle [function], useActivateScope [function], useDeactivateScope [function], useChildScopes [function], useIsScopeActive [function], scopeStack [const]
+  - Imports: effect, @tuix/reactive/jsx-lifecycle, ../../manager, ../stores, ../types
+  - Summary: Scope Hooks for JSX Integration * * Provides React-like hooks for working with the scope system in JSX components. * These hooks abstract the ScopeManager and provide a clean API for scope operations.
+- @tuix/jsx/scope/manager.test.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: bun:test, effect, ./manager, ./types
+  - Summary: Scope Manager Tests * * Comprehensive tests for the scope management system including: * - Scope registration and removal * - Scope hierarchy and parent-child relationships * - Scope activation and deactivation * - Path-based scope matching
+- @tuix/jsx/scope/manager.ts
+  - Package: jsx
+  - Exports: ScopeManager [class], ScopeError [class], scopeManager [const], setScopeDef [const], markScopeRendered [const], hasRenderedContent [const]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/core, @tuix/debug
+  - Summary: Scope Manager * * Central manager for all scope operations. * Handles registration, activation, status tracking, and hierarchy management.
+- @tuix/jsx/scope/stores/activeRoute.store.ts
+  - Package: jsx
+  - Exports: ActiveRoute [interface], activeRouteStore [const], useActiveRoute [function], useRouteMatch [function], useNavigate [function]
+  - Imports: @tuix/reactive/runes
+  - Summary: Active Route Store * * Manages the currently active command route parsed from Bun.argv or changed programmatically. * This is the "URL" equivalent for CLI routing - starts from argv, can be changed reactively.
+- @tuix/jsx/scope/stores/currentScope.store.ts
+  - Package: jsx
+  - Exports: currentScopeStore [const], useCurrentScope [function]
+  - Imports: @tuix/reactive/runes, ../types
+  - Summary: Current scope store - tracks last registered scope for parent-child linking
+- @tuix/jsx/scope/stores/index.ts
+  - Package: jsx
+  - Exports: None
+  - Imports: (none)
+  - Summary: Scope Stores * * Re-exports all scope-related stores and helpers.
+- @tuix/jsx/scope/stores/parentScope.store.ts
+  - Package: jsx
+  - Exports: parentScopeStore [const], useParentScope [function]
+  - Imports: @tuix/reactive/runes, ../manager, ../types, ./currentScope.store
+  - Summary: Parent scope store (derived from current)
+- @tuix/jsx/scope/stores/rootScope.store.ts
+  - Package: jsx
+  - Exports: rootScopeStore [const], useRootScope [function]
+  - Imports: ../manager, ../types, ./currentScope.store
+  - Summary: Root scope store (derived by walking up parents)
+- @tuix/jsx/scope/stores/scopeStack.store.ts
+  - Package: jsx
+  - Exports: scopeStackStore [const]
+  - Imports: ../types
+  - Summary: Scope Stack Store * * Maintains a stack of scopes during JSX evaluation to correctly establish * parent-child relationships despite children being evaluated before parents
+- @tuix/jsx/scope/types.ts
+  - Package: jsx
+  - Exports: ScopeDef [interface], ScopeStatus [type], ScopeState [interface], ScopeError [class], ScopeNotFoundError [class], ScopeExistsError [class], ScopeContext [interface], ArgDef [interface], FlagDef [interface], OptionDef [interface], Handler [interface], ParsedArgs [interface], ExitCode [type], ExecutionError [class], CommandTree [interface], CommandNode [interface], Effect [named]
+  - Imports: effect
+  - Summary: Core Scope Types * * Defines the fundamental types for the scope management system
+- @tuix/logger/components/LiveLogDashboard.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for LiveLogDashboard.ts
+- @tuix/logger/components/LiveLogDashboard.ts
+  - Package: logger
+  - Exports: LiveLogDashboard [function], ProcessLogView [function]
+  - Imports: @tuix/view, @tuix/ansi, ./LogComponents, @tuix/logger/types, @tuix/process-manager/types, ../core/presets, ../core/presets
+  - Summary: Live Log Dashboard with Filtering * * Advanced log dashboard with real-time updates, filtering, and preset support
+- @tuix/logger/components/LogComponents.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for LogComponents.ts
+- @tuix/logger/components/LogComponents.ts
+  - Package: logger
+  - Exports: LEVEL_COLORS [const], LEVEL_EMOJIS [const], LEVEL_ANSI [const], ANSI [const], LogLevelText [function], LogMessage [function], LogError [function], LogMetadata [function], PrettyLogEntry [function], logUtils [const]
+  - Imports: @tuix/view, @tuix/ansi, @tuix/logger/types
+  - Summary: Logger UI Components * * Reusable components for displaying logs with proper formatting and colors
+- @tuix/logger/components/LogExplorer.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for LogExplorer.ts
+- @tuix/logger/components/LogExplorer.ts
+  - Package: logger
+  - Exports: LogExplorer [function]
+  - Imports: effect, @tuix/view, @tuix/ansi, @tuix/logger/types
+  - Summary: Interactive Log Explorer Component * * Rich, interactive log viewer with expandable JSON trees
+- @tuix/logger/constants.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for constants.ts
+- @tuix/logger/constants.ts
+  - Package: logger
+  - Exports: LOG_LEVEL_CONSTANTS [const], TRANSPORT_CONSTANTS [const], FORMATTER_CONSTANTS [const], FILE_TRANSPORT_CONSTANTS [const], CONSOLE_TRANSPORT_CONSTANTS [const], HTTP_TRANSPORT_CONSTANTS [const], PERFORMANCE_CONSTANTS [const], CONTEXT_CONSTANTS [const], ERROR_CONSTANTS [const], STRUCTURED_LOG_CONSTANTS [const], DEBUG_CONSTANTS [const], SECURITY_CONSTANTS [const], BUN_CONSTANTS [const], COMPONENT_CONSTANTS [const]
+  - Imports: (none)
+  - Summary: Logger module constants * * This file contains all constant values used throughout the logger module. * Constants are grouped by functionality and follow the naming convention * of SCREAMING_SNAKE_CASE for immutable values.
+- @tuix/logger/core/bun-logger.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for bun-logger.ts
+- @tuix/logger/core/bun-logger.ts
+  - Package: logger
+  - Exports: BunLogger [interface], BunLogger [const], createBunDevelopmentLogger [const], createBunProductionLogger [const], createBunConsoleLogger [const]
+  - Imports: effect, ../types, ../types, ../transports/bun-transports
+  - Summary: Bun-native Logger with Effect.ts integration * * High-performance logging using Bun's native capabilities and Effect patterns
+- @tuix/logger/core/events.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for events.ts
+- @tuix/logger/core/events.ts
+  - Package: logger
+  - Exports: LogEvent [interface], LogTransportEvent [interface], LogFilterEvent [interface], LogFilterCriteria [interface], LogRotationEvent [interface], LoggerEvent [type], LoggerEventChannels [const], LoggerEventChannel [type]
+  - Imports: @tuix/reactive/events/event-bus
+  - Summary: Logger Event System * * Defines events for logging operations, transport management, * and log aggregation across the application.
+- @tuix/logger/core/logger.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for logger.ts
+- @tuix/logger/core/logger.ts
+  - Package: logger
+  - Exports: TuixLogger [class], makeLoggerLayer [const], LoggerQueue [interface], LoggerQueue [const], makeQueuedLoggerLayer [const], setGlobalLogger [const], getGlobalLogger [const], log [const], withLoggerContext [const]
+  - Imports: effect, os, ../types
+  - Summary: Core Logger Implementation * * Effect-based logger with rich features
+- @tuix/logger/core/module.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for module.ts
+- @tuix/logger/core/module.ts
+  - Package: logger
+  - Exports: LogTransport [interface], LogEntry [interface], LoggerError [class], LoggerModule [class]
+  - Imports: effect, @tuix/core, @tuix/reactive/events/event-bus, ./events, @tuix/process-manager/events
+  - Summary: Logger Module - Domain module for centralized logging * * Manages log aggregation, filtering, transport management, * and integration with all other modules via the event system.
+- @tuix/logger/core/presets.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for presets.ts
+- @tuix/logger/core/presets.ts
+  - Package: logger
+  - Exports: LogFilter [interface], LOG_PRESETS [const], applyPreset [function], matchesFilter [function], getAvailablePresets [function], createFilter [function], quickFilters [const]
+  - Imports: ./types, ../process-manager/types
+  - Summary: Log Filter Presets * * Common filtering scenarios for easier log management
+- @tuix/logger/formatters/formatters.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for formatters.ts
+- @tuix/logger/formatters/formatters.ts
+  - Package: logger
+  - Exports: PrettyFormatter [class], JSONFormatter [class], CompactFormatter [class], CLIFormatter [class]
+  - Imports: ./types, @tuix/ansi
+  - Summary: Log Formatters * * Various formatters for different output styles
+- @tuix/logger/formatters/index.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/logger/formatters/index.ts
+  - Package: logger
+  - Exports: None
+  - Imports: (none)
+  - Summary: Log Formatters * * Export all formatters
+- @tuix/logger/index.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test, effect
+  - Summary: Create a custom transport that captures messages
+- @tuix/logger/index.ts
+  - Package: logger
+  - Exports: createConsoleLogger [const], createProductionLogger [const], createDevelopmentLogger [const], createCLILogger [const], createRemoteLogger [const], LoggerUtils [const], LogExplorer [named], LiveLogDashboard [named], ProcessLogView [named], LoggerPlugin [named], log [named], withLoggerContext [named], setGlobalLogger [named], getGlobalLogger [named]
+  - Imports: effect, ./types, ./core/logger
+  - Summary: Logger Module * * A powerful, flexible logging system for tuix applications
+- @tuix/logger/module.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for module.ts
+- @tuix/logger/module.ts
+  - Package: logger
+  - Exports: None
+  - Imports: (none)
+  - Summary: Logger Module - Main export for logger module * * Re-exports the logger module implementation from the impl directory * following the established module structure pattern.
+- @tuix/logger/plugin/Logger.tsx
+  - Package: logger
+  - Exports: LoggerProps [interface], Logger [function], Logger [default]
+  - Imports: @tuix/jsx
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/logger/plugin/index.ts
+  - Package: logger
+  - Exports: Logger [named], default [named]
+  - Imports: (none)
+  - Summary: Logger Plugin
+- @tuix/logger/transports/bun-transports.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for bun-transports.ts
+- @tuix/logger/transports/bun-transports.ts
+  - Package: logger
+  - Exports: BunConsoleTransport [class], BunFileTransport [class], BunHttpTransport [class], BunStreamTransport [class], createBunTransport [const]
+  - Imports: effect, path, ./types, ./formatters
+  - Summary: Bun-native Log Transports with Effect.ts integration * * High-performance logging using Bun's native APIs and streams
+- @tuix/logger/transports/transports.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for transports.ts
+- @tuix/logger/transports/transports.ts
+  - Package: logger
+  - Exports: ConsoleTransport [class], FileTransport [class], StreamTransport [class], HttpTransport [class], TUITransport [class]
+  - Imports: effect, fs, path, zlib, util, ../types, ../formatters/formatters
+  - Summary: Log Transports * * Various transports for outputting logs
+- @tuix/logger/types.test.ts
+  - Package: logger
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for types.ts
+- @tuix/logger/types.ts
+  - Package: logger
+  - Exports: LogLevel [type], LogLevels [const], LogEntry [interface], LogFormatter [interface], LogTransport [interface], LoggerConfig [interface], Logger [interface], InteractiveLogEntry [interface], InteractiveLogRenderer [interface], LogRotationConfig [interface], StructuredLogFormat [interface], SpanContext [interface], TransportOptions [interface], ConsoleTransportOptions [interface], FileTransportOptions [interface], StreamTransportOptions [interface], HttpTransportOptions [interface], Serializers [type], defaultSerializers [const], Logger [const], LoggerConfig [const], InteractiveLogRenderer [const]
+  - Imports: effect
+  - Summary: Logger Types and Interfaces * * Core types for the tuix logging system
+- @tuix/platform/index.ts
+  - Package: platform
+  - Exports: PLATFORM_VERSION [const]
+  - Imports: (none)
+  - Summary: @tuix/platform - Platform Services * * Provides core platform services for terminal I/O, input handling, * rendering, and storage operations. * * @module platform
+- @tuix/process-manager/bun-fs.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for bun-fs.ts
+- @tuix/process-manager/bun-fs.ts
+  - Package: process-manager
+  - Exports: exists [const], ensureDir [const], readText [const], writeText [const], appendText [const], readJSON [const], writeJSON [const], listDir [const], remove [const], removeDir [const], killProcess [const], processExists [const], resolvePath [const], getAbsolutePath [const]
+  - Imports: effect, path
+  - Summary: Bun-native file system utilities with Effect.ts integration
+- @tuix/process-manager/components/ProcessMonitor.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for ProcessMonitor.ts
+- @tuix/process-manager/components/ProcessMonitor.ts
+  - Package: process-manager
+  - Exports: ProcessMonitor [function]
+  - Imports: effect, @tuix/view, @tuix/ansi, @tuix/process-manager/manager
+  - Summary: Process Monitor Component * * Interactive TUI for monitoring and managing processes
+- @tuix/process-manager/components/ProcessStatusView.test.tsx
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for ProcessStatusView.tsx
+- @tuix/process-manager/components/ProcessStatusView.tsx
+  - Package: process-manager
+  - Exports: ProcessStatusViewProps [interface], ProcessStatusView [const]
+  - Imports: @tuix/ui/components
+  - Summary: Process Status View Component * * Displays the status of a process with visual indicators
+- @tuix/process-manager/components/streams/index.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/process-manager/components/streams/index.ts
+  - Package: process-manager
+  - Exports: StreamProps [interface], StreamComponent [function], PipeProps [interface], PipeComponent [function], TransformProps [interface], TransformComponent [function], StreamBoxProps [interface], StreamBoxComponent [function], fromArray [function], poll [function], fromEventEmitter [function], timer [function], random [function], Stream [const], Pipe [const], Transform [const], StreamBox [const]
+  - Imports: effect, @tuix/core/types, @tuix/view, @tuix/jsx/runtime, @tuix/ansi, @tuix/reactive/runes
+  - Summary: Stream Components for Tuix * * Powerful stream handling with Effect.ts integration for terminal UIs * Uses Svelte 5 runes for reactive state management
+- @tuix/process-manager/components/streams/spawn.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for spawn.ts
+- @tuix/process-manager/components/streams/spawn.ts
+  - Package: process-manager
+  - Exports: SpawnProps [interface], SpawnComponent [function], ManagedSpawnProps [interface], ManagedSpawnComponent [function], CommandPipelineProps [interface], CommandPipelineComponent [function], Spawn [const], ManagedSpawn [const], CommandPipeline [const]
+  - Imports: effect, bun, @tuix/jsx/runtime, @tuix/process-manager/manager
+  - Summary: Spawn Component - Execute processes and stream their output * * Integrates with Process Manager and Stream components for powerful * process execution with real-time output streaming
+- @tuix/process-manager/constants.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for constants.ts
+- @tuix/process-manager/constants.ts
+  - Package: process-manager
+  - Exports: PROCESS_CONSTANTS [const], STREAM_CONSTANTS [const], MONITORING_CONSTANTS [const], SIGNAL_CONSTANTS [const], FILE_SYSTEM_CONSTANTS [const], ENVIRONMENT_CONSTANTS [const], IPC_CONSTANTS [const], ERROR_CONSTANTS [const], PERFORMANCE_CONSTANTS [const], BUN_CONSTANTS [const], COMPONENT_CONSTANTS [const], SECURITY_CONSTANTS [const], DEBUG_CONSTANTS [const], TEMPLATE_CONSTANTS [const]
+  - Imports: (none)
+  - Summary: Process Manager module constants * * This file contains all constant values used throughout the process-manager module. * Constants are grouped by functionality and follow the naming convention * of SCREAMING_SNAKE_CASE for immutable values.
+- @tuix/process-manager/doctor.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for doctor.ts
+- @tuix/process-manager/doctor.ts
+  - Package: process-manager
+  - Exports: ProcessDoctor [class]
+  - Imports: ./manager, bun, path
+  - Summary: Process Manager Doctor * * Diagnose and fix common process management issues
+- @tuix/process-manager/events.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for events.ts
+- @tuix/process-manager/events.ts
+  - Package: process-manager
+  - Exports: ProcessConfig [interface], ProcessEvent [interface], ProcessOutputEvent [interface], ProcessHealthEvent [interface], HealthMetrics [interface], ProcessGroupEvent [interface], ProcessManagerEvent [type], ProcessEventChannels [const], ProcessEventChannel [type]
+  - Imports: @tuix/reactive/events/event-bus
+  - Summary: Process Manager Event System * * Defines events for process lifecycle, output, and health monitoring. * Enables reactive process management and coordination.
+- @tuix/process-manager/index.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/process-manager/index.ts
+  - Package: process-manager
+  - Exports: ProcessHandle [interface], ProcessMetrics [interface], ProcessLogs [interface], ProcessManagerService [interface], ProcessManager [const], ProcessManagerLive [const], ProcessManagerClass [named], setupManagedProcess [named], ProcessMonitor [named], ProcessManagerPlugin [named], ProcessManagerModule [named]
+  - Imports: effect
+  - Summary: Process Manager Module * * Effect-based process management service
+- @tuix/process-manager/manager.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test, effect, ./index, ./types
+  - Summary: Give it a moment to start
+- @tuix/process-manager/manager.ts
+  - Package: process-manager
+  - Exports: ProcessManager [class], setupManagedProcess [function], ProcessManager [default]
+  - Imports: bun, path, fs, ./types, @tuix/logger/types, effect
+  - Summary: Native Bun IPC Process Manager * * This implementation uses Bun's built-in IPC for direct communication with spawned processes. * No wrapper processes needed - much faster, more reliable, and lower overhead. * * Key Benefits: * - 336x faster startup (measured vs wrapper-based) * - 50% less memory (no wrapper processes) * - 90% less IPC code (Bun handles it) * - Instant status (no timeouts) * - Zero orphaned processes * * Architecture: * Manager -> Bun.spawn() -> Child Process * <-- Native IPC -->
+- @tuix/process-manager/module.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for module.ts
+- @tuix/process-manager/module.ts
+  - Package: process-manager
+  - Exports: ProcessHandle [interface], ProcessError [class], ProcessManagerModule [class]
+  - Imports: effect, @tuix/runtime, @tuix/core, ./events, @tuix/core
+  - Summary: Process Manager Module - Domain module for process lifecycle management * * Manages spawning, monitoring, and controlling external processes * with health checks and automatic restarts.
+- @tuix/process-manager/plugin/ProcessManager.tsx
+  - Package: process-manager
+  - Exports: ProcessManagerProps [interface], ProcessManager [function], ProcessManager [default]
+  - Imports: @tuix/jsx, ./commands
+  - Summary: @jsxImportSource @tuix/jsx
+- @tuix/process-manager/plugin/commands/index.ts
+  - Package: process-manager
+  - Exports: PMList [named], PMStatus [named]
+  - Imports: (none)
+  - Summary: Process Manager Commands
+- @tuix/process-manager/plugin/commands/list.tsx
+  - Package: process-manager
+  - Exports: PMListProps [interface], PMList [function]
+  - Imports: @tuix/ui, @tuix/view, ../../manager, effect
+  - Summary: PM List Command - Show all processes
+- @tuix/process-manager/plugin/commands/status.tsx
+  - Package: process-manager
+  - Exports: PMStatusProps [interface], PMStatus [function]
+  - Imports: @tuix/ui, @tuix/view, ../../manager
+  - Summary: PM Status Command - Show detailed process status
+- @tuix/process-manager/plugin/index.ts
+  - Package: process-manager
+  - Exports: ProcessManager [named], default [named]
+  - Imports: (none)
+  - Summary: Process Manager Plugin
+- @tuix/process-manager/templates.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for templates.ts
+- @tuix/process-manager/templates.ts
+  - Package: process-manager
+  - Exports: devServerTemplate [const], apiServerTemplate [const], workerTemplate [const], databaseTemplate [const], buildWatcherTemplate [const], testRunnerTemplate [const], websocketTemplate [const], scheduledJobTemplate [const], createConfig [function]
+  - Imports: ./types
+  - Summary: Process Configuration Templates * * Common patterns for different types of processes
+- @tuix/process-manager/types.test.ts
+  - Package: process-manager
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for types.ts
+- @tuix/process-manager/types.ts
+  - Package: process-manager
+  - Exports: ProcessConfig [interface], ProcessState [interface], ProcessStatus [type], ProcessLog [interface], ProcessStats [interface], HealthCheckConfig [interface], HealthStatus [interface], ProcessManagerConfig [interface], ProcessEvent [interface], ProcessManagerStats [interface], ProcessGroup [interface], ProcessDependency [interface], DoctorReport [interface], DoctorIssue [interface], OrphanedProcess [interface], RunawayProcess [interface], DoctorFix [interface], ProcessManager [const], ProcessManager [interface]
+  - Imports: effect, @tuix/logger/types
+  - Summary: Process Manager Types * * Core types for the process management system with Effect integration
+- @tuix/reactive/events/channels.test.ts
+  - Package: reactive
+  - Exports: None
+  - Imports: bun:test
+  - Summary: @vitest-environment happy-dom
+- @tuix/reactive/events/channels.ts
+  - Package: reactive
+  - Exports: CoreEventChannels [const], JSXEventChannels [const], CLIEventChannels [const], ServiceEventChannels [const], EventChannel [type]
+  - Imports: (none)
+  - Summary: Event Channel Constants * * Centralized definition of all event channel names to prevent circular dependencies * between domain modules while maintaining type safety.
+- @tuix/reactive/events/event-bus.test.ts
+  - Package: reactive
+  - Exports: None
+  - Imports: bun:test, effect, ./event-bus
+  - Summary: Unit tests for the EventBus
+- @tuix/reactive/events/event-bus.ts
+  - Package: reactive
+  - Exports: BaseEvent [interface], generateId [function], EventHandler [type], EventBus [class], EventBusStats [interface], createEventChannel [function], getGlobalEventBus [function], resetGlobalEventBus [function]
+  - Imports: effect
+  - Summary: Event Bus - Core infrastructure for domain event communication * * Provides a typed, Effect-based event bus for inter-module communication * without direct coupling between domains.
+- @tuix/reactive/events/index.ts
+  - Package: reactive
+  - Exports: None
+  - Imports: (none)
+  - Summary: Event bus and domain events * @module core/model/events
+- @tuix/reactive/index.ts
+  - Package: reactive
+  - Exports: $state [named], $derived [named], $effect [named], isStateRune [named], isBindableRune [named]
+  - Imports: (none)
+  - Summary: @tuix/reactive - Reactivity System * * Svelte-like runes, scope management, and event bus for TUIX applications. * * @module reactive
+- @tuix/reactive/runes/components/reactive-component.ts
+  - Package: reactive
+  - Exports: ReactiveComponent [interface], ReactiveComponentManager [class], createReactiveComponent [function], useReactiveState [function], useEventEmitter [function], useReactiveDerived [function]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/runtime/scope/types, @tuix/core/types/core
+  - Summary: Reactive Component System for TUIX * * Provides event-driven reactivity for TUIX components using: * - Svelte 5 Runes for state management * - Effect.ts for async operations * - EventBus for component communication * - Scope system for hierarchical context
+- @tuix/reactive/runes/events.ts
+  - Package: reactive
+  - Exports: BaseReactivityEvent [interface], RuneEvent [interface], LifecycleEvent [interface], StateEvent [interface], EffectEvent [interface], DerivedEvent [interface], ReactivityEvent [type], ReactivityEventChannels [const], ReactivityEventChannel [type], RuneHandle [interface]
+  - Imports: (none)
+  - Summary: Reactivity Domain Event System * * Defines events for Svelte 5 runes and reactive state management. * These events track state changes, lifecycle hooks, and reactive dependencies.
+- @tuix/reactive/runes/index.ts
+  - Package: reactive
+  - Exports: None
+  - Imports: (none)
+  - Summary: Core reactivity system * @module core/update/reactivity
+- @tuix/reactive/runes/jsx-lifecycle.ts
+  - Package: reactive
+  - Exports: initComponent [function], cleanupComponent [function], onMount [function], onDestroy [function], beforeUpdate [function], afterUpdate [function], untrack [function], withLifecycle [function], getLifecyclePhases [function]
+  - Imports: effect, ../core/types
+  - Summary: JSX Component Lifecycle with Runes * * Implements a clean, predictable lifecycle system inspired by Svelte 5: * 1. Component initialization (runs once) * 2. $effect.pre() - Before DOM updates * 3. DOM updates * 4. $effect() - After DOM updates * 5. onMount() - After first DOM update * 6. tick() - Await next update cycle * 7. onDestroy() - Cleanup * * In our terminal UI context: * - "DOM" = Terminal render * - "Updates" = View re-renders * * Design Philosophy: * We've adopted Svelte's clean, intuitive lifecycle API because it provides * the best developer experience. Simple, predictable, and powerful - just * like everything else in TUIX's JSX/runes system.
+- @tuix/reactive/runes/module.ts
+  - Package: reactive
+  - Exports: RuneError [class], ReactivityModule [class]
+  - Imports: effect, @tuix/core, @tuix/reactive/events/event-bus, ./events, ./events, ../events/channels, ./events
+  - Summary: Reactivity Module - Domain module for reactive state management * * Manages Svelte 5 runes, reactive state, and effect coordination.
+- @tuix/reactive/runes/runes.ts
+  - Package: reactive
+  - Exports: Rune [interface], StateRune [interface], BindableRune [interface], DerivedRune [interface], BindableOptions [interface], isStateRune [function], isBindableRune [function], isDerivedRune [function], isRune [function], getValue [function], toBindable [function], $effect [named], onMount [named], onDestroy [named], beforeUpdate [named], afterUpdate [named], tick [named], untrack [named]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/core, ./module, ./events
+  - Summary: Simplified runes implementation without infinite recursion issues
+- @tuix/reactive/runtime/hooks.test.ts
+  - Package: reactive
+  - Exports: None
+  - Imports: bun:test, effect
+  - Summary: Tests for Reactive Runtime Hooks Integration
+- @tuix/reactive/runtime/hooks.ts
+  - Package: reactive
+  - Exports: ReactiveContext [class], createReactiveHooks [function], getGlobalReactiveContext [function], createDefaultReactiveHooks [function], useReactiveState [function]
+  - Imports: effect, @tuix/runtime, ../runes/runes
+  - Summary: Reactive Runtime Hooks * * Integrates Svelte 5 runes with the MVU runtime via hooks
+- @tuix/reactive/runtime/index.ts
+  - Package: reactive
+  - Exports: None
+  - Imports: (none)
+  - Summary: Runtime Integration Module
+- @tuix/reactive/scope/index.ts
+  - Package: reactive
+  - Exports: None
+  - Imports: (none)
+  - Summary: Core scope system for the MVU architecture * @module core/model/scope
+- @tuix/reactive/state/index.ts
+  - Package: reactive
+  - Exports: MyCommand [function], context [const], app [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/jsx/scope/types
+  - Summary: Global Reactive State * * Svelte-style global state for execution context and app-wide data. * Import and use directly in any component - changes trigger re-renders automatically. * * @example * ```tsx * import { context, app } from '@tuix/reactive/state' * * export function MyCommand() { * const key = context.arg(0) * const verbose = context.flag('verbose', false) * * return <text>Key: {key}</text> * } * ```
+- @tuix/runtime/bootstrap.ts
+  - Package: runtime
+  - Exports: BootstrapConfig [interface], bootstrap [function], bootstrapMinimal [function], bootstrapFull [function], BootstrapResult [interface], bootstrapWithModules [function]
+  - Imports: effect, @tuix/reactive/events/event-bus, @tuix/core, @tuix/reactive, @tuix/core/services, @tuix/config, @tuix/process-manager, @tuix/logger, @tuix/coordination
+  - Summary: Bootstrap - Application initialization with all modules * * Sets up the complete module ecosystem including core, domain, * and service modules with proper dependency ordering.
+- @tuix/runtime/cmd/cmd.test.ts
+  - Package: runtime
+  - Exports: None
+  - Imports: bun:test, effect, ./index
+  - Summary: Tests for Built-in Command Helpers
+- @tuix/runtime/cmd/index.ts
+  - Package: runtime
+  - Exports: Cmd [type], Sub [type], Cmd [const], Sub [const]
+  - Imports: effect
+  - Summary: Built-in Command Helpers * * Provides common commands and subscriptions for MVU applications
+- @tuix/runtime/hooks/hooks.test.ts
+  - Package: runtime
+  - Exports: None
+  - Imports: bun:test, effect, ./types
+  - Summary: Tests for Runtime Hooks System
+- @tuix/runtime/hooks/index.ts
+  - Package: runtime
+  - Exports: None
+  - Imports: (none)
+  - Summary: Runtime Hooks Module
+- @tuix/runtime/hooks/integration.test.ts
+  - Package: runtime
+  - Exports: None
+  - Imports: bun:test, effect, ../index
+  - Summary: Integration tests for Runtime with Hooks * Verifies that hooks work correctly with the full runtime
+- @tuix/runtime/hooks/types.ts
+  - Package: runtime
+  - Exports: RuntimeHooks [interface], createHooks [const], composeHooks [const]
+  - Imports: effect, @tuix/core/types
+  - Summary: Runtime Hooks System * * Provides integration points for reactivity, JSX compilation, and custom behaviors
+- @tuix/runtime/index.ts
+  - Package: runtime
+  - Exports: getGlobalRegistry [named], resetGlobalRegistry [named], ModuleRegistry [named], ModuleBase [named], ModuleError [named]
+  - Imports: (none)
+  - Summary: Core runtime system * @module core/runtime
+- @tuix/runtime/interactive.ts
+  - Package: runtime
+  - Exports: InteractiveConfig [interface], InteractiveContext [class], InteractiveFiberRef [const], InteractiveContextLive [const], isInteractive [const], runInteractive [const], maybeInteractive [const], runViewInteractive [const], exitInteractive [const], Interactive [const]
+  - Imports: effect, ./mvu/runtime, @tuix/view/primitives/view
+  - Summary: Interactive Mode Management * * Context-based interactive mode that works across the entire framework * using Effect.ts for proper scoping and lifecycle management
+- @tuix/runtime/mvu/index.ts
+  - Package: runtime
+  - Exports: None
+  - Imports: (none)
+  - Summary: MVU runtime implementation * @module core/runtime/mvu
+- @tuix/runtime/mvu/runtime.test.ts
+  - Package: runtime
+  - Exports: None
+  - Imports: bun:test, effect, ./runtime, ./runtime, ../../view, ../../view, ./runtime
+  - Summary: MVU Runtime Tests * * Comprehensive tests for the Model-View-Update runtime, * focusing on state management, update cycles, and the core data flow.
+- @tuix/runtime/mvu/runtime.ts
+  - Package: runtime
+  - Exports: None
+  - Imports: (none)
+  - Summary: Application Runtime - The heart of the TUIX framework * * This module implements the complete application runtime system, coordinating * between input handling, state updates, and rendering cycles using Effect's * sophisticated fiber system for concurrent, composable operations. * * ## Architecture Overview: * * ### MVU Loop Implementation * - **Input Processing**: Keyboard, mouse, and system events * - **State Management**: Immutable state transitions via update functions * - **Command Execution**: Asynchronous side effects managed as fibers * - **Subscription Handling**: Continuous event streams (input, timers, etc.) * - **Rendering Pipeline**: Efficient view rendering with caching * * ### Fiber-Based Concurrency * - Separate fibers for input, update, render, and command execution * - Graceful shutdown and resource cleanup * - Structured concurrency with automatic cancellation * - Error boundaries and recovery strategies * * ### Performance Optimization * - Configurable frame rate limiting * - Efficient message queuing and batching * - Resource pooling and reuse * - Minimal allocation patterns * * ### Service Integration * - Terminal operations (clear, write, cursor control) * - Input event processing (keyboard, mouse, resize) * - Rendering pipeline management * - Storage operations for persistence * * @example * ```typescript * import { createRuntime, RuntimeConfig } from './runtime' * * const config: RuntimeConfig = { * fps: 60, * enableMouse: true, * fullscreen: true * } * * const program = Effect.gen(function* (_) { * const runtime = yield* _(createRuntime(config)) * yield* _(runtime.run(myComponent)) * }) * ``` * * @module
+- @tuix/runtime/mvu/runtime/async-view.test.ts
+  - Package: runtime
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/core/types
+  - Summary: Async View Tests * * Tests that the runtime properly handles async view functions
+- @tuix/runtime/mvu/runtime/core.ts
+  - Package: runtime
+  - Exports: Runtime [class]
+  - Imports: effect, @tuix/core/types, @tuix/core/services, @tuix/input/keyboard, ./types, ./types, ./scheduler, ./subscriptions
+  - Summary: Runtime Core * * The main runtime class implementation
+- @tuix/runtime/mvu/runtime/factory.ts
+  - Package: runtime
+  - Exports: runApp [const], createRuntime [const]
+  - Imports: effect, @tuix/core/types, ./types, ./core
+  - Summary: Runtime Factory Functions * * Functions for creating and configuring the runtime
+- @tuix/runtime/mvu/runtime/index.ts
+  - Package: runtime
+  - Exports: Runtime [named], runApp [named], createRuntime [named]
+  - Imports: (none)
+  - Summary: Runtime Module * * The core MVU runtime system for TUIX applications
+- @tuix/runtime/mvu/runtime/scheduler.ts
+  - Package: runtime
+  - Exports: FrameScheduler [class], TimerManager [class], CommandScheduler [class]
+  - Imports: effect, ./types
+  - Summary: Runtime Scheduler * * Manages event scheduling, timers, and frame rate control
+- @tuix/runtime/mvu/runtime/subscriptions.ts
+  - Package: runtime
+  - Exports: SubscriptionManager [class]
+  - Imports: effect, @tuix/core/types, ./types
+  - Summary: Subscription Manager * * Manages continuous event streams and subscriptions
+- @tuix/runtime/mvu/runtime/types.ts
+  - Package: runtime
+  - Exports: SystemMsg [type], RuntimeConfig [interface], RuntimeState [interface], RuntimeMetrics [interface], RuntimeError [class]
+  - Imports: effect, ../../../core/types, @tuix/input/keyboard, ../../hooks
+  - Summary: Runtime Types and Interfaces * * Core type definitions for the MVU runtime system
+- @tuix/storage/filesystem.test.ts
+  - Package: storage
+  - Exports: None
+  - Imports: bun:test, effect, ./filesystem.ts
+  - Summary: Tests for filesystem storage implementation
+- @tuix/storage/filesystem.ts
+  - Package: storage
+  - Exports: FilesystemStorage [class], makeFilesystemStorage [const]
+  - Imports: effect, ./types.ts
+  - Summary: Filesystem-based storage implementation with TTL support
+- @tuix/storage/index.ts
+  - Package: storage
+  - Exports: None
+  - Imports: (none)
+  - Summary: @tuix/storage * * Key-value storage with TTL support for TUIX framework
+- @tuix/storage/layer.ts
+  - Package: storage
+  - Exports: MemoryStorageLayer [const], FilesystemStorageLayer [const], DefaultStorageLayer [const]
+  - Imports: effect, ./types.ts, ./memory.ts, ./filesystem.ts
+  - Summary: Storage service layers for Effect runtime
+- @tuix/storage/memory.test.ts
+  - Package: storage
+  - Exports: None
+  - Imports: bun:test, effect, ./memory.ts
+  - Summary: Tests for in-memory storage implementation
+- @tuix/storage/memory.ts
+  - Package: storage
+  - Exports: MemoryStorage [class], makeMemoryStorage [const]
+  - Imports: effect, ./types.ts
+  - Summary: In-memory storage implementation with TTL support
+- @tuix/storage/plugin/index.tsx
+  - Package: storage
+  - Exports: StorageContext [interface], createStorageContext [const], Storage [function], useStorage [function]
+  - Imports: effect, ../types.ts
+  - Summary: Storage Plugin for TUIX * * Provides storage context to JSX components
+- @tuix/storage/types.ts
+  - Package: storage
+  - Exports: StorageEntry [interface], StorageOptions [interface], Storage [interface], StorageError [class], StorageService [class]
+  - Imports: effect
+  - Summary: Storage Type Definitions
+- @tuix/storage/watch.test.ts
+  - Package: storage
+  - Exports: None
+  - Imports: bun:test, effect, ./memory, ./filesystem, node:fs, node:path, node:os
+  - Summary: Storage Watch Tests
+- @tuix/telemetry/collectors/errors.ts
+  - Package: telemetry
+  - Exports: ErrorCollector [class]
+  - Imports: effect, ../types
+  - Summary: Error Collector
+- @tuix/telemetry/collectors/events.test.ts
+  - Package: telemetry
+  - Exports: None
+  - Imports: bun:test, effect, ./events, ../transports/file, node:fs, node:path, node:os
+  - Summary: Event Collector Tests
+- @tuix/telemetry/collectors/events.ts
+  - Package: telemetry
+  - Exports: EventCollector [class]
+  - Imports: effect, ../types
+  - Summary: Event Collector
+- @tuix/telemetry/collectors/index.ts
+  - Package: telemetry
+  - Exports: EventCollector [named], ErrorCollector [named], PerformanceCollector [named]
+  - Imports: (none)
+  - Summary: Telemetry Collectors
+- @tuix/telemetry/collectors/performance.ts
+  - Package: telemetry
+  - Exports: PerformanceCollector [class]
+  - Imports: effect, ../types
+  - Summary: Performance Collector
+- @tuix/telemetry/index.ts
+  - Package: telemetry
+  - Exports: EventCollector [named], ErrorCollector [named], PerformanceCollector [named], HttpTransport [named], createHttpTransport [named], FileTransport [named], createFileTransport [named], Telemetry [named]
+  - Imports: (none)
+  - Summary: @tuix/telemetry - Opt-in telemetry and analytics
+- @tuix/telemetry/plugin/Telemetry.tsx
+  - Package: telemetry
+  - Exports: TelemetryProps [interface], TelemetryModel [interface], TelemetryMsg [type], Telemetry [const], Telemetry [default]
+  - Imports: @tuix/core, @tuix/ui, ../collectors/events, ../collectors/errors, ../collectors/performance, effect
+  - Summary: Telemetry Plugin Component
+- @tuix/telemetry/plugin/index.ts
+  - Package: telemetry
+  - Exports: Telemetry [named]
+  - Imports: (none)
+  - Summary: Telemetry Plugin Exports
+- @tuix/telemetry/transports/file.test.ts
+  - Package: telemetry
+  - Exports: None
+  - Imports: bun:test, effect, ./file, node:fs, node:path, node:os
+  - Summary: File Transport Tests
+- @tuix/telemetry/transports/file.ts
+  - Package: telemetry
+  - Exports: FileTransport [class], createFileTransport [function]
+  - Imports: effect, node:fs, node:path
+  - Summary: File Transport
+- @tuix/telemetry/transports/http.ts
+  - Package: telemetry
+  - Exports: HttpTransport [class], createHttpTransport [function]
+  - Imports: effect
+  - Summary: HTTP Transport
+- @tuix/telemetry/transports/index.ts
+  - Package: telemetry
+  - Exports: HttpTransport [named], createHttpTransport [named], FileTransport [named], createFileTransport [named]
+  - Imports: (none)
+  - Summary: Telemetry Transports
+- @tuix/telemetry/types.ts
+  - Package: telemetry
+  - Exports: TelemetryEvent [interface], TelemetryError [interface], TelemetryPerformance [interface], TelemetryConfig [interface], TelemetryCollector [interface], TelemetryTransport [interface], TelemetryError [class], TransportError [class], HttpTransportConfig [interface], FileTransportConfig [interface]
+  - Imports: effect
+  - Summary: Telemetry System Types
+- @tuix/testing/e2eHarness.test.ts
+  - Package: testing
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for e2eHarness.ts
+- @tuix/testing/e2eHarness.ts
+  - Package: testing
+  - Exports: TestHarnessOptions [interface], KeySequence [interface], TerminalSnapshot [interface], TestSession [interface], createTestHarness [const], runTest [const], captureScreenshots [const], recordScript [const]
+  - Imports: effect, child_process, node-pty, fs, path
+  - Summary: E2E Test Harness for CLI-Kit Applications * * This module provides utilities for testing CLI applications by: * - Capturing terminal output * - Simulating keyboard input * - Taking screenshots of terminal state * - Recording and replaying sessions
+- @tuix/testing/harness.test.ts
+  - Package: testing
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for harness.ts
+- @tuix/testing/harness.ts
+  - Package: testing
+  - Exports: HarnessOptions [interface], TestSession [interface], createHarness [const], runSimpleTest [const]
+  - Imports: effect, child_process, fs, path
+  - Summary: Test Harness for CLI-Kit Applications * * A lightweight harness using child_process (no PTY dependency required)
+- @tuix/testing/index.test.ts
+  - Package: testing
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/testing/index.ts
+  - Package: testing
+  - Exports: TestingPlugin [named]
+  - Imports: (none)
+  - Summary: Testing utilities for TUIX framework * * Provides utilities for testing TUIX applications and components. * * @example * ```typescript * import { testComponent, createTestHarness } from "tuix/testing" * * const harness = createTestHarness() * await testComponent(MyComponent, harness) * ```
+- @tuix/testing/inputAdapter.test.ts
+  - Package: testing
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for inputAdapter.ts
+- @tuix/testing/inputAdapter.ts
+  - Package: testing
+  - Exports: TestInputAdapter [class], createTestInputService [const], getTestInputAdapter [const], runTestApp [const]
+  - Imports: effect, @tuix/core/services, @tuix/core/types, @tuix/input/keyboard
+  - Summary: Testing Input Adapter - Programmatic key simulation for testing TUI apps
+- @tuix/testing/perf/benchmark.ts
+  - Package: testing
+  - Exports: BenchmarkOptions [interface], BenchmarkResult [interface], compareBenchmarks [function], formatBenchmarkResult [function]
+  - Imports: ./metrics, ./metrics
+  - Summary: Performance Benchmark - Measure and compare performance
+- @tuix/testing/perf/index.ts
+  - Package: testing
+  - Exports: None
+  - Imports: (none)
+  - Summary: Performance Testing - Benchmarking and profiling utilities
+- @tuix/testing/perf/metrics.ts
+  - Package: testing
+  - Exports: PerformanceMetrics [interface], PerformanceStats [interface], calculateStats [function], formatMetrics [function], formatStats [function], compareMetrics [function], meetsThreshold [function]
+  - Imports: (none)
+  - Summary: Performance Metrics - Collect and report performance data
+- @tuix/testing/perf/perf.test.ts
+  - Package: testing
+  - Exports: None
+  - Imports: bun:test, ./benchmark, ./metrics, ./profiler, @tuix/view, ./metrics
+  - Summary: Performance Testing Tests
+- @tuix/testing/perf/profiler.ts
+  - Package: testing
+  - Exports: ProfileEvent [interface], ProfileSession [interface], Profiler [class], globalProfiler [const], analyzeSession [function], formatSession [function]
+  - Imports: effect, @tuix/core/types
+  - Summary: Performance Profiler - Profile component rendering and execution
+- @tuix/testing/plugin/Testing.tsx
+  - Package: testing
+  - Exports: Testing [function], Testing [default]
+  - Imports: @tuix/core/types
+  - Summary: Testing Plugin - Provides testing commands for TUI apps
+- @tuix/testing/plugin/commands/benchmark.tsx
+  - Package: testing
+  - Exports: BenchmarkProps [interface], Benchmark [const], Benchmark [default]
+  - Imports: @tuix/view, @tuix/core/types, effect, node:fs, node:path, ../../perf/benchmark
+  - Summary: Benchmark Command - Run performance benchmarks
+- @tuix/testing/plugin/commands/dashboard.tsx
+  - Package: testing
+  - Exports: TestDashboard [const], TestDashboard [default]
+  - Imports: @tuix/view, @tuix/core/types, effect, node:fs, node:path
+  - Summary: Test Dashboard Command - Interactive test runner
+- @tuix/testing/plugin/commands/profile.tsx
+  - Package: testing
+  - Exports: ProfileProps [interface], Profile [const], Profile [default]
+  - Imports: @tuix/view, @tuix/core/types, effect, node:path, ../../perf/profiler, node:fs
+  - Summary: Profile Command - Profile component performance
+- @tuix/testing/plugin/commands/snapshot.tsx
+  - Package: testing
+  - Exports: SnapshotProps [interface], Snapshot [const], Snapshot [default]
+  - Imports: @tuix/view, @tuix/core/types, effect, node:fs, node:path
+  - Summary: Snapshot Command - Manage test snapshots
+- @tuix/testing/plugin/index.ts
+  - Package: testing
+  - Exports: Testing [named], default [named], TestDashboard [named], Benchmark [named], Snapshot [named], Profile [named]
+  - Imports: (none)
+  - Summary: Testing Plugin - CLI commands for testing
+- @tuix/testing/snapshot/index.ts
+  - Package: testing
+  - Exports: None
+  - Imports: (none)
+  - Summary: Snapshot Testing - Snapshot testing utilities for TUI components
+- @tuix/testing/snapshot/matcher.ts
+  - Package: testing
+  - Exports: SnapshotConfig [interface], configureSnapshots [function], getSnapshotConfig [function], setCurrentTestName [function], extendExpect [function]
+  - Imports: ./serializer, ./storage
+  - Summary: Snapshot Matcher - Custom Bun test matcher for snapshots
+- @tuix/testing/snapshot/serializer.ts
+  - Package: testing
+  - Exports: Serializer [interface], ViewSerializer [const], StringSerializer [const], ObjectSerializer [const], normalizeOutput [function], stripAnsiCodes [function], defaultSerializers [const]
+  - Imports: @tuix/core/types, effect
+  - Summary: Snapshot Serializer - Converts TUI output to snapshot format
+- @tuix/testing/snapshot/snapshot.test.ts
+  - Package: testing
+  - Exports: None
+  - Imports: bun:test, ./serializer, ./storage, ./matcher, @tuix/view, node:fs, node:path
+  - Summary: Snapshot Testing Tests
+- @tuix/testing/snapshot/storage.ts
+  - Package: testing
+  - Exports: SnapshotStorage [interface], FileSnapshotStorage [class], createSnapshotStorage [const]
+  - Imports: node:fs, node:path
+  - Summary: Snapshot Storage - Manages snapshot files on disk
+- @tuix/testing/testUtils.test.ts
+  - Package: testing
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/runtime, @tuix/view, @tuix/core/types
+  - Summary: Testing Utilities Tests * * Tests for the testing infrastructure including: * - Mock service implementations * - Test harness functionality * - Component testing utilities * - Runtime testing helpers * - Scope testing utilities * - Integration test helpers * - Performance testing utilities
+- @tuix/testing/testUtils.ts
+  - Package: testing
+  - Exports: TestEnvironment [interface], createTestEnvironment [const], MockTerminalService [interface], createMockTerminalService [const], MockInputService [interface], createMockInputService [const], MockRendererService [interface], createMockRendererService [const], MockStorageService [interface], createMockStorageService [const], createTestLayer [const], testComponent [const], TUIAssert [const], createMockAppServices [const], withMockServices [const], InteractionTest [interface], LifecycleTest [interface], TestHarness [interface], createTestHarness [function]
+  - Imports: effect, bun:test, @tuix/core/types/errors
+  - Summary: Testing Utilities - Test helpers and mocks for TUI framework testing * * This module provides utilities for testing TUI components, including * mock services, test runners, and assertion helpers.
+- @tuix/testing/visualTest.test.ts
+  - Package: testing
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for visualTest.ts
+- @tuix/testing/visualTest.ts
+  - Package: testing
+  - Exports: None
+  - Imports: effect, @tuix/view, @tuix/view/string/width, @tuix/core/services
+  - Summary: Visual Testing - Comprehensive tests for rendering accuracy
+- @tuix/themes/ThemeProvider.tsx
+  - Package: themes
+  - Exports: ThemeProviderProps [interface], ThemeProvider [function], withTheme [function], App [default]
+  - Imports: effect, ./types, ./context
+  - Summary: @tuix/themes - ThemeProvider component * * JSX component for providing theme context to the application.
+- @tuix/themes/context.test.ts
+  - Package: themes
+  - Exports: None
+  - Imports: bun:test, effect, ./context, ./themes, ./types
+  - Summary: @tuix/themes - Context tests
+- @tuix/themes/context.ts
+  - Package: themes
+  - Exports: ThemeContext [interface], ThemeContext [const], createThemeLayer [function], ThemeContextLive [const]
+  - Imports: effect, ./types, ./themes/dark
+  - Summary: @tuix/themes - Theme context * * Reactive theme state management using Effect Context.
+- @tuix/themes/index.ts
+  - Package: themes
+  - Exports: App [default], ThemeContext [named], createThemeLayer [named], ThemeContextLive [named], useTheme [named], ThemeProvider [named], withTheme [named], darkTheme [named], lightTheme [named], nordTheme [named], draculaTheme [named], vibesTheme [named]
+  - Imports: (none)
+  - Summary: @tuix/themes - Theme system for TUIX applications * * Provides a complete theming solution with pre-built themes, * runtime theme switching, and reactive theme updates. * * @example * ```tsx * import { ThemeProvider, useTheme } from '@tuix/themes' * import { darkTheme, nordTheme } from '@tuix/themes/themes' * * export default function App() { * return ( * <ThemeProvider config={{ defaultTheme: 'nord' }}> * <MyApp /> * </ThemeProvider> * ) * } * * function MyApp() { * const { theme, setThemeByName, themeNames } = useTheme() * * return ( * <box> * <text color={theme().colors.primary}> * Current: {theme().name} * </text> * </box> * ) * } * ```
+- @tuix/themes/themes/dark.ts
+  - Package: themes
+  - Exports: darkTheme [const]
+  - Imports: ../types
+  - Summary: @tuix/themes - Dark theme * * A dark theme with high contrast and vibrant accents.
+- @tuix/themes/themes/dracula.ts
+  - Package: themes
+  - Exports: draculaTheme [const]
+  - Imports: ../types
+  - Summary: @tuix/themes - Dracula theme * * A dark theme with vibrant colors inspired by Dracula theme. * https://draculatheme.com/
+- @tuix/themes/themes/index.ts
+  - Package: themes
+  - Exports: darkTheme [named], lightTheme [named], nordTheme [named], draculaTheme [named], vibesTheme [named]
+  - Imports: (none)
+  - Summary: @tuix/themes - Pre-built themes * * Export all pre-built themes.
+- @tuix/themes/themes/light.ts
+  - Package: themes
+  - Exports: lightTheme [const]
+  - Imports: ../types
+  - Summary: @tuix/themes - Light theme * * A clean light theme optimized for daytime use.
+- @tuix/themes/themes/nord.ts
+  - Package: themes
+  - Exports: nordTheme [const]
+  - Imports: ../types
+  - Summary: @tuix/themes - Nord theme * * Arctic, north-bluish color palette based on Nord theme. * https://www.nordtheme.com/
+- @tuix/themes/themes/vibes.ts
+  - Package: themes
+  - Exports: vibesTheme [const]
+  - Imports: ../types
+  - Summary: @tuix/themes - Vibes theme * * Modern black, white, and green theme with clean rounded borders. * Perfect for showing off what TUIX can do.
+- @tuix/themes/types.test.ts
+  - Package: themes
+  - Exports: None
+  - Imports: bun:test, ./types, ./themes
+  - Summary: @tuix/themes - Type tests
+- @tuix/themes/types.ts
+  - Package: themes
+  - Exports: ThemeColors [interface], ThemeTypography [interface], ThemeSpacing [interface], Theme [interface], ThemeConfig [interface], ThemeError [interface]
+  - Imports: (none)
+  - Summary: @tuix/themes - Theme system types * * Defines the theme structure for TUIX applications.
+- @tuix/themes/useTheme.ts
+  - Package: themes
+  - Exports: UseThemeResult [interface], useTheme [function]
+  - Imports: @tuix/reactive, effect, ./types, ./context
+  - Summary: @tuix/themes - useTheme hook * * Reactive hook for accessing and updating themes.
+- @tuix/ui/components/data/FilterBox.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for FilterBox.tsx
+- @tuix/ui/components/data/FilterBox.tsx
+  - Package: ui
+  - Exports: FilterPreset [interface], FilterBoxProps [interface], FilterBox [function], LOG_FILTER_PRESETS [const], PROCESS_FILTER_PRESETS [const], FilterableContentProps [interface], FilterableContent [function]
+  - Imports: @tuix/jsx, @tuix/ansi, ../../theme
+  - Summary: FilterBox Component * * Reusable filter ribbon with preset chips and search summary. * Implemented with JSX primitives so it composes naturally with other @tuix/ui widgets.
+- @tuix/ui/components/data/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/data/index.ts
+  - Package: ui
+  - Exports: None
+  - Imports: (none)
+  - Summary: No description available.
+- @tuix/ui/components/data/list/List.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./List.js, ../../../../core/update/reactivity/runes.js
+  - Summary: List Component Tests
+- @tuix/ui/components/data/list/List.tsx
+  - Package: ui
+  - Exports: SelectionMode [type], ListProps [interface], List [function], SimpleList [function], CheckList [function], NumberedList [function]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: List Component - Vertical scrollable list with selection * * Features: * - Vertical scrolling with keyboard navigation * - Single/multi selection support * - Custom item rendering * - Filtering and search * - Virtualization for large lists * - Focus management * - Customizable key bindings * * @example * ```tsx * import { List } from 'tuix/components/data/list' * * function MyApp() { * const selectedIndex = $state(0) * const items = ['Item 1', 'Item 2', 'Item 3'] * * return ( * <List * items={items} * selectedIndex={selectedIndex} * onSelect={(index) => selectedIndex.$set(index)} * renderItem={(item) => <text>{item}</text>} * /> * ) * } * ```
+- @tuix/ui/components/data/list/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/data/list/index.ts
+  - Package: ui
+  - Exports: List [named], SimpleList [named], CheckList [named], NumberedList [named]
+  - Imports: (none)
+  - Summary: Defines List, SimpleList, CheckList, NumberedList.
+- @tuix/ui/components/data/table/Table.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Table.js, ./Table.js, ../../../../core/update/reactivity/runes.js
+  - Summary: Table Component Tests
+- @tuix/ui/components/data/table/Table.tsx
+  - Package: ui
+  - Exports: Column [interface], TableProps [interface], Table [function], DataTable [function], CompactTable [function]
+  - Imports: @tuix/reactive, @tuix/ansi, @tuix/view
+  - Summary: Table Component - Tabular data display with advanced features * * Features: * - Dynamic column configuration * - Row selection (single/multi) * - Sorting and filtering * - Pagination support * - Keyboard navigation * - Custom cell rendering * - Responsive column widths * * @example * ```tsx * import { Table } from 'tuix/components/data/table' * * function MyApp() { * const data = [ * { id: 1, name: 'John', age: 30 }, * { id: 2, name: 'Jane', age: 25 } * ] * * const columns = [ * { key: 'id', label: 'ID', width: 10 }, * { key: 'name', label: 'Name', width: 20 }, * { key: 'age', label: 'Age', width: 10 } * ] * * return ( * <Table * data={data} * columns={columns} * onSelect={(row) => console.log('Selected:', row)} * /> * ) * } * ```
+- @tuix/ui/components/data/table/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/data/table/index.ts
+  - Package: ui
+  - Exports: Table [named], DataTable [named], CompactTable [named]
+  - Imports: (none)
+  - Summary: Defines Table, DataTable, CompactTable.
+- @tuix/ui/components/display/badge/Badge.tsx
+  - Package: ui
+  - Exports: BadgeProps [interface], Badge [function], badge [function]
+  - Imports: @tuix/ansi, ../../layout/box, ../../../theme
+  - Summary: @tuix/ui - Badge component * * Small status badge with colored background and text.
+- @tuix/ui/components/display/badge/index.ts
+  - Package: ui
+  - Exports: Badge [named], badge [named]
+  - Imports: (none)
+  - Summary: @tuix/ui - Badge component exports
+- @tuix/ui/components/display/divider/Divider.tsx
+  - Package: ui
+  - Exports: DividerProps [interface], Divider [function], divider [function]
+  - Imports: @tuix/ansi, ../../layout/box, ../../../theme
+  - Summary: @tuix/ui - Divider component * * Horizontal or vertical separator line with optional label.
+- @tuix/ui/components/display/divider/index.ts
+  - Package: ui
+  - Exports: Divider [named], divider [named]
+  - Imports: (none)
+  - Summary: @tuix/ui - Divider component exports
+- @tuix/ui/components/display/header/Header.tsx
+  - Package: ui
+  - Exports: HeaderProps [interface], Header [function], header [function]
+  - Imports: @tuix/ansi, ../../layout/box, ../../../theme
+  - Summary: @tuix/ui - Header component * * Page or section header with title, subtitle, and optional actions.
+- @tuix/ui/components/display/header/index.ts
+  - Package: ui
+  - Exports: Header [named], header [named]
+  - Imports: (none)
+  - Summary: @tuix/ui - Header component exports
+- @tuix/ui/components/display/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/display/index.ts
+  - Package: ui
+  - Exports: Text [named], Heading [named], Code [named], Success [named], Error [named], Warning [named], Info [named], Header [named], Badge [named], StatusIndicator [named], Divider [named]
+  - Imports: (none)
+  - Summary: Display Components * * Components for displaying content and information
+- @tuix/ui/components/display/large-text/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/display/large-text/index.ts
+  - Package: ui
+  - Exports: None
+  - Imports: (none)
+  - Summary: Large text display component not yet implemented in MVU/JSX
+- @tuix/ui/components/display/status-indicator/StatusIndicator.tsx
+  - Package: ui
+  - Exports: Status [type], StatusIndicatorProps [interface], StatusIndicator [function], statusIndicator [function]
+  - Imports: @tuix/ansi, ../../layout/box, ../../../theme, @tuix/reactive
+  - Summary: @tuix/ui - StatusIndicator component * * Colored status indicator with optional label and pulse animation.
+- @tuix/ui/components/display/status-indicator/index.ts
+  - Package: ui
+  - Exports: StatusIndicator [named], statusIndicator [named]
+  - Imports: (none)
+  - Summary: @tuix/ui - StatusIndicator component exports
+- @tuix/ui/components/display/text/Text.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for Text.tsx
+- @tuix/ui/components/display/text/Text.tsx
+  - Package: ui
+  - Exports: TextProps [interface], Text [function], Heading [function], Code [function], Link [function], Label [function], Success [function], Error [function], Warning [function], Info [function], text [const], heading [const], code [const], link [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/ansi, @tuix/view/string/width
+  - Summary: Text Component - JSX version for styled text display * * Rich text display with: * - Multiple color options * - Text styles (bold, italic, underline, etc.) * - Alignment options * - Truncation and wrapping * - Gradients and animations * * @example * ```tsx * import { Text, Heading, Code } from 'tuix/components/display/text' * * function MyComponent() { * return ( * <vstack> * <Heading level={1}>Welcome!</Heading> * * <Text color="blue" bold> * Important message * </Text> * * <Code language="typescript"> * const greeting = "Hello, World!" * </Code> * </vstack> * ) * } * ```
+- @tuix/ui/components/display/text/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/display/text/index.ts
+  - Package: ui
+  - Exports: Text [named], Heading [named], Code [named], Link [named], Label [named], Success [named], Error [named], Warning [named], Info [named], text [named], heading [named], code [named], link [named], TextProps [type]
+  - Imports: (none)
+  - Summary: Text Component Export * * Rich text display component with styling options
+- @tuix/ui/components/feedback/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/feedback/index.ts
+  - Package: ui
+  - Exports: ProgressBar [named], Toast [named], infoToast [named], successToast [named], warningToast [named], errorToast [named], dangerToast [named], Tooltip [named], tooltip [named]
+  - Imports: (none)
+  - Summary: Re-export commonly used components
+- @tuix/ui/components/feedback/modal/ConfirmModal.tsx
+  - Package: ui
+  - Exports: ConfirmModalProps [interface], ConfirmModal [function]
+  - Imports: ./Modal
+  - Summary: Defines ConfirmModalProps, ConfirmModal.
+- @tuix/ui/components/feedback/modal/ErrorModal.tsx
+  - Package: ui
+  - Exports: ErrorModalProps [interface], ErrorModal [function]
+  - Imports: ./Modal
+  - Summary: Defines ErrorModalProps, ErrorModal.
+- @tuix/ui/components/feedback/modal/InfoModal.tsx
+  - Package: ui
+  - Exports: InfoModalProps [interface], InfoModal [function]
+  - Imports: ./Modal
+  - Summary: Defines InfoModalProps, InfoModal.
+- @tuix/ui/components/feedback/modal/LoadingModal.tsx
+  - Package: ui
+  - Exports: LoadingModalProps [interface], LoadingModal [function]
+  - Imports: @tuix/ansi, ../spinner/Spinner, ./Modal
+  - Summary: Defines LoadingModalProps, LoadingModal.
+- @tuix/ui/components/feedback/modal/Modal.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for Modal.tsx
+- @tuix/ui/components/feedback/modal/Modal.tsx
+  - Package: ui
+  - Exports: ModalProps [interface], Modal [function]
+  - Imports: @tuix/jsx, @tuix/ansi, ../../../theme, ../../layout/box, ../../forms/button/Button
+  - Summary: Modal Component * * Core JSX-first modal overlay with theming support.
+- @tuix/ui/components/feedback/modal/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/feedback/modal/index.ts
+  - Package: ui
+  - Exports: Modal [named], InfoModal [named], ConfirmModal [named], LoadingModal [named], ErrorModal [named]
+  - Imports: (none)
+  - Summary: Defines Modal, InfoModal, ConfirmModal, LoadingModal, ErrorModal.
+- @tuix/ui/components/feedback/progress-bar/ProgressBar.tsx
+  - Package: ui
+  - Exports: ProgressBarProps [interface], ProgressBar [function], progressBar [function]
+  - Imports: @tuix/ansi, ../../layout/box, ../../../theme
+  - Summary: @tuix/ui - ProgressBar component * * Progress indicator with filled/unfilled sections and percentage display.
+- @tuix/ui/components/feedback/progress-bar/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/feedback/progress-bar/index.ts
+  - Package: ui
+  - Exports: ProgressBar [named], progressBar [named]
+  - Imports: (none)
+  - Summary: @tuix/ui - ProgressBar component exports
+- @tuix/ui/components/feedback/spinner/Spinner.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for Spinner.tsx
+- @tuix/ui/components/feedback/spinner/Spinner.tsx
+  - Package: ui
+  - Exports: SpinnerType [type], SpinnerSize [type], SpinnerProps [interface], Spinner [function], spinner [const], loadingSpinner [const], savingSpinner [const], processingSpinner [const], SpinnerWithMessage [function], LoadingOverlay [function]
+  - Imports: @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: Spinner Component - JSX version for loading indicators * * Animated loading indicators with multiple styles: * - Various spinner types (dots, line, circle, etc.) * - Customizable colors and sizes * - Optional loading text * - Smooth animations * * @example * ```tsx * import { Spinner } from 'tuix/components/feedback/spinner' * * function LoadingScreen() { * return ( * <Center> * <Spinner type="dots" color="blue" /> * <Text>Loading data...</Text> * </Center> * ) * } * ```
+- @tuix/ui/components/feedback/spinner/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/feedback/spinner/index.ts
+  - Package: ui
+  - Exports: Spinner [named], spinner [named], loadingSpinner [named], savingSpinner [named], processingSpinner [named], SpinnerWithMessage [named], LoadingOverlay [named], SpinnerProps [type], SpinnerType [type], SpinnerSize [type]
+  - Imports: (none)
+  - Summary: Spinner Component Export * * Animated loading indicators
+- @tuix/ui/components/feedback/toast/Toast.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Toast
+  - Summary: Test the component function directly (not JSX)
+- @tuix/ui/components/feedback/toast/Toast.tsx
+  - Package: ui
+  - Exports: ToastKind [type], ToastProps [interface], Toast [function], toast [const], infoToast [const], successToast [const], warningToast [const], errorToast [const], dangerToast [const]
+  - Imports: @tuix/ansi
+  - Summary: Toast Component - Notification toast for terminal UI * * @example * ```tsx * import { Toast } from '@tuix/ui' * * function NotificationExample() { * return ( * <Toast * kind="success" * message="File saved successfully!" * icon="✓" * /> * ) * } * ```
+- @tuix/ui/components/feedback/toast/index.ts
+  - Package: ui
+  - Exports: Toast [named], toast [named], infoToast [named], successToast [named], warningToast [named], errorToast [named], dangerToast [named], ToastProps [type], ToastKind [type]
+  - Imports: (none)
+  - Summary: Defines Toast, toast, infoToast, successToast, warningToast, errorToast, dangerToast, ToastProps, ToastKind.
+- @tuix/ui/components/feedback/tooltip/Tooltip.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Tooltip
+  - Summary: Test the component function directly (not JSX)
+- @tuix/ui/components/feedback/tooltip/Tooltip.tsx
+  - Package: ui
+  - Exports: TooltipProps [interface], Tooltip [function], tooltip [const]
+  - Imports: @tuix/ansi
+  - Summary: Tooltip Component - Tooltip popup for terminal UI * * A simple tooltip component for displaying helpful information. * Note: This is a basic implementation - advanced features like hover detection, * positioning, and auto-hide will be added in future versions. * * @example * ```tsx * import { Tooltip } from '@tuix/ui' * * function HelpText() { * const showHelp = $state(false) * * return ( * <> * <Button onHover={() => showHelp.$set(true)}> * Hover me * </Button> * <Tooltip visible={showHelp()} content="This is a helpful tooltip!" /> * </> * ) * } * ```
+- @tuix/ui/components/feedback/tooltip/index.ts
+  - Package: ui
+  - Exports: Tooltip [named], tooltip [named], TooltipProps [type]
+  - Imports: (none)
+  - Summary: Defines Tooltip, tooltip, TooltipProps.
+- @tuix/ui/components/forms/button/Button.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for Button.tsx
+- @tuix/ui/components/forms/button/Button.tsx
+  - Package: ui
+  - Exports: ButtonVariant [type], ButtonSize [type], ButtonProps [interface], Button [function], button [const], primaryButton [const], secondaryButton [const], successButton [const], dangerButton [const], warningButton [const], infoButton [const], ghostButton [const], ButtonGroup [function], SubmitCancelButtons [function]
+  - Imports: @tuix/reactive/runes/runes, @tuix/ansi, @tuix/core/types, @tuix/ui, @tuix/jsx
+  - Summary: Button Component - JSX version with interactive states * * A versatile button component with: * - Multiple variants (primary, secondary, success, danger, etc.) * - Size options (small, medium, large) * - Loading and disabled states * - Keyboard and mouse interaction * - Icon support * * @example * ```tsx * import { Button } from 'tuix/components/forms/button' * * function MyApp() { * const loading = $state(false) * * return ( * <vstack> * <Button onClick={() => console.log('Clicked!')}> * Click Me * </Button> * * <Button * variant="primary" * loading={loading.value} * onClick={async () => { * loading.value = true * await doSomething() * loading.value = false * }} * > * Submit * </Button> * </vstack> * ) * } * ```
+- @tuix/ui/components/forms/button/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/forms/button/index.ts
+  - Package: ui
+  - Exports: Button [named], button [named], primaryButton [named], secondaryButton [named], successButton [named], dangerButton [named], warningButton [named], infoButton [named], ghostButton [named], ButtonGroup [named], SubmitCancelButtons [named], ButtonProps [type], ButtonVariant [type], ButtonSize [type]
+  - Imports: (none)
+  - Summary: Button Component Export * * Interactive button component with variants and states
+- @tuix/ui/components/forms/checkbox/Checkbox.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Checkbox
+  - Summary: Checkbox Component Tests
+- @tuix/ui/components/forms/checkbox/Checkbox.tsx
+  - Package: ui
+  - Exports: CheckboxProps [interface], Checkbox [function], checkbox [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: Checkbox Component - Checkbox for terminal UI * * @example * ```tsx * import { Checkbox } from '@tuix/ui' * * function MyForm() { * const agreed = $state(false) * * return ( * <Checkbox * bind:checked={agreed} * label="I agree to the terms" * /> * ) * } * ```
+- @tuix/ui/components/forms/checkbox/index.ts
+  - Package: ui
+  - Exports: Checkbox [named], checkbox [named]
+  - Imports: (none)
+  - Summary: Checkbox Component Exports
+- @tuix/ui/components/forms/confirm/Confirm.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Confirm
+  - Summary: Confirm Component Tests
+- @tuix/ui/components/forms/confirm/Confirm.tsx
+  - Package: ui
+  - Exports: ConfirmProps [interface], Confirm [function], confirm [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: Confirm Component - Yes/No confirmation prompt * * @example * ```tsx * import { Confirm } from '@tuix/ui' * * function DeleteDialog() { * return ( * <Confirm * message="Are you sure you want to delete this file?" * onConfirm={() => deleteFile()} * onCancel={() => closeDialog()} * defaultChoice="no" * /> * ) * } * ```
+- @tuix/ui/components/forms/confirm/index.ts
+  - Package: ui
+  - Exports: Confirm [named], confirm [named]
+  - Imports: (none)
+  - Summary: Confirm Component Exports
+- @tuix/ui/components/forms/file-picker/FilePicker.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for FilePicker.tsx
+- @tuix/ui/components/forms/file-picker/FilePicker.tsx
+  - Package: ui
+  - Exports: FileItem [interface], FilePickerProps [interface], FilePickerModel [interface], FilePickerMsg [type], FileSystemService [interface], FilePicker [const]
+  - Imports: effect, @tuix/core/types, @tuix/view, @tuix/ansi, @tuix/view/string/width, ../../layout/box/Box, ../../display/text/Text, ../../layout/flex/Flex, ../../data/list/List, ../../feedback/spinner/Spinner
+  - Summary: FilePicker Component - Directory navigation and file selection * * Features: * - Directory tree navigation * - File and folder listing * - Keyboard navigation (arrow keys, Enter, backspace) * - File filtering by extension * - Path breadcrumbs * - Selection modes (file, directory, or both) * - File metadata display (size, date modified) * - Hidden file toggle
+- @tuix/ui/components/forms/file-picker/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/forms/file-picker/index.ts
+  - Package: ui
+  - Exports: FilePicker [named]
+  - Imports: (none)
+  - Summary: Defines FilePicker.
+- @tuix/ui/components/forms/form/Form.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Form
+  - Summary: Form Component Tests
+- @tuix/ui/components/forms/form/Form.tsx
+  - Package: ui
+  - Exports: FormField [interface], FormProps [interface], Form [function], form [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: Form Component - Form container with validation * * @example * ```tsx * import { Form, TextInput, Button } from '@tuix/ui' * * function LoginForm() { * const username = $state('') * const password = $state('') * * const handleSubmit = (data: Record<string, any>) => { * console.log('Form submitted:', data) * } * * return ( * <Form onSubmit={handleSubmit}> * <TextInput bind:value={username} label="Username" required /> * <TextInput bind:value={password} label="Password" type="password" required /> * <Button type="submit">Login</Button> * </Form> * ) * } * ```
+- @tuix/ui/components/forms/form/index.ts
+  - Package: ui
+  - Exports: Form [named], form [named]
+  - Imports: (none)
+  - Summary: Form Component Exports
+- @tuix/ui/components/forms/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/forms/index.ts
+  - Package: ui
+  - Exports: TextInput [named], textInput [named], passwordInput [named], emailInput [named], numberInput [named], Button [named], primaryButton [named], secondaryButton [named], ButtonGroup [named], FilePicker [named], Select [named], select [named], Checkbox [named], checkbox [named], Radio [named], radio [named], Confirm [named], confirm [named], Form [named], form [named], Toggle [named], toggle [named]
+  - Imports: (none)
+  - Summary: Form Components * * Interactive form elements for terminal UIs
+- @tuix/ui/components/forms/radio/Radio.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Radio
+  - Summary: Radio Component Tests
+- @tuix/ui/components/forms/radio/Radio.tsx
+  - Package: ui
+  - Exports: RadioOption [interface], RadioProps [interface], Radio [function], radio [function]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: Radio Component - Radio button group for terminal UI * * @example * ```tsx * import { Radio } from '@tuix/ui' * * function MyForm() { * const theme = $state('dark') * * return ( * <Radio * bind:value={theme} * options={[ * { value: 'dark', label: 'Dark Mode' }, * { value: 'light', label: 'Light Mode' }, * { value: 'auto', label: 'Auto' } * ]} * /> * ) * } * ```
+- @tuix/ui/components/forms/radio/index.ts
+  - Package: ui
+  - Exports: Radio [named], radio [named]
+  - Imports: (none)
+  - Summary: Radio Component Exports
+- @tuix/ui/components/forms/select/Select.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Select
+  - Summary: Select Component Tests
+- @tuix/ui/components/forms/select/Select.tsx
+  - Package: ui
+  - Exports: SelectOption [interface], SelectProps [interface], Select [function], select [function]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: Select Component - Dropdown select for terminal UI * * @example * ```tsx * import { Select } from '@tuix/ui' * * function MyForm() { * const theme = $state('dark') * * return ( * <Select * bind:value={theme} * options={[ * { value: 'dark', label: 'Dark' }, * { value: 'light', label: 'Light' }, * { value: 'auto', label: 'Auto' } * ]} * placeholder="Select theme..." * /> * ) * } * ```
+- @tuix/ui/components/forms/select/index.ts
+  - Package: ui
+  - Exports: Select [named], select [named]
+  - Imports: (none)
+  - Summary: Select Component Exports
+- @tuix/ui/components/forms/text-input/TextInput.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for TextInput.tsx
+- @tuix/ui/components/forms/text-input/TextInput.tsx
+  - Package: ui
+  - Exports: EchoMode [type], CursorStyle [type], TextInputProps [interface], TextInput [function], textInput [const], passwordInput [const], emailInput [const], numberInput [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/ansi, ../../../stores/textInputStore
+  - Summary: TextInput Component - JSX version with reactive state management * * A fully-featured text input component with: * - Reactive state management using Svelte-inspired runes * - Multiple echo modes (normal, password, none) * - Cursor styles and blinking * - Validation and transformation * - Keyboard navigation * * @example * ```tsx * import { TextInput } from 'tuix/components/forms/text-input' * * function MyForm() { * const name = $state('') * const password = $state('') * * return ( * <vstack> * <TextInput * bind:value={name} * placeholder="Enter name..." * /> * <TextInput * bind:value={password} * placeholder="Enter password..." * echoMode="password" * /> * </vstack> * ) * } * ```
+- @tuix/ui/components/forms/text-input/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/forms/text-input/index.ts
+  - Package: ui
+  - Exports: TextInput [named], textInput [named], passwordInput [named], emailInput [named], numberInput [named], TextInputProps [type], EchoMode [type], CursorStyle [type]
+  - Imports: (none)
+  - Summary: TextInput Component Export * * A fully-featured text input component for terminal UIs
+- @tuix/ui/components/forms/toggle/Toggle.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Toggle, @tuix/reactive/runes/runes
+  - Summary: Test suite covering @tuix/ui/components/forms/toggle/Toggle
+- @tuix/ui/components/forms/toggle/Toggle.tsx
+  - Package: ui
+  - Exports: ToggleProps [interface], Toggle [function], toggle [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: Toggle Component - Switch toggle for terminal UI * * @example * ```tsx * import { Toggle } from '@tuix/ui' * * function Settings() { * const darkMode = $state(false) * * return ( * <Toggle * bind:checked={darkMode} * label="Dark Mode" * /> * ) * } * ```
+- @tuix/ui/components/forms/toggle/index.ts
+  - Package: ui
+  - Exports: Toggle [named], toggle [named], ToggleProps [type]
+  - Imports: (none)
+  - Summary: Defines Toggle, toggle, ToggleProps.
+- @tuix/ui/components/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/index.ts
+  - Package: ui
+  - Exports: None
+  - Imports: (none)
+  - Summary: UI Components Module * * This module provides the complete collection of UI components organized by category. * All components follow the Tuix framework standards and provide consistent APIs. * * @example * ```typescript * import { Button, Modal, Table } from 'tuix/components' * * const app = ( * <Modal> * <Table data={myData} /> * <Button onClick={handleClick}>Click me</Button> * </Modal> * ) * ```
+- @tuix/ui/components/layout/box/Box.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for Box.tsx
+- @tuix/ui/components/layout/box/Box.tsx
+  - Package: ui
+  - Exports: BoxProps [interface], Box [function], box [const], card [const], panel [const], centerBox [const], scrollBox [const]
+  - Imports: @tuix/reactive/runes/runes
+  - Summary: Box Component - JSX version for flexible container layouts * * A fundamental layout component that provides: * - Flexible box model with padding and margins * - Border styles and colors * - Background colors and gradients * - Alignment and justification * - Responsive sizing * * @example * ```tsx * import { Box } from 'tuix/components/layout/box' * * function MyLayout() { * return ( * <Box * padding={2} * border="rounded" * borderColor="blue" * background="gray" * > * <text>Content inside a box</text> * </Box> * ) * } * ```
+- @tuix/ui/components/layout/box/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/layout/box/index.ts
+  - Package: ui
+  - Exports: Box [named], box [named], card [named], panel [named], centerBox [named], scrollBox [named], BoxProps [type]
+  - Imports: (none)
+  - Summary: Box Component Export * * Flexible container component for layouts
+- @tuix/ui/components/layout/flex/Flex.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for Flex.tsx
+- @tuix/ui/components/layout/flex/Flex.tsx
+  - Package: ui
+  - Exports: FlexProps [interface], FlexItemProps [interface], Flex [function], FlexItem [function], Row [function], Column [function], SpaceBetween [function], Center [function], Stack [function], Grid [function], Spacer [function], Sidebar [function], Header [function]
+  - Imports: ../box
+  - Summary: Flex Component - JSX version for flexible layouts * * Provides flexbox-like layouts for terminal UIs: * - Row and column layouts * - Alignment and justification * - Gap spacing * - Wrapping support * - Flex grow/shrink * * @example * ```tsx * import { Flex, Row, Column } from 'tuix/components/layout/flex' * * function MyLayout() { * return ( * <Column gap={2}> * <Row justify="between"> * <text>Left</text> * <text>Right</text> * </Row> * * <Flex direction="row" wrap gap={1}> * {items.map(item => <Box key={item}>{item}</Box>)} * </Flex> * </Column> * ) * } * ```
+- @tuix/ui/components/layout/flex/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/layout/flex/index.ts
+  - Package: ui
+  - Exports: Flex [named], FlexItem [named], Row [named], Column [named], SpaceBetween [named], Center [named], Stack [named], Grid [named], Spacer [named], Sidebar [named], Header [named], FlexProps [type], FlexItemProps [type]
+  - Imports: (none)
+  - Summary: Flex Layout Components Export * * Flexbox-like layout system for terminal UIs
+- @tuix/ui/components/layout/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/layout/index.ts
+  - Package: ui
+  - Exports: Box [named], card [named], panel [named], Flex [named], Row [named], Column [named], Stack [named], Grid [named], Spacer [named], Panel [named], StaticLayout [named], staticLayout [named], InteractiveLayout [named], interactiveLayout [named]
+  - Imports: (none)
+  - Summary: Layout Components * * Components for structuring and organizing terminal UI layouts
+- @tuix/ui/components/layout/interactive-layout/InteractiveLayout.tsx
+  - Package: ui
+  - Exports: InteractiveLayoutProps [interface], InteractiveLayout [function], interactiveLayout [function]
+  - Imports: ../box, ../../../theme
+  - Summary: @tuix/ui - InteractiveLayout component * * Full-screen layout for interactive commands (dashboard, live views). * Provides header, content, and footer zones that fill the terminal.
+- @tuix/ui/components/layout/panel/Panel.tsx
+  - Package: ui
+  - Exports: PanelProps [interface], Panel [function], panel [function]
+  - Imports: @tuix/ansi, ../box, ../../../theme
+  - Summary: @tuix/ui - Panel component * * Modern panel container with rounded borders, optional title and footer. * Perfect for showcasing content with clean aesthetics.
+- @tuix/ui/components/layout/panel/index.ts
+  - Package: ui
+  - Exports: Panel [named], panel [named]
+  - Imports: (none)
+  - Summary: @tuix/ui - Panel component exports
+- @tuix/ui/components/layout/scrollable-box/ScrollableBox.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for ScrollableBox.tsx
+- @tuix/ui/components/layout/scrollable-box/ScrollableBox.tsx
+  - Package: ui
+  - Exports: ScrollableBoxProps [interface], ScrollableBox [function], LogEntry [interface], ScrollableLogBox [function], ProcessInfo [interface], ScrollableProcessList [function]
+  - Imports: @tuix/jsx, @tuix/ansi, ../../../theme, ../box, ../viewport
+  - Summary: ScrollableBox Component * * Modern, JSX-first scrollable container that wraps content in a themed panel * and delegates scrolling to the Viewport component.
+- @tuix/ui/components/layout/scrollable-box/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/layout/scrollable-box/index.ts
+  - Package: ui
+  - Exports: ScrollableBox [named], ScrollableLogBox [named], ScrollableProcessList [named], ScrollableBoxProps [type], LogEntry [type], ProcessInfo [type]
+  - Imports: (none)
+  - Summary: Defines ScrollableBox, ScrollableLogBox, ScrollableProcessList, ScrollableBoxProps, LogEntry, ProcessInfo.
+- @tuix/ui/components/layout/static-layout/StaticLayout.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, effect, @tuix/jsx, ./StaticLayout, ../../display/text
+  - Summary: StaticLayout tests
+- @tuix/ui/components/layout/static-layout/StaticLayout.tsx
+  - Package: ui
+  - Exports: StaticLayoutProps [interface], StaticLayout [function], staticLayout [function]
+  - Imports: @tuix/ansi, ../box, ../panel, ../../display/text, ../../../theme
+  - Summary: @tuix/ui - StaticLayout component * * Centered panel layout for non-interactive commands (version, help, welcome). * Renders a branded title bar with content centered in the terminal.
+- @tuix/ui/components/layout/viewport/Viewport.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for Viewport.tsx
+- @tuix/ui/components/layout/viewport/Viewport.tsx
+  - Package: ui
+  - Exports: ViewportProps [interface], Viewport [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/ansi, ../../../stores/viewportStore
+  - Summary: Viewport Component - JSX version for scrollable content areas * * A scrollable container component that provides: * - Vertical and horizontal scrolling * - Scroll indicators/scrollbars * - Mouse wheel support * - Keyboard navigation (arrow keys, page up/down) * - Content that can be larger than the viewport * - Smooth scrolling behavior * * @example * ```tsx * import { Viewport } from 'tuix/components/containers/viewport' * * function MyScrollableContent() { * return ( * <Viewport * width={80} * height={20} * showScrollbars={true} * > * <text>Line 1</text> * <text>Line 2</text> * <text>Line 3</text> * // ... many more lines ... * </Viewport> * ) * } * ```
+- @tuix/ui/components/layout/viewport/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/components/layout/viewport/index.ts
+  - Package: ui
+  - Exports: Viewport [named], ViewportProps [type], ViewportState [type]
+  - Imports: (none)
+  - Summary: JSX Component
+- @tuix/ui/components/navigation/help/index.ts
+  - Package: ui
+  - Exports: None
+  - Imports: (none)
+  - Summary: TODO: Implement MVU/JSX Help component when needed
+- @tuix/ui/components/navigation/index.ts
+  - Package: ui
+  - Exports: None
+  - Imports: (none)
+  - Summary: Navigation Components * * Components for navigating and organizing content
+- @tuix/ui/components/navigation/tabs/Tabs.test.tsx
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test, ./Tabs.js, ../../../../core/update/reactivity/runes.js
+  - Summary: Tabs Component Tests
+- @tuix/ui/components/navigation/tabs/Tabs.tsx
+  - Package: ui
+  - Exports: TabProps [interface], TabsProps [interface], Tab [function], Tabs [function], SimpleTabs [function], PillTabs [function], VerticalTabs [function]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/ansi
+  - Summary: Tabs Component - Multi-view interface with tab navigation * * Features: * - Multiple tab views with content switching * - Keyboard navigation between tabs * - Customizable styling and layout * - Support for dynamic tab content * - Tab state management * - Icons and badges support * - Closeable tabs * * @example * ```tsx * import { Tabs, Tab } from 'tuix/components/navigation/tabs' * * function MyApp() { * const activeTab = $state(0) * * return ( * <Tabs activeIndex={activeTab}> * <Tab label="General" icon="⚙️"> * <text>General settings content</text> * </Tab> * <Tab label="Advanced" badge="3"> * <text>Advanced settings content</text> * </Tab> * <Tab label="About"> * <text>About content</text> * </Tab> * </Tabs> * ) * } * ```
+- @tuix/ui/components/navigation/tabs/index.ts
+  - Package: ui
+  - Exports: Tabs [named], Tab [named], SimpleTabs [named], PillTabs [named], VerticalTabs [named]
+  - Imports: (none)
+  - Summary: Defines Tabs, Tab, SimpleTabs, PillTabs, VerticalTabs.
+- @tuix/ui/components/system/exit/Exit.tsx
+  - Package: ui
+  - Exports: ExitProps [interface], ExitComponent [function], ExitComponent [default]
+  - Imports: effect, @tuix/view/primitives/view, @tuix/core/types, @tuix/runtime/interactive
+  - Summary: Exit Component * * Allows explicit control over when and how to exit the application
+- @tuix/ui/components/system/exit/index.ts
+  - Package: ui
+  - Exports: Exit [named]
+  - Imports: (none)
+  - Summary: Defines Exit.
+- @tuix/ui/components/system/index.ts
+  - Package: ui
+  - Exports: None
+  - Imports: (none)
+  - Summary: System Components * * Components that interact with system-level functionality.
+- @tuix/ui/index.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for index.ts
+- @tuix/ui/index.ts
+  - Package: ui
+  - Exports: Button [named], Modal [named], Table [named], Text [named], Box [named], Flex [named], Select [named], Checkbox [named], Radio [named], Confirm [named], Form [named], Panel [named], Header [named], Badge [named], StatusIndicator [named], Divider [named], ProgressBar [named], StaticLayout [named], InteractiveLayout [named]
+  - Imports: (none)
+  - Summary: User Interface Module * * This module provides the complete UI system for building terminal applications * with Tuix. It includes components, patterns, themes, and utilities for creating * rich interactive user interfaces in the terminal. * * @example * ```typescript * import { components } from 'tuix/ui' * * const { Button, Modal, Table } = components * ```
+- @tuix/ui/stores/formStore.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for formStore.ts
+- @tuix/ui/stores/formStore.ts
+  - Package: ui
+  - Exports: Validator [type], Transformer [type], FieldConfig [interface], FieldState [interface], FormConfig [type], FormFields [type], FormValues [type], FormErrors [type], FormStore [interface], createFormStore [function], formValidators [const], formTransformers [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, effect
+  - Summary: Form Store * * Manages form state for complex forms including: * - Field values and metadata * - Validation state * - Form-wide state (submitting, dirty, touched) * - Field dependencies and computed values * * This store is designed to be instantiated per form, * not as a global singleton.
+- @tuix/ui/stores/textInputStore.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for textInputStore.ts
+- @tuix/ui/stores/textInputStore.ts
+  - Package: ui
+  - Exports: TextInputStoreOptions [interface], TextInputStore [interface], createTextInputStore [function], validators [const], transformers [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/view/string/width
+  - Summary: TextInput Store * * Manages complex state for text input components including: * - Value and cursor position * - Selection state * - Validation and transformation * - Scroll offset for long inputs * * This store is designed to be instantiated per TextInput component, * not as a global singleton.
+- @tuix/ui/stores/viewportStore.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Tests for viewportStore.ts
+- @tuix/ui/stores/viewportStore.ts
+  - Package: ui
+  - Exports: ViewportStoreOptions [interface], ScrollPosition [interface], ViewportDimensions [interface], ViewportStore [interface], createViewportStore [function], scrollBehaviors [const]
+  - Imports: @tuix/reactive/runes/runes, @tuix/reactive/runes/runes, @tuix/view/string/width
+  - Summary: Viewport Store * * Manages state for scrollable viewport components including: * - Scroll position and bounds * - Content dimensions * - Visible area calculations * - Smooth scrolling behavior * * This store is designed to be instantiated per Viewport component, * not as a global singleton.
+- @tuix/ui/theme/index.ts
+  - Package: ui
+  - Exports: useUITheme [named], getTextColor [named], getBackgroundColor [named]
+  - Imports: (none)
+  - Summary: @tuix/ui - Theme utilities
+- @tuix/ui/theme/useUITheme.ts
+  - Package: ui
+  - Exports: ThemeVariant [type], UITheme [interface], useUITheme [function], getTextColor [function], getBackgroundColor [function]
+  - Imports: @tuix/themes, @tuix/themes, @tuix/reactive, @tuix/ansi
+  - Summary: @tuix/ui - Theme integration helper * * Provides easy access to theme colors and utilities for UI components.
+- @tuix/ui/validation/helpers.ts
+  - Package: ui
+  - Exports: combine [function], validate [function], validateFields [function], hasErrors [function], getError [function], clearError [function], setError [function], when [function], debounce [function]
+  - Imports: ./rules
+  - Summary: Form Validation Helpers * * Utilities for combining and applying validation rules
+- @tuix/ui/validation/index.ts
+  - Package: ui
+  - Exports: None
+  - Imports: (none)
+  - Summary: Form Validation * * Validation rules and helpers for forms
+- @tuix/ui/validation/rules.test.ts
+  - Package: ui
+  - Exports: None
+  - Imports: bun:test
+  - Summary: Validation Rules Tests
+- @tuix/ui/validation/rules.ts
+  - Package: ui
+  - Exports: ValidationRule [type], required [function], minLength [function], maxLength [function], email [function], url [function], number [function], integer [function], min [function], max [function], pattern [function], custom [function], oneOf [function], matches [function]
+  - Imports: (none)
+  - Summary: Form Validation Rules * * Common validation rules for form inputs
+- @tuix/update/checker/custom.test.ts
+  - Package: update
+  - Exports: None
+  - Imports: bun:test, effect, ./custom
+  - Summary: Custom Update Checker Tests
+- @tuix/update/checker/custom.ts
+  - Package: update
+  - Exports: CustomUpdateChecker [class], createCustomChecker [function]
+  - Imports: effect, ../types
+  - Summary: Custom URL Update Checker
+- @tuix/update/checker/github.test.ts
+  - Package: update
+  - Exports: None
+  - Imports: bun:test, effect, ./github
+  - Summary: GitHub Update Checker Tests
+- @tuix/update/checker/github.ts
+  - Package: update
+  - Exports: GitHubUpdateChecker [class], createGitHubChecker [function]
+  - Imports: effect, ../types
+  - Summary: GitHub Releases Update Checker
+- @tuix/update/checker/npm.test.ts
+  - Package: update
+  - Exports: None
+  - Imports: bun:test, effect, ./npm
+  - Summary: NPM Update Checker Tests
+- @tuix/update/checker/npm.ts
+  - Package: update
+  - Exports: NpmUpdateChecker [class], createNpmChecker [function]
+  - Imports: effect, ../types
+  - Summary: NPM Registry Update Checker
+- @tuix/update/index.ts
+  - Package: update
+  - Exports: createNpmChecker [named], createGitHubChecker [named], createCustomChecker [named], Updater [named], UpdateBanner [named]
+  - Imports: (none)
+  - Summary: @tuix/update - Update checker and notification system
+- @tuix/update/plugin/Updater.tsx
+  - Package: update
+  - Exports: UpdaterProps [interface], UpdaterModel [interface], UpdaterMsg [type], Updater [const], Updater [default]
+  - Imports: @tuix/core, effect, @tuix/ui, ./banner, ../checker/npm, ../checker/github, ../checker/custom, ../types
+  - Summary: Updater Plugin Component
+- @tuix/update/plugin/banner.tsx
+  - Package: update
+  - Exports: BannerProps [interface], BannerModel [interface], BannerMsg [type], UpdateBanner [const], UpdateBanner [default]
+  - Imports: @tuix/core, @tuix/ui, ../types
+  - Summary: Update Notification Banner
+- @tuix/update/plugin/index.ts
+  - Package: update
+  - Exports: Updater [named], UpdateBanner [named]
+  - Imports: (none)
+  - Summary: Update Plugin Exports
+- @tuix/update/types.ts
+  - Package: update
+  - Exports: VersionInfo [interface], UpdateCheckResult [interface], UpdateCheckerConfig [interface], UpdateChecker [interface], UpdateError [class], UpdateNotificationConfig [interface]
+  - Imports: effect
+  - Summary: Update System Types
+- @tuix/view/coordination/component-coordinator.ts
+  - Package: view
+  - Exports: CoordinationError [class], CoordinationPatternNotFoundError [class], ComponentCoordinator [class], CoordinationPattern [interface], MasterDetailPattern [const], DataFlowPattern [const]
+  - Imports: effect, @tuix/reactive/events/event-bus
+  - Summary: Error types
+- @tuix/view/index.ts
+  - Package: view
+  - Exports: spacer [named], stringWidth [named]
+  - Imports: (none)
+  - Summary: @tuix/view - View System * * Complete view system for TUIX applications including primitives, * layouts, caching, and string utilities. * * @module view
+- @tuix/view/layout/box.test.ts
+  - Package: view
+  - Exports: None
+  - Imports: bun:test, effect, ./box, ../primitives/view, @tuix/ansi
+  - Summary: Box Layout Tests * * Tests for the box layout system with borders and styling
+- @tuix/view/layout/box.ts
+  - Package: view
+  - Exports: BoxProps [interface], styledBox [const], box [const], panel [const], hbox [const], vbox [const]
+  - Imports: effect, @tuix/view/string/width, ../types, ../primitives/view, ./join
+  - Summary: Box Layout - Container components with borders and styling * * Provides styled container components that can wrap other views * with borders, padding, and other visual treatments.
+- @tuix/view/layout/dynamic-layout.ts
+  - Package: view
+  - Exports: DynamicViewProps [interface], SpacerOptions [interface], ConditionalSpacerOptions [interface], fixedSpacer [const], conditionalSpacer [const], dynamicSpacer [const], dynamicVBox [const], heightAwareContainer [const], paddedContainer [const], responsiveLayout [const], scrollableView [const], formField [const], formSection [const]
+  - Imports: effect, @tuix/view/types, @tuix/view/primitives/view
+  - Summary: Dynamic Layout System - Flexible layout components for adaptive UIs * * Provides: * - Dynamic spacing that adapts to content height * - Conditional spacers * - Flexible containers * - Height-aware layouts
+- @tuix/view/layout/flexbox.test.ts
+  - Package: view
+  - Exports: None
+  - Imports: bun:test, effect, ./flexbox, ../primitives/view, ./types
+  - Summary: Flexbox Layout Tests * * Tests for the flexbox layout system
+- @tuix/view/layout/flexbox.ts
+  - Package: view
+  - Exports: flexbox [const], hbox [const], vbox [const], center [const], spread [const]
+  - Imports: effect, @tuix/view/string/width, @tuix/view/types
+  - Summary: Flexbox Layout - Flexible box layout container * * Implements a CSS flexbox-inspired layout system for TUI applications. * Supports: * - Row and column layouts * - Justify content (main axis alignment) * - Align items (cross axis alignment) * - Flex grow/shrink/basis * - Gap between items * - Wrapping
+- @tuix/view/layout/grid.ts
+  - Package: view
+  - Exports: grid [const], columns [const], template [const], gridItem [const], span [const]
+  - Imports: effect, @tuix/view/types
+  - Summary: Grid Layout - CSS Grid-inspired layout system * * Implements a powerful grid layout system for TUI applications: * - Fixed and fractional column/row sizing * - Item placement and spanning * - Gap between cells * - Alignment control
+- @tuix/view/layout/index.ts
+  - Package: view
+  - Exports: styledBox [named], panel [named], hbox [named], vbox [named]
+  - Imports: (none)
+  - Summary: Core layout algorithms * @module core/view/layout
+- @tuix/view/layout/join.ts
+  - Package: view
+  - Exports: Position [type], Top [const], Left [const], Center [const], Bottom [const], Right [const], joinHorizontal [const], joinVertical [const], place [const], JoinOptions [interface], joinHorizontalWithOptions [const], joinVerticalWithOptions [const], joinGrid [const]
+  - Imports: effect, @tuix/view/string/width, @tuix/view/types
+  - Summary: Join Layout Functions - Similar to Lipgloss JoinHorizontal/JoinVertical * * Provides functions to join multiple views together with proper alignment
+- @tuix/view/layout/positioning.ts
+  - Package: view
+  - Exports: positionedLayout [const], layered [const], hbox [named], vbox [named]
+  - Imports: effect, @tuix/view/string/width, @tuix/view/types
+  - Summary: Positioning Layout Functions - Core positioning and arrangement utilities * * Provides fundamental layout functions for positioning and layering * without the complexity of flexbox or grid systems.
+- @tuix/view/layout/spacer.ts
+  - Package: view
+  - Exports: spacer [const], hspace [const], vspace [const], flexSpacer [const], divider [const], hdivider [const], vdivider [const], dottedDivider [const], dashedDivider [const], doubleDivider [const], thickDivider [const], spaced [const], separated [const]
+  - Imports: effect, @tuix/view/types, @tuix/ansi, ./types
+  - Summary: Spacer and Divider - Layout utilities for spacing and separation * * Provides: * - Fixed and flexible spacers * - Horizontal and vertical dividers * - Custom divider styles
+- @tuix/view/layout/types.ts
+  - Package: view
+  - Exports: FlexDirection [enum], JustifyContent [enum], AlignItems [enum], FlexWrap [enum], FlexItem [interface], FlexboxProps [interface], GridTemplate [interface], GridTrack [type], GridPlacement [interface], GridItem [interface], GridProps [interface], LayoutRect [interface], SizeConstraints [interface], LayoutResult [interface], SpacerProps [interface], DividerOrientation [enum], DividerProps [interface]
+  - Imports: ../../types
+  - Summary: Layout Types - Common types and interfaces for the layout system * * This module defines the fundamental types for building flexible * layouts in TUI applications, inspired by CSS flexbox and grid.
+- @tuix/view/lifecycle/lifecycle-manager.ts
+  - Package: view
+  - Exports: ComponentError [class], ComponentNotFoundError [class], ComponentLifecycleManager [class], ComponentConfig [interface], ComponentMetrics [interface]
+  - Imports: effect, @tuix/reactive/events/event-bus, ../../scope
+  - Summary: Error types
+- @tuix/view/performance/optimized-renderer.ts
+  - Package: view
+  - Exports: RenderError [class], OptimizedRenderer [class], RenderResult [interface], RenderingStats [interface]
+  - Imports: effect, @tuix/reactive/events/event-bus, ../lifecycle/lifecycle-manager
+  - Summary: Error types
+- @tuix/view/primitives/types.ts
+  - Package: view
+  - Exports: View [interface], RenderError [class], AppServices [interface]
+  - Imports: effect
+  - Summary: View Types - Core type definitions for the view system
+- @tuix/view/primitives/view.test.ts
+  - Package: view
+  - Exports: None
+  - Imports: bun:test, effect, ./view, @tuix/ansi
+  - Summary: View Primitives Tests * * Comprehensive tests for view creation and rendering functions
+- @tuix/view/primitives/view.ts
+  - Package: view
+  - Exports: text [const], empty [const], createView [const], isView [const], measureView [const], renderView [const], vstack [const], hstack [const], box [const], center [const], styled [const], bold [const], dim [const], italic [const], underline [const], red [const], green [const], yellow [const], blue [const], magenta [const], cyan [const], white [const], styledText [const]
+  - Imports: effect, @tuix/view/string/width, ./types, @tuix/ansi
+  - Summary: View System - Basic view primitives for rendering * * This module provides fundamental view primitives for building terminal UI components. * Views are pure, composable units that can be combined, styled, and rendered to * create complex layouts. All view operations are Effect-based for composability. * * ## Key Features: * * ### Basic Views * - Text views for displaying content * - Empty views for spacing * - View composition and measurement * * ### Layout Primitives * - Vertical stacking (vstack) * - Horizontal stacking (hstack) with multi-line support * - Centering within fixed widths * - Box drawing around content * * ### Styling Support * - ANSI escape sequence styling * - Integration with the TUIX styling system * - Common text decorations (bold, italic, colors) * * ### ANSI-Aware Operations * - Proper width calculation with escape sequences * - Multi-line text handling * - Consistent spacing and alignment * * @example * ```typescript * import { text, vstack, hstack, box, center, bold, blue } from './view' * * // Basic text view * const greeting = text('Hello, World!') * * // Styled view * const styledGreeting = blue(bold(greeting)) * * // Complex layout * const layout = box( * center( * vstack( * styledGreeting, * text('Welcome to TUIX') * ), * 40 * ) * ) * ``` * * @module core/view
+- @tuix/view/string/width.test.ts
+  - Package: view
+  - Exports: None
+  - Imports: bun:test, ./width
+  - Summary: String Width Tests * * Tests for the string width calculation utility that handles ANSI sequences and Unicode
+- @tuix/view/string/width.ts
+  - Package: view
+  - Exports: stringWidth [const], truncateString [const], padString [const]
+  - Imports: @tuix/ansi
+  - Summary: String width calculation utility with ANSI support * * This module provides ANSI-aware string width calculation for terminal UIs. * It strips ANSI escape sequences and handles multiline strings correctly.
+- @tuix/view/types.ts
+  - Package: view
+  - Exports: None
+  - Imports: (none)
+  - Summary: @tuix/view - Type Definitions * * Re-exports all types from the view system for convenient importing
+- @tuix/view/view-cache.ts
+  - Package: view
+  - Exports: CacheEntry [interface], ViewCache [class], globalViewCache [const], memoizeRender [function]
+  - Imports: effect, ./types
+  - Summary: View Rendering Cache - High-performance view rendering optimization * * This module provides intelligent caching for view rendering operations to improve * performance in terminal UI applications. The cache system uses LRU (Least Recently Used) * eviction policies and time-based expiration to manage memory efficiently. * * ## Key Features: * * ### Intelligent Caching * - Automatic cache key generation based on view properties * - Content-aware hashing for cache invalidation * - Configurable size limits and expiration times * * ### Performance Optimization * - LRU eviction to manage memory usage * - Access count tracking for better eviction decisions * - Efficient string hashing for key generation * * ### Cache Management * - Automatic cleanup of expired entries * - Size-based eviction when limits are exceeded * - Comprehensive cache statistics and monitoring * * ### Effect Integration * - Seamless integration with Effect-based view rendering * - Error handling and recovery for cache operations * - Memoization utilities for custom render functions * * @example * ```typescript * import { ViewCache, globalViewCache } from './view-cache' * * // Use global cache * const key = globalViewCache.generateKey(myView) * const rendered = await globalViewCache.renderCached(key, myView) * * // Create custom cache * const cache = new ViewCache({ maxSize: 500, maxAge: 60000 }) * * // Memoize custom render function * const memoizedRender = memoizeRender( * (view) => Effect.succeed(customRenderLogic(view)), * (view) => `custom-${view.id}` * ) * ``` * * @module core/view-cache

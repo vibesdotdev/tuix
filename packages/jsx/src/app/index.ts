@@ -9,4 +9,5 @@
 export { Command, type CommandProps } from './Command'
 export { Plugin, type PluginProps } from './Plugin'
 export { Fallback, type FallbackProps } from './Fallback'
-export { runApp, type JSXComponent, type JSXRunConfig } from './runApp'
+// NOTE: runApp is now exported from ./compiler instead
+export type { JSXComponent, JSXRunConfig } from './runApp'

@@ -8,8 +8,7 @@
 import { test, expect, describe, beforeEach, afterEach } from 'bun:test'
 import { Effect } from 'effect'
 import { getGlobalEventBus, resetGlobalEventBus } from '@tuix/reactive/events/event-bus'
-import { resetGlobalRegistry } from '@tuix/runtime/module/registry.js'
-import { bootstrapWithModules, type BootstrapResult } from './runtime/bootstrap.js'
+import { resetGlobalRegistry, bootstrapWithModules, type BootstrapResult } from '@tuix/runtime'
 
 describe('Core Module Integration', () => {
   beforeEach(async () => {

@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { Effect } from 'effect'
-import { jsx, jsxs, jsxDEV, Fragment, createElement, JSXContext } from './index'
+import { jsx, jsxs, jsxDEV, Fragment, createElement, JSXContext, render } from './index'
 import { scopeManager } from './scope/manager'
 import { text } from '@tuix/view/primitives/view'
 
@@ -18,7 +18,7 @@ describe('JSX Runtime', () => {
 
   describe('jsx function', () => {
     it('should create basic JSX elements', () => {
-      const element = jsx('div', { className: 'test' }, 'Hello World')
+      const element = jsx('div', { className: 'test', children: 'Hello World' })
 
       expect(element).toBeDefined()
       expect(element.type).toBe('div')
@@ -27,31 +27,31 @@ describe('JSX Runtime', () => {
     })
 
     it('should handle empty props', () => {
-      const element = jsx('span', {}, 'content')
+      const element = jsx('span', { children: 'content' })
 
       expect(element.type).toBe('span')
       expect(element.props.children).toBe('content')
     })
 
     it('should handle null props', () => {
-      const element = jsx('p', null, 'text')
+      const element = jsx('p', { children: 'text' })
 
       expect(element.type).toBe('p')
       expect(element.props.children).toBe('text')
     })
 
     it('should handle multiple children', () => {
-      const child1 = jsx('span', {}, 'first')
-      const child2 = jsx('span', {}, 'second')
-      const element = jsx('div', {}, child1, child2)
+      const child1 = jsx('span', { children: 'first' })
+      const child2 = jsx('span', { children: 'second' })
+      const element = jsx('div', { children: [child1, child2] })
 
       expect(Array.isArray(element.props.children)).toBe(true)
       expect(element.props.children).toHaveLength(2)
     })
 
     it('should handle nested elements', () => {
-      const inner = jsx('span', {}, 'inner text')
-      const outer = jsx('div', { id: 'outer' }, inner)
+      const inner = jsx('span', { children: 'inner text' })
+      const outer = jsx('div', { id: 'outer', children: inner })
 
       expect(outer.type).toBe('div')
       expect(outer.props.id).toBe('outer')
@@ -61,13 +61,13 @@ describe('JSX Runtime', () => {
 
   describe('jsxs function', () => {
     it('should handle static children', () => {
-      const element = jsxs(
-        'ul',
-        {},
-        jsx('li', {}, 'Item 1'),
-        jsx('li', {}, 'Item 2'),
-        jsx('li', {}, 'Item 3')
-      )
+      const element = jsxs('ul', {
+        children: [
+          jsx('li', { children: 'Item 1' }),
+          jsx('li', { children: 'Item 2' }),
+          jsx('li', { children: 'Item 3' }),
+        ],
+      })
 
       expect(element.type).toBe('ul')
       expect(Array.isArray(element.props.children)).toBe(true)
@@ -75,13 +75,13 @@ describe('JSX Runtime', () => {
     })
 
     it('should preserve child order', () => {
-      const element = jsxs(
-        'div',
-        {},
-        jsx('h1', {}, 'Title'),
-        jsx('p', {}, 'Content'),
-        jsx('footer', {}, 'Footer')
-      )
+      const element = jsxs('div', {
+        children: [
+          jsx('h1', { children: 'Title' }),
+          jsx('p', { children: 'Content' }),
+          jsx('footer', { children: 'Footer' }),
+        ],
+      })
 
       const children = element.props.children
       expect(children[0].type).toBe('h1')
@@ -92,7 +92,12 @@ describe('JSX Runtime', () => {
 
   describe('Fragment', () => {
     it('should create fragment elements', () => {
-      const fragment = jsx(Fragment, {}, jsx('span', {}, 'First'), jsx('span', {}, 'Second'))
+      const fragment = jsx(Fragment, {
+        children: [
+          jsx('span', { children: 'First' }),
+          jsx('span', { children: 'Second' }),
+        ],
+      })
 
       expect(fragment.type).toBe(Fragment)
       expect(Array.isArray(fragment.props.children)).toBe(true)
@@ -108,7 +113,8 @@ describe('JSX Runtime', () => {
 
   describe('createElement', () => {
     it('should create elements with component functions', () => {
-      const MyComponent = (props: { name: string }) => jsx('div', {}, `Hello, ${props.name}!`)
+      const MyComponent = (props: { name: string }) =>
+        jsx('div', { children: `Hello, ${props.name}!` })
 
       const element = createElement(MyComponent, { name: 'World' })
 
@@ -118,9 +124,9 @@ describe('JSX Runtime', () => {
 
     it('should handle component with children', () => {
       const Container = (props: { children: any }) =>
-        jsx('div', { className: 'container' }, props.children)
+        jsx('div', { className: 'container', children: props.children })
 
-      const element = createElement(Container, {}, jsx('p', {}, 'Child content'))
+      const element = createElement(Container, {}, jsx('p', { children: 'Child content' }))
 
       expect(element.type).toBe(Container)
       expect(element.props.children.type).toBe('p')
@@ -134,7 +140,7 @@ describe('JSX Runtime', () => {
         return text(props.children)
       }
 
-      const element = jsx(TextComponent, {}, 'Hello World')
+      const element = jsx(TextComponent, { children: 'Hello World' })
       expect(element.props.children).toBe('Hello World')
     })
 
@@ -145,7 +151,7 @@ describe('JSX Runtime', () => {
           children: props.children,
         })
 
-      const element = jsx(Box, { border: true }, 'Content')
+      const element = jsx(Box, { border: true, children: 'Content' })
 
       expect(element.props.border).toBe(true)
       expect(element.props.children).toBe('Content')
@@ -175,7 +181,7 @@ describe('JSX Runtime', () => {
 
     it('should handle function props', () => {
       const handler = () => 'clicked'
-      const element = jsx('button', { onClick: handler }, 'Click me')
+      const element = jsx('button', { onClick: handler, children: 'Click me' })
 
       expect(typeof element.props.onClick).toBe('function')
       expect(element.props.onClick()).toBe('clicked')
@@ -184,7 +190,7 @@ describe('JSX Runtime', () => {
 
   describe('Key and ref handling', () => {
     it('should handle key prop', () => {
-      const element = jsx('div', { key: 'unique-key' }, 'content')
+      const element = jsx('div', { key: 'unique-key', children: 'content' })
 
       expect(element.key).toBe('unique-key')
       expect(element.props.key).toBeUndefined() // Key should be extracted
@@ -202,13 +208,15 @@ describe('JSX Runtime', () => {
   describe('Conditional rendering', () => {
     it('should handle conditional elements', () => {
       const showContent = true
-      const element = jsx('div', {}, showContent ? jsx('p', {}, 'Visible') : null)
+      const element = jsx('div', {
+        children: showContent ? jsx('p', { children: 'Visible' }) : null,
+      })
 
       expect(element.props.children.type).toBe('p')
     })
 
     it('should handle false/null children', () => {
-      const element = jsx('div', {}, false, null, undefined)
+      const element = jsx('div', { children: [false, null, undefined] })
 
       // These should be filtered out or handled appropriately
       expect(element.props.children).toBeDefined()
@@ -218,11 +226,9 @@ describe('JSX Runtime', () => {
   describe('List rendering', () => {
     it('should handle arrays of elements', () => {
       const items = ['apple', 'banana', 'cherry']
-      const list = jsx(
-        'ul',
-        {},
-        items.map((item, index) => jsx('li', { key: index }, item))
-      )
+      const list = jsx('ul', {
+        children: items.map((item, index) => jsx('li', { key: index, children: item })),
+      })
 
       expect(list.type).toBe('ul')
       expect(Array.isArray(list.props.children)).toBe(true)
@@ -235,11 +241,9 @@ describe('JSX Runtime', () => {
         { id: 2, name: 'Second' },
       ]
 
-      const list = jsx(
-        'div',
-        {},
-        items.map(item => jsx('span', { key: item.id }, item.name))
-      )
+      const list = jsx('div', {
+        children: items.map(item => jsx('span', { key: item.id, children: item.name })),
+      })
 
       const children = list.props.children
       expect(children[0].key).toBe(1)
@@ -274,7 +278,7 @@ describe('JSX Runtime', () => {
 
       // Create many elements
       for (let i = 0; i < 1000; i++) {
-        jsx('div', { id: `item-${i}` }, `Item ${i}`)
+        jsx('div', { id: `item-${i}`, children: `Item ${i}` })
       }
 
       const endTime = performance.now()
@@ -286,9 +290,9 @@ describe('JSX Runtime', () => {
     it('should handle deep nesting efficiently', () => {
       const startTime = performance.now()
 
-      let nested = jsx('span', {}, 'deepest')
+      let nested = jsx('span', { children: 'deepest' })
       for (let i = 0; i < 100; i++) {
-        nested = jsx('div', { level: i }, nested)
+        nested = jsx('div', { level: i, children: nested })
       }
 
       const endTime = performance.now()
@@ -308,11 +312,31 @@ describe('JSX Runtime', () => {
       }
 
       const Provider = (props: { value: any; children: any }) =>
-        jsx('div', { 'data-context': 'provider' }, props.children)
+        jsx('div', { 'data-context': 'provider', children: props.children })
 
-      const element = jsx(Provider, { value: ThemeContext }, jsx('span', {}, 'Themed content'))
+      const element = jsx(Provider, {
+        value: ThemeContext,
+        children: jsx('span', { children: 'Themed content' }),
+      })
 
       expect(element.props.value).toBe(ThemeContext)
+    })
+  })
+
+  describe('Interactive integration', () => {
+    it('should attach metadata to interactive views', () => {
+      const handler = () => 'clicked'
+      const element = jsx('interactive', {
+        onClick: handler,
+        children: jsx('text', { children: 'Click me' }),
+      })
+
+      const view = render(element)
+      const metadata = (view as any)[Symbol.for('tuix.interactive')]
+
+      expect(metadata).toBeDefined()
+      expect(metadata.events?.onClick).toBe(handler)
+      expect(metadata.focusable).toBe(true)
     })
   })
 
@@ -328,8 +352,8 @@ describe('JSX Runtime', () => {
 
     it('should handle large element trees', () => {
       const createTree = (depth: number): any => {
-        if (depth === 0) return jsx('span', {}, 'leaf')
-        return jsx('div', { depth }, createTree(depth - 1))
+        if (depth === 0) return jsx('span', { children: 'leaf' })
+        return jsx('div', { depth, children: createTree(depth - 1) })
       }
 
       const tree = createTree(50)

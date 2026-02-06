@@ -159,40 +159,61 @@ export function StaticLayout(props: StaticLayoutProps): JSX.Element {
       : props.statusLine
     : undefined
 
-  return (
-    <Box
-      direction="vertical"
-      margin={{ top: marginTop, bottom: marginBottom, left: leftMargin }}
+  const panel = (
+    <Panel
+      width={panelWidth}
+      variant="default"
+      rounded
     >
-      <Panel
-        width={panelWidth}
-        variant="default"
-        rounded
+      {/* Title bar */}
+      <Box
+        direction="vertical"
+        margin={{ bottom: 2 }}
       >
-        {/* Title bar */}
+        {titleBarContent}
+      </Box>
+
+      {/* Main content */}
+      <Box direction="vertical">
+        {props.children}
+      </Box>
+
+      {/* Status line */}
+      {footer && (
         <Box
           direction="vertical"
-          margin={{ bottom: 2 }}
+          margin={{ top: 2 }}
         >
-          {titleBarContent}
+          {footer}
         </Box>
+      )}
+    </Panel>
+  )
 
-        {/* Main content */}
-        <Box direction="vertical">
-          {props.children}
-        </Box>
+  const horizontalWithMargin =
+    leftMargin > 0 ? (
+      <hstack>
+        <text>{' '.repeat(leftMargin)}</text>
+        {panel}
+      </hstack>
+    ) : (
+      panel
+    )
 
-        {/* Status line */}
-        {footer && (
-          <Box
-            direction="vertical"
-            margin={{ top: 2 }}
-          >
-            {footer}
-          </Box>
-        )}
-      </Panel>
-    </Box>
+  const topMarginLines = Array.from({ length: Math.max(marginTop, 0) }, (_, index) => (
+    <text key={`margin-top-${index}`}>{' '}</text>
+  ))
+
+  const bottomMarginLines = Array.from({ length: Math.max(marginBottom, 0) }, (_, index) => (
+    <text key={`margin-bottom-${index}`}>{' '}</text>
+  ))
+
+  return (
+    <vstack>
+      {topMarginLines}
+      {horizontalWithMargin}
+      {bottomMarginLines}
+    </vstack>
   )
 }
 
