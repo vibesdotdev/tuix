@@ -36,6 +36,7 @@ export {
   extractCommandDoc,
   extractPluginDoc,
   extractAppDoc,
+  extractAppDocFromScopes,
   generateCommandMarkdown,
   generatePluginMarkdown,
   generateAppMarkdown,

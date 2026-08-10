@@ -83,11 +83,11 @@ export function StatusIndicator(props: StatusIndicatorProps): JSX.Element {
 
   return (
     <Box direction="horizontal" align="center" gap={1} style={style().inline(true)}>
-      <text style={style().foreground(statusColor)}>
-        {indicator}
-      </text>
+      <text style={style().foreground(statusColor)}>{indicator}</text>
       {props.label && (
-        <text style={style().foreground(theme.colors.textBright ?? theme.colors.fg ?? colors.white)}>
+        <text
+          style={style().foreground(theme.colors.textBright ?? theme.colors.fg ?? colors.white)}
+        >
           {props.label}
         </text>
       )}

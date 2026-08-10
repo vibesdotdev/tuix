@@ -81,7 +81,7 @@ class ThemeContextImpl implements ThemeContext {
       try: () => {
         this.currentTheme = theme
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'ThemeError' as const,
         message: 'Failed to set theme',
         cause: error,
@@ -98,7 +98,7 @@ class ThemeContextImpl implements ThemeContext {
         }
         return theme
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'ThemeError' as const,
         message: `Theme not found: ${name}`,
         cause: error,
@@ -111,7 +111,7 @@ class ThemeContextImpl implements ThemeContext {
       try: () => {
         this.themes.set(theme.name, theme)
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'ThemeError' as const,
         message: `Failed to register theme: ${theme.name}`,
         cause: error,

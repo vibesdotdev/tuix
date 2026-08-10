@@ -8,13 +8,7 @@
 
 import { Effect, Stream, Context } from 'effect'
 import type { RenderError, TerminalError, InputError, StorageError } from './errors'
-import type {
-  WindowSize,
-  Viewport,
-  TerminalCapabilities,
-  KeyEvent,
-  MouseEvent
-} from './common'
+import type { WindowSize, Viewport, TerminalCapabilities, KeyEvent, MouseEvent } from './common'
 
 // =============================================================================
 // Core Framework Types
@@ -71,9 +65,7 @@ export interface Component<Model, Msg> {
   /**
    * Define subscriptions to external events that should be processed by this component.
    */
-  readonly subscriptions?: (
-    model: Model
-  ) => ReadonlyArray<Effect.Effect<Msg, never, AppServices>>
+  readonly subscriptions?: (model: Model) => ReadonlyArray<Effect.Effect<Msg, never, AppServices>>
 }
 
 /**
@@ -137,9 +129,7 @@ export interface InputService
       readonly mapKeys: <T>(
         mapper: (key: KeyEvent) => T | null
       ) => Stream.Stream<T, InputError, never>
-      readonly debounceKeys: (
-        ms: number
-      ) => Stream.Stream<KeyEvent, InputError, never>
+      readonly debounceKeys: (ms: number) => Stream.Stream<KeyEvent, InputError, never>
       readonly parseAnsiSequence: (
         sequence: string
       ) => Effect.Effect<KeyEvent | null, InputError, never>

@@ -26,7 +26,9 @@ class ScopeStackStore {
   pop(): ScopeDef | null {
     const popped = this.stack.pop() || null
     if (process.env.DEBUG_SCOPE) {
-      console.log(`[ScopeStack] Popped ${popped?.name || 'null'}, stack depth: ${this.stack.length}`)
+      console.log(
+        `[ScopeStack] Popped ${popped?.name || 'null'}, stack depth: ${this.stack.length}`
+      )
     }
     return popped
   }

@@ -186,5 +186,22 @@ export class TerminalService extends Context.Tag('TerminalService')<
      * Enable/disable cursor blinking.
      */
     readonly setCursorBlink: (enabled: boolean) => Effect.Effect<void, TerminalError, never>
+
+    /**
+     * Write an image via the best graphics protocol for current capabilities.
+     * Returns which protocol was used, or 'none' when falling back to cell/ASCII.
+     */
+    readonly writeGraphics: (image: {
+      data: Uint8Array | Buffer | number[]
+      width: number
+      height: number
+      channels?: 1 | 3 | 4
+      format?: 'rgb' | 'rgba' | 'png' | 'gray'
+      name?: string
+    }) => Effect.Effect<
+      { protocol: 'kitty' | 'iterm2' | 'sixel' | 'none'; fallback: boolean },
+      TerminalError,
+      never
+    >
   }
 >() {}

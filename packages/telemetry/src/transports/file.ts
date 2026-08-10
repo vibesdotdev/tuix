@@ -34,7 +34,7 @@ export class FileTransport implements TelemetryTransport {
 
   private async appendToFile(filePath: string, data: any[]): Promise<void> {
     // Write as newline-delimited JSON
-    const lines = data.map((item) => JSON.stringify(item)).join('\n') + '\n'
+    const lines = data.map(item => JSON.stringify(item)).join('\n') + '\n'
     await Bun.write(filePath, lines, { createPath: true, append: true })
 
     // Check file size and rotate if needed
@@ -66,7 +66,7 @@ export class FileTransport implements TelemetryTransport {
 
     try {
       const files = readdirSync(this.config.directory)
-        .map((filename) => ({
+        .map(filename => ({
           filename,
           path: join(this.config.directory, filename),
           mtime: statSync(join(this.config.directory, filename)).mtime.getTime(),
@@ -94,7 +94,7 @@ export class FileTransport implements TelemetryTransport {
         const filePath = this.getFilePath('events')
         await this.appendToFile(filePath, events)
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'TransportError' as const,
         message: `Failed to write events to file: ${error}`,
         cause: error,
@@ -108,7 +108,7 @@ export class FileTransport implements TelemetryTransport {
         const filePath = this.getFilePath('errors')
         await this.appendToFile(filePath, errors)
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'TransportError' as const,
         message: `Failed to write errors to file: ${error}`,
         cause: error,
@@ -122,7 +122,7 @@ export class FileTransport implements TelemetryTransport {
         const filePath = this.getFilePath('performance')
         await this.appendToFile(filePath, metrics)
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'TransportError' as const,
         message: `Failed to write performance metrics to file: ${error}`,
         cause: error,

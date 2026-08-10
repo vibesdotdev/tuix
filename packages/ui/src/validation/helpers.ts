@@ -126,7 +126,7 @@ export function debounce<T extends (...args: any[]) => any>(
   let timeoutId: Timer | null = null
 
   return (...args: Parameters<T>) => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (timeoutId) {
         clearTimeout(timeoutId)
       }

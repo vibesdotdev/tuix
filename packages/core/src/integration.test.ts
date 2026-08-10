@@ -7,7 +7,7 @@
 
 import { test, expect, describe, beforeEach, afterEach } from 'bun:test'
 import { Effect } from 'effect'
-import { getGlobalEventBus, resetGlobalEventBus } from '@tuix/reactive/events/event-bus'
+import { getGlobalEventBus, resetGlobalEventBus } from '@tuix/core/events'
 import { resetGlobalRegistry, bootstrapWithModules, type BootstrapResult } from '@tuix/runtime'
 
 describe('Core Module Integration', () => {
@@ -26,14 +26,13 @@ describe('Core Module Integration', () => {
       const result = (await Effect.runPromise(
         bootstrapWithModules({
           enableServices: true,
-          enableEventSystem: true,
-          enableStyling: true,
         })
       )) as BootstrapResult
 
       expect(result.modules).toBeDefined()
-      expect(result.modules.jsx).toBeDefined()
-      expect(result.modules.cli).toBeDefined()
+      // Runtime-owned defaults (app modules inject via additionalModules)
+      expect(result.modules.reactivity).toBeDefined()
+      expect(result.modules.services).toBeDefined()
       expect(result.status).toBe('initialized')
     })
 
@@ -126,7 +125,6 @@ describe('Core Module Integration', () => {
       const result = (await Effect.runPromise(
         bootstrapWithModules({
           enableServices: true,
-          enableEventSystem: true,
         })
       )) as BootstrapResult
 
@@ -158,13 +156,15 @@ describe('Core Module Integration', () => {
       // Test that core module only exports what it should
       const coreExports = await import('./index.js')
 
-      // Core should export these categories
-      expect(coreExports.View).toBeDefined()
-      expect(coreExports.Runtime).toBeDefined()
-      expect(coreExports.Effect).toBeDefined()
+      // Core public surface (Tags, events, services, recovery)
       expect(coreExports.EventBus).toBeDefined()
+      expect(coreExports.Effect).toBeDefined()
+      expect(coreExports.TerminalService).toBeDefined()
+      expect(coreExports.LiveServices).toBeDefined()
+      expect(coreExports.detectCapabilities).toBeDefined()
+      expect(coreExports.encodeGraphics).toBeDefined()
 
-      // Core should not expose internal implementation
+      // Core should not expose runtime bootstrap (lives in @tuix/runtime)
       expect((coreExports as any).bootstrap).toBeUndefined()
       expect((coreExports as any).internal).toBeUndefined()
     })
@@ -247,8 +247,6 @@ describe('Core Module Integration', () => {
       const result = await Effect.runPromise(
         bootstrapWithModules({
           enableServices: true,
-          enableEventSystem: true,
-          enableStyling: true,
         })
       )
 

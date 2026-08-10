@@ -238,10 +238,10 @@ export function List<T = any>(props: ListProps<T>): JSX.Element {
         </text>
       )
     }
-    return props.emptyMessage ?? (
-      <text style={style().foreground(colors.gray).italic()}>
-        No items to display
-      </text>
+    return (
+      props.emptyMessage ?? (
+        <text style={style().foreground(colors.gray).italic()}>No items to display</text>
+      )
     )
   }
 
@@ -343,9 +343,7 @@ export function List<T = any>(props: ListProps<T>): JSX.Element {
           renderEmptyState()
         ) : (
           <box style={style()}>
-            <vstack>
-              {visibleItems().map((item, index) => renderItem(item, index))}
-            </vstack>
+            <vstack>{visibleItems().map((item, index) => renderItem(item, index))}</vstack>
             {renderScrollbar()}
           </box>
         )}
@@ -399,9 +397,7 @@ export function NumberedList<T = any>(props: Omit<ListProps<T>, 'renderItem'>): 
     ...props,
     renderItem: (item, index, selected, focused) => (
       <hstack gap={1}>
-        <text style={style().foreground(colors.gray)}>
-          {(index + 1).toString().padStart(3)}.
-        </text>
+        <text style={style().foreground(colors.gray)}>{(index + 1).toString().padStart(3)}.</text>
         <text
           style={style()
             .background(selected ? colors.blue : 'transparent')

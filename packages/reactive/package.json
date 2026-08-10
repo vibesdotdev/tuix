@@ -26,11 +26,6 @@
       "import": "./src/events/index.ts",
       "default": "./src/events/index.ts"
     },
-    "./events/event-bus": {
-      "types": "./src/events/event-bus.ts",
-      "import": "./src/events/event-bus.ts",
-      "default": "./src/events/event-bus.ts"
-    },
     "./jsx-lifecycle": {
       "types": "./src/runes/jsx-lifecycle.ts",
       "import": "./src/runes/jsx-lifecycle.ts",
@@ -59,12 +54,8 @@
   },
   "dependencies": {
     "@tuix/core": "workspace:*",
-    "effect": "^3.16.9",
     "@tuix/runtime": "workspace:*",
-    "@tuix/jsx": "workspace:*",
-    "@tuix/debug": "workspace:*",
-    "@tuix/ansi": "workspace:*",
-    "@tuix/view": "workspace:*"
+    "effect": "^3.16.9"
   },
   "devDependencies": {
     "@types/bun": "latest",

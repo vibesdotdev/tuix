@@ -182,9 +182,7 @@ export const Sub = {
    * ```
    */
   interval: <Msg>(duration: Duration.DurationInput, msg: Msg): Sub<Msg> =>
-    Stream.repeatEffect(
-      Effect.sleep(duration).pipe(Effect.map(() => msg))
-    ),
+    Stream.repeatEffect(Effect.sleep(duration).pipe(Effect.map(() => msg))),
 
   /**
    * Subscription from a Stream
@@ -195,10 +193,8 @@ export const Sub = {
    * Sub.fromStream(events, event => ({ type: 'event', event }))
    * ```
    */
-  fromStream: <A, Msg>(
-    stream: Stream.Stream<A>,
-    toMsg: (value: A) => Msg
-  ): Sub<Msg> => stream.pipe(Stream.map(toMsg)),
+  fromStream: <A, Msg>(stream: Stream.Stream<A>, toMsg: (value: A) => Msg): Sub<Msg> =>
+    stream.pipe(Stream.map(toMsg)),
 
   /**
    * Combine multiple subscriptions
@@ -216,6 +212,5 @@ export const Sub = {
   /**
    * Map a subscription's messages
    */
-  map: <A, B>(sub: Sub<A>, fn: (msg: A) => B): Sub<B> =>
-    sub.pipe(Stream.map(fn)),
+  map: <A, B>(sub: Sub<A>, fn: (msg: A) => B): Sub<B> => sub.pipe(Stream.map(fn)),
 }

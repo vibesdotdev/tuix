@@ -35,7 +35,7 @@ export const Right: Position = 1.0
  * ```
  */
 export const joinHorizontal = (position: Position, ...views: View[]): View => {
-  // No spacing in the simplified API - use the legacy function if needed
+  // No spacing in the simplified API
   const spacing = 0
 
   if (views.length === 0) {
@@ -50,7 +50,8 @@ export const joinHorizontal = (position: Position, ...views: View[]): View => {
 
         // Split each into lines - handle both string and {content} return types
         const viewLines = rendered.map(content => {
-          const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+          const contentStr =
+            typeof content === 'string' ? content : (content as { content: string }).content
           return contentStr.split('\n')
         })
 
@@ -105,7 +106,7 @@ export const joinHorizontal = (position: Position, ...views: View[]): View => {
  * ```
  */
 export const joinVertical = (position: Position, ...views: View[]): View => {
-  // No spacing in the simplified API - use the legacy function if needed
+  // No spacing in the simplified API
   const spacing = 0
   if (views.length === 0) {
     return { render: () => Effect.succeed(''), width: 0, height: 0 }
@@ -120,7 +121,8 @@ export const joinVertical = (position: Position, ...views: View[]): View => {
         // Filter out empty views to avoid blank lines
         const nonEmptyViews: Array<{ content: any; view: View; index: number }> = []
         rendered.forEach((content, index) => {
-          const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+          const contentStr =
+            typeof content === 'string' ? content : (content as { content: string }).content
           if (contentStr.trim().length > 0) {
             nonEmptyViews.push({ content, view: views[index]!, index })
           }
@@ -136,7 +138,8 @@ export const joinVertical = (position: Position, ...views: View[]): View => {
         // Align each view horizontally
         const aligned = nonEmptyViews.map(({ content, view }) => {
           // Handle both string and {content, width, height} return types
-          const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+          const contentStr =
+            typeof content === 'string' ? content : (content as { content: string }).content
           const lines = contentStr.split('\n')
           const viewWidth = view.width || 0
 
@@ -199,7 +202,8 @@ export const place = (
     render: () =>
       Effect.gen(function* (_) {
         const content = yield* _(view.render())
-        const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+        const contentStr =
+          typeof content === 'string' ? content : (content as { content: string }).content
         const lines = contentStr.split('\n')
 
         // Horizontal alignment
@@ -239,7 +243,7 @@ export const place = (
 }
 
 /**
- * Options for joining views (legacy API)
+ * Options for joining views.
  */
 export interface JoinOptions {
   spacing?: number
@@ -247,9 +251,7 @@ export interface JoinOptions {
 }
 
 /**
- * Legacy horizontal join function with options (for backward compatibility)
- *
- * @deprecated Use joinHorizontal(position, ...views) instead
+ * Horizontal join function with options.
  */
 export const joinHorizontalWithOptions = (views: View[], options: JoinOptions = {}): View => {
   const position = parseAlignmentOption(options.align, Center)
@@ -262,9 +264,7 @@ export const joinHorizontalWithOptions = (views: View[], options: JoinOptions = 
 }
 
 /**
- * Legacy vertical join function with options (for backward compatibility)
- *
- * @deprecated Use joinVertical(position, ...views) instead
+ * Vertical join function with options.
  */
 export const joinVerticalWithOptions = (views: View[], options: JoinOptions = {}): View => {
   const position = parseAlignmentOption(options.align, Center)
@@ -340,7 +340,8 @@ const joinVerticalWithSpacing = (position: Position, views: View[], spacing: num
         const rendered = yield* _(Effect.forEach(views, v => v.render()))
 
         const aligned = rendered.map((content, index) => {
-          const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+          const contentStr =
+            typeof content === 'string' ? content : (content as { content: string }).content
           const lines = contentStr.split('\n')
           const viewWidth = views[index]?.width || 0
 

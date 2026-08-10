@@ -4,7 +4,14 @@
  * Showcase Command - Demonstrates polished TUI components
  */
 
-import { style, colors, textGradient, rainbowGradient, sunsetGradient, oceanGradient } from '@tuix/ansi'
+import {
+  style,
+  colors,
+  textGradient,
+  rainbowGradient,
+  sunsetGradient,
+  oceanGradient,
+} from '@tuix/ansi'
 
 export default function ShowcaseCommand() {
   return (
@@ -22,7 +29,9 @@ export default function ShowcaseCommand() {
           <text style={style().fg(colors.green).bold()}>Welcome to TUIX</text>
           <text style={style().fg(colors.white)}>A Modern Terminal UI Framework</text>
           <text></text>
-          <text style={style().fg(colors.gray)}>Build beautiful, reactive terminal applications with JSX</text>
+          <text style={style().fg(colors.gray)}>
+            Build beautiful, reactive terminal applications with JSX
+          </text>
         </vstack>
       </box>
 
@@ -37,7 +46,7 @@ export default function ShowcaseCommand() {
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         <box border="rounded" padding={1} style={style().fg(colors.magenta)}>
           <vstack>
@@ -46,7 +55,7 @@ export default function ShowcaseCommand() {
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         <box border="rounded" padding={1} style={style().fg(colors.yellow)}>
           <vstack>
@@ -160,14 +169,14 @@ export default function ShowcaseCommand() {
                 <text>45%</text>
               </vstack>
             </box>
-            <text>  </text>
+            <text> </text>
             <box border="rounded" padding={1}>
               <vstack>
                 <text style={style().fg(colors.magenta).bold()}>Memory</text>
                 <text>2.1 GB</text>
               </vstack>
             </box>
-            <text>  </text>
+            <text> </text>
             <box border="rounded" padding={1}>
               <vstack>
                 <text style={style().fg(colors.yellow).bold()}>Disk</text>
@@ -185,9 +194,24 @@ export default function ShowcaseCommand() {
       <vstack>
         <box border="rounded" padding={1}>
           <vstack>
-            <text>{textGradient({ gradient: rainbowGradient(), text: '🌈 Rainbow Gradient - TUIX is Amazing!' })}</text>
-            <text>{textGradient({ gradient: sunsetGradient(), text: '🌅 Sunset Gradient - Beautiful Colors' })}</text>
-            <text>{textGradient({ gradient: oceanGradient(), text: '🌊 Ocean Gradient - Deep Blue Vibes' })}</text>
+            <text>
+              {textGradient({
+                gradient: rainbowGradient(),
+                text: '🌈 Rainbow Gradient - TUIX is Amazing!',
+              })}
+            </text>
+            <text>
+              {textGradient({
+                gradient: sunsetGradient(),
+                text: '🌅 Sunset Gradient - Beautiful Colors',
+              })}
+            </text>
+            <text>
+              {textGradient({
+                gradient: oceanGradient(),
+                text: '🌊 Ocean Gradient - Deep Blue Vibes',
+              })}
+            </text>
           </vstack>
         </box>
       </vstack>
@@ -234,11 +258,11 @@ export default function ShowcaseCommand() {
             <box border="rounded" padding={1} style={style().fg(colors.blue)}>
               <text>Rounded</text>
             </box>
-            <text>  </text>
+            <text> </text>
             <box border="thick" padding={1} style={style().fg(colors.green)}>
               <text>Thick</text>
             </box>
-            <text>  </text>
+            <text> </text>
             <box border="ascii" padding={1} style={style().fg(colors.yellow)}>
               <text>ASCII</text>
             </box>

@@ -15,6 +15,11 @@ export * from '@tuix/input'
 // Export service implementations
 export * from './live'
 
+// Capability detection + graphics protocols (pure)
+export * from './capabilities'
+export * from './graphics'
+export * from './input/paste'
+
 // Export module coordinator
 export * from './module'
 

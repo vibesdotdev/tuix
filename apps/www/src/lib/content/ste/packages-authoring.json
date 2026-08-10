@@ -1,0 +1,117 @@
+{
+  "packages": [
+    {
+      "slug": "jsx",
+      "name": "@tuix/jsx",
+      "layer": "Authoring",
+      "summary": "JSX runtime and compile bridge for terminal apps.",
+      "purpose": "You write views with JSX. The package maps them to MVU components and starts the app.",
+      "whenToUse": "Use this package when you build a CLI or TUI with JSX. Import `runApp`, `Command`, and `Fallback` for app entry and routing.",
+      "mainConcepts": [
+        "JSX elements map to view primitives such as `text`, `box`, and `flex`.",
+        "`runApp` compiles the root component and starts the runtime loop.",
+        "`Command` registers a CLI command scope with args and flags.",
+        "`Fallback` sets the view when no command matches.",
+        "The compiler detects interactive mode and extracts named state."
+      ],
+      "keyExports": [
+        "runApp",
+        "Command",
+        "Fallback",
+        "Plugin",
+        "Scope",
+        "ScopeContent",
+        "ScopeFallback",
+        "jsx",
+        "jsxs",
+        "Fragment",
+        "createElement",
+        "compileToComponent",
+        "toView",
+        "detectInteractive"
+      ],
+      "example": {
+        "lang": "tsx",
+        "filename": "app.tsx",
+        "code": "import { Command, Fallback, runApp } from '@tuix/jsx'\nimport { $state } from '@tuix/reactive'\n\nfunction Version() {\n  return <text>1.0.0</text>\n}\n\nfunction Counter() {\n  const count = $state(0, 'count')\n  return (\n    <box padding={1} border=\"rounded\" gap={1}>\n      <text>Count: {count()}</text>\n      <button onClick={() => count.$set(count() + 1)}>Increment</button>\n    </box>\n  )\n}\n\nfunction App() {\n  return (\n    <>\n      <Command name=\"version\" description=\"Show version\" component={Version} />\n      <Command\n        name=\"counter\"\n        description=\"Interactive counter\"\n        component={Counter}\n        metadata={{ interactive: true }}\n      />\n      <Fallback component={() => <text>Use --help for commands</text>} />\n    </>\n  )\n}\n\nawait runApp(App)"
+      },
+      "related": ["@tuix/ui", "@tuix/themes", "@tuix/reactive", "@tuix/runtime", "@tuix/view"]
+    },
+    {
+      "slug": "ui",
+      "name": "@tuix/ui",
+      "layer": "Authoring",
+      "summary": "High-level widgets for layout, forms, and display.",
+      "purpose": "You import ready widgets. The package gives styled components on top of JSX primitives.",
+      "whenToUse": "Use this package when you need widgets such as `Help`, `Button`, `Box`, or `Viewport`. Prefer these over raw primitives for common UI.",
+      "mainConcepts": [
+        "Layout widgets place content: `Box`, `Flex`, and `Viewport`.",
+        "Display widgets show content: `Text`, `LargeText`, `Header`, and `Badge`.",
+        "Form widgets take input: `Button`, `Select`, `Checkbox`, and `Form`.",
+        "`Help` lists commands with keyboard selection.",
+        "Widgets use theme colors from `@tuix/themes` when you set a theme."
+      ],
+      "keyExports": [
+        "Help",
+        "LargeText",
+        "Viewport",
+        "Box",
+        "Flex",
+        "Text",
+        "Button",
+        "Modal",
+        "Table",
+        "Select",
+        "Checkbox",
+        "Radio",
+        "Confirm",
+        "Form",
+        "Panel",
+        "Header",
+        "Badge",
+        "ProgressBar",
+        "StaticLayout",
+        "InteractiveLayout"
+      ],
+      "example": {
+        "lang": "tsx",
+        "filename": "dashboard.tsx",
+        "code": "import { Box, Flex, Text, Button, Help, LargeText, Viewport } from '@tuix/ui'\nimport { runApp } from '@tuix/jsx'\nimport { $state } from '@tuix/reactive'\n\nfunction Dashboard() {\n  const open = $state(false, 'open')\n\n  return (\n    <Box padding={1} border=\"rounded\" gap={1}>\n      <LargeText color=\"cyan\">TUIX</LargeText>\n      <Text bold>Dashboard</Text>\n      <Flex direction=\"row\" gap={2}>\n        <Button variant=\"primary\" onClick={() => open.$set(!open())}>\n          Toggle help\n        </Button>\n      </Flex>\n      {open() ? (\n        <Viewport width={60} height={8} showScrollbars>\n          <Help\n            title=\"Commands\"\n            entries={[\n              { name: 'build', description: 'Build the project' },\n              { name: 'test', description: 'Run tests' },\n            ]}\n          />\n        </Viewport>\n      ) : null}\n    </Box>\n  )\n}\n\nawait runApp(Dashboard, { interactive: true })"
+      },
+      "related": ["@tuix/jsx", "@tuix/themes", "@tuix/view", "@tuix/ansi"]
+    },
+    {
+      "slug": "themes",
+      "name": "@tuix/themes",
+      "layer": "Authoring",
+      "summary": "Theme tokens and runtime theme switching.",
+      "purpose": "You define colors, type styles, and spacing as a theme. Components read the active theme.",
+      "whenToUse": "Use this package when you share colors across widgets. Wrap the app in `ThemeProvider` and call `useTheme` in components.",
+      "mainConcepts": [
+        "A theme holds `colors`, `typography`, and `spacing`.",
+        "`ThemeProvider` sets the default theme and custom themes.",
+        "`useTheme` returns the active theme and switch helpers.",
+        "Built-in themes include dark, light, nord, dracula, and vibes.",
+        "You can register a custom theme with `customThemes`."
+      ],
+      "keyExports": [
+        "ThemeProvider",
+        "useTheme",
+        "withTheme",
+        "ThemeContext",
+        "createThemeLayer",
+        "darkTheme",
+        "lightTheme",
+        "nordTheme",
+        "draculaTheme",
+        "vibesTheme"
+      ],
+      "example": {
+        "lang": "tsx",
+        "filename": "themed-app.tsx",
+        "code": "import { ThemeProvider, useTheme, nordTheme } from '@tuix/themes'\nimport { Box, Text, Button } from '@tuix/ui'\nimport { runApp } from '@tuix/jsx'\n\nfunction Panel() {\n  const { theme, setThemeByName, themeNames } = useTheme()\n  const t = theme()\n\n  return (\n    <Box padding={1} border=\"rounded\" gap={1}>\n      <Text color={t.colors.primary}>Theme: {t.name}</Text>\n      <Text color={t.colors.fg}>Available: {themeNames().join(', ')}</Text>\n      <Button onClick={() => setThemeByName('dark')}>Use dark</Button>\n    </Box>\n  )\n}\n\nfunction App() {\n  return (\n    <ThemeProvider\n      config={{\n        defaultTheme: 'nord',\n        customThemes: { nord: nordTheme },\n        allowSwitching: true,\n      }}\n    >\n      <Panel />\n    </ThemeProvider>\n  )\n}\n\nawait runApp(App, { interactive: true })"
+      },
+      "related": ["@tuix/ui", "@tuix/jsx", "@tuix/ansi", "@tuix/reactive"]
+    }
+  ]
+}

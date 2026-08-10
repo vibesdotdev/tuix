@@ -1,32 +1,35 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false,
-    "includes": ["src/**/*", "packages/*/src/**/*"]
+    "ignoreUnknown": true,
+    "ignore": [
+      "**/dist/**",
+      "**/coverage/**",
+      "**/node_modules/**",
+      "**/.tuix-typecheck-out/**",
+      "**/qdrant_storage/**",
+      "**/.git/**",
+      "**/.svelte-kit/**",
+      "**/build/**",
+      "apps/www/.vscode/**"
+    ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100,
-    "formatWithErrors": false,
-    "includes": [
-      "src/**/*.ts",
-      "src/**/*.tsx",
-      "src/**/*.js",
-      "src/**/*.jsx",
-      "packages/*/src/**/*.ts",
-      "packages/*/src/**/*.tsx",
-      "packages/*/src/**/*.js",
-      "packages/*/src/**/*.jsx"
-    ]
+    "formatWithErrors": false
   },
   "linter": {
+    "enabled": false
+  },
+  "organizeImports": {
     "enabled": false
   },
   "javascript": {

@@ -26,18 +26,21 @@ async function* simulateStreaming(response: string, delayMs: number = 30) {
 
 export default function AIChatInteractive() {
   // Reactive state
-  const messages = $state<Array<{
-    id: string
-    role: 'user' | 'assistant' | 'system'
-    content: string
-    timestamp: string
-  }>>([
+  const messages = $state<
+    Array<{
+      id: string
+      role: 'user' | 'assistant' | 'system'
+      content: string
+      timestamp: string
+    }>
+  >([
     {
       id: '1',
       role: 'system',
-      content: 'Welcome to TUIX AI Chat! This is an interactive demo showing how to build chat interfaces with TUIX.',
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-    }
+      content:
+        'Welcome to TUIX AI Chat! This is an interactive demo showing how to build chat interfaces with TUIX.',
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    },
   ])
 
   const streamingContent = $state('')
@@ -51,7 +54,7 @@ export default function AIChatInteractive() {
     { id: '1', title: 'API Development', active: true, lastMessage: 'How do I create...' },
     { id: '2', title: 'Database Queries', active: false, lastMessage: 'Show me SQL...' },
     { id: '3', title: 'React Patterns', active: false, lastMessage: 'What are hooks...' },
-    { id: '4', title: 'Testing Strategies', active: false, lastMessage: 'How to test...' }
+    { id: '4', title: 'Testing Strategies', active: false, lastMessage: 'How to test...' },
   ])
 
   // Sample AI responses for demo
@@ -141,7 +144,7 @@ app.get('/api/users',
 );
 \`\`\`
 
-This adds JWT-based authentication to your endpoints!`
+This adds JWT-based authentication to your endpoints!`,
   ]
 
   let responseIndex = 0
@@ -153,7 +156,7 @@ This adds JWT-based authentication to your endpoints!`
       id: Date.now().toString(),
       role: 'user' as const,
       content,
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     }
     messages.$set([...messages(), userMsg])
 
@@ -175,7 +178,7 @@ This adds JWT-based authentication to your endpoints!`
       id: (Date.now() + 1).toString(),
       role: 'assistant' as const,
       content: fullResponse,
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     }
     messages.$set([...messages(), assistantMsg])
 
@@ -187,12 +190,14 @@ This adds JWT-based authentication to your endpoints!`
   }
 
   // Auto-send initial demo messages
-  Effect.runPromise(Effect.gen(function* () {
-    yield* Effect.sleep(1000)
-    yield* Effect.promise(() => sendMessage('How do I create a REST API endpoint?'))
-    yield* Effect.sleep(2000)
-    yield* Effect.promise(() => sendMessage('Thanks! How about with authentication?'))
-  }))
+  Effect.runPromise(
+    Effect.gen(function* () {
+      yield* Effect.sleep(1000)
+      yield* Effect.promise(() => sendMessage('How do I create a REST API endpoint?'))
+      yield* Effect.sleep(2000)
+      yield* Effect.promise(() => sendMessage('Thanks! How about with authentication?'))
+    })
+  )
 
   const getStatusMessage = () => {
     if (isStreaming()) {
@@ -214,23 +219,30 @@ This adds JWT-based authentication to your endpoints!`
       {/* Main layout */}
       <hstack>
         {/* Sidebar */}
-        <box border="thin" padding={1} minWidth={32} style={style().fg(colors.gray).bg(colors.black)}>
+        <box
+          border="thin"
+          padding={1}
+          minWidth={32}
+          style={style().fg(colors.gray).bg(colors.black)}
+        >
           <vstack>
             <text style={style().bold().fg(colors.white)}>💬 Conversations</text>
             <text style={style().faint().fg(colors.gray)}>───────────────────────────</text>
             {conversations().map(conv => (
               <vstack key={conv.id}>
                 <text
-                  style={conv.id === activeConversationId()
-                    ? style().bg(colors.magenta).fg(colors.white).bold()
-                    : style().fg(colors.white)
+                  style={
+                    conv.id === activeConversationId()
+                      ? style().bg(colors.magenta).fg(colors.white).bold()
+                      : style().fg(colors.white)
                   }
                 >
                   {conv.id === activeConversationId() ? '▶ ' : '  '}
                   {conv.title}
                 </text>
-                <text style={style().faint().fg(colors.gray)} >
-                  {'  '}{conv.lastMessage}
+                <text style={style().faint().fg(colors.gray)}>
+                  {'  '}
+                  {conv.lastMessage}
                 </text>
               </vstack>
             ))}
@@ -244,7 +256,7 @@ This adds JWT-based authentication to your endpoints!`
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Main panel */}
         <box border="rounded" padding={1} style={style().fg(colors.white)}>
@@ -253,8 +265,13 @@ This adds JWT-based authentication to your endpoints!`
             {messages().map(msg => {
               if (msg.role === 'system') {
                 return (
-                  <box key={msg.id} border="thin" padding={1} style={style().bg(colors.gray).fg(colors.white)}>
-                    <text style={style().italic()}>ℹ️  {msg.content}</text>
+                  <box
+                    key={msg.id}
+                    border="thin"
+                    padding={1}
+                    style={style().bg(colors.gray).fg(colors.white)}
+                  >
+                    <text style={style().italic()}>ℹ️ {msg.content}</text>
                   </box>
                 )
               }
@@ -281,7 +298,11 @@ This adds JWT-based authentication to your endpoints!`
                       <text style={style().bold().fg(colors.green)}>🤖 Assistant</text>
                       <text style={style().faint().fg(colors.gray)}> • {msg.timestamp}</text>
                     </hstack>
-                    <box border="thin" padding={1} style={style().bg(colors.black).fg(colors.white)}>
+                    <box
+                      border="thin"
+                      padding={1}
+                      style={style().bg(colors.black).fg(colors.white)}
+                    >
                       <text>{msg.content}</text>
                     </box>
                     <text></text>
@@ -310,9 +331,10 @@ This adds JWT-based authentication to your endpoints!`
             <box
               border="rounded"
               padding={1}
-              style={inputFocused()
-                ? style().bg(colors.gray).fg(colors.white)
-                : style().bg(colors.black).fg(colors.gray)
+              style={
+                inputFocused()
+                  ? style().bg(colors.gray).fg(colors.white)
+                  : style().bg(colors.black).fg(colors.gray)
               }
             >
               <text>💬 Type your message here... (Enter to send)</text>
@@ -326,9 +348,13 @@ This adds JWT-based authentication to your endpoints!`
       {/* Status bar */}
       <box padding={1} style={style().bg(colors.blue).fg(colors.white)}>
         <hstack>
-          <text style={style().bold()}>{isStreaming() ? '⏳' : '✅'} {getStatusMessage()}</text>
+          <text style={style().bold()}>
+            {isStreaming() ? '⏳' : '✅'} {getStatusMessage()}
+          </text>
           <text> • </text>
-          <text style={style().faint()}>Tab to switch focus • Ctrl+N new chat • ? for help • Ctrl+C to exit</text>
+          <text style={style().faint()}>
+            Tab to switch focus • Ctrl+N new chat • ? for help • Ctrl+C to exit
+          </text>
         </hstack>
       </box>
     </vstack>

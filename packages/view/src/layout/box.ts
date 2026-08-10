@@ -78,7 +78,8 @@ const createPaddedLines = (
 
   // Content with horizontal padding - use ANSI-aware padding
   for (const line of contentLines) {
-    const padded = ' '.repeat(padding.left) + padToWidth(line, contentWidth) + ' '.repeat(padding.right)
+    const padded =
+      ' '.repeat(padding.left) + padToWidth(line, contentWidth) + ' '.repeat(padding.right)
     paddedLines.push(padded)
   }
 
@@ -123,7 +124,10 @@ export const styledBox = (content: View | View[], props: BoxProps = {}): View =>
       Effect.gen(function* (_) {
         // First render the inner content
         const innerContent = yield* _(innerView.render())
-        let contentStr = typeof innerContent === 'string' ? innerContent : (innerContent as { content: string }).content
+        let contentStr =
+          typeof innerContent === 'string'
+            ? innerContent
+            : (innerContent as { content: string }).content
 
         // Apply style to content if provided
         if (props.style) {

@@ -41,7 +41,7 @@ export class HttpTransport implements TelemetryTransport {
           clearTimeout(timeoutId)
         }
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'TransportError' as const,
         message: `Failed to send events via HTTP: ${error}`,
         cause: error,
@@ -75,7 +75,7 @@ export class HttpTransport implements TelemetryTransport {
           clearTimeout(timeoutId)
         }
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'TransportError' as const,
         message: `Failed to send errors via HTTP: ${error}`,
         cause: error,
@@ -109,7 +109,7 @@ export class HttpTransport implements TelemetryTransport {
           clearTimeout(timeoutId)
         }
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'TransportError' as const,
         message: `Failed to send performance metrics via HTTP: ${error}`,
         cause: error,

@@ -101,9 +101,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
       className={props.className}
     >
       <hstack gap={1} align="middle">
-        <text style={style().foreground(checkboxColor)}>
-          {checkboxChar}
-        </text>
+        <text style={style().foreground(checkboxColor)}>{checkboxChar}</text>
         {props.label && (
           <text style={props.disabled ? style().foreground(colors.gray) : undefined}>
             {props.label}

@@ -135,33 +135,52 @@ export function Scope(props: ScopeProps): JSX.Element {
   // Non-executable scopes (layout) always render
   if (props.executable) {
     return {
-      render: () => Effect.gen(function* () {
-        // Check route matching NOW (Phase 3, after paths are fixed)
-        const routeMatches = activeRouteStore.matches(scopeDef.path)
+      render: () =>
+        Effect.gen(function* () {
+          const routeMatches = activeRouteStore.matches(scopeDef.path)
+          if (!routeMatches) {
+            return ''
+          }
 
-        if (!routeMatches) {
-          // This scope doesn't match the route - don't render
-          return ''
-        }
+          // Convert JSX descriptor / View / function result into renderable content
+          const { render: renderJsx } = yield* Effect.promise(() => import('../../jsx-runtime'))
+          const view =
+            content && typeof (content as { render?: unknown }).render === 'function'
+              ? (content as { render: () => Effect.Effect<unknown> })
+              : renderJsx(content as any)
 
-        // Render the content
-        const rendered = yield* content.render()
-
-        // Handle both string and object returns
-        if (typeof rendered === 'string') {
-          return rendered
-        } else if (rendered && typeof rendered === 'object' && 'content' in rendered) {
-          return rendered.content
-        }
-        return rendered
-      }),
+          const rendered = yield* view.render()
+          if (typeof rendered === 'string') return rendered
+          if (rendered && typeof rendered === 'object' && 'content' in rendered) {
+            return (rendered as { content: string }).content
+          }
+          return String(rendered ?? '')
+        }),
       width: 0,
       height: 0,
-    } as JSX.Element
+    } as unknown as JSX.Element
   }
 
-  // Non-executable scopes always render
-  return content
+  // Non-executable scopes always render (ensure View)
+  if (content && typeof (content as { render?: unknown }).render === 'function') {
+    return content
+  }
+  // Lazy View wrapper so JSX children convert at render time
+  return {
+    render: () =>
+      Effect.gen(function* () {
+        const { render: renderJsx } = yield* Effect.promise(() => import('../../jsx-runtime'))
+        const view = renderJsx(content as any)
+        const rendered = yield* view.render()
+        if (typeof rendered === 'string') return rendered
+        if (rendered && typeof rendered === 'object' && 'content' in rendered) {
+          return (rendered as { content: string }).content
+        }
+        return String(rendered ?? '')
+      }),
+    width: 0,
+    height: 0,
+  } as unknown as JSX.Element
 }
 
 // Import ScopeFallback to avoid circular dependency

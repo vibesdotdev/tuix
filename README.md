@@ -1,164 +1,93 @@
 # TUIX Monorepo
 
-A performant TUI framework for Bun with JSX and reactive state management.
+A Bun-native TUI framework for building terminal apps with JSX, reactive runes, and an Effect-powered runtime.
 
 ## Overview
 
-TUIX is a bun-native monorepo for building terminal user interfaces with a **JSX-first**, Svelte-5-inspired reactive model. The Effect-based MVU runtime still powers the system internally, but author-facing APIs revolve around declarative JSX primitives and runes. Key pillars:
+TUIX combines:
 
-- 🚀 **High Performance**: Optimized for Bun's runtime characteristics
-- ⚡ **TypeScript First**: Full TypeScript support with excellent type safety
-- 🎯 **JSX Primitives**: Terminal-oriented intrinsics like `<text>`, `<box>`, `<flex>`, and `<text-input>` (see [docs/specs/jsx-primitives.md](docs/specs/jsx-primitives.md))
-- 🔄 **Reactive Runes**: `$state`, `$derived`, and friends for component state
-- 🧩 **Modular Packages**: Each capability lives in `packages/<name>` and publishes an `@tuix/<name>` workspace package
-- 🛠️ **CLI & Tooling**: Batteries-included CLI framework, process tooling, logger, and testing utilities
+- **MVU runtime core** (`@tuix/runtime`)
+- **Reactive runes** (`@tuix/reactive`)
+- **JSX primitives and app API** (`@tuix/jsx`)
+- **Composable UI components** (`@tuix/ui`)
 
-## Monorepo Structure
+Authoritative architecture references:
+- [VISION.md](./VISION.md) — target architecture
+- [CURRENT.md](./CURRENT.md) — current inventory
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — design rationale
+- [docs/PRIORITIES.md](./docs/PRIORITIES.md) — implementation order and gap plan
 
-```
-├── packages/              # All TUIX packages
-│   ├── ansi/             # ANSI utilities and terminal control package
-│   ├── cli/              # CLI framework package
-│   ├── core/             # Core runtime system package
-│   ├── config/           # Configuration management package
-│   ├── debug/            # Debugging tools package
-│   ├── jsx/              # JSX runtime package
-│   ├── jsx-runtime/      # JSX runtime implementation
-│   ├── logger/           # Logging framework package
-│   ├── process-manager/  # Process management package
-│   ├── runtime/          # Runtime system package
-│   ├── styling/          # Styling system package
-│   ├── terminal/         # Terminal utilities package
-│   ├── testing/          # Testing utilities package
-│   ├── tuix/             # Main compatibility layer
-│   └── ui/               # UI components package
-├── bin/                   # CLI entry point
-├── docs/                  # Documentation
-└── biome.json            # Code formatting/linting
-```
+## Workspace Structure
 
-## Quick Start
-
-### 🎬 Interactive Demos (For Vibes Team)
-
-**See TUIX in action with live, interactive demos:**
-
-```bash
-# Install dependencies
-bun install
-
-# 🤖 AI Chat - Live streaming with auto-demo
-# Watch messages stream character-by-character, just like your blessed CLI
-bun run apps/demo/src/index.ts ai-chat
-
-# 📊 System Dashboard - Real-time metrics updating every second
-# See CPU, memory, disk, network metrics update live
-bun run apps/demo/src/index.ts dashboard
-
-# ✨ Feature Showcase - Complete tour of all TUIX capabilities
-# Borders, colors, gradients, layouts, and more
-bun run apps/demo/src/index.ts showcase
-```
-
-**These demos prove TUIX can match the quality of your blessed implementation while fixing emoji rendering issues.**
-
-👉 **Start here:** [VIBES_DEMO_READY.md](VIBES_DEMO_READY.md) - Everything you need to evaluate TUIX
-
-### CLI Usage
-
-```bash
-# Show help
-bun run bin/index.ts help
-
-# Show version
-bun run bin/index.ts --version
-
-# Show information
-bun run bin/index.ts info
-```
-
-### Programmatic Usage
-
-```tsx
-import { jsx } from '@tuix/jsx'
-import { $state } from '@tuix/core/update/reactivity/runes'
-
-export function Counter() {
-  const count = $state(0)
-
-  return (
-    <box gap={1} padding={1} border="rounded">
-      <text>Count: {count()}</text>
-      <button onClick={() => count.$set(count() + 1)}>Increment</button>
-    </box>
-  )
-}
-
-// Rendering is runtime-specific; see packages/runtime or the CLI adapter for integration examples.
+```text
+packages/
+  ansi/              # styling primitives
+  app-presets/       # app/plugin module factory presets for runtime bootstrap
+  core/              # core types, module contracts, services
+  view/              # render/layout primitives
+  runtime/           # MVU runtime loop + hooks
+  reactive/          # runes and reactive integration
+  jsx/               # JSX factory/runtime bridge
+  ui/                # high-level components
+  input/             # terminal input parsing
+  platform/          # public LiveServices facade (re-exports core live + caps/graphics; see packages/platform/README)
+  storage/           # storage abstractions
+  testing/           # testing harness and utilities
+  themes/            # theme definitions
+  logger/            # logging services
+  config/            # config plugin/services
+  process-manager/   # process supervision
+  coordination/      # orchestration utilities
+  update/            # update checker
+  telemetry/         # telemetry tooling
+  debug/             # debug tooling
+  docs/              # runtime docs/help package
+  bin/               # tuix CLI binary package
+apps/
+  demo/              # showcase/demo app(s)
+  www/               # SvelteKit product marketing + docs site
+docs/
+  guides/            # install, quickstart, architecture
+  *.md               # architecture, conventions, standards
 ```
 
 ## Development
 
-### Prerequisites
-
-- [Bun](https://bun.com) >= 1.0.0
-
-### Setup
-
 ```bash
-# Install dependencies
+# install deps
 bun install
 
-# Run tests
-bun run test
+# run all tests
+bun test
 
-# Type checking
+# typecheck (delivery: load + bun build — not full monorepo tsc; see RELEASE_GATES)
 bun run typecheck
 
-# Format code
+# lint (packages, apps, docs, scripts, tests — same as lint:all)
+bun run lint
+bun run lint:all
 bun run format
 
-# Lint code
-bun run lint
+# product site (SvelteKit)
+bun run www:dev
+bun run www:build
 ```
 
-### Building
+## Packages
 
-Each workspace owns its own build/test scripts. From the repo root you can iterate quickly with Bun's workspaces:
+All 22 packages under `packages/*` are **Complete** for v1 (see `spec/20-catalog/MODULE_CATALOG.md`). Catalog completeness is enforced by `tests/catalog-honesty.test.ts`.
 
-```bash
-# Example: build the core package
-cd packages/core
-bun run build
-```
+## Package Priority
 
-## Package Information
+If you're deciding where to invest effort first, follow:
 
-- **Primary Entry Points**: `@tuix/core`, `@tuix/jsx`, `@tuix/ui`
-- **Version**: 1.0.0-rc.3
-- **License**: MIT
-- **Runtime**: Bun
+1. `@tuix/core` → `@tuix/view` → `@tuix/runtime`
+2. `@tuix/reactive` → `@tuix/jsx`
+3. `@tuix/ui` + `@tuix/themes`
+4. ecosystem packages (`config`, `logger`, `testing`, etc.)
 
-## Documentation
-
-### For the Vibes Team
-- **[🎉 Demos Ready!](VIBES_DEMO_READY.md)** - Start here! Interactive demos that prove TUIX quality
-- [Getting Started Guide](VIBES_GETTING_STARTED.md) - Quick start for vibes team evaluation
-- [TUIX vs Blessed Comparison](VIBES_COMPARISON.md) - Why switch from blessed to TUIX
-- [Demo Summary](DEMO_SUMMARY.md) - Overview of all demo commands
-
-### General Documentation
-- [Pitch Document](PITCH.md) - Why TUIX for terminal UIs
-- [Showcase Features](SHOWCASE_FEATURES.md) - Detailed feature breakdown
-- [Package Documentation](packages/tuix/README.md) - Detailed package information
-- [ANSI Documentation](packages/ansi/README.md) - ANSI utilities and terminal control
-- [CLI Documentation](packages/cli/README.md) - CLI framework guide
-- [Core Documentation](packages/core/README.md) - Core system documentation
-
-## Contributing
-
-Please see the [Contributing Guide](CONTRIBUTING.md) for information on how to contribute to TUIX.
+Detailed plan: [docs/PRIORITIES.md](./docs/PRIORITIES.md). Specs: [spec/](./spec/).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT

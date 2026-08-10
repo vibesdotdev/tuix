@@ -14,7 +14,7 @@ describe('Shadow effects', () => {
         offset: { x: 1, y: 1 },
         blur: 0,
         color: rgb(0, 0, 0),
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()
@@ -28,7 +28,7 @@ describe('Shadow effects', () => {
         offset: { x: 2, y: 2 },
         blur: 1,
         color: rgb(0, 0, 0),
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()
@@ -41,7 +41,7 @@ describe('Shadow effects', () => {
         offset: { x: 1, y: 1 },
         blur: 0,
         color: rgb(0, 0, 0),
-        opacity: 1
+        opacity: 1,
       })
 
       expect(result.length).toBeGreaterThanOrEqual(content.length)
@@ -52,7 +52,7 @@ describe('Shadow effects', () => {
         offset: { x: 1, y: 1 },
         blur: 0,
         color: rgb(0, 0, 0),
-        opacity: 0.5
+        opacity: 0.5,
       })
       expect(result).toEqual([])
     })
@@ -63,7 +63,7 @@ describe('Shadow effects', () => {
         offset: { x: 1, y: 1 },
         blur: 0,
         color: rgb(0, 0, 0),
-        opacity: 0.5
+        opacity: 0.5,
       })
       expect(result).toBeDefined()
     })
@@ -76,7 +76,7 @@ describe('Shadow effects', () => {
         offset: { x: 0, y: 0 },
         blur: 1,
         color: rgb(0, 0, 0),
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()
@@ -90,7 +90,7 @@ describe('Shadow effects', () => {
         offset: { x: 1, y: 1 },
         blur: 2,
         color: rgb(0, 0, 0),
-        opacity: 0.7
+        opacity: 0.7,
       })
 
       expect(result).toBeDefined()
@@ -103,7 +103,7 @@ describe('Shadow effects', () => {
         offset: { x: 0, y: 1 },
         blur: 1,
         color: rgb(0, 0, 0),
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result.length).toBeGreaterThanOrEqual(content.length)
@@ -114,7 +114,7 @@ describe('Shadow effects', () => {
         offset: { x: 1, y: 1 },
         blur: 1,
         color: rgb(0, 0, 0),
-        opacity: 0.5
+        opacity: 0.5,
       })
       expect(result).toEqual([])
     })

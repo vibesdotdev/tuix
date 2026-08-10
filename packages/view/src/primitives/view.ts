@@ -100,11 +100,6 @@ export const empty = (): View => ({
   height: 0,
 })
 
-/**
- * Alias for text() to match test expectations
- *
- * @deprecated Use text() directly for better clarity
- */
 export const createView = text
 
 /**
@@ -182,7 +177,8 @@ export const renderView = (view: View) => view.render()
  * ```
  */
 export const vstack = (...views: Array<View | View[]>): View => {
-  const items = views.length === 1 && Array.isArray(views[0]) ? (views[0] as View[]) : (views as View[])
+  const items =
+    views.length === 1 && Array.isArray(views[0]) ? (views[0] as View[]) : (views as View[])
 
   const width = items.length > 0 ? Math.max(...items.map(v => v.width || 0)) : 0
   const height = items.reduce((sum, v) => sum + (v.height || 1), 0)
@@ -235,7 +231,8 @@ export const vstack = (...views: Array<View | View[]>): View => {
  * @note For advanced alignment options, use joinHorizontal from layout/join
  */
 export const hstack = (...views: Array<View | View[]>): View => {
-  const items = views.length === 1 && Array.isArray(views[0]) ? (views[0] as View[]) : (views as View[])
+  const items =
+    views.length === 1 && Array.isArray(views[0]) ? (views[0] as View[]) : (views as View[])
 
   const width = items.reduce((sum, v) => sum + (v.width || 0), 0)
   const height = items.length > 0 ? Math.max(...items.map(v => v.height || 1)) : 0
@@ -298,7 +295,8 @@ export const box = (view: View): View => {
     render: () =>
       Effect.gen(function* (_) {
         const content = yield* _(view.render())
-        const contentStr = typeof content === 'string' ? content : (content as { content: string }).content
+        const contentStr =
+          typeof content === 'string' ? content : (content as { content: string }).content
         const lines = contentStr.split('\n')
 
         // Create box with rounded borders

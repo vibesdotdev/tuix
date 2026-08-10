@@ -12,7 +12,7 @@ describe('Layer effects', () => {
       const overlay = ['Overlay']
       const result = applyLayerEffect(base, overlay, {
         type: 'overlay',
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()
@@ -25,7 +25,7 @@ describe('Layer effects', () => {
       const overlay = ['World']
       const result = applyLayerEffect(base, overlay, {
         type: 'multiply',
-        opacity: 1.0
+        opacity: 1.0,
       })
 
       expect(result).toBeDefined()
@@ -37,7 +37,7 @@ describe('Layer effects', () => {
       const overlay = ['Layer']
       const result = applyLayerEffect(base, overlay, {
         type: 'screen',
-        opacity: 0.7
+        opacity: 0.7,
       })
 
       expect(result).toBeDefined()
@@ -48,7 +48,7 @@ describe('Layer effects', () => {
       const overlay = ['Top']
       const result = applyLayerEffect(base, overlay, {
         type: 'color-dodge',
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()
@@ -59,7 +59,7 @@ describe('Layer effects', () => {
       const overlay = ['Effect']
       const result = applyLayerEffect(base, overlay, {
         type: 'color-burn',
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()
@@ -71,12 +71,12 @@ describe('Layer effects', () => {
 
       const transparent = applyLayerEffect(base, overlay, {
         type: 'overlay',
-        opacity: 0.1
+        opacity: 0.1,
       })
 
       const opaque = applyLayerEffect(base, overlay, {
         type: 'overlay',
-        opacity: 1.0
+        opacity: 1.0,
       })
 
       expect(transparent).toBeDefined()
@@ -86,7 +86,7 @@ describe('Layer effects', () => {
     test('should handle empty base', () => {
       const result = applyLayerEffect([], ['Overlay'], {
         type: 'overlay',
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()
@@ -95,7 +95,7 @@ describe('Layer effects', () => {
     test('should handle empty overlay', () => {
       const result = applyLayerEffect(['Base'], [], {
         type: 'overlay',
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()
@@ -106,7 +106,7 @@ describe('Layer effects', () => {
       const overlay = ['Over 1', 'Over 2']
       const result = applyLayerEffect(base, overlay, {
         type: 'multiply',
-        opacity: 0.5
+        opacity: 0.5,
       })
 
       expect(result).toBeDefined()

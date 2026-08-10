@@ -6,7 +6,7 @@
  * low-level services and higher-level modules.
  */
 
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { BaseEvent } from '../../events'
 
 /**
  * Service lifecycle events

@@ -23,12 +23,10 @@ export interface BannerModel {
   dismissed: boolean
 }
 
-export type BannerMsg =
-  | { _tag: 'Dismiss' }
-  | { _tag: 'Update' }
+export type BannerMsg = { _tag: 'Dismiss' } | { _tag: 'Update' }
 
 export const UpdateBanner: Component<BannerProps, BannerModel, BannerMsg> = {
-  init: (props) => ({
+  init: props => ({
     result: props.result,
     position: props.position || 'top',
     dismissed: false,
@@ -54,12 +52,7 @@ export const UpdateBanner: Component<BannerProps, BannerModel, BannerMsg> = {
     const textColor = isBreaking ? 'white' : 'black'
 
     return (
-      <Box
-        backgroundColor={bgColor}
-        padding={1}
-        justifyContent="space-between"
-        flexDirection="row"
-      >
+      <Box backgroundColor={bgColor} padding={1} justifyContent="space-between" flexDirection="row">
         <Box flexDirection="row" gap={1}>
           <Text color={textColor} bold>
             {isBreaking ? '⚠️  Breaking Update Available' : '🔔 Update Available'}
@@ -74,18 +67,10 @@ export const UpdateBanner: Component<BannerProps, BannerModel, BannerMsg> = {
           )}
         </Box>
         <Box flexDirection="row" gap={1}>
-          <Text
-            color={textColor}
-            bold
-            onPress={() => dispatch({ _tag: 'Update' })}
-          >
+          <Text color={textColor} bold onPress={() => dispatch({ _tag: 'Update' })}>
             [Update]
           </Text>
-          <Text
-            color={textColor}
-            dimColor
-            onPress={() => dispatch({ _tag: 'Dismiss' })}
-          >
+          <Text color={textColor} dimColor onPress={() => dispatch({ _tag: 'Dismiss' })}>
             [Dismiss]
           </Text>
         </Box>

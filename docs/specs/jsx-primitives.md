@@ -5,7 +5,7 @@ This document defines the core JSX intrinsic elements supported by the TUIX runt
 ## Design Goals
 
 - Provide a small, predictable “terminal DOM” that covers the majority of CLI app needs.
-- Map each primitive directly to an existing `@tuix/core` view builder or controller.
+- Map each primitive directly to `@tuix/view` builders/controllers and runtime-safe adapters.
 - Keep composites minimal: anything opinionated or themed belongs in `@tuix/jsx/components` or `@tuix/ui`.
 - Accept both fluent `Style` builders and plain style objects for all `style` props.
 - Keep events declarative: intrinsics expose event callbacks, the runtime wires them into MVU handlers.

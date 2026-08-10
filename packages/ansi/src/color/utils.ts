@@ -1,6 +1,5 @@
-import { ColorDefAutoAnsiSchema } from "./schemas";
-import type { Color, ColorRaw } from "./types"
-
+import { ColorDefAutoAnsiSchema } from './schemas'
+import type { Color, ColorRaw } from './types'
 
 /**
  * No color (transparent/default)
@@ -10,14 +9,12 @@ export const none = (): Color => ({ type: 'none' })
 /**
  * ANSI 16-color palette (0-15)
  */
-export const ansi = (code: number): Color =>
-  ColorDefAutoAnsiSchema.parse({ code }) as Color
+export const ansi = (code: number): Color => ColorDefAutoAnsiSchema.parse({ code }) as Color
 
 /**
  * ANSI 256-color palette (0-255)
  */
-export const ansi256 = (code: number): Color =>
-  ColorDefAutoAnsiSchema.parse({ code }) as Color
+export const ansi256 = (code: number): Color => ColorDefAutoAnsiSchema.parse({ code }) as Color
 
 /**
  * Hexadecimal color (#RRGGBB)
@@ -25,7 +22,7 @@ export const ansi256 = (code: number): Color =>
 export const hex = (value: string): Color => ({
   type: 'hex',
   value: value.startsWith('#') ? value : `#${value}`,
-});
+})
 
 /**
  * RGB color (0-255 per component)
@@ -35,7 +32,7 @@ export const rgb = (r: number, g: number, b: number): Color => ({
   r: Math.max(0, Math.min(255, Math.floor(r))),
   g: Math.max(0, Math.min(255, Math.floor(g))),
   b: Math.max(0, Math.min(255, Math.floor(b))),
-});
+})
 
 /**
  * Adaptive color for light/dark terminals
@@ -44,12 +41,12 @@ export const adaptive = (light: ColorRaw, dark: ColorRaw): Color => ({
   type: 'adaptive',
   light,
   dark,
-});
+})
 
 /**
  * Check if color is visible (not NoColor)
  */
-export const isVisible = (c: Color): boolean => c.type !== 'none';
+export const isVisible = (c: Color): boolean => c.type !== 'none'
 
 /**
  * Blend two colors with alpha
@@ -68,11 +65,7 @@ export const lighten = (c: Color, amount: number): Color => {
   if (c.type !== 'rgb') return c
 
   const factor = 1 + Math.max(0, Math.min(1, amount))
-  return rgb(
-    Math.min(255, c.r * factor),
-    Math.min(255, c.g * factor),
-    Math.min(255, c.b * factor)
-  )
+  return rgb(Math.min(255, c.r * factor), Math.min(255, c.g * factor), Math.min(255, c.b * factor))
 }
 
 /**

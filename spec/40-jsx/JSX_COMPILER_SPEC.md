@@ -129,15 +129,20 @@ Determines whether a JSX component produces interactive output. Interactive comp
 
 - Event handlers (`onClick`, `onKeyPress`, `onChange`, etc.)
 - Input elements (`<interactive>`, future `<input>`, `<select>`)
-- Subscriptions (keyboard, timer, etc.)
+- Subscriptions / `$state` (reactive runes)
+- Explicit `component.interactive = true` or Command `metadata.interactive`
 
-**Current Status**: Returns `false` (placeholder). Full implementation requires either:
-- **AST analysis**: Parse the component source for event handler patterns.
-- **Runtime inspection**: Render once, walk the View tree for interactive metadata.
+**Current Status (v1):** Heuristic + explicit flag — **not** a stub.
+1. Explicit `interactive === true|false` on the function wins.
+2. Name markers: `Interactive` / `Game` / `Editor` ( **not** bare `*App` — avoids CLI shell false-positives like `TuixApp`).
+3. `Function#toString` scan for handlers, `$state(`, subscriptions, common form controls.
+4. `runApp` classifies the **matched command component**, not the root shell.
 
 **Acceptance Criteria:**
 - AC-CMP-006-A: MUST return `boolean`.
-- AC-CMP-006-B: When `options.interactive` is provided, it MUST take precedence over auto-detection.
+- AC-CMP-006-B: When `options.interactive` / `config.interactive` is provided, it MUST take precedence over auto-detection.
+- AC-CMP-006-C: Bare `*App` / `*Command` names MUST NOT alone force interactive mode.
+- AC-CMP-006-D: Explicit `fn.interactive = true` MUST return true.
 
 ---
 
@@ -154,16 +159,16 @@ function extractModel<Model>(
 
 Extracts the initial model from a JSX component's reactive state declarations.
 
-**Target Design** (not yet implemented):
-1. Scan component body for `$state(initialValue)` calls.
-2. Map each rune to a model field: `{ runeName: initialValue }`.
-3. Return the assembled model object.
-
-**Current Status**: Returns `{}` (placeholder).
+**Current Status (v1):** Implemented — not a stub.
+1. Prefer `options.initialModel` / `options.model` / `component.initialModel`.
+2. When `extractState`: run a capture session (`beginModelExtraction`) and invoke the component so named `$state(init, 'name')` / `$states({ name: init })` register keys (Bun-safe; const names are stripped from `toString`).
+3. Fallback: parse `$state` literals from `Function#toString` when present.
+4. View phase rehydrates named runes via `beginViewHydration(model)` each frame.
 
 **Acceptance Criteria:**
-- AC-CMP-007-A: When `extractState` is false or not set, MUST return `{}`.
-- AC-CMP-007-B: When `extractState` is true, MUST attempt extraction (currently returns `{}`).
+- AC-CMP-007-A: When `extractState` is false or not set (and no initialModel), MUST return `{}` unless component.initialModel is set.
+- AC-CMP-007-B: When `extractState` is true, MUST extract named `$state` / `$states` into model keys under Bun.
+- AC-CMP-007-C: Named field values MUST match initializer (e.g. `$state(0, 'count')` → `{ count: 0 }`).
 
 ---
 
@@ -237,12 +242,12 @@ Bridge function that takes a compiled component and launches it in the MVU runti
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| `compileToComponent` | Skeleton | Produces valid component, no real state extraction |
+| `compileToComponent` | Complete | Produces MVU component; view hydrates named `$state` via `beginViewHydration` |
 | `createStatelessComponent` | Complete | Fully functional for CLI-style components |
-| `detectInteractive` | Stub | Always returns false |
-| `extractModel` | Stub | Always returns `{}` |
-| Rune-to-MVU mapping | Design only | REQ-JSX-CMP-008/009/010 define target |
-| `runApp` | Partial | Basic bridge exists |
+| `detectInteractive` | Complete | Explicit flag + source heuristics; **no bare `*App` name match** (CLI shell false-positive fixed) |
+| `extractModel` | Complete | Named `$state`/`$states` session under Bun; source literals fallback |
+| Rune-to-MVU mapping | Runtime hydrate | Full AST codegen deferred; hydration preserves model→view one-way flow |
+| `runApp` | Complete | CLI routing, active-command interactivity, one-shot `exitAfterRender` |
 
 ---
 

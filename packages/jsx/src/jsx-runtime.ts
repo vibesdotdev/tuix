@@ -5,7 +5,7 @@
  * Uses React JSX transform with Svelte-inspired binding support
  */
 
-import type { View } from "@tuix/core/types";
+import type { View } from '@tuix/core/types'
 import {
   text,
   vstack,
@@ -20,30 +20,26 @@ import {
   AlignItems,
   FlexWrap,
   type FlexboxProps,
-} from "@tuix/view";
-import { style, Style, color, border, type StyleProps } from "@tuix/ansi";
+} from '@tuix/view'
+import { style, Style, color, border, type StyleProps } from '@tuix/ansi'
 import {
   isBindableRune,
   isStateRune,
   getGlobalEventBus,
   type BindableRune,
   type StateRune,
-} from "@tuix/reactive";
-import { scopeManager } from "./scope/manager";
-import { Scope, ScopeContent, ScopeFallback } from "./scope/components";
-import type { ScopeContext, ScopeDef } from "./scope/types";
-import { config, templates } from "@tuix/config";
-import { mergeDeep } from "@tuix/config/utils";
-import * as fs from "fs/promises";
-import * as path from "path";
-import { Effect } from "effect";
-import { getGlobalRegistry } from "@tuix/core";
-import type { JSXPluginEvent, JSXCommandEvent } from "@tuix/jsx/events";
-import { jsxDebug } from "@tuix/debug";
-import { pluginStore } from "./plugins";
+} from '@tuix/reactive'
+import { scopeManager } from './scope/manager'
+import { Scope, ScopeContent, ScopeFallback } from './scope/components'
+import type { ScopeContext, ScopeDef } from './scope/types'
+import { Effect } from 'effect'
+import { getGlobalRegistry } from '@tuix/core'
+import type { JSXPluginEvent, JSXCommandEvent } from '@tuix/jsx/events'
+import { pluginStore } from './plugins'
 
-// Debug logging that respects TUIX_DEBUG env var
-const debug = jsxDebug.debug;
+const debug = (...args: unknown[]) => {
+  if (process.env.TUIX_DEBUG === '1') console.debug('[jsx]', ...args)
+}
 
 // =============================================================================
 // JSX Element Types
@@ -55,23 +51,23 @@ const debug = jsxDebug.debug;
  */
 export interface JSXElement {
   /** Internal marker to identify Tuix JSX descriptors */
-  $$typeof: symbol;
+  $$typeof: symbol
   /** Element type - either a string (intrinsic) or function (component) */
-  type: string | Function;
+  type: string | Function
   /** Element props */
-  props: Record<string, any>;
+  props: Record<string, any>
   /** Element key for list reconciliation */
-  key: string | number | null;
+  key: string | number | null
   /** Optional ref for imperative handles */
-  ref?: unknown;
+  ref?: unknown
   /** Development metadata (source location) */
   __source?: {
-    fileName: string;
-    lineNumber: number;
-    columnNumber: number;
-  };
+    fileName: string
+    lineNumber: number
+    columnNumber: number
+  }
   /** Development metadata (self reference) */
-  __self?: unknown;
+  __self?: unknown
 }
 
 /**
@@ -79,41 +75,41 @@ export interface JSXElement {
  */
 export type JSXNode = JSXElement | string | number | boolean | null | undefined | JSXNode[]
 
-const JSX_ELEMENT_TYPE = Symbol.for("tuix.jsx.element");
+const JSX_ELEMENT_TYPE = Symbol.for('tuix.jsx.element')
 
 function isJSXElement(value: unknown): value is JSXElement {
   return (
-    typeof value === "object" &&
+    typeof value === 'object' &&
     value !== null &&
     (value as Record<string, unknown>).$$typeof === JSX_ELEMENT_TYPE
-  );
+  )
 }
 
 type DevInfo = {
   source?: {
-    fileName: string;
-    lineNumber: number;
-    columnNumber: number;
-  };
-  self?: unknown;
-};
+    fileName: string
+    lineNumber: number
+    columnNumber: number
+  }
+  self?: unknown
+}
 
-const RESERVED_PROPS = new Set(["key", "ref", "__self", "__source", "children"]);
+const RESERVED_PROPS = new Set(['key', 'ref', '__self', '__source', 'children'])
 
 const normalizeKey = (value: unknown): string | number | null => {
-  if (value == null || typeof value === "boolean") {
-    return null;
+  if (value == null || typeof value === 'boolean') {
+    return null
   }
-  if (typeof value === "number" || typeof value === "string") {
-    return value;
+  if (typeof value === 'number' || typeof value === 'string') {
+    return value
   }
-  return String(value);
-};
+  return String(value)
+}
 
 const appendChild = (target: unknown[], value: unknown) => {
-  if (value === undefined) return;
-  target.push(value);
-};
+  if (value === undefined) return
+  target.push(value)
+}
 
 const createJSXElement = (
   type: string | Function,
@@ -122,69 +118,69 @@ const createJSXElement = (
   additionalChildren: unknown[],
   devInfo?: DevInfo
 ): JSXElement => {
-  const props: Record<string, unknown> = {};
-  let key: string | number | null = null;
-  let ref: unknown = undefined;
-  const children: unknown[] = [];
-  const info: DevInfo = devInfo ?? {};
+  const props: Record<string, unknown> = {}
+  let key: string | number | null = null
+  let ref: unknown = undefined
+  const children: unknown[] = []
+  const info: DevInfo = devInfo ?? {}
 
   if (rawProps != null) {
     for (const propName of Object.keys(rawProps)) {
-      const value = (rawProps as Record<string, unknown>)[propName];
+      const value = (rawProps as Record<string, unknown>)[propName]
 
-      if (propName === "key") {
-        const normalized = normalizeKey(value);
+      if (propName === 'key') {
+        const normalized = normalizeKey(value)
         if (normalized !== null) {
-          key = normalized;
+          key = normalized
         }
-        continue;
+        continue
       }
 
-      if (propName === "ref") {
-        ref = value;
-        continue;
+      if (propName === 'ref') {
+        ref = value
+        continue
       }
 
-      if (propName === "children") {
-        appendChild(children, value);
-        continue;
+      if (propName === 'children') {
+        appendChild(children, value)
+        continue
       }
 
-      if (propName === "__source") {
-        if (value && typeof value === "object") {
-          info.source = value as DevInfo["source"];
+      if (propName === '__source') {
+        if (value && typeof value === 'object') {
+          info.source = value as DevInfo['source']
         }
-        continue;
+        continue
       }
 
-      if (propName === "__self") {
-        info.self = value;
-        continue;
+      if (propName === '__self') {
+        info.self = value
+        continue
       }
 
       if (!RESERVED_PROPS.has(propName)) {
-        props[propName] = value;
+        props[propName] = value
       }
     }
   }
 
   if (keyOverride !== undefined && keyOverride !== null) {
-    const normalized = normalizeKey(keyOverride);
+    const normalized = normalizeKey(keyOverride)
     if (normalized !== null) {
-      key = normalized;
+      key = normalized
     }
   }
 
   if (additionalChildren.length > 0) {
     for (const child of additionalChildren) {
-      appendChild(children, child);
+      appendChild(children, child)
     }
   }
 
   if (children.length === 1) {
-    props.children = children[0];
+    props.children = children[0]
   } else if (children.length > 1) {
-    props.children = children;
+    props.children = children
   }
 
   const element: JSXElement = {
@@ -192,22 +188,38 @@ const createJSXElement = (
     type,
     props,
     key,
-  };
+  }
 
   if (ref !== undefined) {
-    (element as Record<string, unknown>).ref = ref;
+    ;(element as Record<string, unknown>).ref = ref
   }
 
   if (info.source) {
-    element.__source = info.source;
+    element.__source = info.source
   }
 
   if (info.self) {
-    element.__self = info.self;
+    element.__self = info.self
   }
 
-  return element;
-};
+  return element
+}
+
+interface JSXModule {
+  emitPluginStart?: (name: string, scope: ScopeContext) => Effect.Effect<unknown, unknown, unknown>
+  emitPluginEnd?: (name: string, scope: ScopeContext) => Effect.Effect<unknown, unknown, unknown>
+  emitCommandStart?: (path: string[], command: ScopeDef) => Effect.Effect<unknown, unknown, unknown>
+  emitCommandEnd?: (
+    path: string[],
+    command: ScopeDef,
+    result?: unknown
+  ) => Effect.Effect<unknown, unknown, unknown>
+}
+
+interface ConfigManager {
+  get?: (key: string, defaultValue?: unknown) => unknown
+  set?: (key: string, value: unknown) => unknown
+}
 
 // Global plugin registry for JSX components - now uses stores
 class JSXPluginRegistry {
@@ -215,74 +227,74 @@ class JSXPluginRegistry {
   private declarativePlugins: Map<
     string,
     {
-      component: Function;
-      metadata?: Record<string, unknown>;
-      registeredAt: Date;
+      component: Function
+      metadata?: Record<string, unknown>
+      registeredAt: Date
     }
-  > = new Map();
+  > = new Map()
 
   // Use the global scope manager
-  private scopeManager = scopeManager;
+  private scopeManager = scopeManager
 
   // Track current scope context
-  private currentScopeId: string | null = null;
-  private scopeIdStack: string[] = [];
+  private currentScopeId: string | null = null
+  private scopeIdStack: string[] = []
 
   // JSX Module integration
-  private jsxModule: JSXModule | null = null;
+  private jsxModule: JSXModule | null = null
 
   // Command context for proper JSX evaluation
   private activeCommand: {
-    path: string[]; // e.g., ['dev'] or ['dev', 'start']
-    args: Record<string, string | number | boolean | undefined>;
-    flags: Record<string, string | number | boolean | undefined>;
-  } | null = null;
+    path: string[] // e.g., ['dev'] or ['dev', 'start']
+    args: Record<string, string | number | boolean | undefined>
+    flags: Record<string, string | number | boolean | undefined>
+  } | null = null
 
   // Global config manager
-  private configManager: ConfigManager | null = null;
+  private configManager: ConfigManager | null = null
 
   constructor() {
     // Initialize JSX module if available
-    this.initializeJSXModule();
+    this.initializeJSXModule()
   }
 
   private initializeJSXModule() {
     try {
-      const registry = getGlobalRegistry();
-      this.jsxModule = registry.getModule<JSXModule>("jsx");
+      const registry = getGlobalRegistry()
+      this.jsxModule = registry.getModule<JSXModule>('jsx')
 
       if (this.jsxModule) {
-        debug("JSX Module found and initialized");
+        debug('JSX Module found and initialized')
       }
     } catch (error) {
-      debug("JSX Module not available yet:", error);
+      debug('JSX Module not available yet:', error)
     }
   }
 
   // Helper to get current scope
   private getCurrentScope(): ScopeDef | null {
-    if (!this.currentScopeId) return null;
-    return this.scopeManager.getScopeDef(this.currentScopeId);
+    if (!this.currentScopeId) return null
+    return this.scopeManager.getScopeDef(this.currentScopeId)
   }
 
   // Helper to push scope
   private pushScope(scope: ScopeDef): void {
     if (this.currentScopeId) {
-      this.scopeIdStack.push(this.currentScopeId);
+      this.scopeIdStack.push(this.currentScopeId)
     }
-    this.currentScopeId = scope.id;
-    Effect.runSync(this.scopeManager.registerScope(scope));
+    this.currentScopeId = scope.id
+    Effect.runSync(this.scopeManager.registerScope(scope))
   }
 
   // Helper to pop scope
   private popScope(): ScopeDef | null {
-    const current = this.getCurrentScope();
+    const current = this.getCurrentScope()
     if (this.scopeIdStack.length > 0) {
-      this.currentScopeId = this.scopeIdStack.pop()!;
+      this.currentScopeId = this.scopeIdStack.pop()!
     } else {
-      this.currentScopeId = null;
+      this.currentScopeId = null
     }
-    return current;
+    return current
   }
 
   // --- Plugin Store Integration (declarative) ---
@@ -291,101 +303,91 @@ class JSXPluginRegistry {
    * Register a declarative plugin component
    * This is for JSX-based plugins, not loaded plugins
    */
-  registerDeclarativePlugin(
-    name: string,
-    component: Function,
-    metadata?: Record<string, unknown>
-  ) {
-    debug("Registering declarative plugin:", name);
+  registerDeclarativePlugin(name: string, component: Function, metadata?: Record<string, unknown>) {
+    debug('Registering declarative plugin:', name)
 
     // Store the plugin component
     this.declarativePlugins.set(name, {
       component,
       metadata: metadata || {},
       registeredAt: new Date(),
-    });
+    })
 
     // Create and register plugin scope
     const pluginScope: ScopeDef = {
       id: `plugin_${name}_${Date.now()}`,
-      type: "plugin",
+      type: 'plugin',
       name,
       path: [name],
       description: metadata?.description,
       executable: true,
       metadata,
       children: [],
-    };
+    }
 
-    this.pushScope(pluginScope);
+    this.pushScope(pluginScope)
 
     // Emit plugin event if JSX module is available
     if (this.jsxModule) {
-      Effect.runSync(
-        this.jsxModule.emitPluginStart(name, pluginScope as ScopeContext)
-      );
+      Effect.runSync(this.jsxModule.emitPluginStart(name, pluginScope as ScopeContext))
     }
 
-    return name;
+    return name
   }
 
   /**
    * Unregister a declarative plugin
    */
   unregisterDeclarativePlugin(name: string) {
-    debug("Unregistering declarative plugin:", name);
+    debug('Unregistering declarative plugin:', name)
 
     // Find and remove the plugin scope
-    const allScopes = this.scopeManager.getAllScopes();
-    const pluginScope = allScopes.find(
-      (s) => s.type === "plugin" && s.name === name
-    );
+    const allScopes = this.scopeManager.getAllScopes()
+    const pluginScope = allScopes.find(s => s.type === 'plugin' && s.name === name)
 
     if (pluginScope) {
-      Effect.runSync(this.scopeManager.removeScope(pluginScope.id));
+      Effect.runSync(this.scopeManager.removeScope(pluginScope.id))
     }
 
     // Remove from declarative plugins
-    this.declarativePlugins.delete(name);
+    this.declarativePlugins.delete(name)
 
     // Pop scope if it's current
     if (this.currentScopeId === pluginScope?.id) {
-      this.popScope();
+      this.popScope()
     }
 
     // Emit plugin end event
     if (this.jsxModule && pluginScope) {
-      Effect.runSync(this.jsxModule.emitPluginEnd(name));
+      Effect.runSync(this.jsxModule.emitPluginEnd(name))
     }
   }
 
   /**
    * Get a declarative plugin by name
    */
-  getDeclarativePlugin(
-    name: string
-  ):
+  getDeclarativePlugin(name: string):
     | {
-        component: Function;
-        metadata?: Record<string, unknown>;
-        registeredAt: Date;
+        component: Function
+        metadata?: Record<string, unknown>
+        registeredAt: Date
       }
     | undefined {
-    return this.declarativePlugins.get(name);
+    return this.declarativePlugins.get(name)
   }
 
   /**
    * List all declarative plugins
    */
   listDeclarativePlugins(): string[] {
-    return Array.from(this.declarativePlugins.keys());
+    return Array.from(this.declarativePlugins.keys())
   }
 
   /**
    * Check if a declarative plugin exists
    */
   hasDeclarativePlugin(name: string): boolean {
-    return this.declarativePlugins.has(name);
+    return this.declarativePlugins.has(name)
   }
 
   // --- Plugin Registry Integration (loaded plugins) ---
@@ -399,142 +401,129 @@ class JSXPluginRegistry {
     description?: string,
     version?: string
   ) {
-    debug("Registering loaded plugin:", name);
+    debug('Registering loaded plugin:', name)
 
     // Use the store to register the plugin
-    pluginStore.registerDeclarativePlugin(name, plugin);
+    pluginStore.registerDeclarativePlugin(name, plugin)
     // Note: pluginStore doesn't have enable method, removed for now
 
     // Create plugin scope
     const pluginScope: ScopeDef = {
       id: `plugin_${name}_${Date.now()}`,
-      type: "plugin",
+      type: 'plugin',
       name,
       path: [name],
       description,
       metadata: { version, plugin },
       executable: true,
       children: [],
-    };
+    }
 
-    this.pushScope(pluginScope);
+    this.pushScope(pluginScope)
 
     // Emit plugin start event
     if (this.jsxModule) {
-      Effect.runSync(
-        this.jsxModule.emitPluginStart(name, pluginScope as ScopeContext)
-      );
+      Effect.runSync(this.jsxModule.emitPluginStart(name, pluginScope as ScopeContext))
     }
 
-    return name;
+    return name
   }
 
   /**
    * Unregister a loaded plugin
    */
   unregisterPlugin(name: string) {
-    debug("Unregistering loaded plugin:", name);
+    debug('Unregistering loaded plugin:', name)
 
     // Find the plugin scope
-    const allScopes = this.scopeManager.getAllScopes();
-    const pluginScope = allScopes.find(
-      (s) => s.type === "plugin" && s.name === name
-    );
+    const allScopes = this.scopeManager.getAllScopes()
+    const pluginScope = allScopes.find(s => s.type === 'plugin' && s.name === name)
 
     if (pluginScope) {
       // Pop scope if current
       if (this.currentScopeId === pluginScope.id) {
-        this.popScope();
+        this.popScope()
       }
 
       // Remove scope
-      Effect.runSync(this.scopeManager.removeScope(pluginScope.id));
+      Effect.runSync(this.scopeManager.removeScope(pluginScope.id))
     }
 
     // Emit plugin end event
     if (this.jsxModule) {
-      Effect.runSync(this.jsxModule.emitPluginEnd(name));
+      Effect.runSync(this.jsxModule.emitPluginEnd(name))
     }
 
     // Disable in store
-    pluginStore.disable(name);
+    pluginStore.disable(name)
   }
 
   /**
    * Get a loaded plugin
    */
   getPlugin(name: string): Record<string, unknown> | null {
-    const plugin = pluginStore.plugins().find(p => p.name === name);
-    return plugin?.component || null;
+    const plugin = pluginStore.plugins().find(p => p.name === name)
+    return plugin?.component || null
   }
 
   /**
    * List all loaded plugins
    */
   listPlugins(): string[] {
-    return pluginStore.plugins().map(p => p.name);
+    return pluginStore.plugins().map(p => p.name)
   }
 
   // --- Command Registration ---
 
-  registerCommand(
-    path: string[],
-    handler: Function,
-    metadata?: Record<string, unknown>
-  ) {
-    debug("Registering command:", path.join(" "));
+  registerCommand(path: string[], handler: Function, metadata?: Record<string, unknown>) {
+    debug('Registering command:', path.join(' '))
 
-    const currentScope = this.getCurrentScope();
-    const parentPath = currentScope?.path || [];
-    const fullPath = [...parentPath, ...path];
+    const currentScope = this.getCurrentScope()
+    const parentPath = currentScope?.path || []
+    const fullPath = [...parentPath, ...path]
 
     // Create command scope
     const commandScope: ScopeDef = {
-      id: `command_${fullPath.join("_")}_${Date.now()}`,
-      type: "command",
+      id: `command_${fullPath.join('_')}_${Date.now()}`,
+      type: 'command',
       name: path[path.length - 1],
       path: fullPath,
       handler,
       executable: true,
       metadata,
       children: [],
-    };
+    }
 
     // Register with scope manager
-    Effect.runSync(this.scopeManager.registerScope(commandScope));
+    Effect.runSync(this.scopeManager.registerScope(commandScope))
 
     // If current scope exists, add as child
     if (currentScope) {
-      currentScope.children.push(commandScope);
+      currentScope.children.push(commandScope)
     }
 
     // Emit command event if JSX module is available
     if (this.jsxModule) {
-      Effect.runSync(
-        this.jsxModule.emitCommandRegistered(
-          fullPath,
-          commandScope as ScopeContext
-        )
-      );
+      Effect.runSync(this.jsxModule.emitCommandRegistered(fullPath, commandScope as ScopeContext))
     }
 
-    return fullPath.join(" ");
+    return fullPath.join(' ')
   }
 
   unregisterCommand(path: string[]) {
-    debug("Unregistering command:", path.join(" "));
+    debug('Unregistering command:', path.join(' '))
 
     // Find command scope
-    const allScopes = this.scopeManager.getAllScopes();
+    const allScopes = this.scopeManager.getAllScopes()
     const commandScope = allScopes.find(
-      (s) =>
-        s.type === "command" &&
+      s =>
+        s.type === 'command' &&
         s.path.length === path.length &&
         s.path.every((p, i) => p === path[i])
-    );
+    )
 
     if (commandScope) {
-      Effect.runSync(this.scopeManager.removeScope(commandScope.id));
+      Effect.runSync(this.scopeManager.removeScope(commandScope.id))
     }
   }
 
@@ -545,60 +534,54 @@ class JSXPluginRegistry {
     args: Record<string, string | number | boolean | undefined> = {},
     flags: Record<string, string | number | boolean | undefined> = {}
   ) {
-    debug("Executing command:", path.join(" "));
+    debug('Executing command:', path.join(' '))
 
     // Find command scope
-    const allScopes = this.scopeManager.getAllScopes();
+    const allScopes = this.scopeManager.getAllScopes()
     const commandScope = allScopes.find(
-      (s) =>
-        s.type === "command" &&
+      s =>
+        s.type === 'command' &&
         s.path.length === path.length &&
         s.path.every((p, i) => p === path[i])
-    );
+    )
 
     if (!commandScope || !commandScope.handler) {
-      throw new Error(`Command not found: ${path.join(" ")}`);
+      throw new Error(`Command not found: ${path.join(' ')}`)
     }
 
     // Execute handler
-    return commandScope.handler({ args, flags });
+    return commandScope.handler({ args, flags })
   }
 
   // --- Context Management ---
 
   setActiveCommand(
     command: {
-      path: string[];
-      args: Record<string, string | number | boolean | undefined>;
-      flags: Record<string, string | number | boolean | undefined>;
+      path: string[]
+      args: Record<string, string | number | boolean | undefined>
+      flags: Record<string, string | number | boolean | undefined>
     } | null
   ) {
-    this.activeCommand = command;
+    this.activeCommand = command
   }
 
   getActiveCommand() {
-    return this.activeCommand;
+    return this.activeCommand
   }
 
   // Context management for parent/child relationships
-  pushContext(
-    type: "plugin" | "command" | "component",
-    id: string,
-    data: Record<string, unknown>
-  ) {
+  pushContext(type: 'plugin' | 'command' | 'component', id: string, data: Record<string, unknown>) {
     const scope: ScopeDef = {
       id: `${type}_${id}_${Date.now()}`,
       type,
       name: id,
-      path: this.getCurrentScope()?.path
-        ? [...this.getCurrentScope()!.path, id]
-        : [id],
+      path: this.getCurrentScope()?.path ? [...this.getCurrentScope()!.path, id] : [id],
       metadata: data,
-      executable: type !== "component",
+      executable: type !== 'component',
       children: [],
-    };
+    }
 
-    this.pushScope(scope);
+    this.pushScope(scope)
     // The original code had this line commented out, but it seems necessary for context tracking
     // this.commandStack.push({ type, id, data })
   }
@@ -606,25 +589,25 @@ class JSXPluginRegistry {
   popContext() {
     // The original code had this line commented out, but it seems necessary for context tracking
     // const context = this.commandStack.pop()
-    const poppedScope = this.popScope();
+    const poppedScope = this.popScope()
 
     // if (context && poppedScope) {
     //   debug(`Popped ${context.type} context:`, context.id)
     // }
 
-    return null; // Return null as context is commented out
+    return null // Return null as context is commented out
   }
 
   getCurrentContext() {
     // The original code had this line commented out, but it seems necessary for context tracking
     // return this.commandStack[this.commandStack.length - 1] || null
-    return null; // Return null as context is commented out
+    return null // Return null as context is commented out
   }
 
   getContextStack() {
     // The original code had this line commented out, but it seems necessary for context tracking
     // return [...this.commandStack]
-    return []; // Return empty array as context is commented out
+    return [] // Return empty array as context is commented out
   }
 
   // Track renderable content for help generation
@@ -636,101 +619,101 @@ class JSXPluginRegistry {
   popRenderableContent() {
     // The original code had this line commented out, but it seems necessary for context tracking
     // return this.renderableContent.pop()
-    return null; // Return null as renderableContent is commented out
+    return null // Return null as renderableContent is commented out
   }
 
   hasRenderableContent(): boolean {
     // The original code had this line commented out, but it seems necessary for context tracking
     // return this.renderableContent.length > 0
-    return false; // Return false as renderableContent is commented out
+    return false // Return false as renderableContent is commented out
   }
 
   // Scope-aware state management
   getScopedState<T>(key: string, defaultValue?: T): T | undefined {
     // Look up the scope hierarchy for a state value
-    let currentId = this.currentScopeId;
+    let currentId = this.currentScopeId
     while (currentId) {
-      const scope = this.scopeManager.getScopeDef(currentId);
+      const scope = this.scopeManager.getScopeDef(currentId)
       if (scope?.metadata?.[key] !== undefined) {
-        return scope.metadata[key];
+        return scope.metadata[key]
       }
       // Move up to parent
-      const state = this.scopeManager.getScope(currentId);
-      currentId = state?.parentId || null;
+      const state = this.scopeManager.getScope(currentId)
+      currentId = state?.parentId || null
     }
-    return defaultValue;
+    return defaultValue
   }
 
   setScopedState(key: string, value: unknown) {
-    const currentScope = this.getCurrentScope();
+    const currentScope = this.getCurrentScope()
     if (currentScope) {
-      currentScope.metadata = currentScope.metadata || {};
-      currentScope.metadata[key] = value;
+      currentScope.metadata = currentScope.metadata || {}
+      currentScope.metadata[key] = value
     }
   }
 
   // Helper to get all plugins in the current scope
   getScopedPlugins(): Record<string, unknown>[] {
-    const allScopes = this.scopeManager.getAllScopes();
+    const allScopes = this.scopeManager.getAllScopes()
     return allScopes
-      .filter((s) => s.type === "plugin")
-      .map((s) => s.metadata?.plugin)
-      .filter(Boolean);
+      .filter(s => s.type === 'plugin')
+      .map(s => s.metadata?.plugin)
+      .filter(Boolean)
   }
 
   // Config management
   setConfigManager(configManager: ConfigManager) {
-    this.configManager = configManager;
+    this.configManager = configManager
   }
 
   getConfigManager() {
-    return this.configManager;
+    return this.configManager
   }
 
   // Get the scope manager for direct access
   getScopeManager() {
-    return this.scopeManager;
+    return this.scopeManager
   }
 
   // Helper methods for scope access
   getCurrentPlugin(): Record<string, unknown> | null {
-    const currentScope = this.getCurrentScope();
-    if (currentScope?.type === "plugin") {
-      return currentScope.metadata?.plugin || null;
+    const currentScope = this.getCurrentScope()
+    if (currentScope?.type === 'plugin') {
+      return currentScope.metadata?.plugin || null
     }
 
     // Look up the scope hierarchy
-    let currentId = this.currentScopeId;
+    let currentId = this.currentScopeId
     while (currentId) {
-      const scope = this.scopeManager.getScopeDef(currentId);
-      if (scope?.type === "plugin") {
-        return scope.metadata?.plugin || null;
+      const scope = this.scopeManager.getScopeDef(currentId)
+      if (scope?.type === 'plugin') {
+        return scope.metadata?.plugin || null
       }
-      const state = this.scopeManager.getScope(currentId);
-      currentId = state?.parentId || null;
+      const state = this.scopeManager.getScope(currentId)
+      currentId = state?.parentId || null
     }
 
-    return null;
+    return null
   }
 
   getCurrentCommand(): ScopeDef | null {
-    const currentScope = this.getCurrentScope();
-    if (currentScope?.type === "command") {
-      return currentScope;
+    const currentScope = this.getCurrentScope()
+    if (currentScope?.type === 'command') {
+      return currentScope
     }
 
     // Look up the scope hierarchy
-    let currentId = this.currentScopeId;
+    let currentId = this.currentScopeId
     while (currentId) {
-      const scope = this.scopeManager.getScopeDef(currentId);
-      if (scope?.type === "command") {
-        return scope;
+      const scope = this.scopeManager.getScopeDef(currentId)
+      if (scope?.type === 'command') {
+        return scope
       }
-      const state = this.scopeManager.getScope(currentId);
-      currentId = state?.parentId || null;
+      const state = this.scopeManager.getScope(currentId)
+      currentId = state?.parentId || null
     }
 
-    return null;
+    return null
   }
 
   // Debug helpers
@@ -743,176 +726,171 @@ class JSXPluginRegistry {
       renderableContentDepth: 0, // Renderable content is commented out
       declarativePluginsCount: this.declarativePlugins.size,
       totalScopes: this.scopeManager.getAllScopes().length,
-    };
+    }
   }
 }
 
 // Create global registry instance
-const registry = new JSXPluginRegistry();
+const registry = new JSXPluginRegistry()
 
-type StyleInstance = ReturnType<typeof style>;
+type StyleInstance = ReturnType<typeof style>
 
-const INTERACTIVE_METADATA = Symbol.for("tuix.interactive");
+const INTERACTIVE_METADATA = Symbol.for('tuix.interactive')
 
-const isStyleInstance = (value: unknown): value is StyleInstance => value instanceof Style;
+const isStyleInstance = (value: unknown): value is StyleInstance => value instanceof Style
 
 const extractStyleProps = (value: unknown): Partial<StyleProps> | undefined => {
-  if (!value) return undefined;
+  if (!value) return undefined
   if (isStyleInstance(value)) {
-    return { ...value.props };
+    return { ...value.props }
   }
-  if (typeof value === "object") {
-    const record = value as Record<string, unknown>;
-    if (record.props && typeof record.props === "object") {
-      return { ...(record.props as Partial<StyleProps>) };
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    if (record.props && typeof record.props === 'object') {
+      return { ...(record.props as Partial<StyleProps>) }
     }
-    return { ...(record as Partial<StyleProps>) };
+    return { ...(record as Partial<StyleProps>) }
   }
-  return undefined;
-};
+  return undefined
+}
 
 const mergeStyleProps = (
   ...inputs: Array<Partial<StyleProps> | undefined>
 ): Partial<StyleProps> | undefined => {
-  const filtered = inputs.filter(Boolean) as Partial<StyleProps>[];
-  if (filtered.length === 0) return undefined;
-  return filtered.reduce<Partial<StyleProps>>((acc, current) => ({ ...acc, ...current }), {});
-};
+  const filtered = inputs.filter(Boolean) as Partial<StyleProps>[]
+  if (filtered.length === 0) return undefined
+  return filtered.reduce<Partial<StyleProps>>((acc, current) => ({ ...acc, ...current }), {})
+}
 
-const buildStyle = (
-  ...inputs: Array<Partial<StyleProps> | undefined>
-): StyleInstance => {
-  const merged = mergeStyleProps(...inputs);
+const buildStyle = (...inputs: Array<Partial<StyleProps> | undefined>): StyleInstance => {
+  const merged = mergeStyleProps(...inputs)
   if (!merged || Object.keys(merged).length === 0) {
-    return style();
+    return style()
   }
-  return style(merged);
-};
+  return style(merged)
+}
 
 const toTextContent = (children: unknown[]): string | null => {
-  const segments: string[] = [];
+  const segments: string[] = []
   for (const child of children) {
     // Skip null, undefined, and booleans (like React does)
-    if (child == null || typeof child === 'boolean') continue;
+    if (child == null || typeof child === 'boolean') continue
 
-    const type = typeof child;
-    if (type === "string" || type === "number" || type === "bigint") {
-      segments.push(String(child));
-      continue;
+    const type = typeof child
+    if (type === 'string' || type === 'number' || type === 'bigint') {
+      segments.push(String(child))
+      continue
     }
-    if (type === "object" && "toString" in (child as Record<string, unknown>)) {
-      const stringValue = (child as Record<string, unknown>).toString?.();
-      if (stringValue && stringValue !== "[object Object]") {
-        segments.push(stringValue);
-        continue;
+    if (type === 'object' && 'toString' in (child as Record<string, unknown>)) {
+      const stringValue = (child as Record<string, unknown>).toString?.()
+      if (stringValue && stringValue !== '[object Object]') {
+        segments.push(stringValue)
+        continue
       }
     }
-    return null;
+    return null
   }
-  return segments.join("");
-};
+  return segments.join('')
+}
 
 function renderChild(child: unknown): View | null {
-  if (child == null || typeof child === "boolean") {
-    return null;
+  if (child == null || typeof child === 'boolean') {
+    return null
   }
 
   if (isView(child)) {
-    return child;
+    return child
   }
 
   if (Array.isArray(child)) {
-    const collected: View[] = [];
+    const collected: View[] = []
     for (const nested of child) {
-      const view = renderChild(nested);
+      const view = renderChild(nested)
       if (view) {
-        collected.push(view);
+        collected.push(view)
       }
     }
-    if (collected.length === 0) return null;
-    if (collected.length === 1) return collected[0];
-    return vstack(...collected);
+    if (collected.length === 0) return null
+    if (collected.length === 1) return collected[0]
+    return vstack(...collected)
   }
 
   if (isJSXElement(child)) {
-    return renderJSX(child.type, child.props ?? null);
+    return renderJSX(child.type, child.props ?? null)
   }
 
-  if (child && typeof child === "object" && "render" in (child as Record<string, unknown>)) {
-    const candidate = child as View;
-    if (typeof candidate.render === "function") {
-      return candidate;
+  if (child && typeof child === 'object' && 'render' in (child as Record<string, unknown>)) {
+    const candidate = child as View
+    if (typeof candidate.render === 'function') {
+      return candidate
     }
   }
 
-  const content = toTextContent([child]);
+  const content = toTextContent([child])
   if (content !== null) {
-    return text(content);
+    return text(content)
   }
 
-  return null;
+  return null
 }
 
 function ensureViewArray(children: unknown[]): View[] {
-  const views: View[] = [];
+  const views: View[] = []
   for (const child of children) {
-    const rendered = renderChild(child);
+    const rendered = renderChild(child)
     if (rendered) {
-      views.push(rendered);
+      views.push(rendered)
     }
   }
-  return views;
+  return views
 }
 
 const joinViews = (views: View[], gap: number = 1): View => {
-  if (views.length === 0) return text("");
-  if (views.length === 1) return views[0];
+  if (views.length === 0) return text('')
+  if (views.length === 1) return views[0]
   if (!Number.isFinite(gap) || gap <= 0) {
-    return hstack(...views);
+    return hstack(...views)
   }
-  const spacer = text(" ".repeat(gap));
-  const withGap: View[] = [];
+  const spacer = text(' '.repeat(gap))
+  const withGap: View[] = []
   views.forEach((view, index) => {
     if (index > 0) {
-      withGap.push(spacer);
+      withGap.push(spacer)
     }
-    withGap.push(view);
-  });
-  return hstack(...withGap);
-};
+    withGap.push(view)
+  })
+  return hstack(...withGap)
+}
 
-const wrapInteractiveView = (
-  child: View,
-  props: Record<string, unknown>
-): View => {
+const wrapInteractiveView = (child: View, props: Record<string, unknown>): View => {
   const interactiveView: View & { [INTERACTIVE_METADATA]?: Record<string, unknown> } = {
     render: child.render.bind(child),
     width: child.width,
     height: child.height,
-  };
+  }
 
-  const events: Record<string, unknown> = {};
+  const events: Record<string, unknown> = {}
   const possibleEvents = [
-    "onClick",
-    "onFocus",
-    "onBlur",
-    "onMouseEnter",
-    "onMouseLeave",
-    "onKeyPress",
-    "onSubmit",
-    "onChange",
-    "onHover",
-  ];
+    'onClick',
+    'onFocus',
+    'onBlur',
+    'onMouseEnter',
+    'onMouseLeave',
+    'onKeyPress',
+    'onSubmit',
+    'onChange',
+    'onHover',
+  ]
 
   for (const key of possibleEvents) {
-    const handler = props[key];
-    if (typeof handler === "function") {
-      events[key] = handler;
+    const handler = props[key]
+    if (typeof handler === 'function') {
+      events[key] = handler
     }
   }
 
-  const disabled = props.disabled === true || props.disabled === "true";
-  const focusable = disabled ? false : props.focusable !== false;
+  const disabled = props.disabled === true || props.disabled === 'true'
+  const focusable = disabled ? false : props.focusable !== false
   const metadata: Record<string, unknown> = {
     focusable,
     events,
@@ -920,142 +898,148 @@ const wrapInteractiveView = (
     role: props.role,
     tooltip: props.tooltip,
     disabled,
-  };
+  }
 
   Object.defineProperty(interactiveView, INTERACTIVE_METADATA, {
     value: metadata,
     enumerable: false,
     writable: false,
-  });
+  })
 
-  return interactiveView;
-};
+  return interactiveView
+}
 
 const toNumber = (value: unknown): number | undefined => {
-  if (value == null) return undefined;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
-};
+  if (value == null) return undefined
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : undefined
+}
 
 const normalizePadding = (
   value: unknown
 ): { top?: number; right?: number; bottom?: number; left?: number } | undefined => {
-  if (value == null) return undefined;
-  if (typeof value === "number") {
-    return { top: value, right: value, bottom: value, left: value };
+  if (value == null) return undefined
+  if (typeof value === 'number') {
+    return { top: value, right: value, bottom: value, left: value }
   }
-  if (typeof value === "object") {
-    const source = value as Record<string, unknown>;
-    const vertical = toNumber(source.vertical);
-    const horizontal = toNumber(source.horizontal);
+  if (typeof value === 'object') {
+    const source = value as Record<string, unknown>
+    const vertical = toNumber(source.vertical)
+    const horizontal = toNumber(source.horizontal)
     return {
       top: toNumber(source.top) ?? vertical ?? 0,
       bottom: toNumber(source.bottom) ?? vertical ?? 0,
       left: toNumber(source.left) ?? horizontal ?? 0,
       right: toNumber(source.right) ?? horizontal ?? 0,
-    };
+    }
   }
-  return undefined;
-};
+  return undefined
+}
 
 const resolveBorderPreset = (value: unknown) => {
-  if (value === true || value === "true") return border.thin;
-  if (!value || value === false || value === "false" || value === "none") return undefined;
+  if (value === true || value === 'true') return border.thin
+  if (!value || value === false || value === 'false' || value === 'none') return undefined
 
   // If it's already a Border object, return it directly
-  if (typeof value === "object" && value !== null) {
-    const borderObj = value as any;
-    if (borderObj.topLeft && borderObj.topRight && borderObj.bottomLeft &&
-        borderObj.bottomRight && borderObj.horizontal && borderObj.vertical) {
-      return borderObj;
+  if (typeof value === 'object' && value !== null) {
+    const borderObj = value as any
+    if (
+      borderObj.topLeft &&
+      borderObj.topRight &&
+      borderObj.bottomLeft &&
+      borderObj.bottomRight &&
+      borderObj.horizontal &&
+      borderObj.vertical
+    ) {
+      return borderObj
     }
   }
 
-  if (typeof value === "string") {
-    const key = value.toLowerCase();
+  if (typeof value === 'string') {
+    const key = value.toLowerCase()
     switch (key) {
-      case "single":
-      case "thin":
-        return border.thin;
-      case "double":
-        return border.double;
-      case "rounded":
-        return border.rounded;
-      case "thick":
-        return border.thick;
-      case "ascii":
-        return border.ascii;
+      case 'single':
+      case 'thin':
+        return border.thin
+      case 'double':
+        return border.double
+      case 'rounded':
+        return border.rounded
+      case 'thick':
+        return border.thick
+      case 'ascii':
+        return border.ascii
       default:
-        return undefined;
+        return undefined
     }
   }
-  return undefined;
-};
+  return undefined
+}
 
 const mapFlexDirection = (value: unknown): FlexDirection | undefined => {
-  if (typeof value !== "string") return undefined;
+  if (typeof value !== 'string') return undefined
   switch (value) {
-    case "column":
-      return FlexDirection.Column;
-    case "column-reverse":
-      return FlexDirection.ColumnReverse;
-    case "row-reverse":
-      return FlexDirection.RowReverse;
-    case "row":
+    case 'column':
+      return FlexDirection.Column
+    case 'column-reverse':
+      return FlexDirection.ColumnReverse
+    case 'row-reverse':
+      return FlexDirection.RowReverse
+    case 'row':
     default:
-      return FlexDirection.Row;
+      return FlexDirection.Row
   }
-};
+}
 
 const mapJustifyContent = (value: unknown): JustifyContent | undefined => {
-  if (typeof value !== "string") return undefined;
+  if (typeof value !== 'string') return undefined
   switch (value) {
-    case "center":
-      return JustifyContent.Center;
-    case "end":
-    case "flex-end":
-      return JustifyContent.End;
-    case "between":
-    case "space-between":
-      return JustifyContent.SpaceBetween;
-    case "around":
-    case "space-around":
-      return JustifyContent.SpaceAround;
-    case "evenly":
-    case "space-evenly":
-      return JustifyContent.SpaceEvenly;
-    case "start":
-    case "flex-start":
+    case 'center':
+      return JustifyContent.Center
+    case 'end':
+    case 'flex-end':
+      return JustifyContent.End
+    case 'between':
+    case 'space-between':
+      return JustifyContent.SpaceBetween
+    case 'around':
+    case 'space-around':
+      return JustifyContent.SpaceAround
+    case 'evenly':
+    case 'space-evenly':
+      return JustifyContent.SpaceEvenly
+    case 'start':
+    case 'flex-start':
     default:
-      return JustifyContent.Start;
+      return JustifyContent.Start
   }
-};
+}
 
 const mapAlignItems = (value: unknown): AlignItems | undefined => {
-  if (typeof value !== "string") return undefined;
+  if (typeof value !== 'string') return undefined
   switch (value) {
-    case "center":
-      return AlignItems.Center;
-    case "end":
-    case "flex-end":
-      return AlignItems.End;
-    case "stretch":
-      return AlignItems.Stretch;
-    case "baseline":
-      return AlignItems.Baseline;
-    case "start":
-    case "flex-start":
+    case 'center':
+      return AlignItems.Center
+    case 'end':
+    case 'flex-end':
+      return AlignItems.End
+    case 'stretch':
+      return AlignItems.Stretch
+    case 'baseline':
+      return AlignItems.Baseline
+    case 'start':
+    case 'flex-start':
     default:
-      return AlignItems.Start;
+      return AlignItems.Start
   }
-};
+}
 
 const mapFlexWrap = (value: unknown): FlexWrap | undefined => {
-  if (value === true || value === "wrap") return FlexWrap.Wrap;
-  if (value === "reverse" || value === "wrap-reverse") return FlexWrap.WrapReverse;
-  if (value === false || value === "nowrap" || value == null) return FlexWrap.NoWrap;
-  return FlexWrap.NoWrap;
-};
+  if (value === true || value === 'wrap') return FlexWrap.Wrap
+  if (value === 'reverse' || value === 'wrap-reverse') return FlexWrap.WrapReverse
+  if (value === false || value === 'nowrap' || value == null) return FlexWrap.NoWrap
+  return FlexWrap.NoWrap
+}
 
 const headingPresetStyles: Record<number, Partial<StyleProps>> = {
   1: { bold: true, underline: true, foreground: color.white },
@@ -1064,16 +1048,16 @@ const headingPresetStyles: Record<number, Partial<StyleProps>> = {
   4: { bold: true },
   5: { foreground: color.gray },
   6: { faint: true, foreground: color.gray },
-};
+}
 
 const SPINNER_FRAMES = {
-  dots: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
-  line: ["-", "\\", "|", "/"],
-  circle: ["◐", "◓", "◑", "◒"],
-  bounce: ["⠁", "⠂", "⠄", "⠂"],
-  pulse: ["·", "•", "●", "•"],
-  wave: ["▁", "▂", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃", "▂"],
-} as const;
+  dots: ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'],
+  line: ['-', '\\', '|', '/'],
+  circle: ['◐', '◓', '◑', '◒'],
+  bounce: ['⠁', '⠂', '⠄', '⠂'],
+  pulse: ['·', '•', '●', '•'],
+  wave: ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█', '▇', '▆', '▅', '▄', '▃', '▂'],
+} as const
 
 const BUTTON_VARIANTS: Record<string, Partial<StyleProps>> = {
   primary: {
@@ -1106,27 +1090,25 @@ const BUTTON_VARIANTS: Record<string, Partial<StyleProps>> = {
     foreground: color.white,
     borderForeground: color.gray,
   },
-};
+}
 
 const BUTTON_SIZE_PADDING: Record<string, { vertical: number; horizontal: number }> = {
   small: { vertical: 0, horizontal: 1 },
   medium: { vertical: 1, horizontal: 2 },
   large: { vertical: 2, horizontal: 3 },
-};
+}
 
-const DEFAULT_BORDER = "rounded";
+const DEFAULT_BORDER = 'rounded'
 
 const CHECKBOX_MARKS = {
-  checked: "☑",
-  unchecked: "☐",
-};
+  checked: '☑',
+  unchecked: '☐',
+}
 
 const TOGGLE_MARKS = {
-  on: "●",
-  off: "○",
-};
-
-
+  on: '●',
+  off: '○',
+}
 
 /**
  * JSX factory function for creating terminal UI elements
@@ -1165,17 +1147,17 @@ function renderJSX(
   props: Record<string, unknown> | null,
   ...children: unknown[]
 ): View {
-  debug("[JSX] Creating element:", type, {
+  debug('[JSX] Creating element:', type, {
     props: props ? Object.keys(props) : null,
     key: props?.key,
-  });
+  })
 
   // Handle null/undefined props
-  const safeProps = props || {};
+  const safeProps = props || {}
 
-  const hiddenValue = (safeProps as Record<string, unknown>).hidden;
-  if (hiddenValue === true || hiddenValue === "true") {
-    return text("");
+  const hiddenValue = (safeProps as Record<string, unknown>).hidden
+  if (hiddenValue === true || hiddenValue === 'true') {
+    return text('')
   }
 
   // Handle children - can be passed as props.children or as rest args
@@ -1183,317 +1165,333 @@ function renderJSX(
     ? Array.isArray(safeProps.children)
       ? safeProps.children
       : [safeProps.children]
-    : children;
+    : children
 
   // Filter out null/undefined children and flatten
-  const validChildren = allChildren
-    .flat(Infinity)
-    .filter((child) => child != null);
+  const validChildren = allChildren.flat(Infinity).filter(child => child != null)
 
   // Handle function components
-  if (typeof type === "function") {
-    debug("[RUNTIME] Calling function component:", type.name || "Anonymous");
-    const componentProps = { ...safeProps, children: validChildren };
-    const result = type(componentProps);
-    debug("[RUNTIME] Function component returned:", typeof result);
+  if (typeof type === 'function') {
+    debug('[RUNTIME] Calling function component:', type.name || 'Anonymous')
+    const componentProps = { ...safeProps, children: validChildren }
+    const result = type(componentProps)
+    debug('[RUNTIME] Function component returned:', typeof result)
 
-    if (result == null || typeof result === "boolean") {
-      return text("");
+    if (result == null || typeof result === 'boolean') {
+      return text('')
     }
 
     if (isView(result)) {
-      return result;
+      return result
     }
 
     if (isJSXElement(result)) {
-      debug("[RUNTIME] Recursively rendering JSXElement from component");
-      return renderJSX(result.type, result.props ?? null);
+      debug('[RUNTIME] Recursively rendering JSXElement from component')
+      return renderJSX(result.type, result.props ?? null)
     }
 
     if (Array.isArray(result)) {
-      const renderedArray = ensureViewArray(result);
+      const renderedArray = ensureViewArray(result)
       if (renderedArray.length === 0) {
-        return text("");
+        return text('')
       }
-      return renderedArray.length === 1 ? renderedArray[0] : vstack(...renderedArray);
+      return renderedArray.length === 1 ? renderedArray[0] : vstack(...renderedArray)
     }
 
-    if (result && typeof result === "object" && "render" in (result as Record<string, unknown>)) {
-      const candidate = result as View;
-      if (typeof candidate.render === "function") {
-        return candidate;
+    if (result && typeof result === 'object' && 'render' in (result as Record<string, unknown>)) {
+      const candidate = result as View
+      if (typeof candidate.render === 'function') {
+        return candidate
       }
     }
 
-    const rendered = renderChild(result);
+    const rendered = renderChild(result)
     if (rendered) {
-      return rendered;
+      return rendered
     }
 
-    return text(String(result));
+    return text(String(result))
   }
 
   // Handle built-in JSX intrinsics
   switch (type) {
-    case "text": {
-      const textContent = toTextContent(validChildren);
-      const styleProps = extractStyleProps(safeProps.style);
+    case 'text': {
+      const textContent = toTextContent(validChildren)
+      const styleProps = extractStyleProps(safeProps.style)
       if (textContent !== null) {
         if (styleProps) {
-          return styledText(textContent, buildStyle(styleProps));
+          return styledText(textContent, buildStyle(styleProps))
         }
-        return text(textContent);
+        return text(textContent)
       }
-      const views = ensureViewArray(validChildren);
-      return views.length === 1 ? views[0] : vstack(...views);
+      const views = ensureViewArray(validChildren)
+      return views.length === 1 ? views[0] : vstack(...views)
     }
 
-    case "styled-text":
-    case "styledText": {
-      const textContent = toTextContent(validChildren) ?? "";
-      const styleProps = mergeStyleProps(extractStyleProps(safeProps.style));
-      return styledText(textContent, buildStyle(styleProps));
+    case 'styled-text':
+    case 'styledText': {
+      const textContent = toTextContent(validChildren) ?? ''
+      const styleProps = mergeStyleProps(extractStyleProps(safeProps.style))
+      return styledText(textContent, buildStyle(styleProps))
     }
 
-    case "heading": {
-      const level = Math.min(6, Math.max(1, Number(safeProps.level) || 1));
-      const baseStyle = headingPresetStyles[level] ?? headingPresetStyles[1];
-      const styleProps = mergeStyleProps(baseStyle, extractStyleProps(safeProps.style));
-      const textContent = toTextContent(validChildren);
+    case 'heading': {
+      const level = Math.min(6, Math.max(1, Number(safeProps.level) || 1))
+      const baseStyle = headingPresetStyles[level] ?? headingPresetStyles[1]
+      const styleProps = mergeStyleProps(baseStyle, extractStyleProps(safeProps.style))
+      const textContent = toTextContent(validChildren)
       if (textContent !== null) {
-        return styledText(textContent, buildStyle(styleProps));
+        return styledText(textContent, buildStyle(styleProps))
       }
-      const views = ensureViewArray(validChildren);
-      return views.length === 1 ? views[0] : vstack(...views);
+      const views = ensureViewArray(validChildren)
+      return views.length === 1 ? views[0] : vstack(...views)
     }
 
-    case "code": {
+    case 'code': {
       const base = {
         foreground: color.green,
         background: color.black,
-      } satisfies Partial<StyleProps>;
-      const styleProps = mergeStyleProps(base, extractStyleProps(safeProps.style));
-      const textContent = toTextContent(validChildren) ?? "";
-      return styledText(textContent, buildStyle(styleProps));
+      } satisfies Partial<StyleProps>
+      const styleProps = mergeStyleProps(base, extractStyleProps(safeProps.style))
+      const textContent = toTextContent(validChildren) ?? ''
+      return styledText(textContent, buildStyle(styleProps))
     }
 
-    case "icon": {
-      const glyph = typeof safeProps.glyph === "string" ? safeProps.glyph : undefined;
-      const textContent = glyph ?? toTextContent(validChildren) ?? "";
-      const styleProps = extractStyleProps(safeProps.style);
-      return styledText(textContent, buildStyle(styleProps));
+    case 'icon': {
+      const glyph = typeof safeProps.glyph === 'string' ? safeProps.glyph : undefined
+      const textContent = glyph ?? toTextContent(validChildren) ?? ''
+      const styleProps = extractStyleProps(safeProps.style)
+      return styledText(textContent, buildStyle(styleProps))
     }
 
-    case "box": {
-      const childrenViews = ensureViewArray(validChildren);
-      const padding = normalizePadding(safeProps.padding);
-      const resolvedStyle = extractStyleProps(safeProps.style);
-      const styleInputs: Array<Partial<StyleProps> | undefined> = [resolvedStyle];
+    case 'box': {
+      const childrenViews = ensureViewArray(validChildren)
+      const padding = normalizePadding(safeProps.padding)
+      const resolvedStyle = extractStyleProps(safeProps.style)
+      const styleInputs: Array<Partial<StyleProps> | undefined> = [resolvedStyle]
       if (safeProps.background) {
-        styleInputs.push({ background: safeProps.background as any });
+        styleInputs.push({ background: safeProps.background as any })
       }
       if ((safeProps as Record<string, unknown>).borderColor) {
         styleInputs.push({
           borderForeground: (safeProps as Record<string, unknown>).borderColor as any,
-        });
+        })
       }
       if ((safeProps as Record<string, unknown>).borderBackground) {
         styleInputs.push({
           borderBackground: (safeProps as Record<string, unknown>).borderBackground as any,
-        });
+        })
       }
-      const width = toNumber(safeProps.width);
-      if (typeof width === "number") {
-        styleInputs.push({ width });
+      const width = toNumber(safeProps.width)
+      if (typeof width === 'number') {
+        styleInputs.push({ width })
       }
-      const height = toNumber(safeProps.height);
-      if (typeof height === "number") {
-        styleInputs.push({ height });
+      const height = toNumber(safeProps.height)
+      if (typeof height === 'number') {
+        styleInputs.push({ height })
       }
-      const styleForBox = mergeStyleProps(...styleInputs);
+      const styleForBox = mergeStyleProps(...styleInputs)
       const boxView = styledBox(childrenViews, {
-        border: resolveBorderPreset(
-          safeProps.border ?? safeProps.borderStyle ?? safeProps.variant
-        ),
+        border: resolveBorderPreset(safeProps.border ?? safeProps.borderStyle ?? safeProps.variant),
         padding,
         minWidth: toNumber(safeProps.minWidth),
         minHeight: toNumber(safeProps.minHeight),
         style: styleForBox ? buildStyle(styleForBox) : undefined,
-      });
-      return boxView;
+      })
+      return boxView
     }
 
-    case "panel": {
-      const { children: _ignored, ...rest } = safeProps;
+    case 'panel': {
+      const { children: _ignored, ...rest } = safeProps
       const panelStyle = mergeStyleProps(
         { background: rest.background ?? color.black, borderForeground: color.gray },
         extractStyleProps(rest.style)
-      );
+      )
       const panelProps: Record<string, unknown> = {
         ...rest,
-        border: rest.border ?? "rounded",
+        border: rest.border ?? 'rounded',
         padding: rest.padding ?? 1,
         children: validChildren,
-      };
-      if (panelStyle) panelProps.style = panelStyle;
-      return renderJSX("box", panelProps);
+      }
+      if (panelStyle) panelProps.style = panelStyle
+      return renderJSX('box', panelProps)
     }
 
-    case "card": {
-      const { children: _ignored, ...rest } = safeProps;
+    case 'card': {
+      const { children: _ignored, ...rest } = safeProps
       const cardStyle = mergeStyleProps(
         { background: rest.background ?? color.black, borderForeground: color.gray },
         extractStyleProps(rest.style)
-      );
+      )
       const cardProps: Record<string, unknown> = {
         ...rest,
-        border: rest.border ?? "thin",
-        padding:
-          rest.padding ?? {
-            top: 1,
-            bottom: 1,
-            left: 2,
-            right: 2,
-          },
+        border: rest.border ?? 'thin',
+        padding: rest.padding ?? {
+          top: 1,
+          bottom: 1,
+          left: 2,
+          right: 2,
+        },
         children: validChildren,
-      };
-      if (cardStyle) cardProps.style = cardStyle;
-      return renderJSX("box", cardProps);
+      }
+      if (cardStyle) cardProps.style = cardStyle
+      return renderJSX('box', cardProps)
     }
 
-    case "vstack": {
-      const childrenViews = ensureViewArray(validChildren);
-      return vstack(...childrenViews);
+    case 'vstack': {
+      const childrenViews = ensureViewArray(validChildren)
+      return vstack(...childrenViews)
     }
 
-    case "hstack": {
-      const childrenViews = ensureViewArray(validChildren);
-      return hstack(...childrenViews);
+    case 'hstack': {
+      const childrenViews = ensureViewArray(validChildren)
+      return hstack(...childrenViews)
     }
 
-    case "flex": {
-      const childrenViews = ensureViewArray(validChildren);
-      const flexProps: FlexboxProps = {};
-      const direction = mapFlexDirection(safeProps.direction);
-      if (direction) flexProps.direction = direction;
-      const justify = mapJustifyContent(safeProps.justify ?? safeProps.justifyContent);
-      if (justify) flexProps.justifyContent = justify;
-      const align = mapAlignItems(safeProps.align ?? safeProps.alignItems);
-      if (align) flexProps.alignItems = align;
-      const wrap = mapFlexWrap(safeProps.wrap);
-      if (wrap) flexProps.wrap = wrap;
-      const gap = toNumber(safeProps.gap);
-      if (typeof gap === "number") flexProps.gap = gap;
-      const rowGap = toNumber((safeProps as Record<string, unknown>).rowGap);
-      if (typeof rowGap === "number") flexProps.rowGap = rowGap;
-      const columnGap = toNumber((safeProps as Record<string, unknown>).columnGap);
-      if (typeof columnGap === "number") flexProps.columnGap = columnGap;
-      const padding = normalizePadding(safeProps.padding);
-      if (padding) flexProps.padding = padding;
-      return flexbox(childrenViews, flexProps);
+    case 'flex': {
+      const childrenViews = ensureViewArray(validChildren)
+      const flexProps: FlexboxProps = {}
+      const direction = mapFlexDirection(safeProps.direction)
+      if (direction) flexProps.direction = direction
+      const justify = mapJustifyContent(safeProps.justify ?? safeProps.justifyContent)
+      if (justify) flexProps.justifyContent = justify
+      const align = mapAlignItems(safeProps.align ?? safeProps.alignItems)
+      if (align) flexProps.alignItems = align
+      const wrap = mapFlexWrap(safeProps.wrap)
+      if (wrap) flexProps.wrap = wrap
+      const gap = toNumber(safeProps.gap)
+      if (typeof gap === 'number') flexProps.gap = gap
+      const rowGap = toNumber((safeProps as Record<string, unknown>).rowGap)
+      if (typeof rowGap === 'number') flexProps.rowGap = rowGap
+      const columnGap = toNumber((safeProps as Record<string, unknown>).columnGap)
+      if (typeof columnGap === 'number') flexProps.columnGap = columnGap
+      const padding = normalizePadding(safeProps.padding)
+      if (padding) flexProps.padding = padding
+      return flexbox(childrenViews, flexProps)
     }
 
-    case "interactive": {
-      const childrenViews = ensureViewArray(validChildren);
+    case 'interactive': {
+      const childrenViews = ensureViewArray(validChildren)
       const contentView =
         childrenViews.length === 0
-          ? text("")
+          ? text('')
           : childrenViews.length === 1
             ? childrenViews[0]
-            : vstack(...childrenViews);
+            : vstack(...childrenViews)
 
-      const disabled = safeProps.disabled === true || safeProps.disabled === "true";
-      const focusable =
-        disabled
+      const disabled = safeProps.disabled === true || safeProps.disabled === 'true'
+      const focusable = disabled
+        ? false
+        : safeProps.focusable === false || safeProps.focusable === 'false'
           ? false
-          : safeProps.focusable === false || safeProps.focusable === "false"
-            ? false
-            : true;
+          : true
 
       const interactiveProps: Record<string, unknown> = {
         disabled,
         focusable,
-      };
+      }
 
       if (safeProps.className !== undefined) {
-        interactiveProps.className = safeProps.className;
+        interactiveProps.className = safeProps.className
       }
       if (safeProps.role !== undefined) {
-        interactiveProps.role = safeProps.role;
+        interactiveProps.role = safeProps.role
       }
       if (safeProps.tooltip !== undefined) {
-        interactiveProps.tooltip = safeProps.tooltip;
+        interactiveProps.tooltip = safeProps.tooltip
       }
 
       const possibleEvents = [
-        "onClick",
-        "onFocus",
-        "onBlur",
-        "onMouseEnter",
-        "onMouseLeave",
-        "onKeyPress",
-        "onSubmit",
-        "onChange",
-        "onHover",
-      ] as const;
+        'onClick',
+        'onFocus',
+        'onBlur',
+        'onMouseEnter',
+        'onMouseLeave',
+        'onKeyPress',
+        'onSubmit',
+        'onChange',
+        'onHover',
+      ] as const
 
       for (const key of possibleEvents) {
-        const handler = safeProps[key];
-        if (typeof handler === "function") {
-          if (disabled && key === "onClick") {
-            continue;
+        const handler = safeProps[key]
+        if (typeof handler === 'function') {
+          if (disabled && key === 'onClick') {
+            continue
           }
-          interactiveProps[key] = handler;
+          interactiveProps[key] = handler
         }
       }
 
-      return wrapInteractiveView(contentView, interactiveProps);
+      return wrapInteractiveView(contentView, interactiveProps)
     }
 
-    case "spacer": {
-      const size = toNumber(safeProps.size) ?? 1;
-      const flex = toNumber((safeProps as Record<string, unknown>).flex) ?? 0;
-      return layoutSpacer({ size, flex });
+    case 'spacer': {
+      const size = toNumber(safeProps.size) ?? 1
+      const flex = toNumber((safeProps as Record<string, unknown>).flex) ?? 0
+      return layoutSpacer({ size, flex })
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     // Scope Components
-    case "scope":
-      return Scope({ ...safeProps, children: validChildren });
+    case 'scope':
+      return Scope({ ...safeProps, children: validChildren })
 
-    case "scope-content":
-      return ScopeContent({ ...safeProps, children: validChildren });
+    case 'scope-content':
+      return ScopeContent({ ...safeProps, children: validChildren })
 
-    case "scope-fallback":
-      return ScopeFallback({ ...safeProps, children: validChildren });
+    case 'scope-fallback':
+      return ScopeFallback({ ...safeProps, children: validChildren })
+
+    // Form / interactive intrinsics (cell-rendered; full widgets also in @tuix/ui)
+    case 'button': {
+      const kids = toTextContent(validChildren)
+      const label = kids && kids.length > 0 ? kids : String(safeProps.label ?? 'OK')
+      const focused = safeProps.focused === true
+      return text(focused ? `[ ${label} ]` : `( ${label} )`)
+    }
+    case 'text-input':
+    case 'input': {
+      const value = String(safeProps.value ?? safeProps['bind:value'] ?? '')
+      const placeholder = String(safeProps.placeholder ?? '')
+      const shown = value.length > 0 ? value : placeholder
+      const focused = safeProps.focused === true
+      return text(focused ? `▌${shown}▐` : `[${shown}]`)
+    }
+    case 'textarea': {
+      const value = String(safeProps.value ?? '')
+      return text(value.length ? value : String(safeProps.placeholder ?? ''))
+    }
+    case 'checkbox': {
+      const checked = safeProps.checked === true || safeProps.value === true
+      const kids = toTextContent(validChildren)
+      const label = kids && kids.length > 0 ? kids : String(safeProps.label ?? '')
+      return text(`${checked ? '[x]' : '[ ]'} ${label}`.trimEnd())
+    }
+    case 'toggle': {
+      const on = safeProps.on === true || safeProps.checked === true || safeProps.value === true
+      const kids = toTextContent(validChildren)
+      const label = kids && kids.length > 0 ? kids : String(safeProps.label ?? '')
+      return text(`${on ? '(•)' : '( )'} ${label}`.trimEnd())
+    }
+    case 'scrollview':
+    case 'viewport': {
+      const views = ensureViewArray(validChildren)
+      return views.length === 1 ? views[0]! : vstack(...views)
+    }
 
     default:
       // For unknown types, try to create a text node
-      debug(`[RUNTIME] Unknown element type: ${type}, creating text node`);
-      return text(`[${type}]`);
+      debug(`[RUNTIME] Unknown element type: ${type}, creating text node`)
+      return text(`[${type}]`)
   }
-};
+}
 
 export function jsx(
   type: string | Function,
   props: Record<string, unknown> | null,
   key?: string | number
 ): JSXElement {
-  return createJSXElement(type, props, key, []);
+  return createJSXElement(type, props, key, [])
 }
 
 export function jsxs(
@@ -1501,7 +1499,7 @@ export function jsxs(
   props: Record<string, unknown> | null,
   key?: string | number
 ): JSXElement {
-  return createJSXElement(type, props, key, []);
+  return createJSXElement(type, props, key, [])
 }
 
 export function jsxDEV(
@@ -1509,18 +1507,18 @@ export function jsxDEV(
   props: Record<string, unknown> | null,
   key?: string | number,
   _isStaticChildren?: boolean,
-  source?: DevInfo["source"],
+  source?: DevInfo['source'],
   self?: unknown
 ): JSXElement {
-  return createJSXElement(type, props, key, [], { source, self });
+  return createJSXElement(type, props, key, [], { source, self })
 }
 
 /**
  * Render function - converts JSXNode or View into a concrete View ready for MVU runtime
  */
 export function render(element: JSXNode | View): View {
-  const result = renderChild(element);
-  return result ?? text("");
+  const result = renderChild(element)
+  return result ?? text('')
 }
 
 /**
@@ -1548,21 +1546,21 @@ export function render(element: JSXNode | View): View {
  * </>
  * ```
  */
-// Export Fragment support
-export const Fragment = ({ children }: { children?: React.ReactNode }) => {
-  const childArray = Array.isArray(children) ? children : [children];
-  const validChildren = childArray.filter((child) => child != null);
+// Export Fragment support — always returns a View (children may be JSX descriptors)
+export const Fragment = ({ children }: { children?: React.ReactNode }): View => {
+  const childArray = Array.isArray(children) ? children : [children]
+  const views = ensureViewArray(childArray)
 
-  if (validChildren.length === 0) {
-    return text("");
+  if (views.length === 0) {
+    return text('')
   }
 
-  if (validChildren.length === 1) {
-    return validChildren[0];
+  if (views.length === 1) {
+    return views[0]!
   }
 
-  return vstack(validChildren);
-};
+  return vstack(...views)
+}
 
 /**
  * React-compatible createElement function
@@ -1585,7 +1583,7 @@ export function createElement(
   props: Record<string, unknown> | null,
   ...children: unknown[]
 ): JSXElement {
-  return createJSXElement(type, props, null, children);
+  return createJSXElement(type, props, null, children)
 }
 
 // Export JSX namespace types
@@ -1594,45 +1592,65 @@ export namespace JSX {
 
   export interface IntrinsicElements {
     text: {
-      children?: unknown;
-      style?: Style;
-    };
+      children?: unknown
+      style?: Style
+    }
     box: {
-      children?: unknown;
-      style?: Style;
-      border?: string | boolean;
-      borderStyle?: string;
-      borderColor?: string;
-      padding?: number | { top?: number; right?: number; bottom?: number; left?: number };
-      margin?: number;
-      width?: number;
-      height?: number;
-      minWidth?: number;
-      minHeight?: number;
-      background?: string;
-      variant?: string;
-    };
+      children?: unknown
+      style?: Style
+      border?: string | boolean
+      borderStyle?: string
+      borderColor?: string
+      padding?: number | { top?: number; right?: number; bottom?: number; left?: number }
+      margin?: number
+      width?: number
+      height?: number
+      minWidth?: number
+      minHeight?: number
+      background?: string
+      variant?: string
+    }
     vstack: {
-      children?: unknown;
-      gap?: number;
-      align?: "left" | "center" | "right";
-    };
+      children?: unknown
+      gap?: number
+      align?: 'left' | 'center' | 'right'
+    }
     hstack: {
-      children?: unknown;
-      gap?: number;
-      align?: "top" | "middle" | "bottom";
-    };
-    "styled-text": { children?: unknown; style?: Style };
-    styledText: { children?: unknown; style?: Style };
+      children?: unknown
+      gap?: number
+      align?: 'top' | 'middle' | 'bottom'
+    }
+    'styled-text': { children?: unknown; style?: Style }
+    styledText: { children?: unknown; style?: Style }
 
     // Scope Components
-    scope: Record<string, unknown>;
-    "scope-content": Record<string, unknown>;
-    "scope-fallback": Record<string, unknown>;
+    scope: Record<string, unknown>
+    'scope-content': Record<string, unknown>
+    'scope-fallback': Record<string, unknown>
+
+    // Form / interactive
+    button: { children?: unknown; label?: string; focused?: boolean; onClick?: unknown }
+    'text-input': {
+      value?: string
+      placeholder?: string
+      focused?: boolean
+      'bind:value'?: unknown
+    }
+    input: {
+      value?: string
+      placeholder?: string
+      focused?: boolean
+      'bind:value'?: unknown
+    }
+    textarea: { value?: string; placeholder?: string; children?: unknown }
+    checkbox: { checked?: boolean; value?: boolean; label?: string; children?: unknown }
+    toggle: { on?: boolean; checked?: boolean; value?: boolean; label?: string; children?: unknown }
+    scrollview: { children?: unknown }
+    viewport: { children?: unknown }
   }
 
   export interface ElementChildrenAttribute {
-    children: {};
+    children: {}
   }
 }
 
@@ -1654,19 +1672,16 @@ export namespace JSX {
  * ```
  */
 // Export the registry for plugin access
-export const pluginRegistry = registry;
+export const pluginRegistry = registry
 
 // Convenience exports for common patterns
-export const registerPlugin = registry.registerPlugin.bind(registry);
-export const registerCommand = registry.registerCommand.bind(registry);
-export const executeCommand = registry.executeCommand.bind(registry);
-export const getScopeManager = registry.getScopeManager.bind(registry);
-
-// Export utilities
-export { config, templates };
+export const registerPlugin = registry.registerPlugin.bind(registry)
+export const registerCommand = registry.registerCommand.bind(registry)
+export const executeCommand = registry.executeCommand.bind(registry)
+export const getScopeManager = registry.getScopeManager.bind(registry)
 
 // Export JSXContext
 export const JSXContext = {
   registry,
   getScopeManager,
-};
+}

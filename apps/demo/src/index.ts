@@ -8,6 +8,6 @@
  */
 
 import { runApp } from '@tuix/jsx'
-import App from "./app";
+import App from './app'
 
 await runApp(App)

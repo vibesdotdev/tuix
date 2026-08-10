@@ -50,7 +50,9 @@ export default async function ConfigSet({ filename, format }: ConfigSetProps) {
     return (
       <vstack>
         <text color="green">✓ Config updated</text>
-        <text color="cyan">{key} = {JSON.stringify(value)}</text>
+        <text color="cyan">
+          {key} = {JSON.stringify(value)}
+        </text>
       </vstack>
     )
   })

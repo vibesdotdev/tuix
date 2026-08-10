@@ -1,12 +1,12 @@
-import * as utils from "./utils";
+import * as utils from './utils'
 
-import type { ColorDef, ColorRaw } from "./types";
+import type { ColorDef, ColorRaw } from './types'
 
 export class Color {
   constructor(private def: ColorDef) {}
 
   static from(def: ColorDef): Color {
-    return new Color(def);
+    return new Color(def)
   }
 
   /**
@@ -14,8 +14,8 @@ export class Color {
    */
   static ansi(code: number): Color {
     // Use the existing utility function
-    const result = utils.ansi(code);
-    return new Color(result);
+    const result = utils.ansi(code)
+    return new Color(result)
   }
 
   /**
@@ -23,8 +23,8 @@ export class Color {
    */
   static ansi256(code: number): Color {
     // Use the existing utility function
-    const result = utils.ansi256(code);
-    return new Color(result);
+    const result = utils.ansi256(code)
+    return new Color(result)
   }
 
   /**
@@ -32,8 +32,8 @@ export class Color {
    */
   static hex(value: string): Color {
     // Use the existing utility function
-    const result = utils.hex(value);
-    return new Color(result);
+    const result = utils.hex(value)
+    return new Color(result)
   }
 
   /**
@@ -41,8 +41,8 @@ export class Color {
    */
   static rgb(r: number, g: number, b: number): Color {
     // Use the existing utility function
-    const result = utils.rgb(r, g, b);
-    return new Color(result);
+    const result = utils.rgb(r, g, b)
+    return new Color(result)
   }
 
   /**
@@ -50,8 +50,8 @@ export class Color {
    */
   static adaptive(light: ColorRaw, dark: ColorRaw): Color {
     // Use the existing utility function
-    const result = utils.adaptive(light, dark);
-    return new Color(result);
+    const result = utils.adaptive(light, dark)
+    return new Color(result)
   }
 
   /**
@@ -59,94 +59,94 @@ export class Color {
    */
   static none(): Color {
     // Use the existing utility function
-    const result = utils.none();
-    return new Color(result);
+    const result = utils.none()
+    return new Color(result)
   }
 
   get type(): string {
-    return this.def.type;
+    return this.def.type
   }
 
   get value(): ColorDef {
-    return this.def;
+    return this.def
   }
 
   /**
    * Check if color is visible (not NoColor)
    */
   isVisible(): boolean {
-    return utils.isVisible(this.def);
+    return utils.isVisible(this.def)
   }
 
   /**
    * Blend two colors with alpha
    */
   blend(bg: Color, alpha: number): Color {
-    const result = utils.blend(this.def, bg.def, alpha);
-    return new Color(result);
+    const result = utils.blend(this.def, bg.def, alpha)
+    return new Color(result)
   }
 
   /**
    * Lighten a color by amount (0-1)
    */
   lighten(amount: number): Color {
-    const result = utils.lighten(this.def, amount);
-    return new Color(result);
+    const result = utils.lighten(this.def, amount)
+    return new Color(result)
   }
 
   /**
    * Darken a color by amount (0-1)
    */
   darken(amount: number): Color {
-    const result = utils.darken(this.def, amount);
-    return new Color(result);
+    const result = utils.darken(this.def, amount)
+    return new Color(result)
   }
 
   /**
    * Create a gradient between this color and another
    */
   gradient(end: Color, steps: number): Color[] {
-    const result = utils.gradient(this.def, end.def, steps);
-    return result.map(color => new Color(color));
+    const result = utils.gradient(this.def, end.def, steps)
+    return result.map(color => new Color(color))
   }
 
   /**
    * Check if color is visible (not NoColor)
    */
   static isVisible(c: ColorDef): boolean {
-    return utils.isVisible(c);
+    return utils.isVisible(c)
   }
 
   /**
    * Blend two colors with alpha
    */
   static blend(fg: Color, bg: Color, alpha: number): Color {
-    const result = utils.blend(fg.def, bg.def, alpha);
-    return new Color(result);
+    const result = utils.blend(fg.def, bg.def, alpha)
+    return new Color(result)
   }
 
   /**
    * Lighten a color by amount (0-1)
    */
   static lighten(c: Color, amount: number): Color {
-    const result = utils.lighten(c.def, amount);
-    return new Color(result);
+    const result = utils.lighten(c.def, amount)
+    return new Color(result)
   }
 
   /**
    * Darken a color by amount (0-1)
    */
   static darken(c: Color, amount: number): Color {
-    const result = utils.darken(c.def, amount);
-    return new Color(result);
+    const result = utils.darken(c.def, amount)
+    return new Color(result)
   }
 
   /**
    * Create a gradient between two colors
    */
   static gradient(start: Color, end: Color, steps: number): Color[] {
-    const result = utils.gradient(start.def, end.def, steps);
-    return result.map(color => new Color(color));
+    const result = utils.gradient(start.def, end.def, steps)
+    return result.map(color => new Color(color))
   }
 
   /**

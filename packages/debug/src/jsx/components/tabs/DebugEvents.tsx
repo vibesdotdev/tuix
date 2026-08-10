@@ -18,11 +18,17 @@ export function DebugEvents(): JSX.Element {
 
   return (
     <Flex direction="column">
-      <Text color={color.cyan} bold>📝 Event Log</Text>
-      <Text>Showing {recentEvents.length} of {filteredEvents.length} events</Text>
+      <Text color={color.cyan} bold>
+        📝 Event Log
+      </Text>
+      <Text>
+        Showing {recentEvents.length} of {filteredEvents.length} events
+      </Text>
       {state.filter && <Text color={color.yellow}>Filter: "{state.filter}"</Text>}
       <Text />
-      {recentEvents.map(event => <EventRow key={event.id} event={event} />)}
+      {recentEvents.map(event => (
+        <EventRow key={event.id} event={event} />
+      ))}
     </Flex>
   )
 }
@@ -38,8 +44,12 @@ function EventRow({ event }: { event: DebugEvent }): JSX.Element {
       <Text>{icon} </Text>
       <Text color={color.gray}>[{event.category}] </Text>
       <Text color={levelColor}>{event.message}</Text>
-      {event.context?.componentName && <Text color={color.gray}> ({event.context.componentName})</Text>}
-      {event.context?.duration !== undefined && <Text color={color.green}> {event.context.duration.toFixed(2)}ms</Text>}
+      {event.context?.componentName && (
+        <Text color={color.gray}> ({event.context.componentName})</Text>
+      )}
+      {event.context?.duration !== undefined && (
+        <Text color={color.green}> {event.context.duration.toFixed(2)}ms</Text>
+      )}
     </Flex>
   )
 }

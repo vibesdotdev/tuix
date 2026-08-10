@@ -14,7 +14,7 @@ describe('Toast', () => {
 
   it('should not render when open is false', () => {
     // Test the component function directly (not JSX)
-    const result = Toast({ message: "Hidden", open: false })
+    const result = Toast({ message: 'Hidden', open: false })
     expect(result).toBeNull()
   })
 

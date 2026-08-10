@@ -32,9 +32,7 @@ export default async function ConfigExport({ filename, format }: ConfigExportPro
     const entries = yield* _(
       Effect.all(
         keys.map(key =>
-          storage.get(key).pipe(
-            Effect.map(value => [key.replace('config.', ''), value] as const)
-          )
+          storage.get(key).pipe(Effect.map(value => [key.replace('config.', ''), value] as const))
         )
       )
     )

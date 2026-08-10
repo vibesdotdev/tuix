@@ -1,66 +1,64 @@
-@tuix/jsx
+# @tuix/jsx
 
-Custom JSX runtime for TUIX applications with TypeScript support
+Primary authoring surface for Tuix applications.
 
-## Installation
+Use this package to build terminal apps with JSX primitives (`<text>`, `<box>`, `<flex>`, etc.) while the runtime executes MVU/effect orchestration underneath.
 
-```bash
-bun add @tuix/jsx-runtime
-# or
-npm install @tuix/jsx-runtime
-```
-
-## Overview
-
-This package is part of the **TUIX** framework - a performant TUI framework for Bun with JSX and reactive state management.
-
-### Category: Core
-
-Core packages provide the fundamental architecture and runtime for TUIX applications.
-
-## Usage
-
-```typescript
-import { /* exports */ } from '@tuix/jsx-runtime'
-```
-
-## API Reference
-
-- **Default**: `./src/index.ts`
-- **./jsx-dev-runtime**: `./src/dev.ts`
-
-## Examples
-
-See tests and documentation for usage examples.
-
-## Development
-
-This package is part of the TUIX monorepo. For development:
+## Install
 
 ```bash
-# Clone the monorepo
-git clone https://github.com/cinderlink/tuix.git
-cd tuix
-
-# Install dependencies
-bun install
-
-# Run tests for this package
-cd packages/jsx-runtime
-bun test
-
-# Run type checking
-bun run typecheck
+bun add @tuix/jsx
 ```
 
-## Related Packages
+## JSX Runtime Setup
 
-- [@tuix/core](packages/core/README.md) - Core TUIX framework with MVU architecture, reactivity, and coordination
-- [@tuix/config](packages/config/README.md) - Configuration management system with multiple sources and validation
-- [@tuix/runtime](packages/runtime/README.md) - Runtime system for TUIX applications with fiber scheduling
-- [@tuix/process-manager](packages/process-manager/README.md) - Process management and service coordination for development workflows
-- [@tuix/terminal](packages/terminal/README.md) - Terminal I/O abstraction and ANSI rendering capabilities
+In `tsconfig.json`:
 
-## License
+```json
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@tuix/jsx"
+  }
+}
+```
 
-MIT
+## Minimal Example
+
+```tsx
+import { runApp } from '@tuix/jsx'
+import { $state } from '@tuix/reactive'
+
+function Counter() {
+  const count = $state(0)
+
+  return (
+    <box padding={1} border="rounded" gap={1}>
+      <text>Count: {count()}</text>
+      <button onClick={() => count.$set(count() + 1)}>Increment</button>
+    </box>
+  )
+}
+
+runApp(Counter)
+```
+
+## Public API (high-level)
+
+- JSX factory/runtime: `jsx`, `jsxs`, `jsxDEV`, `Fragment`, `createElement`
+- Rendering/runtime bridge: `render`, `runApp`
+- App primitives: `Command`, `Plugin`, `Fallback`, scope components
+- Compiler/parser exports for advanced users
+
+## Package Boundaries
+
+`@tuix/jsx` depends on:
+- `@tuix/core`
+- `@tuix/ansi`
+- `@tuix/view`
+- `@tuix/reactive`
+- `@tuix/runtime`
+
+It intentionally does **not** depend on ecosystem packages like `@tuix/config`, `@tuix/debug`, `@tuix/logger`, etc.
+
+Those integrate at app composition level (for example via `@tuix/app-presets`).

@@ -96,16 +96,12 @@ describe('@tuix/docs - Markdown Generation', () => {
       name: 'test-app',
       version: '1.0.0',
       description: 'A test application',
-      commands: [
-        { name: 'global-cmd', description: 'Global command' },
-      ],
+      commands: [{ name: 'global-cmd', description: 'Global command' }],
       plugins: [
         {
           name: 'plugin1',
           description: 'Plugin 1',
-          commands: [
-            { name: 'plugin-cmd', description: 'Plugin command' },
-          ],
+          commands: [{ name: 'plugin-cmd', description: 'Plugin command' }],
         },
       ],
     }

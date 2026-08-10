@@ -1,0 +1,392 @@
+{
+  "packages": [
+    {
+      "slug": "process-manager",
+      "name": "@tuix/process-manager",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/process-manager` starts, stops, and restarts child processes.",
+      "purpose": "Use this package to own process lifecycle in a Tuix app. The manager spawns work with Bun pipes or an interactive PTY. The production PTY path uses a `node-pty` backend. Set `pty: true` on a process config to open a TTY session.",
+      "whenToUse": "Use it when your app must run tools, servers, or shells. Use it when you need restart policy, logs, or metrics. Use it when a process needs a real terminal.",
+      "mainConcepts": [
+        "Process config and process state",
+        "Start, stop, and restart",
+        "Auto-restart and health checks",
+        "Interactive PTY with node-pty",
+        "Effect service layer and plugin"
+      ],
+      "keyExports": [
+        "ProcessManagerClass \u2014 manage process lifecycle",
+        "createProcessManager \u2014 build and init a manager",
+        "ProcessManager / ProcessManagerLive \u2014 Effect service tag and layer",
+        "spawnPty \u2014 spawn an interactive PTY",
+        "createNodePtyBackend \u2014 production node-pty backend",
+        "wrapNodePty \u2014 wrap a node-pty handle",
+        "createMockPtyBackend \u2014 mock backend for tests",
+        "ProcessManagerPlugin \u2014 JSX plugin and commands",
+        "ProcessMonitor \u2014 process status view"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "process.ts",
+        "code": "import { createProcessManager } from '@tuix/process-manager'\n\nconst pm = await createProcessManager()\nawait pm.add({\n  name: 'shell',\n  command: 'bash',\n  pty: true,\n  ptyCols: 80,\n  ptyRows: 24,\n})\nawait pm.start('shell')"
+      },
+      "related": [
+        "logger",
+        "testing",
+        "app-presets",
+        "bin",
+        "coordination"
+      ]
+    },
+    {
+      "slug": "config",
+      "name": "@tuix/config",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/config` loads and stores app settings from many sources.",
+      "purpose": "Use this package to read config from files, environment, and defaults. It supports JSON, YAML, TOML, TypeScript, and env prefixes. You can validate values and watch files for change.",
+      "whenToUse": "Use it when an app needs hierarchical settings. Use it when you merge user, project, and env values. Use it when you need schema checks.",
+      "mainConcepts": [
+        "Config sources and merge order",
+        "JSON, YAML, TOML, and env",
+        "Schema validation",
+        "File watch and hot reload",
+        "Plugin commands for get and set"
+      ],
+      "keyExports": [
+        "createConfig \u2014 builder for config sources",
+        "loadConfig \u2014 load standard user and project config",
+        "defineConfig \u2014 type a config object",
+        "config \u2014 simple, standard, cli, env, and file helpers",
+        "ConfigLayer \u2014 Effect layer for config",
+        "ConfigPlugin \u2014 JSX plugin with get, set, list, import, export",
+        "JSONLoader / YAMLLoader \u2014 file format loaders",
+        "parseJSON / parseYAML / parseTOML \u2014 storage parsers"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "config.ts",
+        "code": "import { createConfig, loadConfig } from '@tuix/config'\n\nconst cfg = await createConfig()\n  .name('myapp')\n  .defaults({ logger: { level: 'info' } })\n  .withUserConfig()\n  .withProjectConfig()\n  .envPrefix('MYAPP_')\n  .build()\n\nconst level = cfg.get<string>('logger.level')"
+      },
+      "related": [
+        "app-presets",
+        "logger",
+        "storage",
+        "bin"
+      ]
+    },
+    {
+      "slug": "testing",
+      "name": "@tuix/testing",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/testing` provides harnesses, snapshots, and e2e PTY tests.",
+      "purpose": "Use this package to test Tuix components and CLI sessions. `createTestHarness` runs MVU components with mock services. The e2e harness spawns a real process with `node-pty` for keys and text waits.",
+      "whenToUse": "Use it for unit tests of views and updates. Use it for snapshot and performance checks. Use it for full terminal e2e flows.",
+      "mainConcepts": [
+        "Component test harness with mocks",
+        "E2E PTY harness",
+        "Snapshot matchers",
+        "Input simulation",
+        "Benchmarks and profilers"
+      ],
+      "keyExports": [
+        "createTestHarness \u2014 MVU component harness with mock services",
+        "testComponent \u2014 run init, update, and view tests",
+        "createHarness \u2014 light child_process harness",
+        "createTestHarness (e2e) \u2014 PTY session for CLI e2e",
+        "runTest \u2014 run an Effect test against a PTY session",
+        "expectMatchSnapshot \u2014 compare view output to a snapshot",
+        "TestInputAdapter \u2014 send keys in tests",
+        "benchmark / Profiler \u2014 measure render cost",
+        "TestingPlugin \u2014 CLI testing commands"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "harness.test.ts",
+        "code": "import { createTestHarness } from '@tuix/testing'\nimport { test, expect } from 'bun:test'\n\ntest('counter', async () => {\n  const harness = createTestHarness()\n  await harness.run(Counter)\n  await harness.send({ _tag: 'Increment' })\n  const model = await harness.getState()\n  expect(model.count).toBe(1)\n  await harness.stop()\n})"
+      },
+      "related": [
+        "process-manager",
+        "runtime",
+        "view",
+        "bin"
+      ]
+    },
+    {
+      "slug": "bin",
+      "name": "@tuix/bin",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/bin` is the `tuix` CLI entry for version, help, and dashboard.",
+      "purpose": "Use this package as the official command line app. It shows a welcome screen by default. Commands cover version info, interactive help, and a live system dashboard.",
+      "whenToUse": "Use it to run the shipped Tuix CLI. Use it as a sample of app commands and plugins. Use it when you need a ready demo surface.",
+      "mainConcepts": [
+        "tuix binary entry",
+        "version command",
+        "help explorer command",
+        "dashboard command",
+        "welcome fallback"
+      ],
+      "keyExports": [
+        "TuixApp \u2014 root CLI command tree",
+        "VersionCommand \u2014 show version and system info",
+        "HelpCommand \u2014 interactive help explorer",
+        "DashboardCommand \u2014 live system metrics",
+        "WelcomeScreen \u2014 default welcome view"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "cli.ts",
+        "code": "import { runApp } from '@tuix/jsx'\nimport { TuixApp } from '@tuix/bin'\n\n// Install: bun add -g @tuix/bin\n// Then run: tuix | tuix version | tuix help | tuix dashboard\nrunApp(TuixApp)"
+      },
+      "related": [
+        "docs",
+        "config",
+        "logger",
+        "process-manager",
+        "debug",
+        "testing"
+      ]
+    },
+    {
+      "slug": "logger",
+      "name": "@tuix/logger",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/logger` writes structured logs to console, file, stream, or HTTP.",
+      "purpose": "Use this package for levels, formatters, and transports. It provides pretty, JSON, compact, and CLI formats. Presets cover development, production, CLI, and remote sinks.",
+      "whenToUse": "Use it when the app must log with levels and context. Use it when you need file or remote output. Use it when you need a live log view.",
+      "mainConcepts": [
+        "Log levels and entries",
+        "Transports and formatters",
+        "Presets for common setups",
+        "Effect logger layers",
+        "Log explorer views"
+      ],
+      "keyExports": [
+        "TuixLogger \u2014 core logger implementation",
+        "createConsoleLogger \u2014 simple console logger",
+        "createDevelopmentLogger \u2014 pretty debug logger layer",
+        "createProductionLogger \u2014 file and console layer",
+        "createCLILogger \u2014 CLI-focused logger layer",
+        "createRemoteLogger \u2014 HTTP batch logger layer",
+        "ConsoleTransport / FileTransport / HttpTransport \u2014 log sinks",
+        "PrettyFormatter / JSONFormatter \u2014 log formats",
+        "LoggerPlugin \u2014 JSX logger plugin",
+        "LogExplorer / LiveLogDashboard \u2014 terminal log UI"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "logger.ts",
+        "code": "import { createConsoleLogger } from '@tuix/logger'\nimport { Effect } from 'effect'\n\nconst log = createConsoleLogger('info', { showEmoji: true })\nawait Effect.runPromise(log.info('server ready', { port: 3000 }))"
+      },
+      "related": [
+        "config",
+        "process-manager",
+        "debug",
+        "telemetry",
+        "app-presets"
+      ]
+    },
+    {
+      "slug": "coordination",
+      "name": "@tuix/coordination",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/coordination` runs workflows, event choreography, and recovery.",
+      "purpose": "Use this package to coordinate multi-module work. The orchestrator runs centralized workflows. The choreographer links events without tight coupling. Stream tools and recovery helpers keep flows stable.",
+      "whenToUse": "Use it when modules must share long event flows. Use it when you need retries and recovery. Use it when stream load needs control.",
+      "mainConcepts": [
+        "Workflow orchestration",
+        "Event choreography",
+        "Stream optimization",
+        "Error recovery",
+        "Performance monitoring"
+      ],
+      "keyExports": [
+        "WorkflowOrchestrator \u2014 run centralized workflows",
+        "EventChoreographer \u2014 link multi-module events",
+        "EventStreamOptimizer \u2014 tune event streams",
+        "ErrorRecoveryManager \u2014 recover from failures",
+        "PerformanceMonitor \u2014 track coordination cost",
+        "IntegrationPatterns \u2014 reusable integration helpers",
+        "CoordinationModule \u2014 module for bootstrap"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "coord.ts",
+        "code": "import { CoordinationModule } from '@tuix/coordination'\nimport type { EventBus } from '@tuix/core/events'\n\nexport function makeCoordination(eventBus: EventBus) {\n  return new CoordinationModule(eventBus)\n}"
+      },
+      "related": [
+        "app-presets",
+        "process-manager",
+        "logger",
+        "config",
+        "core"
+      ]
+    },
+    {
+      "slug": "debug",
+      "name": "@tuix/debug",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/debug` provides a debug TUI for scopes, events, state, and performance.",
+      "purpose": "Use this package to inspect runtime behavior in the terminal. It stores debug events and exposes tabs for scopes, events, state, and performance. MVU hooks wire the store into the loop.",
+      "whenToUse": "Use it while you build or fix a Tuix app. Use it when you need event and state inspection. Use it when render cost must be visible.",
+      "mainConcepts": [
+        "Debug store and events",
+        "Category loggers",
+        "Scope explorer",
+        "State inspector",
+        "Performance and render tabs"
+      ],
+      "keyExports": [
+        "debugStore \u2014 shared debug event store",
+        "debug \u2014 debug API helpers",
+        "createDebugLogger \u2014 category logger for modules",
+        "DEBUG_DEFAULTS \u2014 default debug settings",
+        "MVU integration exports \u2014 wire debug into the loop"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "debug.ts",
+        "code": "import { createDebugLogger } from '@tuix/debug'\n\nconst dbg = createDebugLogger('my-module', { color: '36' })\ndbg.info('update started')\ndbg.error('update failed', { code: 500 })"
+      },
+      "related": [
+        "logger",
+        "runtime",
+        "bin",
+        "testing"
+      ]
+    },
+    {
+      "slug": "docs",
+      "name": "@tuix/docs",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/docs` extracts command docs and shows an interactive help explorer.",
+      "purpose": "Use this package to read docs from JSX commands and plugins. Generators write Markdown or plain help text. `HelpExplorer` lets users browse commands with the keyboard.",
+      "whenToUse": "Use it when your CLI needs in-app help. Use it when you want docs from the same command tree. Use it when you export Markdown for a site.",
+      "mainConcepts": [
+        "Command and plugin docs",
+        "App doc extraction",
+        "Markdown and help generators",
+        "Help explorer navigation",
+        "Args, options, and examples"
+      ],
+      "keyExports": [
+        "extractAppDoc \u2014 build app docs from JSX",
+        "extractCommandDoc \u2014 document one command",
+        "extractPluginDoc \u2014 document one plugin",
+        "generateAppMarkdown \u2014 write Markdown for an app",
+        "generateCommandHelp \u2014 plain text help for a command",
+        "HelpExplorer \u2014 interactive help TUI"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "docs.ts",
+        "code": "import { extractAppDoc, generateAppMarkdown, HelpExplorer } from '@tuix/docs'\nimport { Effect } from 'effect'\n\nconst docs = extractAppDoc(MyApp, 'myapp', '1.0.0')\nconst md = Effect.runSync(generateAppMarkdown(docs))\n// Or render: <HelpExplorer docs={docs} />"
+      },
+      "related": [
+        "bin",
+        "jsx",
+        "ui"
+      ]
+    },
+    {
+      "slug": "telemetry",
+      "name": "@tuix/telemetry",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/telemetry` collects opt-in events, errors, and performance metrics.",
+      "purpose": "Use this package only when the user opts in. Collectors capture events, errors, and performance data. Transports send batches to HTTP or write them to files.",
+      "whenToUse": "Use it when product metrics must stay opt-in. Use it when you need error or timing reports. Use it when you ship to HTTP or local files.",
+      "mainConcepts": [
+        "Opt-in telemetry config",
+        "Event, error, and performance collectors",
+        "HTTP and file transports",
+        "Sampling and batching",
+        "Telemetry JSX plugin"
+      ],
+      "keyExports": [
+        "Telemetry \u2014 opt-in JSX plugin",
+        "EventCollector \u2014 record product events",
+        "ErrorCollector \u2014 capture errors",
+        "PerformanceCollector \u2014 record timings",
+        "createHttpTransport \u2014 send metrics over HTTP",
+        "createFileTransport \u2014 write metrics to disk"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "telemetry.tsx",
+        "code": "import { Telemetry, createHttpTransport } from '@tuix/telemetry'\n\nconst transport = createHttpTransport({\n  endpoint: 'https://metrics.example.com',\n})\n\nexport function App() {\n  return (\n    <Telemetry enabled={false} appName=\"my-app\" transport={transport}>\n      <Main />\n    </Telemetry>\n  )\n}"
+      },
+      "related": [
+        "logger",
+        "update",
+        "storage",
+        "bin"
+      ]
+    },
+    {
+      "slug": "update",
+      "name": "@tuix/update",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/update` checks package versions and can show an update banner.",
+      "purpose": "Use this package to compare the current version to a remote source. Checkers support npm, GitHub releases, and custom URLs. The plugin can auto-check and render a banner.",
+      "whenToUse": "Use it when a CLI should notify users of new versions. Use it when you publish on npm or GitHub. Use it when you need a custom check endpoint.",
+      "mainConcepts": [
+        "Version compare",
+        "npm, GitHub, and custom checkers",
+        "Cache for check results",
+        "Breaking change detection",
+        "Update banner UI"
+      ],
+      "keyExports": [
+        "createNpmChecker \u2014 check the npm registry",
+        "createGitHubChecker \u2014 check GitHub releases",
+        "createCustomChecker \u2014 check a custom URL",
+        "Updater \u2014 auto-check plugin",
+        "UpdateBanner \u2014 banner for available updates"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "update.tsx",
+        "code": "import { Updater } from '@tuix/update'\n\nexport function App() {\n  return (\n    <Updater\n      packageName=\"@tuix/core\"\n      currentVersion=\"1.0.0\"\n      autoCheck={true}\n      showBanner={true}\n    >\n      <Main />\n    </Updater>\n  )\n}"
+      },
+      "related": [
+        "telemetry",
+        "bin",
+        "ui"
+      ]
+    },
+    {
+      "slug": "app-presets",
+      "name": "@tuix/app-presets",
+      "layer": "Ecosystem",
+      "summary": "`@tuix/app-presets` supplies module factory presets for runtime bootstrap.",
+      "purpose": "Use this package to inject higher-layer modules without wrong dependency edges. Factories cover config, logger, process manager, and coordination. The standard preset returns a safe default set.",
+      "whenToUse": "Use it when you call runtime bootstrap with extra modules. Use it when you want config and logger by default. Use it when you opt into process manager or coordination.",
+      "mainConcepts": [
+        "Module factory type",
+        "Config, logger, process manager, coordination factories",
+        "Standard preset options",
+        "Bootstrap additionalModules",
+        "Runtime-safe injection"
+      ],
+      "keyExports": [
+        "presets.config \u2014 ConfigModule factory",
+        "presets.logger \u2014 LoggerModule factory",
+        "presets.processManager \u2014 ProcessManagerModule factory",
+        "presets.coordination \u2014 CoordinationModule factory",
+        "presets.standard \u2014 selected module factory list",
+        "StandardPresetOptions \u2014 toggle flags for the standard set"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "bootstrap.ts",
+        "code": "import { bootstrap } from '@tuix/runtime'\nimport { presets } from '@tuix/app-presets'\nimport { Effect } from 'effect'\n\nawait Effect.runPromise(\n  bootstrap({\n    additionalModules: presets.standard({\n      config: true,\n      logger: true,\n      processManager: true,\n    }),\n  })\n)"
+      },
+      "related": [
+        "config",
+        "logger",
+        "process-manager",
+        "coordination",
+        "runtime"
+      ]
+    }
+  ]
+}

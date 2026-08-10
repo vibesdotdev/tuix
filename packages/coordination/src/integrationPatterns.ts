@@ -7,8 +7,8 @@
  */
 
 import { Effect } from 'effect'
-import { EventBus } from '@tuix/reactive/events/event-bus'
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'
+import { EventBus } from '@tuix/core/events'
+import type { BaseEvent } from '@tuix/core/events'
 import type { PatternHandle } from './types'
 
 /**

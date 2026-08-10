@@ -255,5 +255,20 @@ export * from './plugin/commands'
 // Constants
 export * from './constants'
 
+// Interactive PTY (node-pty interim — see BUN_CAPABILITY_MATRIX)
+export {
+  spawnPty,
+  wrapNodePty,
+  createMockPtyBackend,
+  createNodePtyBackend,
+  getDefaultPtyBackend,
+  setDefaultPtyBackend,
+  MockPtyHandle,
+  type PtyHandle,
+  type PtyBackend,
+  type PtySpawnOptions,
+  type PtySize,
+} from './pty/pty'
+
 // For backward compatibility, also export the module implementation
 export { ProcessManagerModule } from './module'

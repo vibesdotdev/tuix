@@ -24,7 +24,9 @@ export function DebugOverview(): JSX.Element {
 
   return (
     <Flex direction="column">
-      <Text color={color.cyan} bold>📊 Debug Overview</Text>
+      <Text color={color.cyan} bold>
+        📊 Debug Overview
+      </Text>
       <Text />
       <Text>Command Path: {state.commandPath.join(' → ') || '(root)'}</Text>
       <Text>Total Scopes: {scopes.length}</Text>
@@ -32,12 +34,18 @@ export function DebugOverview(): JSX.Element {
       <Text />
       <Text color={color.yellow}>Event Summary:</Text>
       {Object.entries(eventCounts).map(([category, count]) => (
-        <Text>  {category}: {count} events</Text>
+        <Text>
+          {' '}
+          {category}: {count} events
+        </Text>
       ))}
       <Text />
       <Text color={color.yellow}>Matched Scope Chain:</Text>
       {matchedScopes.map((scope, i) => (
-        <Text>  {' '.repeat(i * 2)}→ {scope.name} [{scope.type}]</Text>
+        <Text>
+          {' '}
+          {' '.repeat(i * 2)}→ {scope.name} [{scope.type}]
+        </Text>
       ))}
       <Text />
       <Text>Total Events: {state.events.length}</Text>

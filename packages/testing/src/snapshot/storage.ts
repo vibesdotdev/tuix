@@ -39,7 +39,10 @@ export class FileSnapshotStorage implements SnapshotStorage {
   getSnapshotPath(testFile: string): string {
     const dir = dirname(testFile)
     const snapshotDir = join(dir, this.snapshotDir)
-    const filename = testFile.split('/').pop()?.replace(/\.(test|spec)\.(ts|tsx|js|jsx)$/, '')
+    const filename = testFile
+      .split('/')
+      .pop()
+      ?.replace(/\.(test|spec)\.(ts|tsx|js|jsx)$/, '')
     return join(snapshotDir, `${filename}.snap`)
   }
 

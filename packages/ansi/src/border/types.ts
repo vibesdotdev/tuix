@@ -1,9 +1,8 @@
-
 // =============================================================================
 // Border Types
 // =============================================================================
 
-import type { Color } from "../color/types"
+import type { Color } from '../color/types'
 
 /**
  * Border character set for drawing boxes
@@ -38,7 +37,16 @@ export enum BorderSide {
  * Border style configuration
  */
 export interface BorderStyle {
-  readonly type: 'thin' | 'thick' | 'double' | 'rounded' | 'ascii' | 'dotted' | 'dashed' | 'solid' | 'double-dashed'
+  readonly type:
+    | 'thin'
+    | 'thick'
+    | 'double'
+    | 'rounded'
+    | 'ascii'
+    | 'dotted'
+    | 'dashed'
+    | 'solid'
+    | 'double-dashed'
   readonly sides?: BorderSide
   readonly color?: Color
 }

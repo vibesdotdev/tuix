@@ -3,7 +3,13 @@
  */
 
 import { Effect } from 'effect'
-import type { TelemetryEvent, TelemetryCollector, TelemetryConfig, TelemetryTransport, TelemetryError as TelemetryErrorType } from '../types'
+import type {
+  TelemetryEvent,
+  TelemetryCollector,
+  TelemetryConfig,
+  TelemetryTransport,
+  TelemetryError as TelemetryErrorType,
+} from '../types'
 
 export class EventCollector {
   private events: TelemetryEvent[] = []
@@ -26,7 +32,7 @@ export class EventCollector {
     const interval = this.config.flushInterval || 30000 // 30 seconds default
 
     this.flushTimer = setInterval(() => {
-      Effect.runPromise(this.flush()).catch((error) => {
+      Effect.runPromise(this.flush()).catch(error => {
         if (process.env.DEBUG) {
           console.error('[Telemetry] Flush error:', error)
         }
@@ -65,7 +71,7 @@ export class EventCollector {
           })
         }
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'TelemetryError' as const,
         message: `Failed to collect event: ${error}`,
         cause: error,
@@ -74,29 +80,31 @@ export class EventCollector {
   }
 
   flush(): Effect.Effect<void, TelemetryErrorType> {
-    return Effect.gen(function* (_) {
-      if (this.events.length === 0) {
-        return
-      }
+    return Effect.gen(
+      function* (_) {
+        if (this.events.length === 0) {
+          return
+        }
 
-      const eventsToSend = [...this.events]
-      this.events = []
+        const eventsToSend = [...this.events]
+        this.events = []
 
-      yield* this.transport.send(eventsToSend).pipe(
-        Effect.catchAll((error) =>
-          Effect.sync(() => {
-            // Put events back if send failed
-            this.events = eventsToSend.concat(this.events)
-            throw error
-          })
-        ),
-        Effect.mapError((error: any) => ({
-          _tag: 'TelemetryError' as const,
-          message: `Failed to flush events: ${error.message || error}`,
-          cause: error,
-        }))
-      )
-    }.bind(this))
+        yield* this.transport.send(eventsToSend).pipe(
+          Effect.catchAll(error =>
+            Effect.sync(() => {
+              // Put events back if send failed
+              this.events = eventsToSend.concat(this.events)
+              throw error
+            })
+          ),
+          Effect.mapError((error: any) => ({
+            _tag: 'TelemetryError' as const,
+            message: `Failed to flush events: ${error.message || error}`,
+            cause: error,
+          }))
+        )
+      }.bind(this)
+    )
   }
 
   stop(): void {

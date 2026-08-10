@@ -84,12 +84,7 @@ export interface TextGradientOptions {
 }
 
 export const textGradient = (options: TextGradientOptions): string => {
-  const {
-    gradient,
-    text,
-    preserveSpaces = false,
-    profile = ColorProfile.TrueColor,
-  } = options
+  const { gradient, text, preserveSpaces = false, profile = ColorProfile.TrueColor } = options
 
   const chars = [...text]
 

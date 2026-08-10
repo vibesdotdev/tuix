@@ -1,10 +1,9 @@
-
 // =============================================================================
 // Style Types
 // =============================================================================
 
-import type { BorderStyle } from "../border/types"
-import type { Color } from "../color/types"
+import type { BorderStyle } from '../border/types'
+import type { Color } from '../color/types'
 
 /**
  * Text transform function

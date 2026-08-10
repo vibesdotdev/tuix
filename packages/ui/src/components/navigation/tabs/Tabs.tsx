@@ -237,9 +237,7 @@ export function Tabs(props: TabsProps): JSX.Element {
 
     // Icon
     if (tab.icon) {
-      content.push(
-        typeof tab.icon === 'string' ? <text>{tab.icon}</text> : tab.icon
-      )
+      content.push(typeof tab.icon === 'string' ? <text>{tab.icon}</text> : tab.icon)
     }
 
     // Label
@@ -348,19 +346,17 @@ export function Tabs(props: TabsProps): JSX.Element {
     if (orientation === 'horizontal') {
       return tabPosition === 'top' ? [tabBar, content] : [content, tabBar]
     } else {
-      return tabPosition === 'left'
-        ? (
-            <hstack>
-              {tabBar}
-              {content}
-            </hstack>
-          )
-        : (
-            <hstack>
-              {content}
-              {tabBar}
-            </hstack>
-          )
+      return tabPosition === 'left' ? (
+        <hstack>
+          {tabBar}
+          {content}
+        </hstack>
+      ) : (
+        <hstack>
+          {content}
+          {tabBar}
+        </hstack>
+      )
     }
   }
 

@@ -13,7 +13,7 @@ describe('Pattern effects', () => {
         type: 'dots',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 1
+        scale: 1,
       })
 
       expect(result).toBeDefined()
@@ -27,7 +27,7 @@ describe('Pattern effects', () => {
         type: 'stripes',
         foreground: rgb(255, 0, 0),
         background: rgb(0, 0, 255),
-        scale: 2
+        scale: 2,
       })
 
       expect(result.length).toBe(5)
@@ -38,7 +38,7 @@ describe('Pattern effects', () => {
         type: 'checkerboard',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 2
+        scale: 2,
       })
 
       expect(result.length).toBe(8)
@@ -49,7 +49,7 @@ describe('Pattern effects', () => {
         type: 'diagonal',
         foreground: rgb(255, 255, 0),
         background: rgb(128, 0, 128),
-        scale: 1
+        scale: 1,
       })
 
       expect(result.length).toBe(5)
@@ -60,7 +60,7 @@ describe('Pattern effects', () => {
         type: 'cross',
         foreground: rgb(0, 255, 0),
         background: rgb(0, 0, 0),
-        scale: 3
+        scale: 3,
       })
 
       expect(result.length).toBe(5)
@@ -71,7 +71,7 @@ describe('Pattern effects', () => {
         type: 'wave',
         foreground: rgb(0, 0, 255),
         background: rgb(255, 255, 255),
-        scale: 2
+        scale: 2,
       })
 
       expect(result.length).toBe(5)
@@ -82,7 +82,7 @@ describe('Pattern effects', () => {
         type: 'dots',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 1
+        scale: 1,
       })
 
       expect(result).toEqual([])
@@ -93,14 +93,14 @@ describe('Pattern effects', () => {
         type: 'dots',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 1
+        scale: 1,
       })
 
       const large = generatePattern(10, 5, {
         type: 'dots',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 3
+        scale: 3,
       })
 
       expect(small.length).toBe(5)
@@ -115,7 +115,7 @@ describe('Pattern effects', () => {
         type: 'dots',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 1
+        scale: 1,
       })
 
       expect(result).toBeDefined()
@@ -130,14 +130,14 @@ describe('Pattern effects', () => {
         type: 'dots',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 1
+        scale: 1,
       })
 
       const stripes = applyPattern(content, {
         type: 'stripes',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 1
+        scale: 1,
       })
 
       expect(dots).toBeDefined()
@@ -149,7 +149,7 @@ describe('Pattern effects', () => {
         type: 'dots',
         foreground: rgb(255, 255, 255),
         background: rgb(0, 0, 0),
-        scale: 1
+        scale: 1,
       })
 
       expect(result).toEqual([])
@@ -161,7 +161,7 @@ describe('Pattern effects', () => {
         type: 'checkerboard',
         foreground: rgb(255, 0, 0),
         background: rgb(0, 0, 255),
-        scale: 2
+        scale: 2,
       })
 
       expect(result.length).toBeGreaterThanOrEqual(content.length)

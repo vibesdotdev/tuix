@@ -2,7 +2,7 @@
 // Gradient Types
 // =============================================================================
 
-import type { Color } from "../color/types"
+import type { Color } from '../color/types'
 
 /**
  * Gradient stop for color transitions

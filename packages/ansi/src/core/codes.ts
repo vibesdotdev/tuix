@@ -90,7 +90,7 @@ export type ANSICode = keyof typeof ANSI_CODES
 /**
  * Type representing the actual ANSI escape sequence strings
  */
-export type ANSISequence = typeof ANSI_CODES[ANSICode]
+export type ANSISequence = (typeof ANSI_CODES)[ANSICode]
 
 /**
  * Get ANSI escape sequence for a given code name

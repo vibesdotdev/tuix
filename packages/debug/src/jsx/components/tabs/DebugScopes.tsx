@@ -20,7 +20,9 @@ export function DebugScopes(): JSX.Element {
 
   return (
     <Flex direction="column">
-      <Text color={color.cyan} bold>🌳 Scope Tree</Text>
+      <Text color={color.cyan} bold>
+        🌳 Scope Tree
+      </Text>
       <Text>Total: {scopes.length} scopes</Text>
       <Text />
       <ScopeNode node={tree} commandPath={state.commandPath} depth={0} />
@@ -53,7 +55,11 @@ function buildScopeTree(scopes: ScopeDef[]): ScopeTreeNode {
   return buildNode(root)
 }
 
-function ScopeNode({ node, commandPath, depth }: { node: ScopeTreeNode, commandPath: string[], depth: number }): JSX.Element {
+function ScopeNode({
+  node,
+  commandPath,
+  depth,
+}: { node: ScopeTreeNode; commandPath: string[]; depth: number }): JSX.Element {
   const indent = '  '.repeat(depth)
   const isMatched = commandPath.includes(node.scope.name)
   const isActive = scopeManager.isScopeActive(node.scope.id)

@@ -17,18 +17,14 @@ describe('Select Component', () => {
   })
 
   test('should handle placeholder', () => {
-    const options = [
-      { value: 'a', label: 'Option A' },
-    ]
+    const options = [{ value: 'a', label: 'Option A' }]
 
     const component = <Select options={options} placeholder="Select one..." />
     expect(component).toBeDefined()
   })
 
   test('should handle disabled state', () => {
-    const options = [
-      { value: 'a', label: 'Option A' },
-    ]
+    const options = [{ value: 'a', label: 'Option A' }]
 
     const component = <Select options={options} disabled />
     expect(component).toBeDefined()

@@ -36,21 +36,13 @@ export function ProcessManager({
   tuixDir = '.tuix',
   autoRestart = true,
   maxRestarts = 5,
-  children
+  children,
 }: ProcessManagerProps) {
   return (
     <>
-      <Command
-        name="pm:list"
-        description="List all managed processes"
-        component={PMList}
-      />
+      <Command name="pm:list" description="List all managed processes" component={PMList} />
 
-      <Command
-        name="pm:status"
-        description="Show detailed process status"
-        component={PMStatus}
-      />
+      <Command name="pm:status" description="Show detailed process status" component={PMStatus} />
 
       {children}
     </>

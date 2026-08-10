@@ -6,7 +6,12 @@ import { vstack, text, box, bold, dim, green, red, yellow } from '@tuix/view'
 import type { Component, Cmd } from '@tuix/core/types'
 import { Effect } from 'effect'
 import { join } from 'node:path'
-import { profileComponent, analyzeSession, formatSession, type ProfileSession } from '../../perf/profiler'
+import {
+  profileComponent,
+  analyzeSession,
+  formatSession,
+  type ProfileSession,
+} from '../../perf/profiler'
 import { writeFileSync } from 'node:fs'
 
 /**
@@ -87,10 +92,7 @@ export const Profile: Component<ProfileModel, ProfileMsg> = {
             ]
           }
 
-          return [
-            { ...model, status: 'profiling' },
-            [runProfile(model.props)],
-          ]
+          return [{ ...model, status: 'profiling' }, [runProfile(model.props)]]
 
         case 'Complete':
           // Save to file if output path specified
@@ -165,16 +167,18 @@ export const Profile: Component<ProfileModel, ProfileMsg> = {
             text(`  Memory Growth: ${formatBytes(analysis.memoryGrowth)}`),
             text(''),
             bold(text('Slowest Events:')),
-            ...slowEvents.map(event =>
-              text(`  ${event.name}: ${event.duration.toFixed(2)}ms`)
-            ),
+            ...slowEvents.map(event => text(`  ${event.name}: ${event.duration.toFixed(2)}ms`)),
             text(''),
             analysis.warnings.length > 0 ? yellow(bold(text('⚠ Performance Warnings:'))) : text(''),
             ...analysis.warnings.map(warning => yellow(text(`  ${warning}`))),
             model.props.output ? text('') : text(''),
             model.props.output
               ? green(text(`✓ Profile saved to ${model.props.output}`))
-              : dim(text('Tip: Add output path to save profile: tuix test profile <component> <duration> <output-path>'))
+              : dim(
+                  text(
+                    'Tip: Add output path to save profile: tuix test profile <component> <duration> <output-path>'
+                  )
+                )
           )
         } else {
           content = dim(text('No profile data'))
@@ -212,11 +216,13 @@ function runProfile(props: ProfileProps): Cmd<ProfileMsg> {
       }
 
       // Profile the component
-      const session = yield* Effect.promise(() => profileComponent(component, {
-        includeInit: true,
-        includeUpdates: [],
-        includeView: true,
-      }))
+      const session = yield* Effect.promise(() =>
+        profileComponent(component, {
+          includeInit: true,
+          includeUpdates: [],
+          includeView: true,
+        })
+      )
 
       return { _tag: 'Complete' as const, session }
     } catch (error) {

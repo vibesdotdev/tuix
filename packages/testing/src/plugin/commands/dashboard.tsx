@@ -124,10 +124,7 @@ export const TestDashboard: Component<DashboardModel, DashboardMsg> = {
             duration: 0,
           })
 
-          return [
-            { ...model, running: true, testResults: newResults },
-            [runTestFile(file)],
-          ]
+          return [{ ...model, running: true, testResults: newResults }, [runTestFile(file)]]
         }
 
         case 'RunTests':
@@ -136,10 +133,7 @@ export const TestDashboard: Component<DashboardModel, DashboardMsg> = {
         case 'TestComplete': {
           const newResults = new Map(model.testResults)
           newResults.set(msg.file, msg.result)
-          return [
-            { ...model, testResults: newResults, running: false },
-            [],
-          ]
+          return [{ ...model, testResults: newResults, running: false }, []]
         }
 
         case 'Quit':
@@ -217,17 +211,18 @@ export const TestDashboard: Component<DashboardModel, DashboardMsg> = {
     const failCount = Array.from(model.testResults.values()).filter(r => r.status === 'fail').length
     const totalCount = model.testResults.size
 
-    const summary = totalCount > 0
-      ? box(
-          vstack(
-            bold(text('Summary:')),
-            text(''),
-            green(text(`✓ Passed: ${passCount}`)),
-            failCount > 0 ? red(text(`✗ Failed: ${failCount}`)) : text(''),
-            dim(text(`Total: ${totalCount}/${model.testFiles.length}`))
+    const summary =
+      totalCount > 0
+        ? box(
+            vstack(
+              bold(text('Summary:')),
+              text(''),
+              green(text(`✓ Passed: ${passCount}`)),
+              failCount > 0 ? red(text(`✗ Failed: ${failCount}`)) : text(''),
+              dim(text(`Total: ${totalCount}/${model.testFiles.length}`))
+            )
           )
-        )
-      : text('')
+        : text('')
 
     return vstack(header, text(''), testList, text(''), summary)
   },

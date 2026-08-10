@@ -43,3 +43,10 @@ qdrant_storage/
 .vibes/
 vibes
 VIBES_*.md
+
+# Typecheck scratch / build output
+.tuix-typecheck-out/
+typecheck-out/
+apps/www/.svelte-kit/
+apps/www/.wrangler/
+**/.wrangler/

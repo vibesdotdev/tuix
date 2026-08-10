@@ -413,9 +413,7 @@ describe('Terminal Service Implementation', () => {
 
           // Mock a write error
           const originalWrite = process.stdout.write
-          process.stdout.write = ((
-            ...args: Parameters<typeof process.stdout.write>
-          ): boolean => {
+          process.stdout.write = ((...args: Parameters<typeof process.stdout.write>): boolean => {
             void args
             throw new Error('Write failed')
           }) as typeof process.stdout.write

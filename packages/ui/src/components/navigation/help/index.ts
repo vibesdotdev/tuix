@@ -1,5 +1,5 @@
-// TODO: Implement MVU/JSX Help component when needed
-// The TEA Help component has been moved to src/tea/examples/navigation/Help
-// This file will contain the MVU/JSX implementation when required
+/**
+ * Help component — navigable command list for terminal UIs.
+ */
 
-export {}
+export { Help, type HelpProps, type HelpEntry } from './Help'

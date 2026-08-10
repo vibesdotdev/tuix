@@ -63,9 +63,7 @@ export interface Storage {
   /**
    * Get all entries (optionally with prefix)
    */
-  entries<T = unknown>(
-    prefix?: string
-  ): Effect.Effect<Array<StorageEntry<T>>, StorageError>
+  entries<T = unknown>(prefix?: string): Effect.Effect<Array<StorageEntry<T>>, StorageError>
 
   /**
    * Remove expired entries
@@ -96,7 +94,4 @@ export class StorageError {
 /**
  * Storage service tag for Effect Context
  */
-export class StorageService extends Context.Tag('Storage')<
-  StorageService,
-  Storage
->() {}
+export class StorageService extends Context.Tag('Storage')<StorageService, Storage>() {}

@@ -45,9 +45,7 @@ export default function DashboardDemo() {
     return (
       <text style={style().fg(color)}>
         {'█'.repeat(filled)}
-        <text style={style().faint()}>{'░'.repeat(empty)}</text>
-        {' '}
-        {percentage}%
+        <text style={style().faint()}>{'░'.repeat(empty)}</text> {percentage}%
       </text>
     )
   }
@@ -57,7 +55,9 @@ export default function DashboardDemo() {
       {/* Header */}
       <box border="double" padding={1} style={style().bg(colors.black)}>
         <hstack>
-          <text>{textGradient({ gradient: oceanGradient(), text: '📊 TUIX System Dashboard' })}</text>
+          <text>
+            {textGradient({ gradient: oceanGradient(), text: '📊 TUIX System Dashboard' })}
+          </text>
           <text style={style().faint().fg(colors.gray)}> • Live monitoring</text>
         </hstack>
       </box>
@@ -78,7 +78,7 @@ export default function DashboardDemo() {
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Memory Panel */}
         <box border="rounded" padding={1} style={style().fg(colors.magenta)}>
@@ -92,7 +92,7 @@ export default function DashboardDemo() {
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Disk Panel */}
         <box border="rounded" padding={1} style={style().fg(colors.yellow)}>
@@ -106,7 +106,7 @@ export default function DashboardDemo() {
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Network Panel */}
         <box border="rounded" padding={1} style={style().fg(colors.cyan)}>
@@ -132,9 +132,9 @@ export default function DashboardDemo() {
             <text></text>
             {/* Header */}
             <hstack>
-              <text style={style().bold()}>PID    </text>
-              <text style={style().bold()}>Name      </text>
-              <text style={style().bold()}>CPU   </text>
+              <text style={style().bold()}>PID </text>
+              <text style={style().bold()}>Name </text>
+              <text style={style().bold()}>CPU </text>
               <text style={style().bold()}>Memory</text>
             </hstack>
             <text style={style().fg(colors.gray)}>────────────────────────────────</text>
@@ -150,7 +150,7 @@ export default function DashboardDemo() {
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Logs panel */}
         <box border="double" padding={1} style={style().fg(colors.white)}>
@@ -159,9 +159,11 @@ export default function DashboardDemo() {
             <text></text>
             {logs.map((log, i) => {
               const levelStyle =
-                log.level === 'error' ? style().bg(colors.red).fg(colors.white).bold() :
-                log.level === 'warn' ? style().bg(colors.yellow).fg(colors.black).bold() :
-                style().bg(colors.blue).fg(colors.white).bold()
+                log.level === 'error'
+                  ? style().bg(colors.red).fg(colors.white).bold()
+                  : log.level === 'warn'
+                    ? style().bg(colors.yellow).fg(colors.black).bold()
+                    : style().bg(colors.blue).fg(colors.white).bold()
 
               return (
                 <vstack key={i}>

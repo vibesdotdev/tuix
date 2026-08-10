@@ -76,7 +76,8 @@ export class GitHubUpdateChecker implements UpdateChecker {
         }
 
         const updateAvailable = compareVersions(this.config.currentVersion, latestVersion)
-        const isBreaking = updateAvailable && isBreakingChange(this.config.currentVersion, latestVersion)
+        const isBreaking =
+          updateAvailable && isBreakingChange(this.config.currentVersion, latestVersion)
 
         const result: UpdateCheckResult = {
           version: {
@@ -97,12 +98,11 @@ export class GitHubUpdateChecker implements UpdateChecker {
 
         return result
       },
-      catch: (error) =>
-        ({
-          _tag: 'UpdateError' as const,
-          message: `Failed to check GitHub releases: ${error}`,
-          cause: error,
-        }),
+      catch: error => ({
+        _tag: 'UpdateError' as const,
+        message: `Failed to check GitHub releases: ${error}`,
+        cause: error,
+      }),
     })
   }
 

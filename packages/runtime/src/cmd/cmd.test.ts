@@ -27,9 +27,7 @@ describe('Cmd', () => {
     })
 
     test('returns null if all commands are none', async () => {
-      const result = await Effect.runPromise(
-        Cmd.batch([Cmd.none(), Cmd.none(), Cmd.none()])
-      )
+      const result = await Effect.runPromise(Cmd.batch([Cmd.none(), Cmd.none(), Cmd.none()]))
       expect(result).toBeNull()
     })
   })
@@ -37,9 +35,7 @@ describe('Cmd', () => {
   describe('delay', () => {
     test('delays a message', async () => {
       const start = Date.now()
-      const result = await Effect.runPromise(
-        Cmd.delay(Duration.millis(100), 'delayed')
-      )
+      const result = await Effect.runPromise(Cmd.delay(Duration.millis(100), 'delayed'))
       const elapsed = Date.now() - start
 
       expect(result).toBe('delayed')
@@ -76,9 +72,10 @@ describe('Cmd', () => {
   describe('fetch', () => {
     test('fetches data successfully', async () => {
       // Mock fetch for testing
-      global.fetch = async (url: string) => ({
-        json: async () => ({ data: 'test' }),
-      }) as any
+      global.fetch = async (url: string) =>
+        ({
+          json: async () => ({ data: 'test' }),
+        }) as any
 
       const cmd = Cmd.fetch(
         'https://api.example.com/data',
@@ -140,9 +137,7 @@ describe('Sub', () => {
       const sub = Sub.interval(Duration.millis(50), 'tick')
 
       // Take first 3 messages
-      const items = await Effect.runPromise(
-        Stream.runCollect(Stream.take(sub, 3))
-      )
+      const items = await Effect.runPromise(Stream.runCollect(Stream.take(sub, 3)))
 
       const array = Array.from(items)
       expect(array).toEqual(['tick', 'tick', 'tick'])

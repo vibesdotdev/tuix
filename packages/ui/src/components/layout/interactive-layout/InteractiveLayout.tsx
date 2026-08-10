@@ -90,36 +90,22 @@ export function InteractiveLayout(props: InteractiveLayoutProps): JSX.Element {
   }
 
   return (
-    <Box
-      direction="vertical"
-      width={terminalWidth}
-      height={terminalHeight}
-    >
+    <Box direction="vertical" width={terminalWidth} height={terminalHeight}>
       {/* Header zone */}
       {props.header && (
-        <Box
-          direction="vertical"
-          width={terminalWidth}
-        >
+        <Box direction="vertical" width={terminalWidth}>
           {props.header}
         </Box>
       )}
 
       {/* Content zone - fills available space */}
-      <Box
-        direction="vertical"
-        width={terminalWidth}
-        height={contentHeight}
-      >
+      <Box direction="vertical" width={terminalWidth} height={contentHeight}>
         {props.children}
       </Box>
 
       {/* Footer zone */}
       {props.footer && (
-        <Box
-          direction="vertical"
-          width={terminalWidth}
-        >
+        <Box direction="vertical" width={terminalWidth}>
           {props.footer}
         </Box>
       )}

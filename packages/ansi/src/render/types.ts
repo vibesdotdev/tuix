@@ -1,9 +1,8 @@
-
 // =============================================================================
 // Render Types
 // =============================================================================
 
-import type { ColorProfile } from "../color/profile"
+import type { ColorProfile } from '../color/profile'
 
 /**
  * Rendering options for styled content

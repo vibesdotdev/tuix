@@ -180,9 +180,7 @@ describe('createReactiveHooks', () => {
 
     // Update
     if (hooks.afterUpdate) {
-      await Effect.runPromise(
-        hooks.afterUpdate({ count: 0 }, { count: 1 }, { type: 'increment' })
-      )
+      await Effect.runPromise(hooks.afterUpdate({ count: 0 }, { count: 1 }, { type: 'increment' }))
     }
 
     expect(context.getState()).toEqual({ count: 1 })
@@ -293,9 +291,7 @@ describe('Integration', () => {
     // Update count
     const newModel1: Model = { count: 1, text: 'hello' }
     if (hooks.afterUpdate) {
-      await Effect.runPromise(
-        hooks.afterUpdate(initialModel, newModel1, { type: 'increment' })
-      )
+      await Effect.runPromise(hooks.afterUpdate(initialModel, newModel1, { type: 'increment' }))
     }
 
     expect(context.getState()).toEqual(newModel1)

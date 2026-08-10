@@ -1,132 +1,104 @@
 /**
  * @tuix/docs - Interactive help explorer component
  *
- * Provides an interactive TUI for browsing command documentation.
+ * Keyboard navigation is MVU-backed:
+ * - named $state.$set → bindMvuPush → UserMsg { type: 'set' } → model update → re-paint
+ * - keys via registerKeyHandler (Runtime KeyPress), not raw stdin $effect every frame
  */
 
-import { $state, $derived } from '@tuix/reactive'
-import type { AppDoc, CommandDoc, PluginDoc } from '../types'
-import { generateCommandHelp, generateAppHelp } from '../generator/help-text'
+import { $state, $derived, registerKeyHandler } from '@tuix/reactive'
+import type { AppDoc, CommandDoc } from '../types'
+import { generateCommandHelp } from '../generator/help-text'
 import { Effect } from 'effect'
 
-/**
- * HelpExplorer props
- */
 export interface HelpExplorerProps {
-  /**
-   * Application documentation
-   */
   docs: AppDoc
-
-  /**
-   * Initial selected command
-   */
   initialCommand?: string
-
-  /**
-   * Show plugin groups?
-   */
   showPlugins?: boolean
 }
 
+/** One stdin/key bridge per process for HelpExplorer (avoids 60fps listener leak). */
+let helpKeyCleanup: (() => void) | null = null
+let helpKeyOwner: symbol | null = null
+
+function ensureHelpKeys(onKey: (key: string) => void): void {
+  const owner = Symbol('HelpExplorer')
+  // Replace prior owner (re-mount)
+  if (helpKeyCleanup) {
+    helpKeyCleanup()
+    helpKeyCleanup = null
+  }
+  helpKeyOwner = owner
+  helpKeyCleanup = registerKeyHandler(key => {
+    if (helpKeyOwner !== owner) return
+    onKey(key)
+  })
+}
+
 /**
- * HelpExplorer component
- *
- * Interactive help browser with keyboard navigation.
- *
- * @example
- * ```tsx
- * import { HelpExplorer } from '@tuix/docs/explorer'
- *
- * function MyApp() {
- *   const docs = extractAppDoc(myAppComponent)
- *
- *   return (
- *     <HelpExplorer
- *       docs={docs}
- *       showPlugins={true}
- *     />
- *   )
- * }
- * ```
- *
- * Controls:
- * - Up/Down: Navigate commands
- * - Enter: View command details
- * - Escape/Backspace: Back to list
- * - q: Quit
+ * Interactive help browser.
+ * Controls: ↑↓/jk navigate · Enter detail · Esc back · q quit
  */
 export function HelpExplorer(props: HelpExplorerProps): JSX.Element {
-  const selectedIndex = $state(0)
-  const viewMode = $state<'list' | 'detail'>('list')
-  const selectedCommand = $state<CommandDoc | null>(null)
+  const selectedIndex = $state(0, 'selectedIndex')
+  const viewMode = $state<'list' | 'detail'>('list', 'viewMode')
+  const selectedCommand = $state<CommandDoc | null>(null, 'selectedCommand')
 
-  // Get all commands (from app + plugins)
   const allCommands = $derived(() => {
-    const commands = [...props.docs.commands]
-
-    if (props.showPlugins) {
-      props.docs.plugins.forEach(plugin => {
-        commands.push(...plugin.commands)
-      })
+    const commands = [...(props.docs?.commands ?? [])]
+    if (props.showPlugins && props.docs?.plugins) {
+      for (const plugin of props.docs.plugins) {
+        commands.push(...(plugin.commands ?? []))
+      }
     }
-
     return commands
   })
 
-  // Handle keyboard input
   function handleKey(key: string) {
+    const k = key.length === 1 ? key : key
     if (viewMode() === 'list') {
-      switch (key) {
-        case 'ArrowUp':
-        case 'k':
-          selectedIndex.$set(Math.max(0, selectedIndex() - 1))
-          break
-
-        case 'ArrowDown':
-        case 'j':
-          selectedIndex.$set(Math.min(allCommands().length - 1, selectedIndex() + 1))
-          break
-
-        case 'Enter':
-        case ' ':
-          const cmd = allCommands()[selectedIndex()]
-          if (cmd) {
-            selectedCommand.$set(cmd)
-            viewMode.$set('detail')
-          }
-          break
-
-        case 'q':
-          process.exit(0)
-          break
+      if (k === 'up' || k === 'ArrowUp' || k === 'k') {
+        selectedIndex.$set(Math.max(0, selectedIndex() - 1))
+        return
+      }
+      if (k === 'down' || k === 'ArrowDown' || k === 'j') {
+        const max = Math.max(0, allCommands().length - 1)
+        selectedIndex.$set(Math.min(max, selectedIndex() + 1))
+        return
+      }
+      if (k === 'enter' || k === 'Enter' || k === ' ') {
+        const cmd = allCommands()[selectedIndex()]
+        if (cmd) {
+          selectedCommand.$set(cmd)
+          viewMode.$set('detail')
+        }
+        return
+      }
+      if (k === 'q') {
+        process.exit(0)
       }
     } else {
-      // Detail view
-      switch (key) {
-        case 'Escape':
-        case 'Backspace':
-        case 'q':
-          viewMode.$set('list')
-          selectedCommand.$set(null)
-          break
+      if (k === 'escape' || k === 'Escape' || k === 'backspace' || k === 'Backspace' || k === 'q') {
+        viewMode.$set('list')
+        selectedCommand.$set(null)
       }
     }
   }
 
-  // Render command list
+  // Mount key handler once per view construction (cleanup replaces previous)
+  ensureHelpKeys(handleKey)
+
   function renderList(): JSX.Element {
     const lines: JSX.Element[] = []
+    const cmds = allCommands()
+    const idx = selectedIndex()
 
-    // Header
     lines.push(
       <box key="header" padding={[1, 2]}>
         <text bold color="cyan">
-          {props.docs.name} - Help
+          {props.docs.name} — Help
         </text>
-        {props.docs.version && (
-          <text color="gray"> v{props.docs.version}</text>
-        )}
+        {props.docs.version ? <text color="gray"> v{props.docs.version}</text> : null}
       </box>
     )
 
@@ -138,76 +110,73 @@ export function HelpExplorer(props: HelpExplorerProps): JSX.Element {
       )
     }
 
-    // Commands
     lines.push(
       <box key="commands-header" padding={[0, 2]}>
-        <text bold color="yellow">Available Commands:</text>
+        <text bold color="yellow">
+          Available Commands:
+        </text>
       </box>
     )
 
-    allCommands().forEach((cmd, index) => {
-      const isSelected = index === selectedIndex()
+    if (cmds.length === 0) {
+      lines.push(
+        <box key="empty" padding={[0, 2]}>
+          <text color="gray">No commands found.</text>
+        </box>
+      )
+    }
+
+    cmds.forEach((cmd, index) => {
+      const isSelected = index === idx
       const bg = isSelected ? 'blue' : undefined
       const color = isSelected ? 'white' : 'gray'
-
       lines.push(
         <box key={`cmd-${index}`} padding={[0, 2]} background={bg}>
           <text color={color}>
             {isSelected ? '> ' : '  '}
-            {cmd.name.padEnd(20)} {cmd.description || ''}
+            {String(cmd.name).padEnd(20)} {cmd.description || ''}
           </text>
         </box>
       )
     })
 
-    // Footer
     lines.push(
       <box key="footer" padding={[1, 2, 0, 2]}>
-        <text color="gray">
-          Use ↑↓ to navigate, Enter to view details, q to quit
-        </text>
+        <text color="gray">↑↓/jk navigate · Enter details · q quit</text>
       </box>
     )
 
     return <box flexDirection="column">{lines}</box>
   }
 
-  // Render command detail
   function renderDetail(): JSX.Element {
     const cmd = selectedCommand()
     if (!cmd) {
       return <text>No command selected</text>
     }
 
-    // Generate help text
-    const helpText = Effect.runSync(generateCommandHelp(cmd))
+    let helpText = cmd.description || ''
+    try {
+      helpText = Effect.runSync(generateCommandHelp(cmd))
+    } catch {
+      /* keep description */
+    }
 
     return (
       <box flexDirection="column" padding={2}>
-        <text color="cyan" bold>{cmd.name}</text>
-        {cmd.description && (
-          <text color="gray">{cmd.description}</text>
-        )}
-
+        <text color="cyan" bold>
+          {cmd.name}
+        </text>
+        {cmd.description ? <text color="gray">{cmd.description}</text> : null}
         <box marginTop={1}>
           <text>{helpText}</text>
         </box>
-
         <box marginTop={1}>
-          <text color="gray">Press Esc or q to go back</text>
+          <text color="gray">Esc/q back to list</text>
         </box>
       </box>
     )
   }
-
-  // Set up keyboard listener
-  $effect(() => {
-    // Note: In real implementation, this would use input service
-    // For now, this is a placeholder showing the pattern
-    const listener = (key: string) => handleKey(key)
-    // input.on('key', listener)
-    // return () => input.off('key', listener)
-  })
 
   return (
     <box flexDirection="column" width="100%" height="100%">
@@ -215,3 +184,4 @@ export function HelpExplorer(props: HelpExplorerProps): JSX.Element {
     </box>
   )
 }
+;(HelpExplorer as { interactive?: boolean }).interactive = true

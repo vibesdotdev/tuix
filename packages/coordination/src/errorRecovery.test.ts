@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
 import { Effect } from 'effect'
-import { getGlobalEventBus, resetGlobalEventBus } from '@tuix/reactive/events/event-bus'
+import { getGlobalEventBus, resetGlobalEventBus } from '@tuix/core/events'
 import { resetGlobalRegistry } from '@tuix/runtime'
 import { ErrorRecoveryManager } from './errorRecovery'
 import type { ErrorPattern, RecoveryStrategy } from './types'

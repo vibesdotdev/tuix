@@ -159,9 +159,7 @@ export function LoadingOverlay(props: {
     >
       <vstack align="center" gap={2}>
         <Spinner size="large" {...props.spinnerProps} />
-        {props.message && (
-          <text style={style({ foreground: colors.white })}>{props.message}</text>
-        )}
+        {props.message && <text style={style({ foreground: colors.white })}>{props.message}</text>}
       </vstack>
     </box>
   )

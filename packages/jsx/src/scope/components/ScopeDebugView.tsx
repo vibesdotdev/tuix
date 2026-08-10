@@ -195,7 +195,7 @@ function renderDebugLogs(): View[] {
         views.push(
           hstack(
             text('      '),
-        styledText(JSON.stringify(entry.data, null, 2), { color: colors.gray, dim: true })
+            styledText(JSON.stringify(entry.data, null, 2), { color: colors.gray, dim: true })
           )
         )
       }

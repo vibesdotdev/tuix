@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { List, SimpleList, CheckList, NumberedList } from './List.js'
-import { $state } from '../../../../core/update/reactivity/runes.js'
+import { $state } from '@tuix/reactive'
 
 describe('List Component', () => {
   describe('Basic rendering', () => {
@@ -47,8 +47,8 @@ describe('List Component', () => {
       })
 
       // Simulate selection
-      selectedIndex.value = 1
-      expect(selectedIndex.value).toBe(1)
+      selectedIndex.$set(1)
+      expect(selectedIndex()).toBe(1)
     })
 
     it('should handle multi selection', () => {
@@ -62,7 +62,7 @@ describe('List Component', () => {
         renderItem: item => <text>{item}</text>,
       })
 
-      expect(selectedIndices.value).toEqual([0])
+      expect(selectedIndices()).toEqual([0])
     })
   })
 

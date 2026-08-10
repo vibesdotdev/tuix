@@ -14,26 +14,31 @@ export function VersionCommand(): JSX.Element {
   const buildDate = new Date().toISOString().split('T')[0]
 
   return (
-    <StaticLayout
-      title="TUIX Framework"
-      version={`v${version}`}
-    >
+    <StaticLayout title="TUIX Framework" version={`v${version}`}>
       <Box direction="vertical">
         {/* System info */}
         <Box direction="vertical">
           <Box direction="horizontal">
-            <Text color={theme.primary} bold>Runtime:</Text>
-            <Text>  </Text>
+            <Text color={theme.primary} bold>
+              Runtime:
+            </Text>
+            <Text> </Text>
             <Text>Bun {Bun.version}</Text>
           </Box>
           <Box direction="horizontal">
-            <Text color={theme.primary} bold>Platform:</Text>
+            <Text color={theme.primary} bold>
+              Platform:
+            </Text>
             <Text> </Text>
-            <Text>{process.platform} {process.arch}</Text>
+            <Text>
+              {process.platform} {process.arch}
+            </Text>
           </Box>
           <Box direction="horizontal">
-            <Text color={theme.primary} bold>Build:</Text>
-            <Text>    </Text>
+            <Text color={theme.primary} bold>
+              Build:
+            </Text>
+            <Text> </Text>
             <Text>{buildDate}</Text>
           </Box>
         </Box>
@@ -44,12 +49,12 @@ export function VersionCommand(): JSX.Element {
         <Box direction="vertical">
           <Box direction="horizontal">
             <Text bold>Website:</Text>
-            <Text>    </Text>
+            <Text> </Text>
             <Text color={theme.info}>https://tuix.dev</Text>
           </Box>
           <Box direction="horizontal">
             <Text bold>License:</Text>
-            <Text>    </Text>
+            <Text> </Text>
             <Text>MIT</Text>
           </Box>
           <Box direction="horizontal">

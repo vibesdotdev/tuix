@@ -62,8 +62,8 @@ export function useTheme(): UseThemeResult {
   // Load current theme
   Effect.runPromise(
     ThemeContext.pipe(
-      Effect.flatMap((ctx) => ctx.getCurrent()),
-      Effect.tap((theme) => Effect.sync(() => currentTheme.$set(theme))),
+      Effect.flatMap(ctx => ctx.getCurrent()),
+      Effect.tap(theme => Effect.sync(() => currentTheme.$set(theme))),
       Effect.catchAll(() => Effect.void)
     )
   ).catch(() => {})
@@ -71,19 +71,21 @@ export function useTheme(): UseThemeResult {
   // Load available theme names
   Effect.runPromise(
     ThemeContext.pipe(
-      Effect.flatMap((ctx) => ctx.getThemeNames()),
-      Effect.tap((names) => Effect.sync(() => availableThemes.$set(names))),
+      Effect.flatMap(ctx => ctx.getThemeNames()),
+      Effect.tap(names => Effect.sync(() => availableThemes.$set(names))),
       Effect.catchAll(() => Effect.void)
     )
   ).catch(() => {})
 
-  const theme = $derived(() => currentTheme() || { name: 'dark', colors: {}, typography: {}, spacing: {} } as Theme)
+  const theme = $derived(
+    () => currentTheme() || ({ name: 'dark', colors: {}, typography: {}, spacing: {} } as Theme)
+  )
   const themeNames = $derived(() => availableThemes())
 
   function setTheme(newTheme: Theme) {
     Effect.runPromise(
       ThemeContext.pipe(
-        Effect.flatMap((ctx) => ctx.setTheme(newTheme)),
+        Effect.flatMap(ctx => ctx.setTheme(newTheme)),
         Effect.tap(() => Effect.sync(() => currentTheme.$set(newTheme))),
         Effect.catchAll(() => Effect.void)
       )
@@ -93,14 +95,14 @@ export function useTheme(): UseThemeResult {
   function setThemeByName(name: string) {
     Effect.runPromise(
       ThemeContext.pipe(
-        Effect.flatMap((ctx) => ctx.getTheme(name)),
-        Effect.flatMap((theme) =>
+        Effect.flatMap(ctx => ctx.getTheme(name)),
+        Effect.flatMap(theme =>
           ThemeContext.pipe(
-            Effect.flatMap((ctx) => ctx.setTheme(theme)),
+            Effect.flatMap(ctx => ctx.setTheme(theme)),
             Effect.map(() => theme)
           )
         ),
-        Effect.tap((theme) => Effect.sync(() => currentTheme.$set(theme))),
+        Effect.tap(theme => Effect.sync(() => currentTheme.$set(theme))),
         Effect.catchAll(() => Effect.void)
       )
     ).catch(() => {})

@@ -1,7 +1,7 @@
 /**
  * @tuix/reactive - Reactivity System
  *
- * Svelte-like runes, scope management, and event bus for TUIX applications.
+ * Svelte-like runes and scope-aware reactivity for TUIX applications.
  *
  * @module reactive
  */
@@ -10,8 +10,38 @@
 // Runes (Reactivity Primitives)
 // =============================================================================
 
-export { $state, $derived, $effect, isStateRune, isBindableRune } from './runes/runes'
-export type { StateRune, DerivedRune, BindableRune } from './runes/runes'
+export {
+  $state,
+  $states,
+  $derived,
+  $effect,
+  $bindable,
+  isStateRune,
+  isBindableRune,
+  isDerivedRune,
+  isRune,
+  getValue,
+  toBindable,
+  runUntracked,
+  beginModelExtraction,
+  endModelExtraction,
+  isModelExtracting,
+  beginViewHydration,
+  endViewHydration,
+  bindMvuPush,
+  getMvuPush,
+  registerKeyHandler,
+  emitKeyToHandlers,
+  clearKeyHandlers,
+} from './runes/runes'
+export type {
+  StateRune,
+  DerivedRune,
+  BindableRune,
+  Rune,
+  BindableOptions,
+  MvuSetMsg,
+} from './runes/runes'
 export * from './runes/events'
 export * from './runes/module'
 export * from './runes/jsx-lifecycle'
@@ -24,8 +54,7 @@ export * from './runes/components/reactive-component'
 export * from './runtime'
 
 // =============================================================================
-// Event Bus
+// Reactive Event Channels
 // =============================================================================
 
-export * from './events/event-bus'
 export * from './events/channels'

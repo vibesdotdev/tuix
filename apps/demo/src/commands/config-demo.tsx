@@ -16,7 +16,7 @@ import { style, colors } from '@tuix/ansi'
 const configData = {
   'api.key': '***secret***',
   'api.url': 'https://api.example.com',
-  'debug': 'true',
+  debug: 'true',
   'log.level': 'info',
 }
 
@@ -34,7 +34,7 @@ export function ConfigGet() {
     return <text style={style().fg(colors.red)}>Error: Config key not found: {key}</text>
   }
 
-  const displayValue = reveal ? value : (value.includes('secret') ? '***' : value)
+  const displayValue = reveal ? value : value.includes('secret') ? '***' : value
 
   return (
     <vstack>
@@ -71,16 +71,14 @@ export function ConfigSet() {
   const value = context.arg(1)
 
   if (!key || !value) {
-    return (
-      <text style={style().fg(colors.red)}>
-        Error: Missing required arguments: key value
-      </text>
-    )
+    return <text style={style().fg(colors.red)}>Error: Missing required arguments: key value</text>
   }
 
   return (
     <vstack>
-      <text style={style().fg(colors.green)}>✓ Set {key} = {value}</text>
+      <text style={style().fg(colors.green)}>
+        ✓ Set {key} = {value}
+      </text>
       <text style={style().faint()}>Configuration updated</text>
     </vstack>
   )

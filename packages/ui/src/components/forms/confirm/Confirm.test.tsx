@@ -12,13 +12,7 @@ describe('Confirm Component', () => {
   })
 
   test('should handle custom labels', () => {
-    const component = (
-      <Confirm
-        message="Continue?"
-        yesLabel="Proceed"
-        noLabel="Cancel"
-      />
-    )
+    const component = <Confirm message="Continue?" yesLabel="Proceed" noLabel="Cancel" />
     expect(component).toBeDefined()
   })
 
@@ -34,8 +28,12 @@ describe('Confirm Component', () => {
     const component = (
       <Confirm
         message="Test?"
-        onConfirm={() => { confirmed = true }}
-        onCancel={() => { cancelled = true }}
+        onConfirm={() => {
+          confirmed = true
+        }}
+        onCancel={() => {
+          cancelled = true
+        }}
       />
     )
     expect(component).toBeDefined()

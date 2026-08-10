@@ -101,10 +101,15 @@ export function DebugLogs({
   )
 }
 
-function LogEntry({ event, isSelected, showTimestamp, showLevel }: {
-  event: DebugEvent,
-  isSelected: boolean,
-  showTimestamp: boolean,
+function LogEntry({
+  event,
+  isSelected,
+  showTimestamp,
+  showLevel,
+}: {
+  event: DebugEvent
+  isSelected: boolean
+  showTimestamp: boolean
   showLevel: boolean
 }): JSX.Element {
   const levelColor = LEVEL_COLORS[event.level]
@@ -123,8 +128,12 @@ function LogEntry({ event, isSelected, showTimestamp, showLevel }: {
         <Text>{icon} </Text>
         {showLevel && <Text color={levelColor}>{event.level.toUpperCase().padEnd(5)} </Text>}
         <Text>{event.message}</Text>
-        {event.context?.componentName && <Text color={color.gray}> [{event.context.componentName}]</Text>}
-        {event.context?.duration !== undefined && <Text color={color.green}> {event.context.duration.toFixed(2)}ms</Text>}
+        {event.context?.componentName && (
+          <Text color={color.gray}> [{event.context.componentName}]</Text>
+        )}
+        {event.context?.duration !== undefined && (
+          <Text color={color.green}> {event.context.duration.toFixed(2)}ms</Text>
+        )}
       </Flex>
     </Box>
   )

@@ -28,6 +28,7 @@
   "dependencies": {
     "@tuix/core": "workspace:*",
     "@tuix/jsx": "workspace:*",
+    "@tuix/reactive": "workspace:*",
     "@tuix/ui": "workspace:*",
     "@tuix/themes": "workspace:*",
     "@tuix/docs": "workspace:*",

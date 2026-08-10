@@ -5,7 +5,9 @@ const ESC = '\u001b['
 export const escape = (code: string | number): string =>
   typeof code === 'number' ? `${ESC}${code}m` : `${ESC}${code}`
 
-export const sequence = (...codes: ReadonlyArray<number | `${number}${string}` | string>): string => {
+export const sequence = (
+  ...codes: ReadonlyArray<number | `${number}${string}` | string>
+): string => {
   if (codes.length === 0) {
     return `${ESC}0m`
   }

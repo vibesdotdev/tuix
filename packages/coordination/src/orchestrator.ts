@@ -7,7 +7,7 @@
  */
 
 import { Effect, Fiber, Duration } from 'effect'
-import { EventBus } from '@tuix/reactive/events/event-bus'
+import { EventBus } from '@tuix/core/events'
 import { ModuleBase, ModuleError, getGlobalRegistry } from '@tuix/core'
 import { EventChoreographer } from './choreography'
 import type { WorkflowConfig, WorkflowInstance, WorkflowResult } from './types'
@@ -21,14 +21,14 @@ export class WorkflowOrchestrator extends ModuleBase {
   private choreographer: EventChoreographer
   private activeWorkflows = new Map<string, Fiber.RuntimeFiber<WorkflowResult, WorkflowError>>()
 
-  constructor(eventBus: EventBus) {
+  constructor(eventBus: EventBus, choreographer?: EventChoreographer) {
     super(eventBus, SUBMODULE_NAMES.ORCHESTRATOR)
     const registry = getGlobalRegistry()
     const choreographerModule = registry.getModule(SUBMODULE_NAMES.CHOREOGRAPHER)
-    if (!choreographerModule) {
-      throw new Error('Choreographer module not found in registry')
-    }
-    this.choreographer = choreographerModule as EventChoreographer
+    this.choreographer =
+      choreographer ??
+      (choreographerModule as EventChoreographer | undefined) ??
+      new EventChoreographer(eventBus)
   }
 
   public initialize(): Effect.Effect<void, ModuleError> {

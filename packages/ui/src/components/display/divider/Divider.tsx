@@ -77,18 +77,11 @@ export function Divider(props: DividerProps): JSX.Element {
       const halfLength = Math.max(2, Math.floor(length / 2))
 
       return (
-        <Box
-          direction="horizontal"
-          align="center"
-          gap={2}
-          margin={{ top: margin, bottom: margin }}
-        >
+        <Box direction="horizontal" align="center" gap={2} margin={{ top: margin, bottom: margin }}>
           <text style={style().foreground(theme.colors.border ?? colors.gray)}>
             {lineChar.repeat(halfLength)}
           </text>
-          <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
-            {props.label}
-          </text>
+          <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>{props.label}</text>
           <text style={style().foreground(theme.colors.border ?? colors.gray)}>
             {lineChar.repeat(halfLength)}
           </text>

@@ -46,10 +46,7 @@ export interface JSXRunConfig {
  * await runApp(InteractiveApp, { interactive: true }) // Stays open
  * ```
  */
-export const runApp = async (
-  component: JSXComponent,
-  config: JSXRunConfig = {}
-): Promise<void> => {
+export const runApp = async (component: JSXComponent, config: JSXRunConfig = {}): Promise<void> => {
   const { LiveServices } = await import('@tuix/core/services/live')
   const { activeRouteStore } = await import('../scope/stores')
   const { scopeManager } = await import('../scope/manager')
@@ -99,8 +96,8 @@ export const runApp = async (
         // E.g., if route.path is ["config", "get", "api.key"] and the matched command is ["config", "get"]
         // then "api.key" should be a positional argument
         const currentRoute = activeRouteStore.get()
-        const matchedCommand = allScopes.find(s =>
-          s.executable && activeRouteStore.isExactMatch(s.path)
+        const matchedCommand = allScopes.find(
+          s => s.executable && activeRouteStore.isExactMatch(s.path)
         )
 
         if (!matchedCommand) {
@@ -133,7 +130,8 @@ export const runApp = async (
         let rendered = yield* result.render()
 
         // Extract the actual string content if render() returns an object
-        let content = typeof rendered === 'string' ? rendered : rendered?.content || String(rendered)
+        let content =
+          typeof rendered === 'string' ? rendered : rendered?.content || String(rendered)
 
         // Check if we should show fallback or help
         const route = activeRouteStore.get()
@@ -150,15 +148,16 @@ export const runApp = async (
             const fallbackView = fallback.component()
             if (fallbackView && typeof fallbackView.render === 'function') {
               const fallbackRendered = yield* fallbackView.render()
-              content = typeof fallbackRendered === 'string' ? fallbackRendered : fallbackRendered?.content || String(fallbackRendered)
+              content =
+                typeof fallbackRendered === 'string'
+                  ? fallbackRendered
+                  : fallbackRendered?.content || String(fallbackRendered)
             }
           } else {
             // No fallback provided - show auto-generated help
             const allScopes = scopeManager.getAllScopes()
-            const rootScopes = allScopes.filter(s =>
-              s.executable &&
-              s.path.length === 1 &&
-              !s.metadata.hidden
+            const rootScopes = allScopes.filter(
+              s => s.executable && s.path.length === 1 && !s.metadata.hidden
             )
 
             if (rootScopes.length > 0) {
@@ -171,7 +170,7 @@ export const runApp = async (
                 }),
                 '',
                 'Run with --help for more information',
-                ''
+                '',
               ]
               content = helpLines.join('\n')
             }
@@ -192,7 +191,6 @@ export const runApp = async (
 
         // If interactive, wait indefinitely (user must Ctrl+C to exit)
         yield* Effect.never
-
       } finally {
         // Cleanup
         yield* terminal.showCursor

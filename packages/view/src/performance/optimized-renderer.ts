@@ -1,5 +1,5 @@
 import { Effect } from 'effect'
-import { EventBus, generateId } from '@tuix/reactive/events/event-bus'
+import { EventBus, generateId } from '@tuix/core/events'
 import { ComponentLifecycleManager } from '../lifecycle/lifecycle-manager'
 
 // Error types

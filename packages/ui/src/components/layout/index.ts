@@ -9,6 +9,7 @@ export * from './flex'
 export * from './panel'
 export * from './static-layout/StaticLayout'
 export * from './interactive-layout/InteractiveLayout'
+export * from './viewport'
 
 // Re-export commonly used components
 export { Box, card, panel } from './box'

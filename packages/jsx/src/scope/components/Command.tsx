@@ -4,6 +4,7 @@
  * High-level component that creates a command scope for CLI commands
  */
 
+import { Effect } from 'effect'
 import { Scope, type ScopeProps } from './Scope'
 import { currentScopeStore } from '../stores'
 import type { JSX } from '@tuix/jsx'
@@ -36,6 +37,12 @@ export interface CommandProps {
 
   /** Additional metadata */
   metadata?: Record<string, unknown>
+
+  /**
+   * When true, runApp keeps an interactive MVU loop for this command
+   * (fullscreen, no exitAfterRender). Prefer for explorers/dashboards.
+   */
+  interactive?: boolean
 
   /** Child elements (args, flags, or content) */
   children?: JSX.Element | JSX.Element[]
@@ -84,6 +91,7 @@ export function Command(props: CommandProps): JSX.Element {
     args,
     flags,
     metadata = {},
+    interactive,
     children,
     defaultContent,
     layout,
@@ -94,23 +102,43 @@ export function Command(props: CommandProps): JSX.Element {
   // If component is provided, use it as the handler
   const effectiveHandler = component || handler
 
-  // Merge hidden into metadata if provided
+  // Mark handler interactive for detectInteractive when Command.interactive
+  if (interactive === true && typeof effectiveHandler === 'function') {
+    ;(effectiveHandler as { interactive?: boolean }).interactive = true
+  }
+
+  // Merge hidden / interactive into metadata for runApp classification
   const commandMetadata = {
     ...metadata,
     ...(hidden && { hidden }),
     ...(component && { component }),
+    ...(interactive !== undefined && { interactive }),
   }
 
-  // If component is provided and no children, render the component as default content
-  // We need to defer calling component() until render time (when args are available)
-  const effectiveDefaultContent = defaultContent || (component ? {
-    render: () => {
-      const result = component()
-      return result.render()
-    },
-    width: 0,
-    height: 0,
-  } as JSX.Element : undefined)
+  // Defer command component render; convert JSX → View via jsx-runtime
+  const effectiveDefaultContent =
+    defaultContent ||
+    (component
+      ? ({
+          render: () =>
+            Effect.gen(function* () {
+              const { render: renderJsx } = yield* Effect.promise(() => import('../../jsx-runtime'))
+              const result = component()
+              const view =
+                result && typeof (result as { render?: unknown }).render === 'function'
+                  ? (result as { render: () => Effect.Effect<unknown> })
+                  : renderJsx(result as any)
+              const rendered = yield* view.render()
+              if (typeof rendered === 'string') return rendered
+              if (rendered && typeof rendered === 'object' && 'content' in rendered) {
+                return (rendered as { content: string }).content
+              }
+              return String(rendered ?? '')
+            }),
+          width: 0,
+          height: 0,
+        } as unknown as JSX.Element)
+      : undefined)
 
   // Create the underlying Scope with command-specific defaults
   return (

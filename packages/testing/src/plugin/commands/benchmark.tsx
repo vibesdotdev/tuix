@@ -125,10 +125,7 @@ export const Benchmark: Component<BenchmarkModel, BenchmarkMsg> = {
 
         case 'Start':
           if (model.files.length === 0) {
-            return [
-              { ...model, status: 'error', error: 'No files to run' },
-              [],
-            ]
+            return [{ ...model, status: 'error', error: 'No files to run' }, []]
           }
 
           return [
@@ -137,10 +134,7 @@ export const Benchmark: Component<BenchmarkModel, BenchmarkMsg> = {
           ]
 
         case 'FileStarted':
-          return [
-            { ...model, currentFile: msg.file },
-            [],
-          ]
+          return [{ ...model, currentFile: msg.file }, []]
 
         case 'FileComplete': {
           const allResults = [...model.results, ...msg.results]
@@ -200,7 +194,9 @@ export const Benchmark: Component<BenchmarkModel, BenchmarkMsg> = {
 
       case 'running':
         content = vstack(
-          yellow(text(`Running benchmarks... (${model.results.length}/${model.files.length} complete)`)),
+          yellow(
+            text(`Running benchmarks... (${model.results.length}/${model.files.length} complete)`)
+          ),
           model.currentFile ? dim(text(`Current: ${model.currentFile}`)) : text('')
         )
         break

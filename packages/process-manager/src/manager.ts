@@ -26,6 +26,8 @@ import { Effect } from 'effect'
 interface ManagedProcess {
   name: string
   subprocess?: Subprocess
+  /** Interactive PTY handle when config.pty is true */
+  ptyHandle?: import('./pty/pty').PtyHandle
   config: ProcessConfig
   startTime?: Date
   restarts: number
@@ -161,12 +163,47 @@ export class ProcessManager {
         }
       }
 
-      // Spawn process with IPC enabled and pipe stdout/stderr for real-time logging
+      // Interactive TTY: production PTY path (node-pty interim per BUN_CAPABILITY_MATRIX)
+      if (managedProcess.config.pty) {
+        const { spawnPty } = await import('./pty/pty')
+        const handle = spawnPty(resolvedCommand, managedProcess.config.args ?? [], {
+          cwd: managedProcess.config.cwd || this.cwd,
+          env: {
+            ...(process.env as Record<string, string>),
+            ...managedProcess.config.env,
+            TUIX_PROCESS_NAME: name,
+            TUIX_MANAGED: 'true',
+            TUIX_PTY: 'true',
+          },
+          cols: managedProcess.config.ptyCols ?? 80,
+          rows: managedProcess.config.ptyRows ?? 24,
+        })
+        managedProcess.ptyHandle = handle
+        managedProcess.status = 'running'
+        managedProcess.startTime = new Date()
+
+        handle.onData(data => {
+          managedProcess.logs.push({
+            timestamp: new Date(),
+            level: 'info',
+            message: data,
+            source: 'stdout',
+          })
+        })
+        handle.onExit(code => {
+          this.handleProcessExit(name, code)
+        })
+
+        this.log('info', `✅ Started ${name} on PTY (PID: ${handle.pid})`)
+        return
+      }
+
+      // Default: Bun.spawn pipes (non-TTY / IPC)
       const subprocess = Bun.spawn({
-        cmd: [resolvedCommand, ...managedProcess.config.args],
+        cmd: [resolvedCommand, ...(managedProcess.config.args ?? [])],
         cwd: managedProcess.config.cwd || this.cwd,
         env: {
-          ...process.env, // Include full environment
+          ...process.env,
           ...managedProcess.config.env,
           TUIX_PROCESS_NAME: name,
           TUIX_MANAGED: 'true',
@@ -174,32 +211,28 @@ export class ProcessManager {
         stdout: 'pipe',
         stderr: 'pipe',
         stdin: 'ignore',
-        // Enable IPC for Bun processes
         ipc: (message, subprocess) => {
           this.handleIPCMessage(name, message, subprocess)
         },
       })
 
-      // Set up real-time log capture and writing
       this.setupLogCapture(name, subprocess, logFile, errorFile)
 
       managedProcess.subprocess = subprocess
       managedProcess.status = 'running'
       managedProcess.startTime = new Date()
 
-      // Monitor process exit
       subprocess.exited.then(exitCode => {
         this.handleProcessExit(name, exitCode)
       })
 
       this.log('info', `✅ Started ${name} (PID: ${subprocess.pid})`)
 
-      // For Bun processes, send initial ping to verify IPC
       if (managedProcess.config.command === 'bun' || resolvedCommand.includes('bun')) {
         try {
           subprocess.send({ type: 'ping', from: 'manager' })
         } catch {
-          // Not a Bun process or IPC not available
+          /* IPC optional */
         }
       }
     } catch (error) {
@@ -209,10 +242,53 @@ export class ProcessManager {
     }
   }
 
+  /**
+   * Write to a PTY-backed process stdin (production interactive path).
+   */
+  writePty(name: string, data: string): void {
+    const managedProcess = this.processes.get(name)
+    if (!managedProcess?.ptyHandle) {
+      throw new Error(`Process ${name} is not a running PTY process`)
+    }
+    managedProcess.ptyHandle.write(data)
+  }
+
+  /**
+   * Resize a PTY-backed process.
+   */
+  resizePty(name: string, cols: number, rows: number): void {
+    const managedProcess = this.processes.get(name)
+    if (!managedProcess?.ptyHandle) {
+      throw new Error(`Process ${name} is not a running PTY process`)
+    }
+    managedProcess.ptyHandle.resize(cols, rows)
+  }
+
+  /**
+   * Access the PTY handle for advanced use (onData, etc.).
+   */
+  getPty(name: string): import('./pty/pty').PtyHandle | undefined {
+    return this.processes.get(name)?.ptyHandle
+  }
+
   async stop(name: string): Promise<void> {
     const managedProcess = this.processes.get(name)
     if (!managedProcess || managedProcess.status !== 'running') {
       this.log('debug', `Process ${name} is not running`)
+      return
+    }
+
+    // PTY-backed processes
+    if (managedProcess.ptyHandle) {
+      managedProcess.status = 'stopping'
+      try {
+        managedProcess.ptyHandle.kill()
+      } catch {
+        /* ignore */
+      }
+      managedProcess.ptyHandle = undefined
+      managedProcess.status = 'stopped'
+      this.log('info', `✅ Stopped PTY process ${name}`)
       return
     }
 

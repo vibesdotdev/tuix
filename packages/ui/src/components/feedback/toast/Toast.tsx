@@ -63,15 +63,9 @@ export function Toast(props: ToastProps): JSX.Element | null {
     >
       <hstack gap={1} align="middle">
         {props.icon && (
-          <text style={style().foreground(variantStyle.foreground)}>
-            {props.icon}
-          </text>
+          <text style={style().foreground(variantStyle.foreground)}>{props.icon}</text>
         )}
-        {props.message ? (
-          <text>{props.message}</text>
-        ) : props.children ? (
-          props.children
-        ) : null}
+        {props.message ? <text>{props.message}</text> : props.children ? props.children : null}
       </hstack>
     </box>
   )

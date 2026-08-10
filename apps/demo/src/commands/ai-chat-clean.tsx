@@ -25,18 +25,20 @@ async function* simulateStreaming(response: string, delayMs: number = 30) {
 
 export default function AIChatClean() {
   // Reactive state
-  const messages = $state<Array<{
-    id: string
-    role: 'user' | 'assistant' | 'system'
-    content: string
-    timestamp: string
-  }>>([
+  const messages = $state<
+    Array<{
+      id: string
+      role: 'user' | 'assistant' | 'system'
+      content: string
+      timestamp: string
+    }>
+  >([
     {
       id: '1',
       role: 'system',
       content: 'Welcome to TUIX AI Chat! Type your message to get started. Press ? for help.',
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-    }
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    },
   ])
 
   const streamingContent = $state('')
@@ -90,7 +92,7 @@ app.get('/api/users', authenticate, async (req, res) => {
 });
 \`\`\`
 
-This adds JWT-based authentication!`
+This adds JWT-based authentication!`,
   ]
 
   let responseIndex = 0
@@ -100,7 +102,7 @@ This adds JWT-based authentication!`
       id: Date.now().toString(),
       role: 'user' as const,
       content,
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     }
     messages.$set([...messages(), userMsg])
 
@@ -120,7 +122,7 @@ This adds JWT-based authentication!`
       id: (Date.now() + 1).toString(),
       role: 'assistant' as const,
       content: fullResponse,
-      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
     }
     messages.$set([...messages(), assistantMsg])
     totalTokens.$set(totalTokens() + Math.floor(fullResponse.length / 4))
@@ -130,12 +132,14 @@ This adds JWT-based authentication!`
   }
 
   // Auto-send demo messages
-  Effect.runPromise(Effect.gen(function* () {
-    yield* Effect.sleep(1500)
-    yield* Effect.promise(() => sendMessage('How do I create a REST API endpoint?'))
-    yield* Effect.sleep(3000)
-    yield* Effect.promise(() => sendMessage('Thanks! How about with authentication?'))
-  }))
+  Effect.runPromise(
+    Effect.gen(function* () {
+      yield* Effect.sleep(1500)
+      yield* Effect.promise(() => sendMessage('How do I create a REST API endpoint?'))
+      yield* Effect.sleep(3000)
+      yield* Effect.promise(() => sendMessage('Thanks! How about with authentication?'))
+    })
+  )
 
   return (
     <vstack>
@@ -222,10 +226,8 @@ This adds JWT-based authentication!`
       {/* Status bar - no border, just text */}
       <box style={style().bg(colors.black).fg(colors.white)}>
         <text>
-          {isStreaming() ? '⏳ Generating...' : '✓ Ready'} •
-          Messages: {messages().length} •
-          Tokens: {totalTokens()} •
-          Tab to switch focus • ? for help
+          {isStreaming() ? '⏳ Generating...' : '✓ Ready'} • Messages: {messages().length} • Tokens:{' '}
+          {totalTokens()} • Tab to switch focus • ? for help
         </text>
       </box>
     </vstack>

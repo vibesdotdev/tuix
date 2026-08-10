@@ -62,9 +62,7 @@ export function Header(props: HeaderProps): JSX.Element {
     <Box direction="vertical" margin={{ bottom: marginBottom }}>
       <Box direction="horizontal" justify="between" align="center">
         <Box direction="horizontal" align="center" gap={2}>
-          <text style={style().foreground(titleColor).bold()}>
-            {props.title}
-          </text>
+          <text style={style().foreground(titleColor).bold()}>{props.title}</text>
           {props.badge}
         </Box>
         {props.actions}
@@ -72,9 +70,7 @@ export function Header(props: HeaderProps): JSX.Element {
 
       {props.subtitle && (
         <Box margin={{ top: 1 }}>
-          <text style={style().foreground(subtitleColor)}>
-            {props.subtitle}
-          </text>
+          <text style={style().foreground(subtitleColor)}>{props.subtitle}</text>
         </Box>
       )}
     </Box>

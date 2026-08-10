@@ -1,12 +1,12 @@
-import { Command, Plugin } from '@tuix/jsx';
-import FooPlugin from './plugin/foo';
-import HelloCommand from './commands/hello-test';
-import ShowcaseCommand from './commands/showcase';
-import AIChatDemo from './commands/ai-chat-demo';
-import DashboardDemo from './commands/dashboard-demo';
-import AIChatInteractive from './commands/ai-chat-interactive';
-import DashboardInteractive from './commands/dashboard-interactive';
-import { ConfigGet, ConfigList, ConfigSet } from './commands/config-demo';
+import { Command, Plugin } from '@tuix/jsx'
+import FooPlugin from './plugin/foo'
+import HelloCommand from './commands/hello-test'
+import ShowcaseCommand from './commands/showcase'
+import AIChatDemo from './commands/ai-chat-demo'
+import DashboardDemo from './commands/dashboard-demo'
+import AIChatInteractive from './commands/ai-chat-interactive'
+import DashboardInteractive from './commands/dashboard-interactive'
+import { ConfigGet, ConfigList, ConfigSet } from './commands/config-demo'
 
 export default function App() {
   return (
@@ -23,12 +23,28 @@ export default function App() {
       </Plugin>
 
       {/* AI demos */}
-      <Command name="ai-chat" description="Interactive AI chat with live streaming" component={AIChatInteractive} />
-      <Command name="ai-chat-static" description="Static AI chat demo (non-interactive)" component={AIChatDemo} />
+      <Command
+        name="ai-chat"
+        description="Interactive AI chat with live streaming"
+        component={AIChatInteractive}
+      />
+      <Command
+        name="ai-chat-static"
+        description="Static AI chat demo (non-interactive)"
+        component={AIChatDemo}
+      />
 
       {/* Dashboard demos */}
-      <Command name="dashboard" description="Live system monitoring dashboard" component={DashboardInteractive} />
-      <Command name="dashboard-static" description="Static dashboard demo (non-interactive)" component={DashboardDemo} />
+      <Command
+        name="dashboard"
+        description="Live system monitoring dashboard"
+        component={DashboardInteractive}
+      />
+      <Command
+        name="dashboard-static"
+        description="Static dashboard demo (non-interactive)"
+        component={DashboardDemo}
+      />
     </vstack>
-  );
+  )
 }

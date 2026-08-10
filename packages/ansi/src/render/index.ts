@@ -1,8 +1,9 @@
 import { BorderSide } from '../types'
-import type { RenderOptions, StyleProps } from '../types'
+import type { ColorDef, RenderOptions, StyleProps } from '../types'
 import { getBorderFromStyle, renderBox } from '../border/utils'
 import { ColorProfile } from '../color/profile'
 import { toAnsiSequence } from '../color/convert'
+import { parseColor } from '../color/parse'
 import { Style } from '../style'
 import { pad as padToWidth, visualWidth } from '../core/width'
 import { stripAnsi } from '../core/strip'
@@ -81,7 +82,11 @@ const alignHorizontal = (line: string, width: number, alignment: StyleProps['ali
   }
 }
 
-const alignLines = (lines: string[], width: number | undefined, alignment: StyleProps['align']): string[] => {
+const alignLines = (
+  lines: string[],
+  width: number | undefined,
+  alignment: StyleProps['align']
+): string[] => {
   if (!width) return lines
   return lines.map(line => alignHorizontal(line, width, alignment))
 }
@@ -102,11 +107,7 @@ const applyVerticalAlign = (
     case 'middle': {
       const top = Math.floor(padCount / 2)
       const bottom = padCount - top
-      return [
-        ...Array(top).fill(emptyLine),
-        ...lines,
-        ...Array(bottom).fill(emptyLine),
-      ]
+      return [...Array(top).fill(emptyLine), ...lines, ...Array(bottom).fill(emptyLine)]
     }
     case 'top':
     default:
@@ -131,11 +132,7 @@ const applyPadding = (lines: string[], props: StyleProps): string[] => {
     return ' '.repeat(left) + base + ' '.repeat(right)
   })
 
-  return [
-    ...Array(top).fill(emptyLine),
-    ...horizontal,
-    ...Array(bottom).fill(emptyLine),
-  ]
+  return [...Array(top).fill(emptyLine), ...horizontal, ...Array(bottom).fill(emptyLine)]
 }
 
 const applyBorder = (lines: string[], props: StyleProps): string[] => {
@@ -145,7 +142,10 @@ const applyBorder = (lines: string[], props: StyleProps): string[] => {
   const border = getBorderFromStyle(borderStyle)
   const sides = borderStyle.sides ?? BorderSide.All
   const contentWidth = Math.max(0, ...lines.map(visualWidth))
-  const width = Math.max(borderStyle.type ? contentWidth + 2 : contentWidth, props.width ?? contentWidth + 2)
+  const width = Math.max(
+    borderStyle.type ? contentWidth + 2 : contentWidth,
+    props.width ?? contentWidth + 2
+  )
   const height = lines.length + 2
 
   const rendered = renderBox({
@@ -177,11 +177,15 @@ const applyColors = (line: string, props: StyleProps, profile: ColorProfile): st
 
   let sequence = ''
 
+  // Coerce theme hex/named strings (e.g. "#222222") to ColorDef — raw strings
+  // have no `.type` and would concatenate as the literal "undefined".
   if (props.foreground) {
-    sequence += toAnsiSequence(props.foreground, profile, false)
+    const fg = parseColor(props.foreground as ColorDef | string)
+    if (fg) sequence += toAnsiSequence(fg, profile, false)
   }
   if (props.background) {
-    sequence += toAnsiSequence(props.background, profile, true)
+    const bg = parseColor(props.background as ColorDef | string)
+    if (bg) sequence += toAnsiSequence(bg, profile, true)
   }
 
   sequence += buildDecorationSequence(props)
@@ -204,11 +208,7 @@ const applyMargin = (lines: string[], props: StyleProps): string[] => {
   const emptyLine = ' '.repeat(widest)
 
   const margined = lines.map(line => leftPad + line + rightPad)
-  return [
-    ...Array(top).fill(emptyLine),
-    ...margined,
-    ...Array(bottom).fill(emptyLine),
-  ]
+  return [...Array(top).fill(emptyLine), ...margined, ...Array(bottom).fill(emptyLine)]
 }
 
 const shouldWrap = (props: StyleProps, options: RenderOptions): boolean => {
@@ -258,7 +258,10 @@ export const renderLines = (
 /**
  * Convert style props to ANSI escape sequence
  */
-export const toAnsiStyleCode = (props: StyleProps, profile: ColorProfile = ColorProfile.TrueColor): string => {
+export const toAnsiStyleCode = (
+  props: StyleProps,
+  profile: ColorProfile = ColorProfile.TrueColor
+): string => {
   let sequence = ''
 
   // Add color sequences

@@ -7,7 +7,7 @@
  */
 
 import { Effect } from 'effect'
-import { EventBus } from '@tuix/reactive/events/event-bus'
+import { EventBus } from '@tuix/core/events'
 import { ModuleBase, ModuleError } from '@tuix/runtime'
 import type {
   ErrorPattern,
@@ -16,7 +16,7 @@ import type {
   CircuitBreaker,
   ErrorIndicator,
 } from './types'
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { BaseEvent } from '@tuix/core/events'
 
 export class ErrorRecoveryManager extends ModuleBase {
   private errorPatterns = new Map<string, ErrorPattern>()
@@ -62,6 +62,41 @@ export class ErrorRecoveryManager extends ModuleBase {
   registerRecoveryStrategy(strategy: RecoveryStrategy): Effect.Effect<void, never> {
     return Effect.sync(() => {
       this.recoveryStrategies.set(strategy.id, strategy)
+    })
+  }
+
+  /**
+   * Detect the first registered pattern matching the error.
+   */
+  detectErrorPattern(error: Error): Effect.Effect<ErrorPattern | undefined, never> {
+    return Effect.sync(() => {
+      for (const pattern of this.errorPatterns.values()) {
+        try {
+          if (pattern.condition(error)) return pattern
+        } catch {
+          /* ignore pattern errors */
+        }
+      }
+      return undefined
+    })
+  }
+
+  /**
+   * Execute a named recovery strategy against an error.
+   */
+  executeRecoveryStrategy(
+    strategyId: string,
+    error: Error
+  ): Effect.Effect<{ success: boolean; message?: string }, Error> {
+    return Effect.gen(this, function* () {
+      const strategy = this.recoveryStrategies.get(strategyId)
+      if (!strategy) {
+        return yield* Effect.fail(new Error(`Recovery strategy not found: ${strategyId}`))
+      }
+      this.errorStats.recoveryAttempts++
+      const result = yield* strategy.execute(error)
+      this.errorStats.recoverySuccesses++
+      return result as { success: boolean; message?: string }
     })
   }
 

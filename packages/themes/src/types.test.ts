@@ -39,15 +39,17 @@ describe('@tuix/themes - Types', () => {
     const themes = [darkTheme, lightTheme, nordTheme, draculaTheme]
 
     for (const theme of themes) {
-      expect(theme.colors.primary).toBeDefined()
-      expect(theme.colors.secondary).toBeDefined()
-      expect(theme.colors.accent).toBeDefined()
-      expect(theme.colors.background).toBeDefined()
-      expect(theme.colors.text).toBeDefined()
-      expect(theme.colors.success).toBeDefined()
-      expect(theme.colors.warning).toBeDefined()
-      expect(theme.colors.error).toBeDefined()
-      expect(theme.colors.border).toBeDefined()
+      const c = theme.colors as Record<string, string | undefined>
+      expect(c.primary).toBeDefined()
+      expect(c.secondary).toBeDefined()
+      expect(c.success).toBeDefined()
+      expect(c.warning).toBeDefined()
+      expect(c.border).toBeDefined()
+      // Surface tokens: dark uses bg/fg; others use background/text
+      expect(c.bg ?? c.background).toBeDefined()
+      expect(c.fg ?? c.text).toBeDefined()
+      expect(c.danger ?? c.error).toBeDefined()
+      expect(c.tertiary ?? c.accent).toBeDefined()
     }
   })
 

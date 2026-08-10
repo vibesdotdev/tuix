@@ -33,6 +33,15 @@ export interface ProcessConfig {
   gid?: number
   healthCheck?: HealthCheckConfig
   skipValidation?: boolean // Skip command validation (useful for complex commands)
+  /**
+   * When true, start the process under an interactive PTY (stdin/stdout/resize).
+   * Default false uses Bun.spawn pipes (non-TTY / IPC).
+   */
+  pty?: boolean
+  /** Initial PTY columns (default 80) */
+  ptyCols?: number
+  /** Initial PTY rows (default 24) */
+  ptyRows?: number
 }
 
 export interface ProcessState {

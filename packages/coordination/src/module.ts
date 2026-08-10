@@ -6,7 +6,7 @@
  */
 
 import { Effect, Duration, Fiber } from 'effect'
-import { EventBus } from '@tuix/reactive/events/event-bus'
+import { EventBus } from '@tuix/core/events'
 import { ModuleBase, ModuleError } from '@tuix/core'
 import { EventChoreographer } from './choreography'
 import { WorkflowOrchestrator } from './orchestrator'

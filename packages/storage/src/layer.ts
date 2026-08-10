@@ -10,10 +10,7 @@ import { makeFilesystemStorage } from './filesystem.ts'
 /**
  * Live in-memory storage layer
  */
-export const MemoryStorageLayer = Layer.succeed(
-  StorageService,
-  makeMemoryStorage()
-)
+export const MemoryStorageLayer = Layer.succeed(StorageService, makeMemoryStorage())
 
 /**
  * Live filesystem storage layer

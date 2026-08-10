@@ -45,6 +45,9 @@ export { ProgressBar } from './components/feedback/progress-bar/index.js'
 // Layout patterns
 export { StaticLayout } from './components/layout/static-layout/StaticLayout.js'
 export { InteractiveLayout } from './components/layout/interactive-layout/InteractiveLayout.js'
+export { Help } from './components/navigation/help/index.js'
+export { LargeText } from './components/display/large-text/index.js'
+export { Viewport } from './components/layout/viewport/index.js'
 
 // Theme utilities
 export * from './theme/index.js'

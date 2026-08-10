@@ -1,2 +1,5 @@
-// Large text display component not yet implemented in MVU/JSX
-// TODO: Implement when needed using JSX and MVU architecture
+/**
+ * Large text (block letters) for terminal banners.
+ */
+
+export { LargeText, type LargeTextProps } from './LargeText'

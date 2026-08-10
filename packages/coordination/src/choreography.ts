@@ -7,9 +7,13 @@
  */
 
 import { Effect } from 'effect'
-import type { EventBus } from '@tuix/reactive/events/event-bus'
+import type { EventBus } from '@tuix/core/events'
 import { ModuleBase, ModuleError } from '@tuix/runtime'
-import type { ProcessEvent, ProcessOutputEvent, ProcessHealthEvent } from '@tuix/process-manager/events'
+import type {
+  ProcessEvent,
+  ProcessOutputEvent,
+  ProcessHealthEvent,
+} from '@tuix/process-manager/events'
 // TODO: Create @tuix/cli package or define these types
 // import type { CLICommandEvent, CLIParseEvent } from '@tuix/cli/core/events'
 type CLICommandEvent = any

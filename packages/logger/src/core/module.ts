@@ -7,7 +7,7 @@
 
 import { Effect, Stream } from 'effect'
 import { ModuleBase, ModuleError } from '@tuix/core'
-import type { EventBus, BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { EventBus, BaseEvent } from '@tuix/core/events'
 import type {
   LogEvent,
   LogTransportEvent,

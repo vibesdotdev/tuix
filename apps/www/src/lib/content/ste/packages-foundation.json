@@ -1,0 +1,160 @@
+{
+  "packages": [
+    {
+      "slug": "core",
+      "name": "@tuix/core",
+      "layer": "Foundation",
+      "summary": "Shared types, errors, services, modules, and events for Tuix apps.",
+      "purpose": "The package defines foundation types, error classes, and service tags. It owns Live I/O implementations for the terminal, input, renderer, and storage. It also provides the module base, registry, and event bus that other packages use.",
+      "whenToUse": "Import this package when you need shared types or error helpers. Use it when you define modules or publish events. Prefer @tuix/platform for app-facing Live service layers.",
+      "mainConcepts": [
+        "Service tags for terminal, input, renderer, and storage",
+        "Live service layers under services/live",
+        "ModuleBase and ModuleRegistry lifecycle",
+        "Typed EventBus channels",
+        "Shared error classes and recovery helpers"
+      ],
+      "keyExports": [
+        "TerminalService — Effect tag for terminal I/O",
+        "InputService — Effect tag for input streams",
+        "RendererService — Effect tag for render output",
+        "StorageService — Effect tag for key-value storage",
+        "LiveServices — merged Live layers for bootstrap",
+        "ModuleBase — base class for module lifecycle",
+        "ModuleRegistry — register and look up modules",
+        "EventBus — publish and subscribe to typed events",
+        "TerminalError / InputError / RenderError — typed errors",
+        "Effect / Context / Layer — re-exported from effect"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "event-bus.ts",
+        "code": "import { Effect } from 'effect'\nimport { EventBus, generateId } from '@tuix/core'\n\nconst bus = new EventBus()\n\nconst program = Effect.gen(function* () {\n  yield* bus.subscribe('app', (event) =>\n    Effect.sync(() => console.log(event.type))\n  )\n  yield* bus.publish('app', {\n    type: 'ready',\n    timestamp: new Date(),\n    source: 'main',\n    id: generateId(),\n  })\n})\n\nawait Effect.runPromise(program)"
+      },
+      "related": ["@tuix/platform", "@tuix/input", "@tuix/ansi", "@tuix/storage"]
+    },
+    {
+      "slug": "platform",
+      "name": "@tuix/platform",
+      "layer": "Foundation",
+      "summary": "Public facade for Live services, capabilities, and graphics.",
+      "purpose": "The package re-exports Live service layers and service tags from @tuix/core. It exposes capability detection and graphics encode helpers for apps. It does not implement Live I/O itself.",
+      "whenToUse": "Import this package at app bootstrap to provide LiveServices. Use it when you detect terminal capabilities or write graphics. Prefer this package over deep @tuix/core Live paths in apps.",
+      "mainConcepts": [
+        "LiveServices as the default service layer bundle",
+        "Service tags for dependency injection and tests",
+        "Capability detection from environment and probes",
+        "Graphics encode and decode for sixel, kitty, and iTerm2",
+        "writeGraphicsLive helper for image output"
+      ],
+      "keyExports": [
+        "LiveServices — merged terminal, input, renderer, storage layers",
+        "TerminalService / InputService / RendererService / StorageService — tags",
+        "detectCapabilities — probe terminal features from env",
+        "selectGraphicsProtocol — choose sixel, kitty, iTerm2, or none",
+        "encodeGraphics / decodeGraphics — image protocol helpers",
+        "parsePrimaryDA / probeFromEnv / mergeProbeResults — DA probe helpers",
+        "writeGraphicsLive — encode and write an image via Live terminal",
+        "PLATFORM_VERSION — package version string"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "bootstrap.ts",
+        "code": "import { Effect } from 'effect'\nimport {\n  LiveServices,\n  TerminalService,\n  detectCapabilities,\n  selectGraphicsProtocol,\n} from '@tuix/platform'\n\nconst caps = detectCapabilities({\n  env: process.env,\n  columns: 80,\n  rows: 24,\n})\nconst protocol = selectGraphicsProtocol(caps)\n\nconst program = Effect.gen(function* () {\n  const term = yield* TerminalService\n  yield* term.writeLine(`graphics: ${protocol}`)\n})\n\nawait Effect.runPromise(program.pipe(Effect.provide(LiveServices)))"
+      },
+      "related": ["@tuix/core", "@tuix/input", "@tuix/storage", "@tuix/runtime"]
+    },
+    {
+      "slug": "ansi",
+      "name": "@tuix/ansi",
+      "layer": "Foundation",
+      "summary": "ANSI colors, styles, borders, and text render helpers.",
+      "purpose": "The package builds ANSI escape sequences for terminal text. It styles strings with colors, decorations, padding, and borders. It also measures visual width and strips ANSI codes.",
+      "whenToUse": "Use this package when you style terminal text by hand. Use it for box borders, gradients, and color profiles. Higher layers may call it for you when you use views or widgets.",
+      "mainConcepts": [
+        "Style builder for colors, bold, padding, and borders",
+        "renderStyled output for styled multi-line text",
+        "Border presets and renderBox frames",
+        "Color parse and ColorProfile for terminal depth",
+        "visualWidth, stripAnsi, and pad for layout"
+      ],
+      "keyExports": [
+        "style / Style — fluent style builder",
+        "renderStyled — apply style props to text",
+        "colorize — wrap text in a named ANSI code",
+        "stripAnsi / visualWidth / truncate / pad — text width tools",
+        "renderBox / border — box drawing helpers",
+        "parseColor / ColorProfile — color input and depth",
+        "fgRgb / bgRgb / fg256 / bg256 — low-level color sequences",
+        "ANSI_CODES — named escape code map"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "styled-box.ts",
+        "code": "import { style, renderStyled, colorize, renderBox, border } from '@tuix/ansi'\n\nconst title = colorize('Status', 'bold')\nconst body = renderStyled('All systems go', style().fg('green').padding(1))\n\nconst frame = renderBox({\n  width: 24,\n  height: 5,\n  border: border.rounded,\n  content: [title, body],\n  padding: 1,\n})\n\nconsole.log(frame)"
+      },
+      "related": ["@tuix/core", "@tuix/view", "@tuix/themes", "@tuix/ui"]
+    },
+    {
+      "slug": "input",
+      "name": "@tuix/input",
+      "layer": "Foundation",
+      "summary": "Keyboard, mouse, and focus services for terminal input.",
+      "purpose": "The package parses key events and matches shortcuts. It routes mouse hits to components by bounds. It manages focus order, traps, and keyboard navigation.",
+      "whenToUse": "Use this package when you handle keys, mouse clicks, or focus. Import KeyUtils for quit and navigation bindings. Wire FocusService and HitTestService when you build interactive views.",
+      "mainConcepts": [
+        "KeyEvent model and KeyType enum",
+        "KeyUtils matching and common bindings",
+        "FocusService for tab order and focus traps",
+        "HitTestService for component bounds",
+        "MouseRouterService for click and hover routing"
+      ],
+      "keyExports": [
+        "KeyUtils — match keys and build bindings",
+        "KeyType / KeyEvent — key event model",
+        "parseChar — build a KeyEvent from a character",
+        "FocusService / FocusServiceLive — focus registration and move",
+        "HitTestService / createBounds — mouse hit testing",
+        "MouseRouterService — route mouse events to handlers",
+        "clickHandler / pressReleaseHandler — mouse handler helpers",
+        "ComponentNotFoundError / KeyEventParseError — typed errors"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "keys.ts",
+        "code": "import { KeyUtils, parseChar, type KeyEvent } from '@tuix/input'\n\nfunction onKey(event: KeyEvent): void {\n  if (KeyUtils.isQuit(event)) {\n    process.exit(0)\n  }\n  if (KeyUtils.matches(event, 'ctrl+s')) {\n    console.log('save')\n  }\n  if (KeyUtils.bindings.confirm.keys.includes(event.key)) {\n    console.log('confirm')\n  }\n}\n\nconst event = parseChar('s', true, false, false)\nonKey(event)"
+      },
+      "related": ["@tuix/core", "@tuix/platform", "@tuix/runtime", "@tuix/view"]
+    },
+    {
+      "slug": "storage",
+      "name": "@tuix/storage",
+      "layer": "Foundation",
+      "summary": "Key-value storage with TTL, memory and filesystem backends.",
+      "purpose": "The package stores values by key with optional time-to-live. It provides in-memory and filesystem backends as Effect layers. It also exposes useStorage and Storage for JSX context.",
+      "whenToUse": "Use this package when you persist app data or cache sessions. Choose MemoryStorageLayer for tests and short-lived state. Choose FilesystemStorageLayer when data must survive restarts.",
+      "mainConcepts": [
+        "Storage interface with get, set, delete, and keys",
+        "Optional TTL on set and cleanup of expired entries",
+        "MemoryStorage for process-local data",
+        "FilesystemStorage for on-disk persistence",
+        "Effect layers and JSX useStorage context"
+      ],
+      "keyExports": [
+        "Storage / StorageService — interface and Effect tag",
+        "makeMemoryStorage / MemoryStorage — in-memory backend",
+        "makeFilesystemStorage / FilesystemStorage — disk backend",
+        "MemoryStorageLayer / FilesystemStorageLayer — Effect layers",
+        "useStorage / Storage / provideStorage — JSX context helpers",
+        "StorageEntry / StorageOptions — entry shape and TTL options",
+        "StorageError — typed storage failure"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "session.ts",
+        "code": "import { Effect } from 'effect'\nimport {\n  MemoryStorageLayer,\n  StorageService,\n} from '@tuix/storage'\n\nconst program = Effect.gen(function* () {\n  const storage = yield* StorageService\n  yield* storage.set('session', { user: 'alice' }, { ttl: 3_600_000 })\n  const session = yield* storage.get<{ user: string }>('session')\n  const keys = yield* storage.keys('session')\n  return { session, keys }\n})\n\nconst result = await Effect.runPromise(\n  program.pipe(Effect.provide(MemoryStorageLayer))\n)\nconsole.log(result)"
+      },
+      "related": ["@tuix/core", "@tuix/platform", "@tuix/config", "@tuix/jsx"]
+    }
+  ]
+}

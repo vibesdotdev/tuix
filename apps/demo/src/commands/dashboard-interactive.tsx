@@ -33,11 +33,13 @@ export default function DashboardInteractive() {
   ])
 
   // Logs
-  const logs = $state<Array<{
-    level: 'info' | 'warn' | 'error'
-    time: string
-    message: string
-  }>>([
+  const logs = $state<
+    Array<{
+      level: 'info' | 'warn' | 'error'
+      time: string
+      message: string
+    }>
+  >([
     { level: 'info', time: '14:23:45', message: 'Server started on port 3000' },
     { level: 'warn', time: '14:24:12', message: 'High memory usage detected' },
     { level: 'error', time: '14:24:30', message: 'Database connection timeout' },
@@ -61,47 +63,65 @@ export default function DashboardInteractive() {
   })
 
   // Simulate live updates
-  Effect.runPromise(Effect.gen(function* () {
-    while (true) {
-      yield* Effect.sleep(1000)
+  Effect.runPromise(
+    Effect.gen(function* () {
+      while (true) {
+        yield* Effect.sleep(1000)
 
-      // Update CPU (random walk)
-      cpuUsage.$set(Math.max(10, Math.min(95, cpuUsage() + (Math.random() - 0.5) * 10)))
+        // Update CPU (random walk)
+        cpuUsage.$set(Math.max(10, Math.min(95, cpuUsage() + (Math.random() - 0.5) * 10)))
 
-      // Update memory (slow increase)
-      memoryUsage.$set(Math.max(50, Math.min(90, memoryUsage() + (Math.random() - 0.3) * 3)))
+        // Update memory (slow increase)
+        memoryUsage.$set(Math.max(50, Math.min(90, memoryUsage() + (Math.random() - 0.3) * 3)))
 
-      // Update disk (very slow)
-      diskUsage.$set(Math.max(70, Math.min(95, diskUsage() + (Math.random() - 0.48) * 0.5)))
+        // Update disk (very slow)
+        diskUsage.$set(Math.max(70, Math.min(95, diskUsage() + (Math.random() - 0.48) * 0.5)))
 
-      // Update network
-      networkIn.$set(Math.max(50, Math.min(250, Math.floor(networkIn() + (Math.random() - 0.5) * 30))))
-      networkOut.$set(Math.max(30, Math.min(200, Math.floor(networkOut() + (Math.random() - 0.5) * 25))))
+        // Update network
+        networkIn.$set(
+          Math.max(50, Math.min(250, Math.floor(networkIn() + (Math.random() - 0.5) * 30)))
+        )
+        networkOut.$set(
+          Math.max(30, Math.min(200, Math.floor(networkOut() + (Math.random() - 0.5) * 25)))
+        )
 
-      // Update process CPU
-      processes.$set(processes().map(p => ({
-        ...p,
-        cpu: Math.max(1, Math.min(50, p.cpu + (Math.random() - 0.5) * 5))
-      })))
+        // Update process CPU
+        processes.$set(
+          processes().map(p => ({
+            ...p,
+            cpu: Math.max(1, Math.min(50, p.cpu + (Math.random() - 0.5) * 5)),
+          }))
+        )
 
-      // Increment uptime
-      uptime.$set(uptime() + 1)
+        // Increment uptime
+        uptime.$set(uptime() + 1)
 
-      // Add log every 5 seconds
-      if (uptime() % 5 === 0) {
-        const logMessages = [
-          { level: 'info' as const, message: `Request processed: GET /api/data/${Math.floor(Math.random() * 1000)}` },
-          { level: 'info' as const, message: 'Health check passed' },
-          { level: 'warn' as const, message: `Slow query detected: ${Math.floor(Math.random() * 500)}ms` },
-        ]
-        const newLog = {
-          ...logMessages[Math.floor(Math.random() * logMessages.length)],
-          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        // Add log every 5 seconds
+        if (uptime() % 5 === 0) {
+          const logMessages = [
+            {
+              level: 'info' as const,
+              message: `Request processed: GET /api/data/${Math.floor(Math.random() * 1000)}`,
+            },
+            { level: 'info' as const, message: 'Health check passed' },
+            {
+              level: 'warn' as const,
+              message: `Slow query detected: ${Math.floor(Math.random() * 500)}ms`,
+            },
+          ]
+          const newLog = {
+            ...logMessages[Math.floor(Math.random() * logMessages.length)],
+            time: new Date().toLocaleTimeString('en-US', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            }),
+          }
+          logs.$set([...logs().slice(-9), newLog])
         }
-        logs.$set([...logs().slice(-9), newLog])
       }
-    }
-  }))
+    })
+  )
 
   const renderProgressBar = (percentage: number, width: number = 16) => {
     const filled = Math.round((percentage / 100) * width)
@@ -110,12 +130,8 @@ export default function DashboardInteractive() {
 
     return (
       <hstack>
-        <text style={style().fg(color)}>
-          {'█'.repeat(filled)}
-        </text>
-        <text style={style().faint().fg(colors.gray)}>
-          {'░'.repeat(empty)}
-        </text>
+        <text style={style().fg(color)}>{'█'.repeat(filled)}</text>
+        <text style={style().faint().fg(colors.gray)}>{'░'.repeat(empty)}</text>
         <text> </text>
         <text style={style().bold()}>{Math.round(percentage)}%</text>
       </hstack>
@@ -127,7 +143,9 @@ export default function DashboardInteractive() {
       {/* Header */}
       <box border="double" padding={1} style={style().bg(colors.black)}>
         <hstack>
-          <text>{textGradient({ gradient: oceanGradient(), text: '📊 TUIX System Dashboard' })}</text>
+          <text>
+            {textGradient({ gradient: oceanGradient(), text: '📊 TUIX System Dashboard' })}
+          </text>
           <text style={style().faint().fg(colors.gray)}> • Live Monitoring</text>
         </hstack>
       </box>
@@ -148,7 +166,7 @@ export default function DashboardInteractive() {
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Memory Panel */}
         <box border="rounded" padding={1} style={style().fg(colors.magenta)}>
@@ -158,13 +176,13 @@ export default function DashboardInteractive() {
             {renderProgressBar(memoryUsage())}
             <text></text>
             <text style={style().faint()}>
-              {(memoryUsage() * 16 / 100).toFixed(1)} GB / 16 GB
+              {((memoryUsage() * 16) / 100).toFixed(1)} GB / 16 GB
             </text>
             <text style={style().faint()}>Swap: 2.1 GB</text>
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Disk Panel */}
         <box border="rounded" padding={1} style={style().fg(colors.yellow)}>
@@ -174,13 +192,13 @@ export default function DashboardInteractive() {
             {renderProgressBar(diskUsage())}
             <text></text>
             <text style={style().faint()}>
-              {(diskUsage() * 500 / 100).toFixed(0)} GB / 500 GB
+              {((diskUsage() * 500) / 100).toFixed(0)} GB / 500 GB
             </text>
             <text style={style().faint()}>R/W: 45 MB/s</text>
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Network Panel */}
         <box border="rounded" padding={1} style={style().fg(colors.cyan)}>
@@ -207,9 +225,9 @@ export default function DashboardInteractive() {
             <text></text>
             {/* Header */}
             <hstack>
-              <text style={style().bold()}>PID    </text>
-              <text style={style().bold()}>Name      </text>
-              <text style={style().bold()}>CPU   </text>
+              <text style={style().bold()}>PID </text>
+              <text style={style().bold()}>Name </text>
+              <text style={style().bold()}>CPU </text>
               <text style={style().bold()}>Memory</text>
             </hstack>
             <text style={style().fg(colors.gray)}>──────────────────────────────────</text>
@@ -227,11 +245,13 @@ export default function DashboardInteractive() {
               </hstack>
             ))}
             <text></text>
-            <text style={style().faint().fg(colors.gray)}>Total: {processes().length} processes</text>
+            <text style={style().faint().fg(colors.gray)}>
+              Total: {processes().length} processes
+            </text>
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Logs panel */}
         <box border="double" padding={1} style={style().fg(colors.white)}>
@@ -240,9 +260,11 @@ export default function DashboardInteractive() {
             <text></text>
             {logs().map((log, i) => {
               const levelStyle =
-                log.level === 'error' ? style().bg(colors.red).fg(colors.white).bold() :
-                log.level === 'warn' ? style().bg(colors.yellow).fg(colors.black).bold() :
-                style().bg(colors.blue).fg(colors.white).bold()
+                log.level === 'error'
+                  ? style().bg(colors.red).fg(colors.white).bold()
+                  : log.level === 'warn'
+                    ? style().bg(colors.yellow).fg(colors.black).bold()
+                    : style().bg(colors.blue).fg(colors.white).bold()
 
               return (
                 <vstack key={i}>
@@ -270,7 +292,9 @@ export default function DashboardInteractive() {
           <text> • </text>
           <text>Updated: just now</text>
           <text> • </text>
-          <text style={style().faint()}>Refreshing every 1s • Press 'r' to force refresh • 'q' to quit</text>
+          <text style={style().faint()}>
+            Refreshing every 1s • Press 'r' to force refresh • 'q' to quit
+          </text>
         </hstack>
       </box>
     </vstack>

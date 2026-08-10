@@ -78,7 +78,7 @@ export function Panel(props: PanelProps): JSX.Element {
   const variant = props.variant || 'default'
   const borderColor = getColor(variant) ?? theme.colors.border ?? colors.gray
   const borderPreset =
-    props.rounded !== false ? 'rounded' : theme.typography.borderStyle ?? 'thin'
+    props.rounded !== false ? 'rounded' : (theme.typography.borderStyle ?? 'thin')
 
   const padding = props.padding ?? spacing.padding
   const margin = props.margin ?? spacing.margin
@@ -89,16 +89,12 @@ export function Panel(props: PanelProps): JSX.Element {
   // Title section
   if (props.title) {
     content.push(
-      <Box
-        key="title"
-        padding={{ horizontal: padding }}
-        margin={{ bottom: 1 }}
-      >
+      <Box key="title" padding={{ horizontal: padding }} margin={{ bottom: 1 }}>
         <text
           style={style()
             .foreground(
               variant === 'default'
-                ? theme.colors.textBright ?? theme.colors.fg ?? colors.white
+                ? (theme.colors.textBright ?? theme.colors.fg ?? colors.white)
                 : borderColor
             )
             .bold()}
@@ -119,11 +115,7 @@ export function Panel(props: PanelProps): JSX.Element {
   // Footer section
   if (props.footer) {
     content.push(
-      <Box
-        key="footer"
-        padding={{ horizontal: padding }}
-        margin={{ top: 1 }}
-      >
+      <Box key="footer" padding={{ horizontal: padding }} margin={{ top: 1 }}>
         <text
           style={style()
             .foreground(theme.colors.textDim ?? colors.gray)

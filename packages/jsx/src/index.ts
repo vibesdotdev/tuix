@@ -35,5 +35,5 @@ export type {
   ComponentContextRef,
   TerminalError,
   WindowSize,
-  TerminalCapabilities
+  TerminalCapabilities,
 } from '@tuix/core'

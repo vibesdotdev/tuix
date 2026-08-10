@@ -1,135 +1,218 @@
 /**
- * New JSX runApp - Uses MVU Runtime
- *
- * This replaces the old direct-rendering runApp with one that:
- * 1. Compiles JSX to Component<Model, Msg>
- * 2. Detects if interactive (CLI vs TUI)
- * 3. Uses MVU runtime with hooks
- * 4. Integrates reactive state
+ * JSX runApp — compile JSX to MVU, convert trees to View, run Effect runtime.
+ * CLI routing: argv → scopes → fallback/help when no command / --help.
  */
 
 import { Effect } from 'effect'
 import { runApp as mvuRunApp } from '@tuix/runtime'
 import { createDefaultReactiveHooks } from '@tuix/reactive'
 import type { JSXComponent } from './jsx-to-component'
-import { compileToComponent, detectInteractive } from './jsx-to-component'
+import { compileToComponent, detectInteractive, toView } from './jsx-to-component'
+import { text } from '@tuix/view'
 
-/**
- * Configuration for JSX app
- */
+export type { JSXComponent }
+
 export interface JSXRunConfig {
-  /**
-   * Enable debug output
-   * @default false
-   */
   debug?: boolean
-
-  /**
-   * Force interactive mode (keeps app running)
-   * Auto-detected if not specified
-   * @default auto-detect
-   */
   interactive?: boolean
-
-  /**
-   * Extract reactive state as model
-   * @default true
-   */
   extractState?: boolean
-
-  /**
-   * Target FPS for rendering
-   * @default 60
-   */
   fps?: number
-
-  /**
-   * Enable mouse support
-   * @default false
-   */
   enableMouse?: boolean
 }
 
+type MatchedScope = {
+  executable?: boolean
+  path?: string[]
+  handler?: () => unknown
+  metadata?: { component?: () => unknown; interactive?: boolean }
+  component?: () => unknown
+}
+
 /**
- * Run a JSX component as a TUIX application
- *
- * This is the main entry point for JSX-based TUIX apps.
- * It compiles the JSX component to a proper MVU component and runs it
- * with the runtime.
- *
- * @example
- * ```tsx
- * // CLI command - exits after render
- * function ListCommand() {
- *   return <text>Item 1\nItem 2\nItem 3</text>
- * }
- *
- * await runApp(ListCommand)
- *
- * // TUI app - stays open
- * function CounterApp() {
- *   const count = $state(0)
- *   return (
- *     <vstack>
- *       <text>Count: {count()}</text>
- *       <text>Press 'q' to quit</text>
- *     </vstack>
- *   )
- * }
- *
- * await runApp(CounterApp, { interactive: true })
- * ```
+ * Run a JSX component as a TUIX application.
  */
-export async function runApp(
-  jsxComponent: JSXComponent,
-  config: JSXRunConfig = {}
-): Promise<void> {
+export async function runApp(jsxComponent: JSXComponent, config: JSXRunConfig = {}): Promise<void> {
   const { LiveServices } = await import('@tuix/core/services/live')
   const { activeRouteStore } = await import('../scope/stores')
   const { scopeManager } = await import('../scope/manager')
 
-  // PHASE 1: Initialize CLI routing
-  // Parse command line args and set up active route
+  // Reset scopes between runs (important for tests / repeated CLI)
+  try {
+    scopeManager.clear?.()
+  } catch {
+    /* optional API */
+  }
+
   activeRouteStore.initFromArgv()
+  const route = activeRouteStore.get()
+
+  const helpOrOneShot =
+    route.helpRequested || process.argv.includes('--help') || process.argv.includes('-h')
+
+  // Evaluate + fully render JSX tree once so function components (Command/Scope)
+  // run and register scopes. Descriptors alone do not invoke components.
+  const rootTree = jsxComponent()
+  try {
+    void toView(rootTree)
+    scopeManager.resolveScopePaths?.()
+  } catch (e) {
+    if (config.debug) console.warn('scope registration render:', e)
+  }
+
+  const buildHelp = (): string => {
+    try {
+      const allScopes = scopeManager.getAllScopes?.() ?? []
+      const rootScopes = allScopes.filter(
+        (s: {
+          executable?: boolean
+          path?: string[]
+          metadata?: { hidden?: boolean }
+          name?: string
+          description?: string
+        }) => s.executable && Array.isArray(s.path) && s.path.length === 1 && !s.metadata?.hidden
+      )
+      if (rootScopes.length === 0) {
+        return 'tuix — Terminal UI framework\n\nUsage: tuix <command> [--help]\n'
+      }
+      const lines = [
+        'tuix — Terminal UI framework',
+        '',
+        'Available commands:',
+        ...rootScopes.map((s: { name: string; description?: string }) => {
+          const desc = s.description ? ` — ${s.description}` : ''
+          return `  ${s.name}${desc}`
+        }),
+        '',
+        'Run: tuix <command> [--help]',
+        '',
+      ]
+      return lines.join('\n')
+    } catch {
+      return 'tuix — Terminal UI framework\n\nUsage: tuix <command> [--help]\n'
+    }
+  }
+
+  const noCommand = route.path.length === 0
+  const showHelp = helpOrOneShot || noCommand
+
+  const findMatched = (): MatchedScope | undefined => {
+    try {
+      return scopeManager
+        .getAllScopes?.()
+        ?.find(
+          (s: MatchedScope) =>
+            s.executable &&
+            Array.isArray(s.path) &&
+            s.path.length === route.path.length &&
+            s.path.every((p: string, i: number) => p === route.path[i])
+        ) as MatchedScope | undefined
+    } catch {
+      return undefined
+    }
+  }
+
+  const matched = !noCommand ? findMatched() : undefined
+
+  // Prefer Fallback when registered and no path (and not pure --help)
+  let fallbackComponent: (() => unknown) | null = null
+  let fallbackView: unknown = null
+  if (noCommand && !route.helpRequested) {
+    try {
+      const fb = scopeManager.getFallback?.()
+      if (fb?.component) {
+        fallbackComponent = fb.component
+        fallbackView = fb.component()
+      }
+    } catch {
+      /* none */
+    }
+  }
+
+  // Interactivity from the *active surface*, not the root shell name.
+  // Bare *App names must not force fullscreen (hangs one-shot CLI).
+  let isInteractive: boolean
+  if (config.interactive !== undefined) {
+    isInteractive = config.interactive
+  } else if (helpOrOneShot && !fallbackView) {
+    isInteractive = false
+  } else if (matched) {
+    const cmd =
+      (typeof matched.handler === 'function' && matched.handler) ||
+      (typeof matched.metadata?.component === 'function' && matched.metadata.component) ||
+      (typeof matched.component === 'function' && matched.component) ||
+      null
+    if (matched.metadata?.interactive === true) {
+      isInteractive = true
+    } else if (matched.metadata?.interactive === false) {
+      isInteractive = false
+    } else if (cmd && typeof cmd === 'function') {
+      isInteractive = detectInteractive(cmd as JSXComponent)
+    } else {
+      isInteractive = false
+    }
+  } else if (fallbackComponent) {
+    isInteractive = detectInteractive(fallbackComponent as JSXComponent)
+  } else if (noCommand) {
+    isInteractive = false
+  } else {
+    isInteractive = detectInteractive(jsxComponent)
+  }
 
   if (config.debug) {
-    const route = activeRouteStore.get()
     console.log('Active route:', {
       path: route.path,
       args: route.args,
       flags: route.flags,
       helpRequested: route.helpRequested,
     })
-  }
-
-  // PHASE 2: Detect if interactive
-  // CLI commands exit after render, TUI apps loop
-  const isInteractive = config.interactive ?? detectInteractive(jsxComponent)
-
-  if (config.debug) {
     console.log('Interactive mode:', isInteractive)
   }
 
-  // PHASE 3: Compile JSX to MVU Component
-  // This extracts state and creates proper Component<Model, Msg>
-  const component = compileToComponent(jsxComponent, {
+  const wrapper: JSXComponent = () => {
+    if (showHelp && !fallbackView) {
+      return text(buildHelp())
+    }
+    if (fallbackView) {
+      return fallbackView
+    }
+    try {
+      const m = findMatched()
+      if (m?.handler && typeof m.handler === 'function') {
+        return m.handler()
+      }
+      if (m?.metadata?.component && typeof m.metadata.component === 'function') {
+        return m.metadata.component()
+      }
+    } catch {
+      /* fall through */
+    }
+    if (noCommand) return text(buildHelp())
+    return rootTree
+  }
+
+  const component = compileToComponent(wrapper, {
     extractState: config.extractState ?? true,
     interactive: isInteractive,
     debug: config.debug,
   })
 
-  // PHASE 4: Create reactive hooks
-  // This syncs MVU model with reactive $state
-  const hooks = createDefaultReactiveHooks()
+  const originalView = component.view
+  component.view = async (model: any) => toView(await originalView(model))
 
-  // PHASE 5: Run with MVU runtime
-  // The runtime handles the full MVU loop with hooks
+  let hooks
+  try {
+    hooks = createDefaultReactiveHooks()
+  } catch {
+    hooks = undefined
+  }
+
   return Effect.runPromise(
     mvuRunApp(component, {
       fps: config.fps ?? 60,
       enableMouse: config.enableMouse ?? false,
-      exitAfterRender: !isInteractive, // CLI exits, TUI loops
-      hooks, // Reactive integration
+      fullscreen: isInteractive,
+      exitAfterRender: !isInteractive,
+      hooks,
       debug: config.debug ?? false,
     }).pipe(Effect.provide(LiveServices))
   )

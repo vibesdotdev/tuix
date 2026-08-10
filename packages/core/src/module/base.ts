@@ -7,8 +7,7 @@
  */
 
 import { Effect, Ref } from 'effect'
-import type { BaseEvent, EventHandler } from '@tuix/reactive/events/event-bus'
-import type { EventBus } from '@tuix/reactive/events/event-bus'
+import type { BaseEvent, EventHandler, EventBus } from '../events'
 import { v4 as uuidv4 } from 'uuid'
 
 /**

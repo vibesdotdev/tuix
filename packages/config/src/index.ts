@@ -5,26 +5,38 @@
  */
 
 // Types and service interfaces (export Config context tag explicitly)
-export type { Config, ConfigOptions, ConfigError, ConfigNotFoundError, ConfigValidationError, TuixConfig } from "./types";
-export { Config as ConfigTag } from "./types";
+export type {
+  Config,
+  ConfigOptions,
+  ConfigError,
+  ConfigNotFoundError,
+  ConfigValidationError,
+  TuixConfig,
+} from './types'
+export { Config as ConfigTag } from './types'
 
 // NEW: Storage-backed config (Phase 5)
-export * from "./storage";
-export * from "./context";
+export * from './storage'
+export * from './context'
 
 // Plugin components (export with specific names to avoid conflicts)
-export { Config as ConfigPlugin, ConfigGet, ConfigSet, ConfigList, ConfigImport, ConfigExport } from "./plugin";
+export {
+  Config as ConfigPlugin,
+  ConfigGet,
+  ConfigSet,
+  ConfigList,
+  ConfigImport,
+  ConfigExport,
+} from './plugin'
 
-// Legacy config implementation (kept for backwards compatibility)
-export * from "./sources/config";
-export * from "./core/loader";
-export * from "./sources/utils";
-export * from "./jsxConfig";
-export * from "./core/module";
+export * from './sources/config'
+export * from './core/loader'
+export * from './sources/utils'
+export * from './core/module'
 
-import { Effect, Layer } from "effect";
-import { Config as ConfigTag, ConfigOptions } from "./types";
-import { createConfig } from "./sources/config";
+import { Effect, Layer } from 'effect'
+import { Config as ConfigTag, ConfigOptions } from './types'
+import { createConfig } from './sources/config'
 
 /**
  * Create the default configuration layer
@@ -33,29 +45,29 @@ export const ConfigLayer = (options?: ConfigOptions) =>
   Layer.effect(
     ConfigTag,
     Effect.gen(function* (_) {
-      const builder = createConfig();
+      const builder = createConfig()
 
-      if (options?.name) builder.name(options.name);
-      if (options?.defaults) builder.defaults(options.defaults);
-      if (options?.schema) builder.schema(options.schema);
-      if (options?.envPrefix) builder.envPrefix(options.envPrefix);
-      if (options?.loadUserConfig) builder.withUserConfig();
-      if (options?.loadProjectConfig) builder.withProjectConfig();
-      if (options?.watch) builder.withWatch();
+      if (options?.name) builder.name(options.name)
+      if (options?.defaults) builder.defaults(options.defaults)
+      if (options?.schema) builder.schema(options.schema)
+      if (options?.envPrefix) builder.envPrefix(options.envPrefix)
+      if (options?.loadUserConfig) builder.withUserConfig()
+      if (options?.loadProjectConfig) builder.withProjectConfig()
+      if (options?.watch) builder.withWatch()
       if (options?.files) {
         for (const file of options.files) {
-          builder.file(file);
+          builder.file(file)
         }
       }
       if (options?.searchPaths) {
         for (const path of options.searchPaths) {
-          builder.searchPath(path);
+          builder.searchPath(path)
         }
       }
 
-      return yield* _(Effect.promise(() => builder.build()));
+      return yield* _(Effect.promise(() => builder.build()))
     })
-  );
+  )
 
 /**
  * Quick config creation helpers
@@ -64,8 +76,7 @@ export const config = {
   /**
    * Create a simple config with defaults
    */
-  simple: (defaults: Record<string, any>) =>
-    createConfig().defaults(defaults).build(),
+  simple: (defaults: Record<string, any>) => createConfig().defaults(defaults).build(),
 
   /**
    * Create a config that loads from standard locations
@@ -96,14 +107,14 @@ export const config = {
    */
   env: (prefix?: string) =>
     createConfig()
-      .envPrefix(prefix || "")
+      .envPrefix(prefix || '')
       .build(),
 
   /**
    * Create a config from a specific file
    */
   file: (path: string) => createConfig().file(path).build(),
-};
+}
 
 /**
  * Configuration file templates
@@ -164,14 +175,14 @@ export default defineConfig({
     JSON.stringify(
       {
         name: appName,
-        version: "1.0.0",
+        version: '1.0.0',
         logger: {
-          level: "info",
-          format: "pretty",
+          level: 'info',
+          format: 'pretty',
           showEmoji: true,
         },
         processManager: {
-          tuixDir: ".tuix",
+          tuixDir: '.tuix',
           autoRestart: true,
           maxRestarts: 5,
         },
@@ -205,30 +216,30 @@ ${appName.toUpperCase()}_PROCESS_MANAGER_MAX_RESTARTS=5
 # Custom configuration
 # ${appName.toUpperCase()}_CUSTOM_KEY=value
 `,
-};
+}
 
 /**
  * Helper to define a typed config
  */
 export function defineConfig<T extends Record<string, any>>(config: T): T {
-  return config;
+  return config
 }
 
 /**
  * Load configuration from standard locations
  */
-export async function loadConfig(appName: string = "tuix"): Promise<Config> {
+export async function loadConfig(appName: string = 'tuix'): Promise<Config> {
   const configBuilder = createConfig()
     .name(appName)
     .withUserConfig()
     .withProjectConfig()
     .envPrefix(`${appName.toUpperCase()}_`)
-    .searchPath(process.cwd());
+    .searchPath(process.cwd())
 
-  return await configBuilder.build();
+  return await configBuilder.build()
 }
 
 /**
  * Config constants
  */
-export * from "./constants";
+export * from './constants'

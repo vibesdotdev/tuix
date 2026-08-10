@@ -1,5 +1,5 @@
 import { Effect, Fiber } from 'effect'
-import { EventBus, BaseEvent, generateId } from '@tuix/reactive/events/event-bus'
+import { EventBus, BaseEvent, generateId } from '@tuix/core/events'
 
 // Error types
 export class CoordinationError extends Error {

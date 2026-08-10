@@ -5,7 +5,7 @@
  * and log aggregation across the application.
  */
 
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { BaseEvent } from '@tuix/core/events'
 
 /**
  * Log entry events

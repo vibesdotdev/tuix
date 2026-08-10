@@ -1,17 +1,129 @@
 /**
- * Simplified runes implementation without infinite recursion issues
+ * Svelte-inspired runes with dependency-tracked $derived.
  */
 
 import { Effect } from 'effect'
-import { getGlobalEventBus } from '@tuix/reactive/events/event-bus'
+import { getGlobalEventBus } from '@tuix/core/events'
 import { getGlobalRegistry } from '@tuix/core'
 import { ReactivityModule } from './module'
-import { ReactivityEventChannels } from './events'
+import { trackRead, pushCollector, popCollector, runUntracked } from './tracking'
+
+export { runUntracked }
+
+// ---------------------------------------------------------------------------
+// Model extraction session (JSX compile-time / extractModel)
+// Bun rewrites `const count = $state(0)` → `return $state(0)`, stripping names.
+// Named extraction uses $state(0, 'count') or $states({ count: 0 }).
+// ---------------------------------------------------------------------------
+
+let extractionModel: Record<string, unknown> | null = null
+let extractionAnon = 0
+
+export function beginModelExtraction(): void {
+  extractionModel = {}
+  extractionAnon = 0
+}
+
+export function endModelExtraction(): Record<string, unknown> {
+  const out = extractionModel ?? {}
+  extractionModel = null
+  extractionAnon = 0
+  return out
+}
+
+export function isModelExtracting(): boolean {
+  return extractionModel != null
+}
+
+function registerExtracted(name: string | undefined, initial: unknown): void {
+  if (!extractionModel) return
+  if (name && name.length > 0) {
+    extractionModel[name] = initial
+    return
+  }
+  const n = Object.keys(extractionModel).filter(k => k === 'value' || /^value\d+$/.test(k)).length
+  extractionModel[n === 0 ? 'value' : `value${n}`] = initial
+  extractionAnon = n + 1
+}
+
+// ---------------------------------------------------------------------------
+// View hydration: named $state reads current MVU model so re-renders paint updates
+// ---------------------------------------------------------------------------
+
+let viewHydrationModel: Record<string, unknown> | null = null
+
+export function beginViewHydration(model: Record<string, unknown>): void {
+  viewHydrationModel = model
+}
+
+export function endViewHydration(): void {
+  viewHydrationModel = null
+}
+
+function hydrateInitial<T>(initial: T, name?: string): T {
+  if (viewHydrationModel && name && name in viewHydrationModel) {
+    return viewHydrationModel[name] as T
+  }
+  return initial
+}
+
+// ---------------------------------------------------------------------------
+// MVU bridge: named $set must update the model, not only the ephemeral rune.
+// Runtime binds a push that offers UserMsg { type: 'set', key, value }.
+// Without this, next view() rehydrates from stale model and paints the old value.
+// ---------------------------------------------------------------------------
+
+export type MvuSetMsg = { readonly type: 'set'; readonly key: string; readonly value: unknown }
+
+type MvuPush = (msg: MvuSetMsg) => void
+
+let mvuPush: MvuPush | null = null
+
+/** Bind (or clear) the sink for named `$state.$set` → MVU UserMsg. */
+export function bindMvuPush(push: MvuPush | null): void {
+  mvuPush = push
+}
+
+export function getMvuPush(): MvuPush | null {
+  return mvuPush
+}
+
+// ---------------------------------------------------------------------------
+// Key handlers: Runtime KeyPress notifies registered handlers (one-shot mount).
+// Prefer this over raw stdin in components (avoids double-read / 60fps $effect leak).
+// ---------------------------------------------------------------------------
+
+const keyHandlers = new Set<(key: string) => void>()
+
+/**
+ * Register a keyboard handler for the active interactive session.
+ * Returns cleanup. Safe to call once from a module-level mount guard.
+ */
+export function registerKeyHandler(handler: (key: string) => void): () => void {
+  keyHandlers.add(handler)
+  return () => {
+    keyHandlers.delete(handler)
+  }
+}
+
+/** Called by Runtime on each KeyPress (string form of the key). */
+export function emitKeyToHandlers(key: string): void {
+  for (const h of keyHandlers) {
+    try {
+      h(key)
+    } catch {
+      /* handler errors must not kill input */
+    }
+  }
+}
+
+export function clearKeyHandlers(): void {
+  keyHandlers.clear()
+}
 
 // Global reactivity module reference
 let reactivityModule: ReactivityModule | null = null
 
-// Initialize reactivity module
 function getReactivityModule(): ReactivityModule | null {
   if (!reactivityModule) {
     try {
@@ -19,40 +131,32 @@ function getReactivityModule(): ReactivityModule | null {
       reactivityModule = registry.getModule<ReactivityModule>('reactivity')
 
       if (!reactivityModule) {
-        // Create and register reactivity module
         const eventBus = getGlobalEventBus()
         reactivityModule = new ReactivityModule(eventBus)
         Effect.runSync(registry.register(reactivityModule))
         Effect.runSync(reactivityModule.initialize())
       }
-    } catch (error) {
+    } catch {
       // Continue without event support
     }
   }
   return reactivityModule
 }
 
-/**
- * Base interface for all runes
- */
 export interface Rune<T> {
   (): T
   readonly $type: string
 }
 
-/**
- * State rune for reactive values
- */
 export interface StateRune<T> extends Rune<T> {
   readonly $type: 'state'
+  /** Optional model key for extractModel under Bun (set via $state(init, name)) */
+  readonly $key?: string
   $set(value: T): void
   $update(fn: (current: T) => T): void
   $subscribe(listener: (value: T) => void): () => void
 }
 
-/**
- * Bindable rune for two-way data binding
- */
 export interface BindableRune<T> extends StateRune<T> {
   readonly $type: 'bindable'
   readonly $bindable: true
@@ -60,53 +164,56 @@ export interface BindableRune<T> extends StateRune<T> {
   $transform?: (value: T) => T
 }
 
-/**
- * Derived rune for computed values
- */
 export interface DerivedRune<T> extends Rune<T> {
   readonly $type: 'derived'
 }
 
-/**
- * Options for creating bindable runes
- */
 export interface BindableOptions<T> {
   validate?: (value: T) => boolean | string
   transform?: (value: T) => T
 }
 
 /**
- * Creates a reactive state value
+ * Create reactive state.
+ * @param initial Initial value
+ * @param name Optional model field name for extractModel (required for named
+ *   fields when Bun rewrites `const count = $state(0)` → `return $state(0)`).
+ *   Prefer `$states({ count: 0 })` for multi-field models.
  */
-export function $state<T>(initial: T): StateRune<T> {
-  let value = initial
+export function $state<T>(initial: T, name?: string): StateRune<T> {
+  registerExtracted(name, initial)
+
+  // During view(), hydrate from MVU model so update→view paints new values
+  let value = hydrateInitial(initial, name)
   const listeners = new Set<(value: T) => void>()
   const runeId = `state_${Date.now()}_${Math.random()}`
 
-  // Emit rune created event
   const module = getReactivityModule()
   if (module) {
-    Effect.runSync(module.emitStateChange(runeId, initial, 'user'))
+    Effect.runSync(module.emitStateChange(runeId, value, 'user'))
   }
 
   const rune = (() => {
+    trackRead(rune as unknown as { $subscribe: StateRune<T>['$subscribe'] })
     return value
   }) as StateRune<T>
 
   rune.$type = 'state' as const
+  if (name) {
+    Object.defineProperty(rune, '$key', { value: name, enumerable: false })
+  }
 
   rune.$set = (newValue: T) => {
     if (value !== newValue) {
-      const previousValue = value
       value = newValue
-
-      // Emit state change event
       if (module) {
         Effect.runSync(module.emitStateChange(runeId, newValue, 'user'))
       }
-
-      // Notify all listeners
       listeners.forEach(listener => listener(value))
+      // Named state → MVU model (required for paint after next beginViewHydration)
+      if (name && mvuPush) {
+        mvuPush({ type: 'set', key: name, value: newValue })
+      }
     }
   }
 
@@ -116,9 +223,7 @@ export function $state<T>(initial: T): StateRune<T> {
 
   rune.$subscribe = (listener: (value: T) => void) => {
     listeners.add(listener)
-    // Call listener immediately with current value
     listener(value)
-    // Return unsubscribe function
     return () => {
       listeners.delete(listener)
     }
@@ -128,20 +233,32 @@ export function $state<T>(initial: T): StateRune<T> {
 }
 
 /**
- * Creates a bindable value with optional validation and transformation
+ * Create a bag of named state runes. Survives Bun rewrite (names from object keys).
+ * @example
+ * const { count, name } = $states({ count: 0, name: 'hi' })
  */
+export function $states<T extends Record<string, unknown>>(
+  init: T
+): { [K in keyof T]: StateRune<T[K]> } {
+  const out = {} as { [K in keyof T]: StateRune<T[K]> }
+  for (const key of Object.keys(init) as Array<keyof T>) {
+    out[key] = $state(init[key] as T[keyof T], String(key)) as StateRune<T[keyof T]>
+  }
+  return out
+}
+
 export function $bindable<T>(initial: T, options: BindableOptions<T> = {}): BindableRune<T> {
   let value = initial
   const listeners = new Set<(value: T) => void>()
   const runeId = `bindable_${Date.now()}_${Math.random()}`
 
-  // Emit rune created event
   const module = getReactivityModule()
   if (module) {
     Effect.runSync(module.emitStateChange(runeId, initial, 'user'))
   }
 
   const rune = (() => {
+    trackRead(rune as unknown as { $subscribe: StateRune<T>['$subscribe'] })
     return value
   }) as BindableRune<T>
 
@@ -152,34 +269,22 @@ export function $bindable<T>(initial: T, options: BindableOptions<T> = {}): Bind
 
   rune.$set = (newValue: T) => {
     let finalValue = newValue
-
-    // Apply transformation
     if (options.transform) {
       finalValue = options.transform(finalValue)
     }
-
-    // Validate
     if (options.validate) {
       const result = options.validate(finalValue)
-      if (result === false) {
-        return // Reject the change silently
-      }
+      if (result === false) return
       if (typeof result === 'string') {
         console.error(`Validation error: ${result}`)
-        return // Reject with error message
+        return
       }
     }
-
     if (value !== finalValue) {
-      const previousValue = value
       value = finalValue
-
-      // Emit state change event
       if (module) {
         Effect.runSync(module.emitStateChange(runeId, finalValue, 'user'))
       }
-
-      // Notify all listeners
       listeners.forEach(listener => listener(value))
     }
   }
@@ -190,9 +295,7 @@ export function $bindable<T>(initial: T, options: BindableOptions<T> = {}): Bind
 
   rune.$subscribe = (listener: (value: T) => void) => {
     listeners.add(listener)
-    // Call listener immediately with current value
     listener(value)
-    // Return unsubscribe function
     return () => {
       listeners.delete(listener)
     }
@@ -202,24 +305,50 @@ export function $bindable<T>(initial: T, options: BindableOptions<T> = {}): Bind
 }
 
 /**
- * Creates a simple derived value that recalculates on each access
- * This avoids the complexity of subscription management and infinite loops
+ * Derived value with dependency tracking and cache invalidation.
  */
 export function $derived<T>(fn: () => T): DerivedRune<T> {
+  let cached: T | undefined
+  let hasCache = false
+  const unsubs: Array<() => void> = []
+
+  const recompute = () => {
+    for (const u of unsubs) u()
+    unsubs.length = 0
+
+    const deps = new Set<{ $subscribe: (l: (v: unknown) => void) => () => void }>()
+    pushCollector(deps as any)
+    try {
+      cached = fn()
+      hasCache = true
+    } finally {
+      popCollector()
+    }
+
+    // Subscribe without treating the immediate callback as invalidation
+    for (const dep of deps) {
+      let first = true
+      unsubs.push(
+        dep.$subscribe(() => {
+          if (first) {
+            first = false
+            return
+          }
+          hasCache = false
+        })
+      )
+    }
+  }
+
   const rune = (() => {
-    return fn()
+    if (!hasCache) recompute()
+    return cached as T
   }) as DerivedRune<T>
 
   rune.$type = 'derived' as const
-
   return rune
 }
 
-/**
- * Creates an effect that runs immediately and whenever dependencies change
- * For now, this is a simple implementation that just runs the function once
- */
-// Re-export lifecycle-aware $effect and other lifecycle hooks
 export {
   $effect,
   onMount,
@@ -230,16 +359,10 @@ export {
   untrack,
 } from './jsx-lifecycle'
 
-/**
- * Type guard to check if a value is a state rune
- */
 export function isStateRune<T>(value: any): value is StateRune<T> {
   return !!(value && typeof value === 'function' && value.$type === 'state')
 }
 
-/**
- * Type guard to check if a value is a bindable rune
- */
 export function isBindableRune<T>(value: any): value is BindableRune<T> {
   return !!(
     value &&
@@ -249,58 +372,37 @@ export function isBindableRune<T>(value: any): value is BindableRune<T> {
   )
 }
 
-/**
- * Type guard to check if a value is a derived rune
- */
 export function isDerivedRune<T>(value: any): value is DerivedRune<T> {
   return !!(value && typeof value === 'function' && value.$type === 'derived')
 }
 
-/**
- * Type guard to check if a value is any type of rune
- */
 export function isRune<T>(value: any): value is Rune<T> {
   return !!(value && typeof value === 'function' && typeof value.$type === 'string')
 }
 
-/**
- * Gets the current value from a rune
- */
 export function getValue<T>(rune: Rune<T>): T {
   return rune()
 }
 
-/**
- * Converts a state rune to a bindable rune
- */
 export function toBindable<T>(
   state: StateRune<T>,
   options: BindableOptions<T> = {}
 ): BindableRune<T> {
-  // Create a bindable with the same initial value
   const bindable = $bindable(state(), options)
   const runeId = `toBindable_${Date.now()}_${Math.random()}`
-
-  // Get reactivity module for event emission
   const module = getReactivityModule()
 
-  // Override the set method to update both runes
   const originalSet = bindable.$set
   bindable.$set = (value: T) => {
     originalSet(value)
     state.$set(value)
-
-    // Emit state sync event
     if (module) {
       Effect.runSync(module.emitStateChange(runeId, value, 'sync'))
     }
   }
 
-  // Subscribe to state changes to keep bindable in sync
   state.$subscribe(value => {
     originalSet(value)
-
-    // Emit state sync event
     if (module) {
       Effect.runSync(module.emitStateChange(runeId, value, 'sync'))
     }

@@ -131,7 +131,8 @@ export function calculateStats(metrics: PerformanceMetrics[]): PerformanceStats 
   const mean = sum / durations.length
 
   // Calculate variance and standard deviation
-  const variance = durations.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / durations.length
+  const variance =
+    durations.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / durations.length
   const stdDev = Math.sqrt(variance)
 
   // Calculate percentiles
@@ -254,7 +255,8 @@ export function compareMetrics(
 
   if (baseline.memoryUsed !== undefined && current.memoryUsed !== undefined) {
     result.memoryChange = current.memoryUsed - baseline.memoryUsed
-    result.memoryChangePercent = ((current.memoryUsed - baseline.memoryUsed) / baseline.memoryUsed) * 100
+    result.memoryChangePercent =
+      ((current.memoryUsed - baseline.memoryUsed) / baseline.memoryUsed) * 100
   }
 
   return result
@@ -274,10 +276,16 @@ export function meetsThreshold(
   const failures: string[] = []
 
   if (thresholds.maxDuration !== undefined && metrics.duration > thresholds.maxDuration) {
-    failures.push(`Duration ${metrics.duration.toFixed(2)}ms exceeds threshold ${thresholds.maxDuration}ms`)
+    failures.push(
+      `Duration ${metrics.duration.toFixed(2)}ms exceeds threshold ${thresholds.maxDuration}ms`
+    )
   }
 
-  if (thresholds.minFps !== undefined && metrics.fps !== undefined && metrics.fps < thresholds.minFps) {
+  if (
+    thresholds.minFps !== undefined &&
+    metrics.fps !== undefined &&
+    metrics.fps < thresholds.minFps
+  ) {
     failures.push(`FPS ${metrics.fps.toFixed(2)} below threshold ${thresholds.minFps}`)
   }
 
@@ -286,7 +294,9 @@ export function meetsThreshold(
     metrics.memoryUsed !== undefined &&
     metrics.memoryUsed > thresholds.maxMemory
   ) {
-    failures.push(`Memory ${formatBytes(metrics.memoryUsed)} exceeds threshold ${formatBytes(thresholds.maxMemory)}`)
+    failures.push(
+      `Memory ${formatBytes(metrics.memoryUsed)} exceeds threshold ${formatBytes(thresholds.maxMemory)}`
+    )
   }
 
   return {

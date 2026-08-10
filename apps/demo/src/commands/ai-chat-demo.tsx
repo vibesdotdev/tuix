@@ -20,12 +20,12 @@ export default function AIChatDemo() {
     {
       role: 'system',
       content: 'Welcome to TUIX AI Chat! This demonstrates how to build chat interfaces.',
-      timestamp: '14:23'
+      timestamp: '14:23',
     },
     {
       role: 'user',
       content: 'How do I create a REST API endpoint?',
-      timestamp: '14:24'
+      timestamp: '14:24',
     },
     {
       role: 'assistant',
@@ -45,13 +45,13 @@ app.listen(3000);
 \`\`\`
 
 This creates a GET endpoint that returns all users.`,
-      timestamp: '14:24'
+      timestamp: '14:24',
     },
     {
       role: 'user',
       content: 'Thanks! How about with authentication?',
-      timestamp: '14:25'
-    }
+      timestamp: '14:25',
+    },
   ]
 
   // Simulate sidebar items (chat history)
@@ -59,7 +59,7 @@ This creates a GET endpoint that returns all users.`,
     { id: '1', title: 'API Development', active: true },
     { id: '2', title: 'Database Queries' },
     { id: '3', title: 'React Patterns' },
-    { id: '4', title: 'Testing Strategies' }
+    { id: '4', title: 'Testing Strategies' },
   ]
 
   return (
@@ -79,8 +79,14 @@ This creates a GET endpoint that returns all users.`,
             <text style={style().bold().fg(colors.cyan)}>💬 Conversations</text>
             <text></text>
             {conversations.map(conv => (
-              <text key={conv.id} style={conv.active ? style().bg(colors.blue).fg(colors.white) : style().fg(colors.gray)}>
-                {conv.active ? '▶ ' : '  '}{conv.title}
+              <text
+                key={conv.id}
+                style={
+                  conv.active ? style().bg(colors.blue).fg(colors.white) : style().fg(colors.gray)
+                }
+              >
+                {conv.active ? '▶ ' : '  '}
+                {conv.title}
               </text>
             ))}
             <text></text>
@@ -89,7 +95,7 @@ This creates a GET endpoint that returns all users.`,
           </vstack>
         </box>
 
-        <text>  </text>
+        <text> </text>
 
         {/* Main panel - Messages */}
         <box border="rounded" padding={1} style={style().fg(colors.white)}>
@@ -98,8 +104,13 @@ This creates a GET endpoint that returns all users.`,
             {chatHistory.map((msg, i) => {
               if (msg.role === 'system') {
                 return (
-                  <box key={i} border="thin" padding={1} style={style().bg(colors.gray).fg(colors.white)}>
-                    <text style={style().italic()}>ℹ️  {msg.content}</text>
+                  <box
+                    key={i}
+                    border="thin"
+                    padding={1}
+                    style={style().bg(colors.gray).fg(colors.white)}
+                  >
+                    <text style={style().italic()}>ℹ️ {msg.content}</text>
                   </box>
                 )
               }
@@ -126,7 +137,11 @@ This creates a GET endpoint that returns all users.`,
                       <text style={style().bold().fg(colors.green)}>🤖 Assistant</text>
                       <text style={style().faint().fg(colors.gray)}> • {msg.timestamp}</text>
                     </hstack>
-                    <box border="thin" padding={1} style={style().bg(colors.black).fg(colors.white)}>
+                    <box
+                      border="thin"
+                      padding={1}
+                      style={style().bg(colors.black).fg(colors.white)}
+                    >
                       <text>{msg.content}</text>
                     </box>
                     <text></text>

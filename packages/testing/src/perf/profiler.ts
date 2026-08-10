@@ -257,9 +257,14 @@ export async function profileComponent<Model, Msg>(
     // Profile updates
     if (options.includeUpdates) {
       for (const msg of options.includeUpdates) {
-        const updateResult = await profiler.profile('component.update', 'update', async () => {
-          return await Effect.runPromise(component.update(msg, model))
-        }, { msg: String(msg) })
+        const updateResult = await profiler.profile(
+          'component.update',
+          'update',
+          async () => {
+            return await Effect.runPromise(component.update(msg, model))
+          },
+          { msg: String(msg) }
+        )
         ;[model, cmd] = updateResult
       }
     }

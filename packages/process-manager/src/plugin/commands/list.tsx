@@ -38,7 +38,7 @@ export function PMList(props: PMListProps): JSX.Element {
       <Divider margin={1} />
 
       <box flexDirection="column" gap={1}>
-        {processes.map((proc) => {
+        {processes.map(proc => {
           const statusMap = {
             running: 'active' as const,
             stopped: 'inactive' as const,
@@ -61,20 +61,13 @@ export function PMList(props: PMListProps): JSX.Element {
               borderRadius={1}
             >
               <box flexDirection="row" alignItems="center" gap={2}>
-                <StatusIndicator
-                  status={status}
-                  pulse={proc.status === 'running'}
-                />
+                <StatusIndicator status={status} pulse={proc.status === 'running'} />
                 <text bold>{proc.name}</text>
-                {proc.pid && (
-                  <text dim>PID: {proc.pid}</text>
-                )}
+                {proc.pid && <text dim>PID: {proc.pid}</text>}
               </box>
 
               <box flexDirection="row" gap={1}>
-                {proc.config.group && (
-                  <Badge variant="info" label={proc.config.group} />
-                )}
+                {proc.config.group && <Badge variant="info" label={proc.config.group} />}
                 {proc.restarts > 0 && (
                   <Badge variant="warning" label={`${proc.restarts} restarts`} />
                 )}

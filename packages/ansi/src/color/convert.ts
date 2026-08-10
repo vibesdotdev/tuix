@@ -1,6 +1,6 @@
-import { Option } from 'effect';
-import type { ColorDef } from './types';
-import { ColorProfile } from './profile';
+import { Option } from 'effect'
+import type { ColorDef } from './types'
+import { ColorProfile } from './profile'
 
 // =============================================================================
 // Color Conversion
@@ -13,21 +13,21 @@ export type RGB = { r: number; g: number; b: number }
  * Standard VGA colors used by terminals
  */
 export const ANSI_16_RGB: Record<number, RGB> = {
-  0: { r: 0, g: 0, b: 0 },       // Black
-  1: { r: 128, g: 0, b: 0 },     // Red
-  2: { r: 0, g: 128, b: 0 },     // Green
-  3: { r: 128, g: 128, b: 0 },   // Yellow
-  4: { r: 0, g: 0, b: 128 },     // Blue
-  5: { r: 128, g: 0, b: 128 },   // Magenta
-  6: { r: 0, g: 128, b: 128 },   // Cyan
+  0: { r: 0, g: 0, b: 0 }, // Black
+  1: { r: 128, g: 0, b: 0 }, // Red
+  2: { r: 0, g: 128, b: 0 }, // Green
+  3: { r: 128, g: 128, b: 0 }, // Yellow
+  4: { r: 0, g: 0, b: 128 }, // Blue
+  5: { r: 128, g: 0, b: 128 }, // Magenta
+  6: { r: 0, g: 128, b: 128 }, // Cyan
   7: { r: 192, g: 192, b: 192 }, // White
   8: { r: 128, g: 128, b: 128 }, // Bright Black (Gray)
-  9: { r: 255, g: 0, b: 0 },     // Bright Red
-  10: { r: 0, g: 255, b: 0 },    // Bright Green
-  11: { r: 255, g: 255, b: 0 },  // Bright Yellow
-  12: { r: 0, g: 0, b: 255 },    // Bright Blue
-  13: { r: 255, g: 0, b: 255 },  // Bright Magenta
-  14: { r: 0, g: 255, b: 255 },  // Bright Cyan
+  9: { r: 255, g: 0, b: 0 }, // Bright Red
+  10: { r: 0, g: 255, b: 0 }, // Bright Green
+  11: { r: 255, g: 255, b: 0 }, // Bright Yellow
+  12: { r: 0, g: 0, b: 255 }, // Bright Blue
+  13: { r: 255, g: 0, b: 255 }, // Bright Magenta
+  14: { r: 0, g: 255, b: 255 }, // Bright Cyan
   15: { r: 255, g: 255, b: 255 }, // Bright White
 }
 

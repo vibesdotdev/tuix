@@ -93,10 +93,7 @@ describe('JSX Runtime', () => {
   describe('Fragment', () => {
     it('should create fragment elements', () => {
       const fragment = jsx(Fragment, {
-        children: [
-          jsx('span', { children: 'First' }),
-          jsx('span', { children: 'Second' }),
-        ],
+        children: [jsx('span', { children: 'First' }), jsx('span', { children: 'Second' })],
       })
 
       expect(fragment.type).toBe(Fragment)

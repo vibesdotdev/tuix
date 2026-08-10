@@ -16,7 +16,11 @@ export interface View {
    *
    * @returns Effect that produces either a string or an object with content/width/height
    */
-  render: () => Effect.Effect<string | { content: string; width: number; height: number }, RenderError, never>
+  render: () => Effect.Effect<
+    string | { content: string; width: number; height: number },
+    RenderError,
+    never
+  >
 
   /**
    * Width of the view in terminal columns
@@ -35,7 +39,10 @@ export interface View {
 export class RenderError extends Error {
   readonly _tag = 'RenderError'
 
-  constructor(message: string, readonly cause?: unknown) {
+  constructor(
+    message: string,
+    readonly cause?: unknown
+  ) {
     super(message)
     this.name = 'RenderError'
   }

@@ -9,15 +9,9 @@
  */
 
 import { Effect } from 'effect'
-import { EventBus, BaseEvent, generateId } from '@tuix/reactive/events/event-bus'
+import { EventBus, BaseEvent, generateId } from '@tuix/core/events'
 import type { ScopeContext } from '@tuix/runtime/scope/types'
-import {
-  $state,
-  $derived,
-  $effect,
-  type StateRune,
-  type DerivedRune,
-} from '@tuix/reactive/runes'
+import { $state, $derived, $effect, type StateRune, type DerivedRune } from '@tuix/reactive/runes'
 import type { Component, View } from '@tuix/core/types/core'
 
 /**

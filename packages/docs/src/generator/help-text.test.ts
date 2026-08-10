@@ -100,9 +100,7 @@ describe('@tuix/docs - Help Text Generation', () => {
         {
           name: 'plugin1',
           description: 'Plugin 1',
-          commands: [
-            { name: 'plugin-cmd', description: 'Plugin command' },
-          ],
+          commands: [{ name: 'plugin-cmd', description: 'Plugin command' }],
         },
       ],
     }

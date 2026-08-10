@@ -45,13 +45,7 @@ export default async function ConfigImport({ filename, format }: ConfigImportPro
     const entries = flatten(config)
 
     // Store all entries
-    yield* _(
-      Effect.all(
-        entries.map(([key, value]) =>
-          storage.set(`config.${key}`, value)
-        )
-      )
-    )
+    yield* _(Effect.all(entries.map(([key, value]) => storage.set(`config.${key}`, value))))
 
     return (
       <vstack>

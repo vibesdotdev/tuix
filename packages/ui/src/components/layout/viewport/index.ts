@@ -1,5 +1,5 @@
-// JSX Component
-export { Viewport, type ViewportProps, type ViewportState } from './Viewport.tsx'
+/**
+ * Viewport — scrollable content region
+ */
 
-// TODO: The TEA viewport utilities have been moved to src/tea/examples/containers/Viewport
-// Additional MVU/JSX utilities can be implemented here when needed
+export { Viewport, type ViewportProps } from './Viewport'

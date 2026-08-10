@@ -1,0 +1,18 @@
+version: 1
+
+jobs:
+  quality:
+    on: [pr]
+    runsOn: linux
+    steps:
+      - run: bun install --frozen-lockfile
+      - run: bun test
+      - run: bun run typecheck
+      - run: bun run lint
+
+  www:
+    on: [pr]
+    runsOn: linux
+    steps:
+      - run: bun install --frozen-lockfile
+      - run: bun run --cwd apps/www build

@@ -11,12 +11,6 @@ export function InfoModal(props: InfoModalProps) {
   const { title, message, isOpen, ...rest } = props
 
   return (
-    <Modal
-      title={title}
-      description={message}
-      variant="info"
-      isOpen={isOpen ?? true}
-      {...rest}
-    />
+    <Modal title={title} description={message} variant="info" isOpen={isOpen ?? true} {...rest} />
   )
 }

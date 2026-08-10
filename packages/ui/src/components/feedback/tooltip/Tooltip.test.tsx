@@ -9,7 +9,7 @@ describe('Tooltip', () => {
 
   it('should not render when visible is false', () => {
     // Test the component function directly (not JSX)
-    const result = Tooltip({ visible: false, content: "Hidden" })
+    const result = Tooltip({ visible: false, content: 'Hidden' })
     expect(result).toBeNull()
   })
 

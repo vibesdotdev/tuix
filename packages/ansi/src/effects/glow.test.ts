@@ -13,7 +13,7 @@ describe('Glow effects', () => {
       const result = createGlow(content, {
         radius: 1,
         color: rgb(255, 255, 255),
-        intensity: 0.8
+        intensity: 0.8,
       })
 
       expect(result).toBeDefined()
@@ -26,7 +26,7 @@ describe('Glow effects', () => {
       const result = createGlow(content, {
         radius: 2,
         color: rgb(0, 255, 0),
-        intensity: 0.8
+        intensity: 0.8,
       })
 
       expect(result).toBeDefined()
@@ -47,7 +47,7 @@ describe('Glow effects', () => {
       const result = createGlow(content, {
         radius: 1,
         color: rgb(255, 255, 0),
-        intensity: 0.5
+        intensity: 0.5,
       })
 
       expect(result.length).toBeGreaterThanOrEqual(content.length)
@@ -60,7 +60,7 @@ describe('Glow effects', () => {
         createGlow([], {
           radius: 1,
           color: rgb(255, 0, 0),
-          intensity: 0.5
+          intensity: 0.5,
         })
       }).toThrow()
     })
@@ -70,7 +70,7 @@ describe('Glow effects', () => {
       const result = createGlow(content, {
         radius: 0,
         color: rgb(255, 0, 0),
-        intensity: 1
+        intensity: 1,
       })
 
       expect(result.length).toBeGreaterThanOrEqual(content.length)

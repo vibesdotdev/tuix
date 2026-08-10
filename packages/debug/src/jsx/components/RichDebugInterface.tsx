@@ -243,7 +243,9 @@ export function RichDebugInterface({
                     View.text('')
                   )
                 ),
-              debugState.updateHistory.length === 0 ? View.text('(No updates captured)') : View.empty
+              debugState.updateHistory.length === 0
+                ? View.text('(No updates captured)')
+                : View.empty
             ),
           ]
         )
@@ -288,7 +290,9 @@ export function RichDebugInterface({
               ...debugState.jsxComponents.map(component =>
                 View.text(`- ${component.name} (${component.props?.length || 0} props)`)
               ),
-              debugState.jsxComponents.length === 0 ? View.text('(No components tracked)') : View.empty
+              debugState.jsxComponents.length === 0
+                ? View.text('(No components tracked)')
+                : View.empty
             ),
           ]
         )

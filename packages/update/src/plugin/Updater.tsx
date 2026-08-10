@@ -9,7 +9,12 @@ import { UpdateBanner } from './banner'
 import { createNpmChecker } from '../checker/npm'
 import { createGitHubChecker } from '../checker/github'
 import { createCustomChecker } from '../checker/custom'
-import type { UpdateChecker, UpdateCheckResult, UpdateCheckerConfig, UpdateNotificationConfig } from '../types'
+import type {
+  UpdateChecker,
+  UpdateCheckResult,
+  UpdateCheckerConfig,
+  UpdateNotificationConfig,
+} from '../types'
 
 export interface UpdaterProps extends UpdateCheckerConfig, UpdateNotificationConfig {
   /** Children to render */
@@ -49,7 +54,7 @@ function createChecker(config: UpdateCheckerConfig): UpdateChecker {
 }
 
 export const Updater: Component<UpdaterProps, UpdaterModel, UpdaterMsg> = {
-  init: (props) => {
+  init: props => {
     const checker = createChecker(props)
     const notificationConfig: UpdateNotificationConfig = {
       showBanner: props.showBanner ?? true,
@@ -77,7 +82,7 @@ export const Updater: Component<UpdaterProps, UpdaterModel, UpdaterMsg> = {
             const result = yield* model.checker.check()
             return { _tag: 'CheckComplete' as const, result }
           }).pipe(
-            Effect.catchAll((error) =>
+            Effect.catchAll(error =>
               Effect.succeed({
                 _tag: 'CheckError' as const,
                 error: error.message || 'Unknown error',
@@ -144,12 +149,10 @@ export const Updater: Component<UpdaterProps, UpdaterModel, UpdaterMsg> = {
     )
   },
 
-  subscriptions: (model) => {
+  subscriptions: model => {
     // Auto-check on startup if enabled
     if (model.config.autoCheck && !model.checkResult && !model.checking) {
-      return [
-        Effect.succeed({ _tag: 'CheckForUpdates' as const }),
-      ]
+      return [Effect.succeed({ _tag: 'CheckForUpdates' as const })]
     }
     return []
   },

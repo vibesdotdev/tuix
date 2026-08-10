@@ -87,11 +87,7 @@ export function Toggle(props: ToggleProps): JSX.Element {
 
   // Render
   const on = isOn()
-  const toggleColor = props.disabled
-    ? colors.gray
-    : on
-      ? colors.green
-      : colors.gray
+  const toggleColor = props.disabled ? colors.gray : on ? colors.green : colors.gray
   const borderColor = props.disabled
     ? colors.gray
     : isFocused()
@@ -125,9 +121,7 @@ export function Toggle(props: ToggleProps): JSX.Element {
           borderColor={borderColor}
           padding={{ vertical: 0, horizontal: 1 }}
         >
-          <text style={style().foreground(toggleColor)}>
-            {on ? ' ON ' : ' OFF '}
-          </text>
+          <text style={style().foreground(toggleColor)}>{on ? ' ON ' : ' OFF '}</text>
         </box>
         {props.label && (
           <text style={props.disabled ? style().foreground(colors.gray) : undefined}>

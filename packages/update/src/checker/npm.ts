@@ -71,7 +71,8 @@ export class NpmUpdateChecker implements UpdateChecker {
         }
 
         const updateAvailable = compareVersions(this.config.currentVersion, latestVersion)
-        const isBreaking = updateAvailable && isBreakingChange(this.config.currentVersion, latestVersion)
+        const isBreaking =
+          updateAvailable && isBreakingChange(this.config.currentVersion, latestVersion)
 
         const result: UpdateCheckResult = {
           version: {
@@ -79,7 +80,9 @@ export class NpmUpdateChecker implements UpdateChecker {
             latest: latestVersion,
             updateAvailable,
             releaseNotesUrl: `https://www.npmjs.com/package/${this.config.packageName}`,
-            publishedAt: data.time?.[latestVersion] ? new Date(data.time[latestVersion]) : undefined,
+            publishedAt: data.time?.[latestVersion]
+              ? new Date(data.time[latestVersion])
+              : undefined,
             isBreaking,
           },
           source: 'npm',
@@ -92,12 +95,11 @@ export class NpmUpdateChecker implements UpdateChecker {
 
         return result
       },
-      catch: (error) =>
-        ({
-          _tag: 'UpdateError' as const,
-          message: `Failed to check npm registry: ${error}`,
-          cause: error,
-        }),
+      catch: error => ({
+        _tag: 'UpdateError' as const,
+        message: `Failed to check npm registry: ${error}`,
+        cause: error,
+      }),
     })
   }
 

@@ -35,12 +35,15 @@ export interface ConfigProps {
  * ```
  */
 export default function Config({ filename = 'config.json', format, children }: ConfigProps) {
-  const detectedFormat = format || (
-    filename.endsWith('.yaml') || filename.endsWith('.yml') ? 'yaml' :
-    filename.endsWith('.toml') ? 'toml' :
-    filename.endsWith('.ts') ? 'typescript' :
-    'json'
-  )
+  const detectedFormat =
+    format ||
+    (filename.endsWith('.yaml') || filename.endsWith('.yml')
+      ? 'yaml'
+      : filename.endsWith('.toml')
+        ? 'toml'
+        : filename.endsWith('.ts')
+          ? 'typescript'
+          : 'json')
 
   return (
     <Plugin name="config" description="Configuration management">

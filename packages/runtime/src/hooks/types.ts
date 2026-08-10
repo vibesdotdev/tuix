@@ -136,9 +136,7 @@ export const composeHooks = <Model, Msg>(
       composed[key] = (msg: Msg) =>
         hooks.reduce(
           (effect, hook) =>
-            effect.pipe(
-              Effect.flatMap(m => (m === null ? Effect.succeed(null) : hook(m)))
-            ),
+            effect.pipe(Effect.flatMap(m => (m === null ? Effect.succeed(null) : hook(m)))),
           Effect.succeed(msg)
         )
     } else {

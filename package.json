@@ -4,11 +4,18 @@
   "scripts": {
     "tuix": "bun run packages/bin/src/bin/tuix.ts",
     "build": "bun run ./scripts/build.ts",
-    "lint": "bunx biome check .",
-    "lint:fix": "bunx biome check --write .",
+    "lint": "bunx biome check packages apps docs scripts tests",
+    "lint:fix": "bunx biome check --write packages apps docs scripts tests",
+    "lint:all": "bunx biome check packages apps docs scripts tests",
     "format": "bunx biome format .",
     "test": "bun test",
-    "typecheck": "bunx tsc --noEmit"
+    "typecheck": "bun run ./scripts/typecheck-v1.ts",
+    "typecheck:packages": "bun run ./scripts/typecheck-packages.ts",
+    "typecheck:root": "bunx tsc --noEmit",
+    "www:dev": "bun run --cwd apps/www dev",
+    "www:build": "bun run --cwd apps/www build",
+    "www:preview": "bun run --cwd apps/www preview",
+    "www:check": "bun run --cwd apps/www check"
   },
   "workspaces": [
     "packages/*",
@@ -18,6 +25,8 @@
     "@ast-grep/cli": "^0.39.6",
     "@biomejs/biome": "^1.7.3",
     "@types/bun": "^1.2.23",
+    "@vibesdotdev/infra-cloudflare": "^0.0.2",
+    "@vibesdotdev/infra-core": "^0.0.2",
     "typescript": "^5.6.2"
   },
   "peerDependencies": {

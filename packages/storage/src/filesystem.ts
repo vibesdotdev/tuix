@@ -48,7 +48,7 @@ export class FilesystemStorage implements Storage {
 
         return entry.value
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to get key "${key}"`,
         cause: error,
@@ -90,7 +90,7 @@ export class FilesystemStorage implements Storage {
         // Notify watchers
         this.notifyWatchers(key, value)
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to set key "${key}"`,
         cause: error,
@@ -115,7 +115,7 @@ export class FilesystemStorage implements Storage {
 
         return true
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to delete key "${key}"`,
         cause: error,
@@ -143,7 +143,7 @@ export class FilesystemStorage implements Storage {
 
         return true
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to check key "${key}"`,
         cause: error,
@@ -181,7 +181,7 @@ export class FilesystemStorage implements Storage {
 
         return keys
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to list keys`,
         cause: error,
@@ -206,7 +206,7 @@ export class FilesystemStorage implements Storage {
           }
         }
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to clear storage`,
         cause: error,
@@ -214,9 +214,7 @@ export class FilesystemStorage implements Storage {
     })
   }
 
-  entries<T = unknown>(
-    prefix?: string
-  ): Effect.Effect<Array<StorageEntry<T>>, StorageError> {
+  entries<T = unknown>(prefix?: string): Effect.Effect<Array<StorageEntry<T>>, StorageError> {
     return Effect.tryPromise({
       try: async () => {
         await this.ensureDirectory()
@@ -246,7 +244,7 @@ export class FilesystemStorage implements Storage {
 
         return entries
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to list entries`,
         cause: error,
@@ -278,7 +276,7 @@ export class FilesystemStorage implements Storage {
 
         return count
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to cleanup expired entries`,
         cause: error,
@@ -309,7 +307,7 @@ export class FilesystemStorage implements Storage {
           }
         }
       },
-      catch: (error) => ({
+      catch: error => ({
         _tag: 'StorageError' as const,
         message: `Failed to watch key "${key}"`,
         cause: error,
@@ -337,5 +335,4 @@ export class FilesystemStorage implements Storage {
 /**
  * Create a new filesystem storage instance
  */
-export const makeFilesystemStorage = (basePath: string): Storage =>
-  new FilesystemStorage(basePath)
+export const makeFilesystemStorage = (basePath: string): Storage => new FilesystemStorage(basePath)

@@ -12,6 +12,26 @@ The runtime provides:
 - **Configuration**: Flexible runtime behavior configuration
 - **Error Boundaries**: Comprehensive error handling and recovery
 
+## Bootstrap Composition
+
+`@tuix/runtime` should stay runtime-focused. App/plugin modules (config/logger/process-manager/etc.)
+are supplied through `bootstrap({ additionalModules })` instead of runtime importing those packages directly.
+
+```ts
+import { bootstrap } from '@tuix/runtime'
+import { presets } from '@tuix/app-presets'
+
+await Effect.runPromise(
+  bootstrap({
+    additionalModules: presets.standard({
+      config: true,
+      logger: true,
+      processManager: true,
+    }),
+  })
+)
+```
+
 ## Basic Usage
 
 ### Simple Application

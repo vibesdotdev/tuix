@@ -49,7 +49,9 @@ export default async function ConfigGet({ filename, format }: ConfigGetProps) {
 
     return (
       <vstack>
-        <text color="cyan" bold>{key}</text>
+        <text color="cyan" bold>
+          {key}
+        </text>
         <text color="green">{JSON.stringify(value, null, 2)}</text>
       </vstack>
     )

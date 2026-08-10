@@ -1,5 +1,5 @@
 import { Effect, Ref, Duration } from 'effect'
-import { EventBus, generateId } from '@tuix/reactive/events/event-bus'
+import { EventBus, generateId } from '@tuix/core/events'
 import type { ScopeContext } from '../../scope'
 
 // Error types

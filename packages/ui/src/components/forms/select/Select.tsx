@@ -75,9 +75,7 @@ export function Select<T = string>(props: SelectProps<T>): JSX.Element {
       return props.options
     }
     const query = searchQuery().toLowerCase()
-    return props.options.filter(opt =>
-      opt.label.toLowerCase().includes(query)
-    )
+    return props.options.filter(opt => opt.label.toLowerCase().includes(query))
   })
 
   // Get selected option
@@ -186,9 +184,7 @@ export function Select<T = string>(props: SelectProps<T>): JSX.Element {
               {selectedOption()?.label || props.placeholder || 'Select...'}
             </text>
             <spacer />
-            <text style={style().foreground(colors.gray)}>
-              {isOpen() ? '▲' : '▼'}
-            </text>
+            <text style={style().foreground(colors.gray)}>{isOpen() ? '▲' : '▼'}</text>
           </hstack>
         </box>
 

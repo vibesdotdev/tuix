@@ -103,17 +103,21 @@ export function Command(props: CommandProps): JSX.Element {
   // If component is provided and no children, render the component as default content
   // We need to defer calling component() until render time (when args are available)
   // Wrap component in lifecycle context so $effect and other runes work
-  const effectiveDefaultContent = defaultContent || (component ? {
-    render: () => {
-      // Import withLifecycle at the top if not already imported
-      const { withLifecycle } = require('@tuix/reactive/jsx-lifecycle')
-      const wrappedComponent = withLifecycle(component)
-      const result = wrappedComponent({})
-      return result.render()
-    },
-    width: 0,
-    height: 0,
-  } as JSX.Element : undefined)
+  const effectiveDefaultContent =
+    defaultContent ||
+    (component
+      ? ({
+          render: () => {
+            // Import withLifecycle at the top if not already imported
+            const { withLifecycle } = require('@tuix/reactive/jsx-lifecycle')
+            const wrappedComponent = withLifecycle(component)
+            const result = wrappedComponent({})
+            return result.render()
+          },
+          width: 0,
+          height: 0,
+        } as JSX.Element)
+      : undefined)
 
   // Create the underlying Scope with command-specific defaults
   return (

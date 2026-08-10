@@ -136,12 +136,15 @@ export class YAMLLoader implements ConfigLoader {
     return ext === '.yaml' || ext === '.yml'
   }
 
-  async load(_filePath: string): Promise<ConfigObject> {
-    throw new Error('YAML support not implemented. Install a YAML parser to enable.')
+  async load(filePath: string): Promise<ConfigObject> {
+    const { parseYamlValue } = await import('../storage/yaml-toml')
+    const text = await Bun.file(filePath).text()
+    return parseYamlValue(text) as ConfigObject
   }
 
-  async save(_filePath: string, _config: ConfigObject): Promise<void> {
-    throw new Error('YAML support not implemented. Install a YAML parser to enable.')
+  async save(filePath: string, config: ConfigObject): Promise<void> {
+    const { serializeYamlValue } = await import('../storage/yaml-toml')
+    await Bun.write(filePath, serializeYamlValue(config) + '\n')
   }
 }
 
@@ -154,12 +157,15 @@ export class TOMLLoader implements ConfigLoader {
     return ext === '.toml'
   }
 
-  async load(_filePath: string): Promise<ConfigObject> {
-    throw new Error('TOML support not implemented. Install a TOML parser to enable.')
+  async load(filePath: string): Promise<ConfigObject> {
+    const { parseTomlValue } = await import('../storage/yaml-toml')
+    const text = await Bun.file(filePath).text()
+    return parseTomlValue(text) as ConfigObject
   }
 
-  async save(_filePath: string, _config: ConfigObject): Promise<void> {
-    throw new Error('TOML support not implemented. Install a TOML parser to enable.')
+  async save(filePath: string, config: ConfigObject): Promise<void> {
+    const { serializeTomlValue } = await import('../storage/yaml-toml')
+    await Bun.write(filePath, serializeTomlValue(config as Record<string, unknown>))
   }
 }
 

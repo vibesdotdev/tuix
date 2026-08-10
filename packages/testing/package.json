@@ -29,6 +29,8 @@
   },
   "dependencies": {
     "@tuix/core": "workspace:*",
+    "@tuix/input": "workspace:*",
+    "@tuix/runtime": "workspace:*",
     "@tuix/ui": "workspace:*",
     "@tuix/view": "workspace:*",
     "node-pty": "^1.0.0"

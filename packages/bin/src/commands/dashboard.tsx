@@ -4,7 +4,17 @@
  * System status dashboard with modern UI.
  */
 
-import { InteractiveLayout, Panel, Header, StatusIndicator, Divider, ProgressBar, Badge, Text, Box } from '@tuix/ui'
+import {
+  InteractiveLayout,
+  Panel,
+  Header,
+  StatusIndicator,
+  Divider,
+  ProgressBar,
+  Badge,
+  Text,
+  Box,
+} from '@tuix/ui'
 import { $state, $derived, $effect } from '@tuix/reactive'
 import { vibesTheme } from '@tuix/themes'
 
@@ -42,7 +52,9 @@ export function DashboardCommand(): JSX.Element {
       }
       footer={
         <Box>
-          <Text color={theme.textDim} dim>Press Ctrl+C to exit</Text>
+          <Text color={theme.textDim} dim>
+            Press Ctrl+C to exit
+          </Text>
         </Box>
       }
     >
@@ -81,23 +93,33 @@ export function DashboardCommand(): JSX.Element {
 
         <Box direction="vertical">
           <Box direction="horizontal">
-            <Text color={theme.primary} bold>Uptime:</Text>
-            <Text>      </Text>
+            <Text color={theme.primary} bold>
+              Uptime:
+            </Text>
+            <Text> </Text>
             <Text>{uptimeHours()} hours</Text>
           </Box>
           <Box direction="horizontal">
-            <Text color={theme.primary} bold>Bun Version:</Text>
+            <Text color={theme.primary} bold>
+              Bun Version:
+            </Text>
             <Text> </Text>
             <Text>{Bun.version}</Text>
           </Box>
           <Box direction="horizontal">
-            <Text color={theme.primary} bold>Platform:</Text>
-            <Text>    </Text>
-            <Text>{process.platform} / {process.arch}</Text>
+            <Text color={theme.primary} bold>
+              Platform:
+            </Text>
+            <Text> </Text>
+            <Text>
+              {process.platform} / {process.arch}
+            </Text>
           </Box>
           <Box direction="horizontal">
-            <Text color={theme.primary} bold>PID:</Text>
-            <Text>         </Text>
+            <Text color={theme.primary} bold>
+              PID:
+            </Text>
+            <Text> </Text>
             <Text>{process.pid}</Text>
           </Box>
         </Box>

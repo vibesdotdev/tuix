@@ -7,7 +7,7 @@ import { Form } from './Form'
 
 describe('Form Component', () => {
   test('should create form component', () => {
-    const component = <Form onSubmit={(data) => console.log(data)} />
+    const component = <Form onSubmit={data => console.log(data)} />
     expect(component).toBeDefined()
   })
 

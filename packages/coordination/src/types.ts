@@ -5,7 +5,7 @@
  */
 
 import type { Duration, Effect } from 'effect'
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { BaseEvent } from '@tuix/core/events'
 
 // Choreography Types
 export interface UIUpdateEvent extends BaseEvent {

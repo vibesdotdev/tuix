@@ -98,10 +98,7 @@ export function StaticLayout(props: StaticLayoutProps): JSX.Element {
   const terminalWidth = process.stdout.columns || 80
   const widthPercent = props.widthPercent ?? 0.5
   const minWidth = props.minWidth ?? 40
-  const panelWidth = Math.max(
-    minWidth,
-    Math.floor(terminalWidth * widthPercent)
-  )
+  const panelWidth = Math.max(minWidth, Math.floor(terminalWidth * widthPercent))
 
   // Calculate left margin for horizontal centering
   const leftMargin = Math.max(0, Math.floor((terminalWidth - panelWidth) / 2))
@@ -123,11 +120,7 @@ export function StaticLayout(props: StaticLayoutProps): JSX.Element {
   if (props.version) {
     titleLine.push(
       <Text key="space"> </Text>,
-      <Text
-        key="version"
-        color={theme.colors.textDim ?? colors.gray}
-        dim
-      >
+      <Text key="version" color={theme.colors.textDim ?? colors.gray} dim>
         {props.version}
       </Text>
     )
@@ -143,47 +136,35 @@ export function StaticLayout(props: StaticLayoutProps): JSX.Element {
   if (props.subtitle) {
     titleBarContent.push(
       <Box key="subtitle" margin={{ top: 1 }}>
-        <Text color={theme.colors.textDim ?? colors.gray}>
-          {props.subtitle}
-        </Text>
+        <Text color={theme.colors.textDim ?? colors.gray}>{props.subtitle}</Text>
       </Box>
     )
   }
 
   // Build panel footer (status line)
-  const footer = props.statusLine
-    ? typeof props.statusLine === 'string'
-      ? <Text color={theme.colors.textDim ?? colors.gray} dim>
-          {props.statusLine}
-        </Text>
-      : props.statusLine
-    : undefined
+  const footer = props.statusLine ? (
+    typeof props.statusLine === 'string' ? (
+      <Text color={theme.colors.textDim ?? colors.gray} dim>
+        {props.statusLine}
+      </Text>
+    ) : (
+      props.statusLine
+    )
+  ) : undefined
 
   const panel = (
-    <Panel
-      width={panelWidth}
-      variant="default"
-      rounded
-    >
+    <Panel width={panelWidth} variant="default" rounded>
       {/* Title bar */}
-      <Box
-        direction="vertical"
-        margin={{ bottom: 2 }}
-      >
+      <Box direction="vertical" margin={{ bottom: 2 }}>
         {titleBarContent}
       </Box>
 
       {/* Main content */}
-      <Box direction="vertical">
-        {props.children}
-      </Box>
+      <Box direction="vertical">{props.children}</Box>
 
       {/* Status line */}
       {footer && (
-        <Box
-          direction="vertical"
-          margin={{ top: 2 }}
-        >
+        <Box direction="vertical" margin={{ top: 2 }}>
           {footer}
         </Box>
       )}
@@ -201,11 +182,11 @@ export function StaticLayout(props: StaticLayoutProps): JSX.Element {
     )
 
   const topMarginLines = Array.from({ length: Math.max(marginTop, 0) }, (_, index) => (
-    <text key={`margin-top-${index}`}>{' '}</text>
+    <text key={`margin-top-${index}`}> </text>
   ))
 
   const bottomMarginLines = Array.from({ length: Math.max(marginBottom, 0) }, (_, index) => (
-    <text key={`margin-bottom-${index}`}>{' '}</text>
+    <text key={`margin-bottom-${index}`}> </text>
   ))
 
   return (

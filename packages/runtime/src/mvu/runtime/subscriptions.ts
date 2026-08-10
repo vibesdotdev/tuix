@@ -7,6 +7,7 @@
 import { Effect, Stream, Queue, Fiber } from 'effect'
 import type { Subscription } from '@tuix/core/types'
 import type { SystemMsg } from './types'
+import type { RuntimeHooks } from '../../hooks'
 
 /**
  * Manages active subscriptions
@@ -14,9 +15,11 @@ import type { SystemMsg } from './types'
 export class SubscriptionManager<Model, Msg> {
   private subscriptions = new Map<string, Fiber.RuntimeFiber<void>>()
   private messageQueue: Queue.Queue<SystemMsg<Msg>>
+  private hooks?: RuntimeHooks<Model, Msg>
 
-  constructor(messageQueue: Queue.Queue<SystemMsg<Msg>>) {
+  constructor(messageQueue: Queue.Queue<SystemMsg<Msg>>, hooks?: RuntimeHooks<Model, Msg>) {
     this.messageQueue = messageQueue
+    this.hooks = hooks
   }
 
   /**
@@ -29,7 +32,7 @@ export class SubscriptionManager<Model, Msg> {
     return Effect.gen(
       function* (_) {
         const model = yield* _(getModel())
-        const subscriptions = subscriptionsFn(model)
+        const subscriptions = subscriptionsFn(model) ?? []
 
         for (const sub of subscriptions) {
           yield* _(this.addSubscription(sub))
@@ -46,6 +49,16 @@ export class SubscriptionManager<Model, Msg> {
       function* (_) {
         // Cancel existing subscription with same ID
         yield* _(this.removeSubscription(sub.id))
+
+        // Notify onSubscription hook (observability only — does not consume stream)
+        if (this.hooks?.onSubscription) {
+          // Represent the subscription as an Effect for the hook signature.
+          // Cold streams: runHead is independent of the forked consumer below.
+          const subEffect = Stream.runHead(sub.stream).pipe(
+            Effect.flatMap(opt => (opt._tag === 'Some' ? Effect.succeed(opt.value) : Effect.never))
+          ) as Effect.Effect<Msg>
+          yield* _(this.hooks.onSubscription(subEffect))
+        }
 
         const fiber = yield* _(
           Stream.runForEach(sub.stream, msg =>

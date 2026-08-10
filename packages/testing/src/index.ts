@@ -15,9 +15,8 @@
 // Test utilities
 export * from './testUtils'
 
-// E2E testing harness - only export if not in production
-// Skip node-pty import to avoid ABI version issues
-// export * from './e2eHarness'
+// E2E PTY harness (node-pty) — full session spawn / keys / waitForText
+export * from './e2eHarness'
 
 // Lightweight testing harness (no PTY dependency)
 export * from './harness'

@@ -2,11 +2,14 @@
  * Input Service Implementation V2 - Using BubbleTea-inspired key handling
  */
 
-import { Effect, Layer, Stream, Queue, Chunk, Option, PubSub } from 'effect'
+import { Effect, Layer, Stream, Queue, Chunk, Option, PubSub, Ref } from 'effect'
 import { InputService } from '../input'
 import { InputError } from '../../types/errors'
 import type { KeyEvent, MouseEvent, WindowSize } from '../../types'
 import { ANSI_SEQUENCES, parseChar, KeyType } from '@tuix/input/keyboard/keys'
+import { BRACKETED_PASTE_START, BRACKETED_PASTE_END, extractBracketedPaste } from '../input/paste'
+import { applyKeyToLine, readLineFromQueue } from '../input/line'
+import { drainFocusEvents, type FocusEvent } from '../input/focus'
 
 /**
  * Platform abstraction for input operations
@@ -120,14 +123,51 @@ const parseMouseEvent = (sequence: string): MouseEvent | null => {
 }
 
 /**
- * Parse a buffer of input into key events
+ * Parse a buffer of input into key / mouse / paste / focus events.
+ * Exported for unit tests of the shipped Live parse path.
  */
-const parseBuffer = (
+export const parseBuffer = (
   buffer: string,
   keyPubSub: PubSub.PubSub<KeyEvent>,
-  mousePubSub: PubSub.PubSub<MouseEvent>
+  mousePubSub: PubSub.PubSub<MouseEvent>,
+  pastePubSub?: PubSub.PubSub<string>,
+  focusPubSub?: PubSub.PubSub<FocusEvent>,
+  onKeyPublished?: () => void
 ): string => {
   while (buffer.length > 0) {
+    // Focus in/out (CSI I / CSI O) — must run before generic ANSI key table
+    if (focusPubSub) {
+      const drained = drainFocusEvents(buffer)
+      if (drained.events.length > 0) {
+        for (const ev of drained.events) {
+          Effect.runSync(PubSub.publish(focusPubSub, ev))
+        }
+        buffer = drained.rest
+        if (buffer.length === 0 || buffer === '\x1b' || buffer === '\x1b[') {
+          if (buffer === '\x1b' || buffer === '\x1b[') break
+          continue
+        }
+        continue
+      }
+      if (buffer === '\x1b' || buffer === '\x1b[') {
+        break
+      }
+    }
+
+    // Bracketed paste (may appear anywhere in the buffer)
+    if (pastePubSub && buffer.includes(BRACKETED_PASTE_START)) {
+      const extracted = extractBracketedPaste(buffer)
+      if (extracted) {
+        Effect.runSync(PubSub.publish(pastePubSub, extracted.paste))
+        buffer = extracted.rest
+        continue
+      }
+      // Incomplete paste — wait for more data if start is present without end
+      if (buffer.includes(BRACKETED_PASTE_START) && !buffer.includes(BRACKETED_PASTE_END)) {
+        break
+      }
+    }
+
     // Check for SGR mouse events first: ESC [ < btn ; x ; y ; M/m
     const sgrMatch = buffer.match(/^\x1b\[<(\d+);(\d+);(\d+)[Mm]/)
     if (sgrMatch) {
@@ -172,6 +212,7 @@ const parseBuffer = (
           sequence: seq,
         }
         Effect.runSync(PubSub.publish(keyPubSub, keyEvent))
+        onKeyPublished?.()
         buffer = buffer.slice(seq.length)
         matched = true
         break
@@ -191,6 +232,7 @@ const parseBuffer = (
         sequence: buffer.slice(0, 2),
       }
       Effect.runSync(PubSub.publish(keyPubSub, keyEvent))
+      onKeyPublished?.()
       buffer = buffer.slice(2)
       continue
     }
@@ -205,6 +247,7 @@ const parseBuffer = (
           sequence: char,
         })
       )
+      onKeyPublished?.()
       buffer = buffer.slice(1)
       continue
     }
@@ -233,6 +276,12 @@ export const InputServiceLive = Layer.scoped(
     // Use PubSub to broadcast events to all consumers
     const keyPubSub = yield* _(PubSub.unbounded<KeyEvent>())
     const mousePubSub = yield* _(PubSub.unbounded<MouseEvent>())
+    const pastePubSub = yield* _(PubSub.unbounded<string>())
+    const focusPubSub = yield* _(PubSub.unbounded<FocusEvent>())
+    /** Keys published and not yet observed via readKey/readLine bookkeeping */
+    const pendingKeys = yield* _(Ref.make(0))
+    /** Unparsed stdin bytes waiting for more data */
+    const pendingRaw = yield* _(Ref.make(0))
 
     // Start reading from stdin
     yield* _(
@@ -250,7 +299,10 @@ export const InputServiceLive = Layer.scoped(
           let buffer = ''
           stdin.on('data', (chunk: string) => {
             buffer += chunk
-            buffer = parseBuffer(buffer, keyPubSub, mousePubSub)
+            buffer = parseBuffer(buffer, keyPubSub, mousePubSub, pastePubSub, focusPubSub, () => {
+              Effect.runSync(Ref.update(pendingKeys, n => n + 1))
+            })
+            Effect.runSync(Ref.set(pendingRaw, buffer.length))
           })
         }),
         () =>
@@ -273,16 +325,44 @@ export const InputServiceLive = Layer.scoped(
         Stream.runHead,
         Effect.flatMap(opt =>
           Option.isSome(opt)
-            ? Effect.succeed(opt.value)
-            : Effect.fail(new InputError({ operation: 'readKey', cause: 'No key event available' }))
+            ? Effect.succeed(opt.value).pipe(
+                Effect.tap(() => Ref.update(pendingKeys, n => Math.max(0, n - 1)))
+              )
+            : Effect.fail(
+                new InputError({
+                  type: 'keyboard',
+                  message: 'No key event available',
+                })
+              )
         )
       ),
 
-      readLine: Effect.fail(new InputError({ operation: 'readLine', cause: 'Not implemented' })),
+      // One continuous PubSub subscription for the whole line — never re-subscribe per key
+      // (Effect PubSub drops messages with no subscriber; re-subscribe lost multi-char input).
+      // Consume path is readLineFromQueue (unit-tested with multi-char hello+Enter).
+      readLine: Effect.scoped(
+        Effect.gen(function* (_) {
+          const dequeue = yield* _(PubSub.subscribe(keyPubSub))
+          return yield* _(
+            readLineFromQueue(dequeue, () => Ref.update(pendingKeys, n => Math.max(0, n - 1)))
+          )
+        })
+      ),
 
-      inputAvailable: Effect.succeed(false),
+      inputAvailable: Effect.gen(function* (_) {
+        const pending = yield* _(Ref.get(pendingKeys))
+        if (pending > 0) return true
+        const raw = yield* _(Ref.get(pendingRaw))
+        if (raw > 0) return true
+        const rs = stdin as { readableLength?: number }
+        if (typeof rs.readableLength === 'number' && rs.readableLength > 0) return true
+        return false
+      }),
 
-      flushInput: Effect.void,
+      flushInput: Effect.gen(function* (_) {
+        yield* _(Ref.set(pendingKeys, 0))
+        yield* _(Ref.set(pendingRaw, 0))
+      }),
 
       filterKeys: predicate => Stream.fromPubSub(keyPubSub).pipe(Stream.filter(predicate)),
 
@@ -406,7 +486,7 @@ export const InputServiceLive = Layer.scoped(
         })
       }),
 
-      pasteEvents: Stream.empty, // Not implemented yet
+      pasteEvents: Stream.fromPubSub(pastePubSub),
 
       enableBracketedPaste: Effect.try({
         try: () => {
@@ -452,7 +532,16 @@ export const InputServiceLive = Layer.scoped(
           }),
       }),
 
-      focusEvents: Stream.empty, // Not implemented yet
+      focusEvents: Stream.fromPubSub(focusPubSub),
     }
   })
 )
+
+// Re-export pure helpers used by tests of the shipped Live path
+export {
+  applyKeyToLine,
+  accumulateLineFromKeys,
+  isEnterKey,
+  readLineFromQueue,
+} from '../input/line'
+export { extractFocusEvent, drainFocusEvents, FOCUS_IN, FOCUS_OUT } from '../input/focus'

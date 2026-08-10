@@ -60,11 +60,6 @@
       "import": "./src/scope/stores/index.ts",
       "default": "./src/scope/stores/index.ts"
     },
-    "./config": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
-    },
     "./*": {
       "types": "./src/*",
       "import": "./src/*",
@@ -77,12 +72,10 @@
     "typecheck": "tsc --noEmit --pretty false"
   },
   "dependencies": {
-    "@tuix/core": "workspace:*",
     "@tuix/ansi": "workspace:*",
-    "@tuix/config": "workspace:*",
-    "@tuix/runtime": "workspace:*",
+    "@tuix/core": "workspace:*",
     "@tuix/reactive": "workspace:*",
-    "@tuix/debug": "workspace:*"
+    "@tuix/runtime": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",

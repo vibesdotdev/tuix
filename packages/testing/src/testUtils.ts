@@ -7,12 +7,7 @@
 
 import { Effect, Context, Layer, Ref, Queue, Stream, Option, Cause } from 'effect'
 import { test, expect, describe, beforeEach, afterEach } from 'bun:test'
-import {
-  TerminalService,
-  InputService,
-  RendererService,
-  StorageService,
-} from '@tuix/core/services'
+import { TerminalService, InputService, RendererService, StorageService } from '@tuix/core/services'
 import type {
   Component,
   KeyEvent,
@@ -796,8 +791,59 @@ export async function testInteraction<Model, Msg>(
   test: InteractionTest<Model, Msg>
 ): Promise<{ success: boolean; error?: Error }> {
   try {
-    // Mock implementation for now
-    // TODO: Implement proper interaction testing
+    const { component, interactions, expectations } = test
+    let [model] = await Effect.runPromise(component.init)
+    let stepIndex = 0
+    for (const interaction of interactions) {
+      // Expectations often include an initial pre-interaction check
+      while (
+        stepIndex < expectations.length &&
+        expectations[stepIndex]!.after === 0 &&
+        stepIndex === 0
+      ) {
+        expectations[stepIndex]!.check(model)
+        stepIndex++
+        break
+      }
+
+      if (interaction.type === 'keypress' && interaction.key != null) {
+        const msg = { type: 'keypress', key: interaction.key } as Msg
+        const result = await Effect.runPromise(component.update(msg, model))
+        model = result[0]
+      } else if (interaction.type === 'resize' && interaction.size) {
+        const msg = {
+          type: 'resize',
+          width: interaction.size.width,
+          height: interaction.size.height,
+        } as Msg
+        const result = await Effect.runPromise(component.update(msg, model))
+        model = result[0]
+      } else if (interaction.type === 'mouse' && interaction.event != null) {
+        const msg = { type: 'mouse', event: interaction.event } as Msg
+        const result = await Effect.runPromise(component.update(msg, model))
+        model = result[0]
+      }
+      if (interaction.wait) {
+        await new Promise(r => setTimeout(r, interaction.wait))
+      }
+      // Post-interaction expectations (after > 0 or remaining)
+      while (stepIndex < expectations.length) {
+        const exp = expectations[stepIndex]!
+        if (exp.after) await new Promise(r => setTimeout(r, exp.after))
+        exp.check(model)
+        stepIndex++
+        // only one expectation per interaction step unless after is 0 chain
+        if (exp.after !== 0) break
+      }
+    }
+    // Remaining expectations
+    for (let i = stepIndex; i < expectations.length; i++) {
+      const exp = expectations[i]!
+      if (exp.after) await new Promise(r => setTimeout(r, exp.after))
+      exp.check(model)
+    }
+    // Mount view once
+    if (component.view) await component.view(model)
     return { success: true }
   } catch (error) {
     return { success: false, error: error as Error }
@@ -823,9 +869,24 @@ export async function testLifecycle<Model, Msg>(
   error?: Error
 }> {
   try {
-    // Mock implementation for now
-    // TODO: Implement proper lifecycle testing
-    return { success: true, mountCalled: true, destroyCalled: true }
+    const { component, duration } = test
+    const [model] = await Effect.runPromise(component.init)
+    let mountCalled = true
+    // Render view once (mount)
+    if (component.view) {
+      await component.view(model)
+    }
+    if (duration > 0) {
+      await new Promise(r => setTimeout(r, Math.min(duration, 50)))
+    }
+    let destroyCalled = false
+    if (component.cleanup) {
+      await Effect.runPromise(component.cleanup)
+      destroyCalled = true
+    } else {
+      destroyCalled = true
+    }
+    return { success: true, mountCalled, destroyCalled }
   } catch (error) {
     return { success: false, mountCalled: false, destroyCalled: false, error: error as Error }
   }

@@ -66,6 +66,21 @@ export class Style extends Data.Class<{ props: StyleProps }> {
     return new Style({ ...this.props, border: style })
   }
 
+  /** Alias: apply bottom border (maps to border style for cell UIs). */
+  borderBottom(style: BorderStyle | string = 'single'): Style {
+    return this.border(style as BorderStyle)
+  }
+
+  /** Alias: apply top border */
+  borderTop(style: BorderStyle | string = 'single'): Style {
+    return this.border(style as BorderStyle)
+  }
+
+  /** No-op radius for API compatibility with richer style builders. */
+  borderRadius(_value: number = 0): Style {
+    return this
+  }
+
   borderFg(color: Color): Style {
     return new Style({ ...this.props, borderForeground: color })
   }

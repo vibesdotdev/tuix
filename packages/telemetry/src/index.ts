@@ -19,7 +19,12 @@ export type {
 export { EventCollector, ErrorCollector, PerformanceCollector } from './collectors'
 
 // Transports
-export { HttpTransport, createHttpTransport, FileTransport, createFileTransport } from './transports'
+export {
+  HttpTransport,
+  createHttpTransport,
+  FileTransport,
+  createFileTransport,
+} from './transports'
 
 // Plugin
 export { Telemetry } from './plugin'

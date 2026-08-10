@@ -4,6 +4,7 @@ import { debugWrapperStore } from '../stores/debugWrapperStore'
 import { Effect } from 'effect'
 import { Box, Flex, Text } from '@tuix/ui'
 import type { JSX } from '@tuix/jsx'
+import { StateInspector } from './StateInspector'
 
 interface DebugWrapperProps {
   children?: JSX.Element
@@ -166,7 +167,9 @@ export function DebugWrapper({ children }: DebugWrapperProps): JSX.Element {
         <Flex direction="column">
           <Text>Console Logs ({debugWrapperStore.logCount} total)</Text>
           <Text />
-          {recentLogs.map(log => <Text>{log}</Text>)}
+          {recentLogs.map(log => (
+            <Text>{log}</Text>
+          ))}
         </Flex>
       )
     } else if (debugWrapperStore.activeTab === 'output') {
@@ -175,17 +178,69 @@ export function DebugWrapper({ children }: DebugWrapperProps): JSX.Element {
         <Flex direction="column">
           <Text>Process Output ({lines.length} lines)</Text>
           <Text />
-          {lines.map(line => <Text>{line}</Text>)}
+          {lines.map(line => (
+            <Text>{line}</Text>
+          ))}
         </Flex>
       )
     } else if (debugWrapperStore.activeTab === 'scopes') {
-      return <Text>Scopes view not implemented yet</Text>
+      const state = debugStore.getState()
+      const scopes =
+        state.matchedScopes.length > 0
+          ? state.matchedScopes
+          : state.renderTree.map(n => n.name || n.id || 'scope')
+      return (
+        <Flex direction="column">
+          <Text>Scopes ({scopes.length})</Text>
+          <Text />
+          {scopes.length === 0 ? (
+            <Text color="gray">No scopes registered</Text>
+          ) : (
+            scopes.map((s, i) => (
+              <Text key={i}>{typeof s === 'string' ? s : JSON.stringify(s)}</Text>
+            ))
+          )}
+          {state.selectedScope ? <Text>Selected: {String(state.selectedScope)}</Text> : null}
+        </Flex>
+      )
     } else if (debugWrapperStore.activeTab === 'events') {
-      return <Text>Events view not implemented yet</Text>
+      const events = debugStore.getState().events.slice(-20)
+      return (
+        <Flex direction="column">
+          <Text>Events ({debugStore.getState().events.length} total)</Text>
+          <Text />
+          {events.length === 0 ? (
+            <Text color="gray">No events yet</Text>
+          ) : (
+            events.map(ev => (
+              <Text key={ev.id}>
+                [{ev.level}] {ev.category}: {ev.message}
+              </Text>
+            ))
+          )}
+        </Flex>
+      )
     } else if (debugWrapperStore.activeTab === 'performance') {
-      return <Text>Performance view not implemented yet</Text>
+      const metrics = [...debugStore.getState().performanceMetrics.entries()]
+      return (
+        <Flex direction="column">
+          <Text>Performance</Text>
+          <Text />
+          {metrics.length === 0 ? (
+            <Text color="gray">No metrics recorded</Text>
+          ) : (
+            metrics.map(([name, m]) => (
+              <Text key={name}>
+                {name}: n={m.count} avg=
+                {m.count ? (m.totalTime / m.count).toFixed(2) : 0}ms min={m.minTime}
+                ms max={m.maxTime}ms
+              </Text>
+            ))
+          )}
+        </Flex>
+      )
     } else if (debugWrapperStore.activeTab === 'state') {
-      return <Text>State view not implemented yet</Text>
+      return <StateInspector />
     }
     return null
   }

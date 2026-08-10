@@ -37,9 +37,7 @@ describe('Radio Component', () => {
   })
 
   test('should handle disabled state', () => {
-    const options = [
-      { value: 'a', label: 'Option A' },
-    ]
+    const options = [{ value: 'a', label: 'Option A' }]
 
     const component = <Radio options={options} disabled />
     expect(component).toBeDefined()

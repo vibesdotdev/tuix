@@ -12,9 +12,7 @@ describe('@tuix/themes - Context', () => {
   test('creates theme context with dark theme by default', async () => {
     const layer = createThemeLayer()
 
-    const program = ThemeContext.pipe(
-      Effect.flatMap((ctx) => ctx.getCurrent())
-    )
+    const program = ThemeContext.pipe(Effect.flatMap(ctx => ctx.getCurrent()))
 
     const theme = await Effect.runPromise(program.pipe(Effect.provide(layer)))
     expect(theme.name).toBe('dark')
@@ -23,9 +21,7 @@ describe('@tuix/themes - Context', () => {
   test('creates theme context with custom default theme', async () => {
     const layer = createThemeLayer(lightTheme)
 
-    const program = ThemeContext.pipe(
-      Effect.flatMap((ctx) => ctx.getCurrent())
-    )
+    const program = ThemeContext.pipe(Effect.flatMap(ctx => ctx.getCurrent()))
 
     const theme = await Effect.runPromise(program.pipe(Effect.provide(layer)))
     expect(theme.name).toBe('light')
@@ -35,11 +31,7 @@ describe('@tuix/themes - Context', () => {
     const layer = createThemeLayer()
 
     const program = ThemeContext.pipe(
-      Effect.flatMap((ctx) =>
-        ctx.setTheme(nordTheme).pipe(
-          Effect.flatMap(() => ctx.getCurrent())
-        )
-      )
+      Effect.flatMap(ctx => ctx.setTheme(nordTheme).pipe(Effect.flatMap(() => ctx.getCurrent())))
     )
 
     const theme = await Effect.runPromise(program.pipe(Effect.provide(layer)))
@@ -49,9 +41,7 @@ describe('@tuix/themes - Context', () => {
   test('can get theme by name', async () => {
     const layer = createThemeLayer()
 
-    const program = ThemeContext.pipe(
-      Effect.flatMap((ctx) => ctx.getTheme('nord'))
-    )
+    const program = ThemeContext.pipe(Effect.flatMap(ctx => ctx.getTheme('nord')))
 
     const theme = await Effect.runPromise(program.pipe(Effect.provide(layer)))
     expect(theme.name).toBe('nord')
@@ -60,16 +50,9 @@ describe('@tuix/themes - Context', () => {
   test('fails when getting non-existent theme', async () => {
     const layer = createThemeLayer()
 
-    const program = ThemeContext.pipe(
-      Effect.flatMap((ctx) => ctx.getTheme('nonexistent'))
-    )
+    const program = ThemeContext.pipe(Effect.flatMap(ctx => ctx.getTheme('nonexistent')))
 
-    const result = await Effect.runPromise(
-      program.pipe(
-        Effect.provide(layer),
-        Effect.either
-      )
-    )
+    const result = await Effect.runPromise(program.pipe(Effect.provide(layer), Effect.either))
 
     expect(result._tag).toBe('Left')
   })
@@ -112,10 +95,8 @@ describe('@tuix/themes - Context', () => {
     }
 
     const program = ThemeContext.pipe(
-      Effect.flatMap((ctx) =>
-        ctx.registerTheme(customTheme).pipe(
-          Effect.flatMap(() => ctx.getTheme('custom'))
-        )
+      Effect.flatMap(ctx =>
+        ctx.registerTheme(customTheme).pipe(Effect.flatMap(() => ctx.getTheme('custom')))
       )
     )
 
@@ -127,9 +108,7 @@ describe('@tuix/themes - Context', () => {
   test('can get all theme names', async () => {
     const layer = createThemeLayer()
 
-    const program = ThemeContext.pipe(
-      Effect.flatMap((ctx) => ctx.getThemeNames())
-    )
+    const program = ThemeContext.pipe(Effect.flatMap(ctx => ctx.getThemeNames()))
 
     const names = await Effect.runPromise(program.pipe(Effect.provide(layer)))
     expect(names).toContain('dark')
@@ -175,9 +154,7 @@ describe('@tuix/themes - Context', () => {
 
     const layer = createThemeLayer(undefined, { custom: customTheme })
 
-    const program = ThemeContext.pipe(
-      Effect.flatMap((ctx) => ctx.getTheme('custom'))
-    )
+    const program = ThemeContext.pipe(Effect.flatMap(ctx => ctx.getTheme('custom')))
 
     const theme = await Effect.runPromise(program.pipe(Effect.provide(layer)))
     expect(theme.name).toBe('custom')

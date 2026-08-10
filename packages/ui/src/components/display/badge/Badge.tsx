@@ -47,19 +47,15 @@ export function Badge(props: BadgeProps): JSX.Element {
   const bgColor = getBackgroundColor(variant, theme) ?? theme.colors.selection ?? colors.gray
   const textColor =
     variant === 'default'
-      ? theme.colors.textBright ?? theme.colors.fg ?? colors.white
-      : getTextColor(variant, theme) ?? theme.colors.bg ?? colors.black
+      ? (theme.colors.textBright ?? theme.colors.fg ?? colors.white)
+      : (getTextColor(variant, theme) ?? theme.colors.bg ?? colors.black)
 
   const content = props.icon ? `${props.icon} ${props.label}` : props.label
 
   return (
     <Box
       padding={{ horizontal: 1 }}
-      style={style()
-        .background(bgColor)
-        .foreground(textColor)
-        .bold()
-        .inline(true)}
+      style={style().background(bgColor).foreground(textColor).bold().inline(true)}
     >
       <text>{content}</text>
     </Box>

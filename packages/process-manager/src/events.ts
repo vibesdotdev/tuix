@@ -5,7 +5,7 @@
  * Enables reactive process management and coordination.
  */
 
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { BaseEvent } from '@tuix/core/events'
 
 /**
  * Process configuration

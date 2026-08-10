@@ -259,11 +259,17 @@ export const ViewSchema: z.ZodType<{
 // =============================================================================
 
 export const ComponentSchema = z.object({
-  init: z.function().returns(z.promise(z.tuple([z.unknown(), z.array(z.function().returns(z.promise(z.unknown())))]))),
+  init: z
+    .function()
+    .returns(
+      z.promise(z.tuple([z.unknown(), z.array(z.function().returns(z.promise(z.unknown())))]))
+    ),
   update: z
     .function()
     .args(z.unknown(), z.unknown())
-    .returns(z.promise(z.tuple([z.unknown(), z.array(z.function().returns(z.promise(z.unknown())))]))),
+    .returns(
+      z.promise(z.tuple([z.unknown(), z.array(z.function().returns(z.promise(z.unknown())))]))
+    ),
   view: z.function().args(z.unknown()).returns(ViewSchema),
   subscriptions: z.function().args(z.unknown()).returns(z.array(z.function())).optional(),
 })

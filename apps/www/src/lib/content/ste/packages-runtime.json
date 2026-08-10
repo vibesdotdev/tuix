@@ -1,0 +1,107 @@
+{
+  "packages": [
+    {
+      "slug": "view",
+      "name": "@tuix/view",
+      "layer": "Runtime",
+      "summary": "Builds terminal views with text, layout, style, and cache helpers.",
+      "purpose": "The @tuix/view package creates terminal views. A view has width, height, and a render function. You compose views with layout helpers. You style views with ANSI helpers from this package.",
+      "whenToUse": "Use this package when you build terminal layouts. Import it for text, stack, box, and style helpers. Use it inside Model-View-Update (MVU) view functions.",
+      "mainConcepts": [
+        "View",
+        "Layout",
+        "Cache",
+        "stringWidth",
+        "ANSI style"
+      ],
+      "keyExports": [
+        "text — Create a text view from a string",
+        "empty — Create an empty view for spacing",
+        "vstack — Stack views from top to bottom",
+        "hstack — Place views side by side",
+        "box — Draw a border around a view",
+        "center — Center a view within a width",
+        "styledText — Create text with a style object",
+        "bold / dim / italic / underline — Apply text styles",
+        "red / green / blue — Apply foreground colors",
+        "stringWidth — Measure display width of a string",
+        "ViewCache — Cache rendered views",
+        "memoizeRender — Memoize a view render",
+        "isView — Check if a value is a view"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "view-panel.ts",
+        "code": "import { text, vstack, box, bold, green } from '@tuix/view'\n\nconst title = bold(text('Status'))\nconst body = green(text('All systems OK'))\nconst panel = box(vstack(title, body))\n\n// panel.render() returns an Effect that yields terminal text"
+      },
+      "related": ["@tuix/ansi", "@tuix/runtime", "@tuix/jsx", "@tuix/ui"]
+    },
+    {
+      "slug": "runtime",
+      "name": "@tuix/runtime",
+      "layer": "Runtime",
+      "summary": "Runs Model-View-Update (MVU) apps with commands, subscriptions, and hooks.",
+      "purpose": "The @tuix/runtime package runs the application loop. It processes messages and updates the model. It renders views and executes commands. It also manages subscriptions and runtime hooks.",
+      "whenToUse": "Use this package to start a terminal app with runApp. Use Cmd and Sub for side effects and streams. Pass hooks to connect reactive or logging code.",
+      "mainConcepts": [
+        "Model-View-Update (MVU)",
+        "Component",
+        "Cmd",
+        "Sub",
+        "RuntimeHooks",
+        "bootstrap"
+      ],
+      "keyExports": [
+        "runApp — Start an MVU component with optional config",
+        "createRuntime — Create a runtime instance",
+        "Cmd.none / Cmd.delay / Cmd.fetch / Cmd.exec — Built-in commands",
+        "Cmd.batch / Cmd.map / Cmd.fromEffect — Compose commands",
+        "Sub.none / Sub.interval / Sub.fromStream — Built-in subscriptions",
+        "Sub.batch / Sub.map — Compose subscriptions",
+        "createHooks / composeHooks — Build and merge runtime hooks",
+        "bootstrap — Register default modules and app modules",
+        "ModuleRegistry — Access modules from @tuix/core re-exports"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "counter.ts",
+        "code": "import { Effect } from 'effect'\nimport { runApp } from '@tuix/runtime'\nimport { text } from '@tuix/view'\n\ntype Model = { count: number }\ntype Msg = { type: 'inc' }\n\nconst component = {\n  init: Effect.succeed([{ count: 0 }, []] as const),\n  update: (msg: Msg, model: Model) =>\n    Effect.succeed(\n      msg.type === 'inc'\n        ? [{ count: model.count + 1 }, []] as const\n        : [model, []] as const\n    ),\n  view: (model: Model) => text(`Count: ${model.count}`),\n}\n\nawait Effect.runPromise(runApp(component, { fps: 60 }))"
+      },
+      "related": ["@tuix/view", "@tuix/reactive", "@tuix/core", "@tuix/input", "@tuix/app-presets"]
+    },
+    {
+      "slug": "reactive",
+      "name": "@tuix/reactive",
+      "layer": "Runtime",
+      "summary": "Provides runes and a Model-View-Update (MVU) bridge for reactive state.",
+      "purpose": "The @tuix/reactive package manages reactive state with runes. Named $state fields map to the model. bindMvuPush sends set messages to the runtime. Hooks sync runes after model updates.",
+      "whenToUse": "Use this package for $state, $derived, and $effect. Pass a name string to $state for model fields. Use createReactiveHooks with runApp for MVU sync.",
+      "mainConcepts": [
+        "Rune",
+        "$state",
+        "$derived",
+        "$effect",
+        "bindMvuPush",
+        "View hydration"
+      ],
+      "keyExports": [
+        "$state — Create reactive state; pass a name string for model keys",
+        "$states — Create named state runes from an object",
+        "$derived — Compute a value from other runes",
+        "$effect — Run a side effect when dependencies change",
+        "$bindable — Create state with validate and transform options",
+        "bindMvuPush — Bind named $set to MVU set messages",
+        "createReactiveHooks — Build RuntimeHooks for model sync",
+        "ReactiveContext — Hold model state and registered effects",
+        "registerKeyHandler — Register a key handler for the session",
+        "beginViewHydration / endViewHydration — Hydrate runes from the model"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "runes.ts",
+        "code": "import { $state, $states, $derived, bindMvuPush } from '@tuix/reactive'\n\n// Name string is required for model field mapping under Bun rewrites\nconst count = $state(0, 'count')\nconst { label } = $states({ label: 'hi' })\nconst doubled = $derived(() => count() * 2)\n\n// Runtime binds this; named $set becomes { type: 'set', key, value }\nbindMvuPush((msg) => {\n  // push UserMsg into the MVU queue\n  console.log(msg.type, msg.key, msg.value)\n})\n\ncount.$set(2)\nlabel.$set('ready')"
+      },
+      "related": ["@tuix/runtime", "@tuix/jsx", "@tuix/core", "@tuix/view"]
+    }
+  ]
+}

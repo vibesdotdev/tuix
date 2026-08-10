@@ -74,9 +74,19 @@ export interface TextProps {
 /**
  * Text Component
  */
+/** Flatten JSX text children without Array.prototype.toString commas. */
+function childrenToText(children: TextProps['children'] | unknown): string {
+  if (children == null || typeof children === 'boolean') return ''
+  if (typeof children === 'string' || typeof children === 'number') return String(children)
+  if (Array.isArray(children)) {
+    return children.map(childrenToText).join('')
+  }
+  return String(children)
+}
+
 export function Text(props: TextProps): JSX.Element {
-  // Convert children to string
-  const content = String(props.children)
+  // Convert children to string (arrays must not use Array#toString → "a,b")
+  const content = childrenToText(props.children)
 
   // Computed style
   const textStyle = $derived(() => {
@@ -136,7 +146,45 @@ export function Text(props: TextProps): JSX.Element {
 
     // Handle wrapping
     if (props.wrap && props.width) {
-      // TODO: Implement text wrapping
+      const maxW = props.width
+      const mode = props.wrap === 'char' ? 'char' : 'word'
+      const lines: string[] = []
+      if (mode === 'char') {
+        let rest = text
+        while (rest.length > 0) {
+          let take = rest.length
+          while (take > 0 && stringWidth(rest.slice(0, take)) > maxW) take--
+          if (take === 0) take = 1
+          lines.push(rest.slice(0, take))
+          rest = rest.slice(take)
+        }
+      } else {
+        const words = text.split(/(\s+)/)
+        let line = ''
+        for (const w of words) {
+          const candidate = line + w
+          if (stringWidth(candidate) <= maxW) {
+            line = candidate
+          } else {
+            if (line) lines.push(line)
+            line = w.trimStart()
+            if (stringWidth(line) > maxW) {
+              let rest = line
+              line = ''
+              while (stringWidth(rest) > maxW) {
+                let take = rest.length
+                while (take > 0 && stringWidth(rest.slice(0, take)) > maxW) take--
+                if (take === 0) take = 1
+                lines.push(rest.slice(0, take))
+                rest = rest.slice(take)
+              }
+              line = rest
+            }
+          }
+        }
+        if (line) lines.push(line)
+      }
+      text = lines.join('\n')
     }
 
     return text
@@ -160,7 +208,14 @@ export function Text(props: TextProps): JSX.Element {
 
 // Effect components
 function RainbowText(props: TextProps): JSX.Element {
-  const rainbowColors = [colors.red, colors.yellow, colors.green, colors.cyan, colors.blue, colors.magenta]
+  const rainbowColors = [
+    colors.red,
+    colors.yellow,
+    colors.green,
+    colors.cyan,
+    colors.blue,
+    colors.magenta,
+  ]
 
   const colorIndex = $state(0)
 

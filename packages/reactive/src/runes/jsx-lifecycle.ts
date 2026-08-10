@@ -22,6 +22,7 @@
 
 import { Effect, Queue, Deferred } from 'effect'
 import type { View } from '../core/types'
+import { runUntracked } from './tracking'
 
 /**
  * Component lifecycle state
@@ -126,7 +127,14 @@ export function cleanupComponent(component: ComponentState): void {
 export function $effect(fn: () => void | (() => void)): void {
   const component = getCurrentComponent()
   if (!component) {
-    throw new Error('$effect called outside component context')
+    // Outside component context: run once immediately (dev/test friendly).
+    // Production interactive apps should use withLifecycle / initComponent.
+    try {
+      fn()
+    } catch {
+      /* ignore */
+    }
+    return
   }
 
   component.effects.post.push(fn)
@@ -422,9 +430,7 @@ function flushUpdates(): void {
  * ```
  */
 export function untrack<T>(fn: () => T): T {
-  // In a real implementation, this would prevent dependency tracking
-  // For now, just run the function
-  return fn()
+  return runUntracked(fn)
 }
 
 /**

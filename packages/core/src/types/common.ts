@@ -209,11 +209,17 @@ export const ViewSchema: z.ZodType<{
 // =============================================================================
 
 export const ComponentSchema = z.object({
-  init: z.function().returns(z.promise(z.tuple([z.unknown(), z.array(z.function().returns(z.promise(z.unknown())))]))),
+  init: z
+    .function()
+    .returns(
+      z.promise(z.tuple([z.unknown(), z.array(z.function().returns(z.promise(z.unknown())))]))
+    ),
   update: z
     .function()
     .args(z.unknown(), z.unknown())
-    .returns(z.promise(z.tuple([z.unknown(), z.array(z.function().returns(z.promise(z.unknown())))]))),
+    .returns(
+      z.promise(z.tuple([z.unknown(), z.array(z.function().returns(z.promise(z.unknown())))]))
+    ),
   view: z.function().args(z.unknown()).returns(ViewSchema),
   subscriptions: z.function().args(z.unknown()).returns(z.array(z.function())).optional(),
 })
@@ -232,25 +238,11 @@ export const AppOptionsSchema = z.object({
 
 export const ViewportSchema = BoundsSchema
 
-export const TerminalCapabilitiesSchema = z.object({
-  colors: z.union([
-    z.literal('none'),
-    z.literal('basic'),
-    z.literal('256'),
-    z.literal('truecolor'),
-  ]),
-  unicode: z.boolean(),
-  mouse: z.boolean(),
-  clipboard: z.boolean(),
-  sixel: z.boolean(),
-  kitty: z.boolean(),
-  iterm2: z.boolean(),
-  windowTitle: z.boolean(),
-  columns: z.number(),
-  rows: z.number(),
-  alternateScreen: z.boolean().optional(),
-  cursorShapes: z.boolean().optional(),
-})
+// Single source of truth: packages/core/src/types/schemas.ts
+export {
+  TerminalCapabilitiesSchema,
+  type TerminalCapabilities,
+} from './schemas'
 
 // =============================================================================
 // CLI Framework Schemas
@@ -361,7 +353,7 @@ export type Align = z.infer<typeof AlignSchema>
 export type VerticalAlign = z.infer<typeof VerticalAlignSchema>
 export type Style = z.infer<typeof StyleSchema>
 export type BorderCharacters = z.infer<typeof BorderCharactersSchema>
-export type TerminalCapabilities = z.infer<typeof TerminalCapabilitiesSchema>
+// TerminalCapabilities re-exported from ./schemas above
 export type CLIOption = z.infer<typeof CLIOptionSchema>
 export type CLICommand = z.infer<typeof CLICommandSchema>
 export type CLIConfig = z.infer<typeof CLIConfigSchema>

@@ -31,7 +31,14 @@
  * ```
  */
 
-export type { Theme, ThemeColors, ThemeTypography, ThemeSpacing, ThemeConfig, ThemeError } from './types'
+export type {
+  Theme,
+  ThemeColors,
+  ThemeTypography,
+  ThemeSpacing,
+  ThemeConfig,
+  ThemeError,
+} from './types'
 export type { ThemeContext } from './context'
 export type { UseThemeResult } from './useTheme'
 export type { ThemeProviderProps } from './ThemeProvider'

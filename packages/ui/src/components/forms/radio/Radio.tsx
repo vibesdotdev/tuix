@@ -146,10 +146,12 @@ export function Radio<T = string>(props: RadioProps<T>): JSX.Element {
 
           return (
             <hstack key={String(option.value)} gap={1} align="middle">
-              <text style={style().foreground(radioColor)}>
-                {radioChar}
-              </text>
-              <text style={option.disabled || props.disabled ? style().foreground(colors.gray) : undefined}>
+              <text style={style().foreground(radioColor)}>{radioChar}</text>
+              <text
+                style={
+                  option.disabled || props.disabled ? style().foreground(colors.gray) : undefined
+                }
+              >
                 {option.label}
               </text>
             </hstack>

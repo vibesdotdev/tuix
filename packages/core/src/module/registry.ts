@@ -7,7 +7,7 @@
 
 import { Effect } from 'effect'
 import { ModuleBase, ModuleError } from './base'
-import { EventBus, getGlobalEventBus } from '@tuix/reactive/events/event-bus'
+import { EventBus, getGlobalEventBus } from '../events'
 
 /**
  * Module registration entry

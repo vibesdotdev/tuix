@@ -6,7 +6,7 @@
 
 import { Effect, Fiber } from 'effect'
 import { ModuleBase, ModuleError } from '@tuix/core'
-import type { EventBus, BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { EventBus, BaseEvent } from '@tuix/core/events'
 import type { RuneEvent, StateEvent, EffectEvent, RuneHandle } from './events'
 import { ReactivityEventChannels } from './events'
 import { JSXEventChannels } from '../events/channels'

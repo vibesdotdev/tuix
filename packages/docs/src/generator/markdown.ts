@@ -98,7 +98,7 @@ export function generateCommandMarkdown(doc: CommandDoc): Effect.Effect<string, 
 
       return lines.join('\n')
     },
-    catch: (error) => ({
+    catch: error => ({
       _tag: 'DocError' as const,
       message: 'Failed to generate command markdown',
       cause: error,
@@ -137,7 +137,7 @@ export function generatePluginMarkdown(doc: PluginDoc): Effect.Effect<string, Do
 
       return lines.join('\n')
     },
-    catch: (error) => ({
+    catch: error => ({
       _tag: 'DocError' as const,
       message: 'Failed to generate plugin markdown',
       cause: error,
@@ -212,7 +212,7 @@ export function generateAppMarkdown(doc: AppDoc): Effect.Effect<string, DocError
 
       return lines.join('\n')
     },
-    catch: (error) => ({
+    catch: error => ({
       _tag: 'DocError' as const,
       message: 'Failed to generate app markdown',
       cause: error,

@@ -18,9 +18,7 @@ import { StorageServiceLive } from './storage'
  *
  * RendererServiceLive depends on TerminalService, so we provide it to renderer
  */
-const RendererWithTerminal = RendererServiceLive.pipe(
-  Layer.provide(TerminalServiceLive)
-)
+const RendererWithTerminal = RendererServiceLive.pipe(Layer.provide(TerminalServiceLive))
 
 export const LiveServices = Layer.mergeAll(
   TerminalServiceLive,
@@ -29,7 +27,7 @@ export const LiveServices = Layer.mergeAll(
   StorageServiceLive
 )
 
-export { TerminalServiceLive } from './terminal'
+export { TerminalServiceLive, TerminalServiceTest } from './terminal'
 export { InputServiceLive } from './input'
 export { RendererServiceLive } from './renderer'
 export { StorageServiceLive } from './storage'

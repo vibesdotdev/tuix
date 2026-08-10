@@ -92,8 +92,8 @@ export function withTheme<P extends object>(
 
     Effect.runPromise(
       ThemeContext.pipe(
-        Effect.flatMap((ctx) => ctx.getCurrent()),
-        Effect.tap((t) => Effect.sync(() => theme.$set(t))),
+        Effect.flatMap(ctx => ctx.getCurrent()),
+        Effect.tap(t => Effect.sync(() => theme.$set(t))),
         Effect.catchAll(() => Effect.void)
       )
     ).catch(() => {})

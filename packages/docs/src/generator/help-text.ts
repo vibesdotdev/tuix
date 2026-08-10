@@ -48,10 +48,12 @@ export function generateCommandHelp(doc: CommandDoc): Effect.Effect<string, DocE
       if (doc.options && doc.options.length > 0) {
         lines.push('OPTIONS:')
 
-        const maxFlagLen = Math.max(...doc.options.map(opt => {
-          const flags = [opt.short, opt.long].filter(Boolean).join(', ')
-          return flags.length
-        }))
+        const maxFlagLen = Math.max(
+          ...doc.options.map(opt => {
+            const flags = [opt.short, opt.long].filter(Boolean).join(', ')
+            return flags.length
+          })
+        )
 
         doc.options.forEach(opt => {
           const flags = [opt.short, opt.long].filter(Boolean).join(', ')
@@ -74,7 +76,7 @@ export function generateCommandHelp(doc: CommandDoc): Effect.Effect<string, DocE
 
       return lines.join('\n')
     },
-    catch: (error) => ({
+    catch: error => ({
       _tag: 'DocError' as const,
       message: 'Failed to generate command help text',
       cause: error,
@@ -130,7 +132,7 @@ export function generateAppHelp(doc: AppDoc): Effect.Effect<string, DocError> {
 
       return lines.join('\n')
     },
-    catch: (error) => ({
+    catch: error => ({
       _tag: 'DocError' as const,
       message: 'Failed to generate app help text',
       cause: error,

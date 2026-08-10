@@ -6,7 +6,7 @@
 
 import { Effect } from 'effect'
 import { ModuleBase, ModuleError } from '../module/base'
-import type { EventBus } from '@tuix/reactive/events/event-bus'
+import type { EventBus, BaseEvent } from '../events'
 import type {
   ServiceEvent,
   TerminalEvent,
@@ -238,5 +238,3 @@ export class ServiceModule extends ModuleBase {
     })
   }
 }
-
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'

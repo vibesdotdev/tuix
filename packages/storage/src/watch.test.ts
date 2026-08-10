@@ -22,7 +22,7 @@ describe('MemoryStorage Watch', () => {
 
     // Set up watch
     const unsubscribe = await Effect.runPromise(
-      storage.watch('test-key', (value) => {
+      storage.watch('test-key', value => {
         updates.push(value)
       })
     )
@@ -52,7 +52,7 @@ describe('MemoryStorage Watch', () => {
     await Effect.runPromise(storage.set('test-key', 'initial'))
 
     const unsubscribe = await Effect.runPromise(
-      storage.watch('test-key', (value) => {
+      storage.watch('test-key', value => {
         updates.push(value)
       })
     )
@@ -71,11 +71,11 @@ describe('MemoryStorage Watch', () => {
     const updates2: any[] = []
 
     const unsubscribe1 = await Effect.runPromise(
-      storage.watch('test-key', (value) => updates1.push(value))
+      storage.watch('test-key', value => updates1.push(value))
     )
 
     const unsubscribe2 = await Effect.runPromise(
-      storage.watch('test-key', (value) => updates2.push(value))
+      storage.watch('test-key', value => updates2.push(value))
     )
 
     await Effect.runPromise(storage.set('test-key', 'shared'))
@@ -94,7 +94,7 @@ describe('MemoryStorage Watch', () => {
     const updates: any[] = []
 
     const unsubscribe = await Effect.runPromise(
-      storage.watch('test-key', (value) => updates.push(value))
+      storage.watch('test-key', value => updates.push(value))
     )
 
     await Effect.runPromise(storage.set('test-key', 'value1'))
@@ -118,11 +118,11 @@ describe('MemoryStorage Watch', () => {
     const updates2: any[] = []
 
     const unsubscribe1 = await Effect.runPromise(
-      storage.watch('key1', (value) => updates1.push(value))
+      storage.watch('key1', value => updates1.push(value))
     )
 
     const unsubscribe2 = await Effect.runPromise(
-      storage.watch('key2', (value) => updates2.push(value))
+      storage.watch('key2', value => updates2.push(value))
     )
 
     await Effect.runPromise(storage.set('key1', 'value1'))
@@ -147,7 +147,7 @@ describe('MemoryStorage Watch', () => {
     await Effect.runPromise(storage.set('test-key', 'expiring', { ttl: 50 }))
 
     const unsubscribe = await Effect.runPromise(
-      storage.watch('test-key', (value) => updates.push(value))
+      storage.watch('test-key', value => updates.push(value))
     )
 
     // Wait for expiration
@@ -177,7 +177,7 @@ describe('FilesystemStorage Watch', () => {
     const updates: any[] = []
 
     const unsubscribe = await Effect.runPromise(
-      storage.watch('test-key', (value) => {
+      storage.watch('test-key', value => {
         updates.push(value)
       })
     )
@@ -203,7 +203,7 @@ describe('FilesystemStorage Watch', () => {
     await Effect.runPromise(storage.set('test-key', 'initial'))
 
     const unsubscribe = await Effect.runPromise(
-      storage.watch('test-key', (value) => {
+      storage.watch('test-key', value => {
         updates.push(value)
       })
     )
@@ -222,11 +222,11 @@ describe('FilesystemStorage Watch', () => {
     const updates2: any[] = []
 
     const unsubscribe1 = await Effect.runPromise(
-      storage.watch('test-key', (value) => updates1.push(value))
+      storage.watch('test-key', value => updates1.push(value))
     )
 
     const unsubscribe2 = await Effect.runPromise(
-      storage.watch('test-key', (value) => updates2.push(value))
+      storage.watch('test-key', value => updates2.push(value))
     )
 
     await Effect.runPromise(storage.set('test-key', 'shared'))
@@ -251,7 +251,7 @@ describe('Config Adapter Watch', () => {
     const updates: any[] = []
 
     const unsubscribe = await Effect.runPromise(
-      config.watch('setting', (value) => {
+      config.watch('setting', value => {
         updates.push(value)
       })
     )

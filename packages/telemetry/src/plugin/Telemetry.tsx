@@ -47,7 +47,7 @@ export type TelemetryMsg =
   | { _tag: 'EndTiming'; name: string; metadata?: Record<string, any> }
 
 export const Telemetry: Component<TelemetryProps, TelemetryModel, TelemetryMsg> = {
-  init: (props) => {
+  init: props => {
     const enabled = props.enabled ?? false
     const consentGiven = enabled // If explicitly enabled, consent is given
 

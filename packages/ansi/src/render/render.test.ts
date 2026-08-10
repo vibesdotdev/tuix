@@ -10,6 +10,14 @@ describe('Render utilities', () => {
     expect(renderStyled('Hello', style())).toBe('Hello')
   })
 
+  test('hex string foreground does not paint literal undefined', () => {
+    // Theme tokens often store "#RRGGBB" strings; must coerce before ANSI.
+    const result = renderStyledSync('────', { foreground: '#222222' } as any)
+    expect(result).not.toContain('undefined')
+    expect(result).toContain('────')
+    expect(result.startsWith('\x1b[')).toBe(true)
+  })
+
   test('applies foreground color sequences', () => {
     const result = renderStyledSync('Hello', style().fg(colors.red))
     expect(result).toContain('\u001b[')

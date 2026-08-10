@@ -29,12 +29,14 @@ export function TuixApp(): JSX.Element {
         name="help"
         description="Interactive help explorer"
         component={HelpCommand}
+        interactive
       />
 
       <Command
         name="dashboard"
         description="System status dashboard with live metrics"
         component={DashboardCommand}
+        interactive
       />
 
       {/* Fallback: show welcome screen when no command matches */}

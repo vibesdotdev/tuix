@@ -19,16 +19,10 @@ type CounterModel = {
   history: number[]
 }
 
-type CounterMsg =
-  | { type: 'increment' }
-  | { type: 'decrement' }
-  | { type: 'reset' }
+type CounterMsg = { type: 'increment' } | { type: 'decrement' } | { type: 'reset' }
 
 const counterComponent = {
-  init: Effect.succeed([
-    { count: 0, history: [] } as CounterModel,
-    []
-  ] as const),
+  init: Effect.succeed([{ count: 0, history: [] } as CounterModel, []] as const),
 
   update: (msg: CounterMsg, model: CounterModel) => {
     switch (msg.type) {
@@ -36,36 +30,34 @@ const counterComponent = {
         return Effect.succeed([
           {
             count: model.count + 1,
-            history: [...model.history, model.count + 1]
+            history: [...model.history, model.count + 1],
           },
-          []
+          [],
         ] as const)
 
       case 'decrement':
         return Effect.succeed([
           {
             count: model.count - 1,
-            history: [...model.history, model.count - 1]
+            history: [...model.history, model.count - 1],
           },
-          []
+          [],
         ] as const)
 
       case 'reset':
         return Effect.succeed([
           {
             count: 0,
-            history: []
+            history: [],
           },
-          []
+          [],
         ] as const)
     }
   },
 
   view: (model: CounterModel) => ({
-    render: () => Effect.succeed(
-      `Count: ${model.count}\nHistory: [${model.history.join(', ')}]`
-    )
-  })
+    render: () => Effect.succeed(`Count: ${model.count}\nHistory: [${model.history.join(', ')}]`),
+  }),
 }
 
 /**
@@ -94,7 +86,7 @@ export async function runCounterExample() {
   await Effect.runPromise(
     runApp(counterComponent, {
       hooks,
-      exitAfterRender: true
+      exitAfterRender: true,
     })
   )
 
@@ -122,23 +114,17 @@ type TodoMsg =
   | { type: 'deleteTodo'; id: number }
 
 const todoComponent = {
-  init: Effect.succeed([
-    { todos: [], nextId: 1 } as TodoModel,
-    []
-  ] as const),
+  init: Effect.succeed([{ todos: [], nextId: 1 } as TodoModel, []] as const),
 
   update: (msg: TodoMsg, model: TodoModel) => {
     switch (msg.type) {
       case 'addTodo':
         return Effect.succeed([
           {
-            todos: [
-              ...model.todos,
-              { id: model.nextId, text: msg.text, completed: false }
-            ],
-            nextId: model.nextId + 1
+            todos: [...model.todos, { id: model.nextId, text: msg.text, completed: false }],
+            nextId: model.nextId + 1,
           },
-          []
+          [],
         ] as const)
 
       case 'toggleTodo':
@@ -146,32 +132,27 @@ const todoComponent = {
           {
             ...model,
             todos: model.todos.map(todo =>
-              todo.id === msg.id
-                ? { ...todo, completed: !todo.completed }
-                : todo
-            )
+              todo.id === msg.id ? { ...todo, completed: !todo.completed } : todo
+            ),
           },
-          []
+          [],
         ] as const)
 
       case 'deleteTodo':
         return Effect.succeed([
           {
             ...model,
-            todos: model.todos.filter(todo => todo.id !== msg.id)
+            todos: model.todos.filter(todo => todo.id !== msg.id),
           },
-          []
+          [],
         ] as const)
     }
   },
 
   view: (model: TodoModel) => ({
-    render: () => Effect.succeed(
-      model.todos
-        .map(t => `[${t.completed ? 'x' : ' '}] ${t.text}`)
-        .join('\n')
-    )
-  })
+    render: () =>
+      Effect.succeed(model.todos.map(t => `[${t.completed ? 'x' : ' '}] ${t.text}`).join('\n')),
+  }),
 }
 
 /**
@@ -198,7 +179,7 @@ export async function runTodoExample() {
   await Effect.runPromise(
     runApp(todoComponent, {
       hooks,
-      exitAfterRender: true
+      exitAfterRender: true,
     })
   )
 }
@@ -219,10 +200,7 @@ type UserMsg =
   | { type: 'setAge'; age: number }
 
 const userComponent = {
-  init: Effect.succeed([
-    { firstName: 'John', lastName: 'Doe', age: 30 } as UserModel,
-    []
-  ] as const),
+  init: Effect.succeed([{ firstName: 'John', lastName: 'Doe', age: 30 } as UserModel, []] as const),
 
   update: (msg: UserMsg, model: UserModel) => {
     switch (msg.type) {
@@ -236,10 +214,8 @@ const userComponent = {
   },
 
   view: (model: UserModel) => ({
-    render: () => Effect.succeed(
-      `${model.firstName} ${model.lastName}, ${model.age} years old`
-    )
-  })
+    render: () => Effect.succeed(`${model.firstName} ${model.lastName}, ${model.age} years old`),
+  }),
 }
 
 /**
@@ -269,7 +245,7 @@ export async function runUserExample() {
   await Effect.runPromise(
     runApp(userComponent, {
       hooks,
-      exitAfterRender: true
+      exitAfterRender: true,
     })
   )
 

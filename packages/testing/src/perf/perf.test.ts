@@ -131,20 +131,16 @@ describe('Benchmark', () => {
     let setupCount = 0
     let teardownCount = 0
 
-    await benchmark(
-      'with hooks',
-      () => {},
-      {
-        iterations: 3,
-        warmup: 0,
-        setup: () => {
-          setupCount++
-        },
-        teardown: () => {
-          teardownCount++
-        },
-      }
-    )
+    await benchmark('with hooks', () => {}, {
+      iterations: 3,
+      warmup: 0,
+      setup: () => {
+        setupCount++
+      },
+      teardown: () => {
+        teardownCount++
+      },
+    })
 
     expect(setupCount).toBe(3)
     expect(teardownCount).toBe(3)

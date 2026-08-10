@@ -61,7 +61,11 @@ export function ScrollableBox<T>(props: ScrollableBoxProps<T>): JSX.Element {
     >
       <vstack gap={1}>
         {props.title && (
-          <text style={style().foreground(theme.colors.textBright ?? colors.white).bold()}>
+          <text
+            style={style()
+              .foreground(theme.colors.textBright ?? colors.white)
+              .bold()}
+          >
             {props.title}
           </text>
         )}
@@ -87,11 +91,7 @@ export function ScrollableBox<T>(props: ScrollableBoxProps<T>): JSX.Element {
     if (!showCount) return null
 
     const countStyle = style().foreground(theme.colors.textDim ?? colors.gray)
-    return (
-      <text style={countStyle}>
-        Items: {props.items.length}
-      </text>
-    )
+    return <text style={countStyle}>Items: {props.items.length}</text>
   }
 
   function renderFilter(): JSX.Element {
@@ -108,7 +108,11 @@ export function ScrollableBox<T>(props: ScrollableBoxProps<T>): JSX.Element {
             {props.filterValue}
           </text>
         ) : (
-          <text style={style().foreground(theme.colors.textDim ?? colors.gray).italic()}>
+          <text
+            style={style()
+              .foreground(theme.colors.textDim ?? colors.gray)
+              .italic()}
+          >
             {placeholder}
           </text>
         )}
@@ -123,9 +127,7 @@ export function ScrollableBox<T>(props: ScrollableBoxProps<T>): JSX.Element {
 
     if (typeof props.footer === 'string') {
       return (
-        <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
-          {props.footer}
-        </text>
+        <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>{props.footer}</text>
       )
     }
 
@@ -216,9 +218,7 @@ export function ScrollableLogBox(
             <text style={style().foreground(colors.gray)}>
               {log.timestamp.toLocaleTimeString()}
             </text>
-            <text style={style().foreground(colors.cyan)}>
-              [{log.source}]
-            </text>
+            <text style={style().foreground(colors.cyan)}>[{log.source}]</text>
             <text
               style={
                 colorize
@@ -278,23 +278,15 @@ export function ScrollableProcessList(
         <vstack gap={detailed ? 1 : 0} key={String(index)}>
           <hstack gap={1} align="middle">
             <text>{statusIcons[proc.status]}</text>
-            <text style={style().foreground(colors.cyan).bold()}>
-              {proc.name}
-            </text>
+            <text style={style().foreground(colors.cyan).bold()}>{proc.name}</text>
             {proc.pid !== undefined && (
-              <text style={style().foreground(colors.gray)}>
-                PID: {proc.pid}
-              </text>
+              <text style={style().foreground(colors.gray)}>PID: {proc.pid}</text>
             )}
             {proc.uptime !== undefined && (
-              <text style={style().foreground(colors.blue)}>
-                ⏱ {proc.uptime}s
-              </text>
+              <text style={style().foreground(colors.blue)}>⏱ {proc.uptime}s</text>
             )}
             {proc.restarts !== undefined && (
-              <text style={style().foreground(colors.yellow)}>
-                🔄 {proc.restarts}
-              </text>
+              <text style={style().foreground(colors.yellow)}>🔄 {proc.restarts}</text>
             )}
           </hstack>
           {detailed && (

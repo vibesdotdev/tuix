@@ -268,7 +268,13 @@ export function Box(props: BoxProps): JSX.Element {
 export const box = (props: BoxProps) => <Box {...props} />
 
 export const card = (props: BoxProps) => (
-  <Box padding={2} border="rounded" borderColor={colors.gray} background={colors.black} {...props} />
+  <Box
+    padding={2}
+    border="rounded"
+    borderColor={colors.gray}
+    background={colors.black}
+    {...props}
+  />
 )
 
 export const panel = (props: BoxProps & { title?: string }) => {
@@ -313,16 +319,14 @@ function resolveColor(value?: string | Color): Color | undefined {
   }
 }
 
-function normalizeBoxSpacing(
-  spacing: {
-    top?: number
-    right?: number
-    bottom?: number
-    left?: number
-    horizontal?: number
-    vertical?: number
-  }
-): { top?: number; right?: number; bottom?: number; left?: number } {
+function normalizeBoxSpacing(spacing: {
+  top?: number
+  right?: number
+  bottom?: number
+  left?: number
+  horizontal?: number
+  vertical?: number
+}): { top?: number; right?: number; bottom?: number; left?: number } {
   const { top, right, bottom, left, horizontal, vertical } = spacing
 
   return {

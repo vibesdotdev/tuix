@@ -46,30 +46,30 @@ import type { JSX } from '@tuix/jsx'
 
 // Types
 export type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "success"
-  | "danger"
-  | "warning"
-  | "info"
-  | "ghost";
-export type ButtonSize = "small" | "medium" | "large";
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'danger'
+  | 'warning'
+  | 'info'
+  | 'ghost'
+export type ButtonSize = 'small' | 'medium' | 'large'
 
 export interface ButtonProps {
-  children: string | JSX.Element;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  onClick?: () => void | Promise<void>;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  disabled?: boolean;
-  loading?: boolean;
-  fullWidth?: boolean;
-  icon?: string | JSX.Element;
-  iconPosition?: "left" | "right";
-  autoFocus?: boolean;
-  className?: string;
-  type?: "button" | "submit" | "cancel";
+  children: string | JSX.Element
+  variant?: ButtonVariant
+  size?: ButtonSize
+  onClick?: () => void | Promise<void>
+  onFocus?: () => void
+  onBlur?: () => void
+  disabled?: boolean
+  loading?: boolean
+  fullWidth?: boolean
+  icon?: string | JSX.Element
+  iconPosition?: 'left' | 'right'
+  autoFocus?: boolean
+  className?: string
+  type?: 'button' | 'submit' | 'cancel'
 }
 
 /**
@@ -77,83 +77,72 @@ export interface ButtonProps {
  */
 export function Button(props: ButtonProps): JSX.Element {
   // Internal state
-  const focused = $state(props.autoFocus || false);
-  const pressed = $state(false);
-  const hovering = $state(false);
+  const focused = $state(props.autoFocus || false)
+  const pressed = $state(false)
+  const hovering = $state(false)
 
   // Configuration
-  const variant = props.variant || "secondary";
-  const size = props.size || "medium";
-  const disabled = props.disabled || props.loading;
+  const variant = props.variant || 'secondary'
+  const size = props.size || 'medium'
+  const disabled = props.disabled || props.loading
 
   // Derived styles
   const buttonStyle = $derived(() => {
-    const baseStyle = getVariantStyle(variant);
-    const sizeStyle = getSizeStyle(size);
-    const stateStyle = getStateStyle(
-      focused.value,
-      pressed.value,
-      hovering.value,
-      disabled
-    );
+    const baseStyle = getVariantStyle(variant)
+    const sizeStyle = getSizeStyle(size)
+    const stateStyle = getStateStyle(focused.value, pressed.value, hovering.value, disabled)
 
     return style({
       ...baseStyle,
       ...sizeStyle,
       ...stateStyle,
-      width: props.fullWidth ? "100%" : undefined,
-      cursor: disabled ? "not-allowed" : "pointer",
-    });
-  });
+      width: props.fullWidth ? '100%' : undefined,
+      cursor: disabled ? 'not-allowed' : 'pointer',
+    })
+  })
 
   // Event handlers
   async function handleClick() {
-    if (disabled) return;
+    if (disabled) return
 
-    pressed.value = true;
+    pressed.value = true
 
     try {
-      await props.onClick?.();
+      await props.onClick?.()
     } finally {
-      pressed.value = false;
+      pressed.value = false
     }
   }
 
   function handleKeyPress(key: string) {
-    if (disabled) return;
+    if (disabled) return
 
-    if (key === "Enter" || key === " ") {
-      handleClick();
+    if (key === 'Enter' || key === ' ') {
+      handleClick()
     }
   }
 
   // Render content
   function renderContent(): JSX.Element {
-    const content = props.loading ? <Spinner /> : props.children;
+    const content = props.loading ? <Spinner /> : props.children
 
     if (!props.icon) {
-      return typeof content === "string"
-        ? <Text>{content}</Text>
-        : content;
+      return typeof content === 'string' ? <Text>{content}</Text> : content
     }
 
-    const icon =
-      typeof props.icon === "string"
-        ? <Text>{props.icon}</Text>
-        : props.icon;
+    const icon = typeof props.icon === 'string' ? <Text>{props.icon}</Text> : props.icon
 
-    const elements =
-      props.iconPosition === "right" ? [content, icon] : [icon, content];
+    const elements = props.iconPosition === 'right' ? [content, icon] : [icon, content]
 
     return (
       <Flex direction="row" gap={1}>
         {elements}
       </Flex>
-    );
+    )
   }
 
   function Spinner(): JSX.Element {
-    return <Text>...</Text>;
+    return <Text>...</Text>
   }
 
   // Main render
@@ -161,18 +150,18 @@ export function Button(props: ButtonProps): JSX.Element {
     <Box
       onKeyPress={handleKeyPress}
       onMouseEnter={() => {
-        hovering.value = true;
+        hovering.value = true
       }}
       onMouseLeave={() => {
-        hovering.value = false;
+        hovering.value = false
       }}
       onFocus={() => {
-        focused.value = true;
-        props.onFocus?.();
+        focused.value = true
+        props.onFocus?.()
       }}
       onBlur={() => {
-        focused.value = false;
-        props.onBlur?.();
+        focused.value = false
+        props.onBlur?.()
       }}
       onClick={handleClick}
       focusable={!disabled}
@@ -181,7 +170,7 @@ export function Button(props: ButtonProps): JSX.Element {
     >
       {renderContent()}
     </Box>
-  );
+  )
 }
 
 // Style helpers
@@ -218,13 +207,13 @@ function getVariantStyle(variant: ButtonVariant) {
       borderColor: colors.cyan,
     },
     ghost: {
-      background: "transparent",
+      background: 'transparent',
       color: colors.white,
       borderColor: colors.gray,
     },
-  };
+  }
 
-  return variants[variant];
+  return variants[variant]
 }
 
 function getSizeStyle(size: ButtonSize) {
@@ -241,98 +230,71 @@ function getSizeStyle(size: ButtonSize) {
       padding: { horizontal: 4, vertical: 2 },
       minHeight: 5,
     },
-  };
+  }
 
-  return sizes[size];
+  return sizes[size]
 }
 
-function getStateStyle(
-  focused: boolean,
-  pressed: boolean,
-  hovering: boolean,
-  disabled: boolean
-) {
+function getStateStyle(focused: boolean, pressed: boolean, hovering: boolean, disabled: boolean) {
   const stateStyle: any = {
-    border: "single",
+    border: 'single',
     opacity: disabled ? 0.5 : 1,
-  };
+  }
 
   if (pressed) {
-    stateStyle.transform = "scale(0.95)";
+    stateStyle.transform = 'scale(0.95)'
   }
 
   if (focused) {
-    stateStyle.borderStyle = "double";
-    stateStyle.borderColor = colors.white;
+    stateStyle.borderStyle = 'double'
+    stateStyle.borderColor = colors.white
   }
 
   if (hovering && !disabled) {
-    stateStyle.brightness = 1.2;
+    stateStyle.brightness = 1.2
   }
 
-  return stateStyle;
+  return stateStyle
 }
 
 // Factory functions
-export const button = (props: ButtonProps) => <Button {...props} />;
-export const primaryButton = (props: ButtonProps) => (
-  <Button {...props} variant="primary" />
-);
-export const secondaryButton = (props: ButtonProps) => (
-  <Button {...props} variant="secondary" />
-);
-export const successButton = (props: ButtonProps) => (
-  <Button {...props} variant="success" />
-);
-export const dangerButton = (props: ButtonProps) => (
-  <Button {...props} variant="danger" />
-);
-export const warningButton = (props: ButtonProps) => (
-  <Button {...props} variant="warning" />
-);
-export const infoButton = (props: ButtonProps) => (
-  <Button {...props} variant="info" />
-);
-export const ghostButton = (props: ButtonProps) => (
-  <Button {...props} variant="ghost" />
-);
+export const button = (props: ButtonProps) => <Button {...props} />
+export const primaryButton = (props: ButtonProps) => <Button {...props} variant="primary" />
+export const secondaryButton = (props: ButtonProps) => <Button {...props} variant="secondary" />
+export const successButton = (props: ButtonProps) => <Button {...props} variant="success" />
+export const dangerButton = (props: ButtonProps) => <Button {...props} variant="danger" />
+export const warningButton = (props: ButtonProps) => <Button {...props} variant="warning" />
+export const infoButton = (props: ButtonProps) => <Button {...props} variant="info" />
+export const ghostButton = (props: ButtonProps) => <Button {...props} variant="ghost" />
 
 // Common button groups
 export function ButtonGroup({
   children,
 }: {
-  children: JSX.Element[];
+  children: JSX.Element[]
 }): JSX.Element {
   return (
     <Flex direction="row" gap={2}>
       {children}
     </Flex>
-  );
+  )
 }
 
 export function SubmitCancelButtons(props: {
-  onSubmit: () => void;
-  onCancel: () => void;
-  submitText?: string;
-  cancelText?: string;
-  loading?: boolean;
+  onSubmit: () => void
+  onCancel: () => void
+  submitText?: string
+  cancelText?: string
+  loading?: boolean
 }): JSX.Element {
   return (
     <ButtonGroup>
-      <Button
-        variant="primary"
-        onClick={props.onSubmit}
-        loading={props.loading}
-      >
-        {props.submitText || "Submit"}
+      <Button variant="primary" onClick={props.onSubmit} loading={props.loading}>
+        {props.submitText || 'Submit'}
       </Button>
-      <Button
-        variant="secondary"
-        onClick={props.onCancel}
-        disabled={props.loading}
-      >
-        {props.cancelText || "Cancel"}
+      <Button variant="secondary" onClick={props.onCancel} disabled={props.loading}>
+        {props.cancelText || 'Cancel'}
       </Button>
     </ButtonGroup>
-  );
+  )
 }

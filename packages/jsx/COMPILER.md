@@ -145,17 +145,17 @@ interface CompileOptions {
 
 ### detectInteractive(component)
 
-Detects if a component is interactive (needs continuous loop).
+Detects if a component is interactive (needs continuous loop / fullscreen).
 
 **Parameters:**
 - `component: JSXComponent` - JSX component to analyze
 
-**Returns:** `boolean` - Currently always returns `false` (placeholder)
+**Returns:** `boolean` — real heuristics (v1):
+1. Explicit `component.interactive === true|false`
+2. Name contains `Interactive` / `Game` / `Editor` (not bare `*App`)
+3. Source contains event handlers, `$state(`, subscriptions, or form controls
 
-**Future:** Will analyze component for:
-- Event handlers (`onKeyPress`, `onClick`, etc.)
-- Input components (`<Input>`, `<TextInput>`, etc.)
-- Subscriptions
+`runApp` uses this on the **matched command**, not the root CLI shell. Override with `runApp(app, { interactive })` or Command `metadata.interactive`.
 
 ### createStatelessComponent(component)
 

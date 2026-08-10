@@ -177,7 +177,7 @@ export const borderPresets = {
    */
   box: {
     type: 'thin' as const,
-    sides: BSide.All
+    sides: BSide.All,
   },
 
   /**
@@ -185,7 +185,7 @@ export const borderPresets = {
    */
   roundedBox: {
     type: 'rounded' as const,
-    sides: BSide.All
+    sides: BSide.All,
   },
 
   /**
@@ -193,7 +193,7 @@ export const borderPresets = {
    */
   heavyBox: {
     type: 'thick' as const,
-    sides: BSide.All
+    sides: BSide.All,
   },
 
   /**
@@ -201,7 +201,7 @@ export const borderPresets = {
    */
   doubleBox: {
     type: 'double' as const,
-    sides: BSide.All
+    sides: BSide.All,
   },
 
   /**
@@ -209,7 +209,7 @@ export const borderPresets = {
    */
   horizontal: {
     type: 'thin' as const,
-    sides: BSide.Top | BSide.Bottom
+    sides: BSide.Top | BSide.Bottom,
   },
 
   /**
@@ -217,7 +217,7 @@ export const borderPresets = {
    */
   vertical: {
     type: 'thin' as const,
-    sides: BSide.Left | BSide.Right
+    sides: BSide.Left | BSide.Right,
   },
 
   /**
@@ -225,6 +225,6 @@ export const borderPresets = {
    */
   compatible: {
     type: 'ascii' as const,
-    sides: BSide.All
-  }
+    sides: BSide.All,
+  },
 } as const

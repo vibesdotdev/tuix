@@ -1,4 +1,4 @@
-import { Plugin, Command } from "@tuix/jsx";
+import { Plugin, Command } from '@tuix/jsx'
 
 export default function Foo({ scope = 'foo' }) {
   return (

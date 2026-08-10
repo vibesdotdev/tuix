@@ -14,9 +14,17 @@ import {
   ScopeNotFoundError,
   ScopeExistsError,
 } from './types'
-import { getGlobalEventBus } from '@tuix/reactive/events/event-bus'
+import { getGlobalEventBus } from '@tuix/core/events'
 import { getGlobalRegistry } from '@tuix/core'
-import { scopeDebug } from '@tuix/debug'
+
+const scopeDebug = {
+  debug: (...args: unknown[]) => {
+    if (process.env.TUIX_DEBUG === '1') console.debug('[scope]', ...args)
+  },
+  warn: (...args: unknown[]) => {
+    if (process.env.TUIX_DEBUG === '1') console.warn('[scope]', ...args)
+  },
+}
 
 export class ScopeManager {
   private scopes = new Map<string, ScopeState>()
@@ -83,10 +91,13 @@ export class ScopeManager {
           if (parent) {
             state.parentId = parentId
             parent.childIds.push(def.id)
-            scopeDebug.debug(`Linked child ${def.name} to parent ${parent.def.name} (via metadata)`, {
-              childId: def.id,
-              parentId,
-            })
+            scopeDebug.debug(
+              `Linked child ${def.name} to parent ${parent.def.name} (via metadata)`,
+              {
+                childId: def.id,
+                parentId,
+              }
+            )
           } else {
             scopeDebug.warn(`Parent ID in metadata not found: ${parentId}`, {
               childName: def.name,

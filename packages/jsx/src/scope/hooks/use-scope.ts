@@ -7,7 +7,7 @@
 
 import { Effect } from 'effect'
 import { onMount, onDestroy } from '@tuix/reactive/jsx-lifecycle'
-import { scopeManager } from '../../manager'
+import { scopeManager } from '../manager'
 import { currentScopeStore, parentScopeStore } from '../stores'
 import type { ScopeDef, ScopeContext as ScopeState } from '../types'
 

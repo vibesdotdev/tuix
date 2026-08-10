@@ -4,14 +4,30 @@
  * The main runtime class implementation
  */
 
-import { Effect, Queue, Fiber, Ref, FiberRef, Layer, Context, Duration } from 'effect'
+import { Effect, Queue, Fiber, Ref, FiberRef, Layer, Context, Duration, Stream } from 'effect'
 import type { Component, View, Update, Command } from '@tuix/core/types'
 import { TerminalService, InputService, RendererService } from '@tuix/core/services'
 import { KeyUtils } from '@tuix/input/keyboard'
+import { bindMvuPush, emitKeyToHandlers, clearKeyHandlers } from '@tuix/reactive'
 import type { RuntimeConfig, RuntimeState, SystemMsg, RuntimeMetrics } from './types'
 import { RuntimeError } from './types'
 import { FrameScheduler, TimerManager, CommandScheduler } from './scheduler'
 import { SubscriptionManager } from './subscriptions'
+import type { RuntimeHooks } from '../../hooks'
+
+/**
+ * Apply onMessage hook chain. Returns null if the message was cancelled.
+ * Exported for unit testing without a full Runtime.
+ */
+export function applyOnMessageHook<Msg>(
+  hooks: RuntimeHooks<unknown, Msg> | undefined,
+  msg: Msg
+): Effect.Effect<Msg | null> {
+  if (!hooks?.onMessage) {
+    return Effect.succeed(msg)
+  }
+  return hooks.onMessage(msg)
+}
 
 /**
  * The main runtime class that orchestrates the MVU loop
@@ -24,12 +40,20 @@ export class Runtime<Model, Msg> {
   private readonly timerManager: TimerManager<Msg>
   private readonly commandScheduler: CommandScheduler<Msg>
   private readonly subscriptionManager: SubscriptionManager<Model, Msg>
-  private readonly hooks?: import('../../hooks').RuntimeHooks<Model, Msg>
+  private readonly hooks?: RuntimeHooks<Model, Msg>
+
+  /** Stored from run() so subscriptions can re-evaluate after model updates */
+  private subscriptionsFn?: (
+    model: Model
+  ) => ReadonlyArray<import('@tuix/core/types').Subscription<Msg>> | undefined | null
 
   // Fibers for concurrent operations
   private inputFiber?: Fiber.RuntimeFiber<void>
   private updateFiber?: Fiber.RuntimeFiber<void>
   private renderFiber?: Fiber.RuntimeFiber<void>
+  /** Consecutive render failures (success resets). Stops app after maxRenderErrors. */
+  private consecutiveRenderErrors = 0
+  private readonly maxRenderErrors = 5
   private hasRendered: boolean = false
 
   constructor(
@@ -61,7 +85,7 @@ export class Runtime<Model, Msg> {
     this.frameScheduler = new FrameScheduler(this.config.fps)
     this.timerManager = new TimerManager(messageQueue)
     this.commandScheduler = new CommandScheduler(messageQueue, this.config.maxConcurrentCommands)
-    this.subscriptionManager = new SubscriptionManager(messageQueue)
+    this.subscriptionManager = new SubscriptionManager(messageQueue, this.hooks)
   }
 
   /**
@@ -107,6 +131,16 @@ export class Runtime<Model, Msg> {
             yield* _(this.hooks.afterInit(initialModel))
           }
 
+          // Named $state.$set → UserMsg { type: 'set', key, value }
+          bindMvuPush(msg => {
+            Effect.runFork(
+              Queue.offer(this.messageQueue, {
+                _tag: 'UserMsg' as const,
+                msg: msg as Msg,
+              })
+            )
+          })
+
           // Execute initial commands
           yield* _(this.executeCommands(initialCommands))
 
@@ -116,6 +150,8 @@ export class Runtime<Model, Msg> {
           // Wait for quit signal
           yield* _(this.waitForQuit())
         } finally {
+          bindMvuPush(null)
+          clearKeyHandlers()
           // Cleanup
           yield* _(this.cleanup(terminal))
         }
@@ -138,11 +174,17 @@ export class Runtime<Model, Msg> {
         // Start render fiber
         this.renderFiber = yield* _(this.createRenderFiber(component.view).pipe(Effect.fork))
 
-        // Start subscriptions
+        // Start subscriptions (and keep fn for re-evaluation after updates).
+        // onSubscription is invoked from SubscriptionManager.addSubscription for each sub.
         if (component.subscriptions) {
+          this.subscriptionsFn = component.subscriptions as typeof this.subscriptionsFn
           yield* _(
-            this.subscriptionManager.start(component.subscriptions, () =>
-              Effect.map(Ref.get(this.state), s => s.model)
+            this.subscriptionManager.start(
+              model => {
+                const result = component.subscriptions!(model)
+                return (result ?? []) as ReadonlyArray<import('@tuix/core/types').Subscription<Msg>>
+              },
+              () => Effect.map(Ref.get(this.state), s => s.model)
             )
           )
         }
@@ -151,66 +193,46 @@ export class Runtime<Model, Msg> {
   }
 
   /**
-   * Create the input processing fiber
+   * Create the input processing fiber — drains InputService streams into the message queue.
    */
   private createInputFiber(): Effect<void, RuntimeError> {
     return Effect.gen(
       function* (_) {
         const input = yield* _(InputService)
 
-        yield* _(
-          input.subscribe(event =>
-            Effect.gen(
-              function* (_) {
-                switch (event._tag) {
-                  case 'KeyPress':
-                    yield* _(
-                      Queue.offer(this.messageQueue, {
-                        _tag: 'KeyPress',
-                        key: event.key,
-                      })
-                    )
-                    break
-
-                  case 'MouseMove':
-                    if (this.config.enableMouse) {
-                      yield* _(
-                        Queue.offer(this.messageQueue, {
-                          _tag: 'MouseMove',
-                          x: event.x,
-                          y: event.y,
-                        })
-                      )
-                    }
-                    break
-
-                  case 'MouseClick':
-                    if (this.config.enableMouse) {
-                      yield* _(
-                        Queue.offer(this.messageQueue, {
-                          _tag: 'MouseClick',
-                          x: event.x,
-                          y: event.y,
-                          button: event.button,
-                        })
-                      )
-                    }
-                    break
-
-                  case 'Resize':
-                    yield* _(
-                      Queue.offer(this.messageQueue, {
-                        _tag: 'WindowResize',
-                        width: event.width,
-                        height: event.height,
-                      })
-                    )
-                    break
-                }
-              }.bind(this)
-            )
-          )
+        const runKeys = Stream.runForEach(input.keyEvents, key =>
+          Queue.offer(this.messageQueue, { _tag: 'KeyPress' as const, key })
         )
+        const runResize = Stream.runForEach(input.resizeEvents, size =>
+          Queue.offer(this.messageQueue, {
+            _tag: 'WindowResize' as const,
+            width: size.width,
+            height: size.height,
+          })
+        )
+        const runMouse = this.config.enableMouse
+          ? Stream.runForEach(input.mouseEvents, ev => {
+              if (ev.type === 'motion' || (ev as { type?: string }).type === 'move') {
+                return Queue.offer(this.messageQueue, {
+                  _tag: 'MouseMove' as const,
+                  x: ev.x,
+                  y: ev.y,
+                })
+              }
+              return Queue.offer(this.messageQueue, {
+                _tag: 'MouseClick' as const,
+                x: ev.x,
+                y: ev.y,
+                button:
+                  typeof (ev as { button?: unknown }).button === 'number'
+                    ? (ev as { button: number }).button
+                    : 0,
+              })
+            })
+          : Effect.void
+
+        // Run until fibers interrupted on shutdown
+        yield* _(Effect.all([runKeys, runResize, runMouse], { concurrency: 'unbounded' }))
       }.bind(this)
     ).pipe(
       Effect.catchAll(error => Effect.fail(new RuntimeError('Input fiber failed', 'input', error)))
@@ -233,6 +255,10 @@ export class Runtime<Model, Msg> {
               yield* _(this.config.onError(error))
             } else {
               yield* _(Effect.logError('Update error', error))
+            }
+            // Also invoke hooks.onError when present
+            if (this.hooks?.onError) {
+              yield* _(this.hooks.onError(error, 'update'))
             }
           }
 
@@ -262,70 +288,82 @@ export class Runtime<Model, Msg> {
           const state = yield* _(Ref.get(this.state))
           if (!state.isRunning) break
 
-          try {
-            // Call beforeRender hook
-            if (this.hooks?.beforeRender) {
-              yield* _(this.hooks.beforeRender(state.model))
-            }
+          const frame = Effect.gen(
+            function* (_) {
+              if (this.hooks?.beforeRender) {
+                yield* _(this.hooks.beforeRender(state.model))
+              }
 
-            // Generate view (may be async)
-            const viewResultOrPromise = view(state.model)
+              const viewResultOrPromise = view(state.model)
+              const viewResult =
+                viewResultOrPromise instanceof Promise
+                  ? yield* _(Effect.promise(() => viewResultOrPromise))
+                  : viewResultOrPromise
 
-            // Handle async views
-            const viewResult = viewResultOrPromise instanceof Promise
-              ? yield* _(Effect.promise(() => viewResultOrPromise))
-              : viewResultOrPromise
+              yield* _(terminal.clear)
+              // Support View.render(), plain strings, or JSX elements (no render)
+              let content = ''
+              if (typeof viewResult === 'string') {
+                content = viewResult
+              } else if (
+                viewResult &&
+                typeof (viewResult as { render?: unknown }).render === 'function'
+              ) {
+                const rendered = yield* _(
+                  (viewResult as { render: () => Effect.Effect<unknown> }).render()
+                )
+                content =
+                  typeof rendered === 'string'
+                    ? rendered
+                    : String((rendered as { content?: string })?.content ?? rendered ?? '')
+              } else if (viewResult != null) {
+                // JSX element or unknown tree — best-effort string (CLI debug)
+                content = String(
+                  (viewResult as { props?: { children?: unknown } }).props?.children ??
+                    (viewResult as { type?: { name?: string } }).type?.name ??
+                    '[view]'
+                )
+              }
+              yield* _(terminal.write(content))
 
-            // Render to terminal
-            yield* _(terminal.clear)
-            const rendered = yield* _(viewResult.render())
-            // Normalize rendered result - can be string or { content, width, height }
-            const content = typeof rendered === 'string' ? rendered : rendered.content
-            yield* _(terminal.write(content))
+              if (this.hooks?.afterRender) {
+                yield* _(this.hooks.afterRender(viewResult, state.model))
+              }
 
-            // Call afterRender hook
-            if (this.hooks?.afterRender) {
-              yield* _(this.hooks.afterRender(viewResult, state.model))
-            }
-
-            // Track metrics
-            const renderTime = Date.now() - startTime
-            yield* _(
-              Ref.update(this.state, s => ({
-                ...s,
-                frameCount: s.frameCount + 1,
-                lastRenderTime: renderTime,
-              }))
-            )
-
-            if (this.config.performanceMonitoring) {
+              this.consecutiveRenderErrors = 0
+              const renderTime = Date.now() - startTime
               yield* _(
-                Queue.offer(this.messageQueue, {
-                  _tag: 'RenderComplete',
-                  duration: renderTime,
-                })
+                Ref.update(this.state, s => ({
+                  ...s,
+                  frameCount: s.frameCount + 1,
+                  lastRenderTime: renderTime,
+                }))
               )
-            }
 
-            // Exit after first render if configured (for CLI commands)
-            if (this.config.exitAfterRender && !this.hasRendered) {
-              this.hasRendered = true
-              yield* _(Ref.update(this.state, s => ({ ...s, isRunning: false })))
-              break
-            }
-          } catch (error) {
-            yield* _(Effect.logError('Render error', error))
+              if (this.config.performanceMonitoring) {
+                yield* _(
+                  Queue.offer(this.messageQueue, {
+                    _tag: 'RenderComplete',
+                    duration: renderTime,
+                  })
+                )
+              }
 
-            // Stop the app if we get too many render errors
-            const errorState = yield* _(Ref.get(this.state))
-            if (errorState.frameCount > 100) {
-              console.error(
-                '[MVU Runtime] Too many render errors - stopping app to prevent infinite loop'
-              )
-              yield* _(Ref.update(this.state, s => ({ ...s, isRunning: false })))
-              break
-            }
-          }
+              if (this.config.exitAfterRender && !this.hasRendered) {
+                this.hasRendered = true
+                yield* _(Ref.update(this.state, s => ({ ...s, isRunning: false })))
+              }
+            }.bind(this)
+          ).pipe(
+            Effect.catchAll(error => this.handleRenderFailure(error)),
+            // TypeError from missing render() is a Die, not Fail — must catch defects too
+            Effect.catchAllDefect(error => this.handleRenderFailure(error))
+          )
+
+          yield* _(frame)
+
+          const after = yield* _(Ref.get(this.state))
+          if (!after.isRunning) break
 
           // Wait for next frame
           yield* _(this.frameScheduler.waitForNextFrame())
@@ -335,6 +373,28 @@ export class Runtime<Model, Msg> {
       Effect.catchAll(error =>
         Effect.fail(new RuntimeError('Render fiber failed', 'render', error))
       )
+    )
+  }
+
+  private handleRenderFailure(error: unknown): Effect.Effect<void> {
+    return Effect.gen(
+      function* (_) {
+        this.consecutiveRenderErrors++
+        yield* _(Effect.logError('Render error', error))
+
+        if (this.hooks?.onError) {
+          yield* _(this.hooks.onError(error, 'render'))
+        }
+
+        if (this.consecutiveRenderErrors >= this.maxRenderErrors || this.config.exitAfterRender) {
+          if (this.consecutiveRenderErrors >= this.maxRenderErrors) {
+            console.error(
+              `[MVU Runtime] ${this.consecutiveRenderErrors} consecutive render errors — stopping`
+            )
+          }
+          yield* _(Ref.update(this.state, s => ({ ...s, isRunning: false })))
+        }
+      }.bind(this)
     )
   }
 
@@ -350,13 +410,19 @@ export class Runtime<Model, Msg> {
           case 'UserMsg': {
             const startTime = Date.now()
 
+            // onMessage can transform or cancel (null) the message
+            const filteredMsg = yield* _(applyOnMessageHook(this.hooks, msg.msg))
+            if (filteredMsg === null) {
+              break
+            }
+
             // Call beforeUpdate hook
             if (this.hooks?.beforeUpdate) {
-              yield* _(this.hooks.beforeUpdate(msg.msg, state.model))
+              yield* _(this.hooks.beforeUpdate(filteredMsg, state.model))
             }
 
             const oldModel = state.model
-            const [newModel, commands] = yield* _(update(msg.msg, state.model))
+            const [newModel, commands] = yield* _(update(filteredMsg, state.model))
 
             yield* _(
               Ref.update(this.state, s => ({
@@ -365,9 +431,25 @@ export class Runtime<Model, Msg> {
               }))
             )
 
+            // Re-evaluate subscriptions against the new model
+            if (this.subscriptionsFn) {
+              const subsFn = this.subscriptionsFn
+              yield* _(
+                this.subscriptionManager.update(
+                  model => {
+                    const result = subsFn(model)
+                    return (result ?? []) as ReadonlyArray<
+                      import('@tuix/core/types').Subscription<Msg>
+                    >
+                  },
+                  () => Effect.map(Ref.get(this.state), s => s.model)
+                )
+              )
+            }
+
             // Call afterUpdate hook
             if (this.hooks?.afterUpdate) {
-              yield* _(this.hooks.afterUpdate(oldModel, newModel, msg.msg))
+              yield* _(this.hooks.afterUpdate(oldModel, newModel, filteredMsg))
             }
 
             yield* _(this.executeCommands(commands))
@@ -387,7 +469,17 @@ export class Runtime<Model, Msg> {
             // Check for quit key
             if (KeyUtils.isQuit(msg.key)) {
               yield* _(Queue.offer(this.messageQueue, { _tag: 'Quit' }))
+              break
             }
+            // Notify registered handlers (HelpExplorer etc.) — they $set named
+            // state which bindMvuPush turns into UserMsg SetMsg → model update.
+            const keyName =
+              typeof (msg.key as { key?: string }).key === 'string'
+                ? (msg.key as { key: string }).key
+                : typeof (msg.key as { runes?: string }).runes === 'string'
+                  ? (msg.key as { runes: string }).runes
+                  : String((msg.key as { type?: string }).type ?? msg.key ?? '')
+            emitKeyToHandlers(keyName)
             break
           }
 

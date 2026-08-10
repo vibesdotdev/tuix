@@ -74,30 +74,22 @@ export function ProgressBar(props: ProgressBarProps): JSX.Element {
   const empty = '░'.repeat(emptyChars)
 
   // Format percentage text
-  const percentageText = props.showPercentage
-    ? ` ${percentage.toFixed(0)}%`
-    : ''
+  const percentageText = props.showPercentage ? ` ${percentage.toFixed(0)}%` : ''
 
   return (
     <Box direction="vertical" gap={0.5}>
       {props.label && (
-        <text style={style().foreground(theme.colors.textBright ?? theme.colors.fg ?? colors.white)}>
+        <text
+          style={style().foreground(theme.colors.textBright ?? theme.colors.fg ?? colors.white)}
+        >
           {props.label}
           {percentageText}
         </text>
       )}
 
       <Box direction="horizontal" gap={0}>
-        {filled && (
-          <text style={style().foreground(filledColor)}>
-            {filled}
-          </text>
-        )}
-        {empty && (
-          <text style={style().foreground(emptyColor)}>
-            {empty}
-          </text>
-        )}
+        {filled && <text style={style().foreground(filledColor)}>{filled}</text>}
+        {empty && <text style={style().foreground(emptyColor)}>{empty}</text>}
       </Box>
     </Box>
   )

@@ -18,7 +18,20 @@
  */
 
 import { $state, $derived } from '@tuix/reactive/runes/runes'
-import type { ScopeDef } from '@tuix/jsx/scope/types'
+
+/**
+ * Lightweight scope shape to avoid reactive -> jsx coupling.
+ */
+export interface ScopeDef {
+  id: string
+  type: string
+  name: string
+  path: string[]
+  executable?: boolean
+  description?: string
+  metadata?: Record<string, unknown>
+  children?: ScopeDef[]
+}
 
 /**
  * Current execution context
@@ -86,8 +99,7 @@ export const context = {
    * const theme = context.get('theme', 'dark')
    * ```
    */
-  get: <T = any>(key: string, defaultValue?: T): T =>
-    (context.data()[key] as T) ?? defaultValue,
+  get: <T = any>(key: string, defaultValue?: T): T => (context.data()[key] as T) ?? defaultValue,
 
   /**
    * Set value in context data
@@ -162,17 +174,13 @@ export const app = {
    * All root-level scopes (path length === 1)
    * Derived - automatically updates when scopes change
    */
-  rootScopes: $derived(() =>
-    Array.from(app.scopes().values()).filter(s => s.path.length === 1)
-  ),
+  rootScopes: $derived(() => Array.from(app.scopes().values()).filter(s => s.path.length === 1)),
 
   /**
    * All executable scopes (commands and plugins)
    * Derived - automatically updates when scopes change
    */
-  commands: $derived(() =>
-    Array.from(app.scopes().values()).filter(s => s.executable)
-  ),
+  commands: $derived(() => Array.from(app.scopes().values()).filter(s => s.executable)),
 
   /**
    * Get all child scopes of a given scope

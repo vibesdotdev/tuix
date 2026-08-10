@@ -23,7 +23,13 @@ describe('Checkbox Component', () => {
 
   test('should handle onChange callback', () => {
     let changed = false
-    const component = <Checkbox onChange={() => { changed = true }} />
+    const component = (
+      <Checkbox
+        onChange={() => {
+          changed = true
+        }}
+      />
+    )
     expect(component).toBeDefined()
   })
 })

@@ -7,8 +7,8 @@
  * Dogfoods the CLI framework with JSX components
  */
 
-import { render } from "@tuix/cli";
-import { TuixCLI } from "./app";
+import { render } from '@tuix/cli'
+import { TuixCLI } from './app'
 
 // Run the CLI application
-render(TuixCLI);
+render(TuixCLI)

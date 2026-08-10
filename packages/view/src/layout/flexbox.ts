@@ -218,7 +218,11 @@ const calculateWrappedLayout = (
 
   // Calculate height based on number of lines
   const lineHeight = Math.max(...items.map(item => getCrossAxisSize(item, direction)), 1)
-  const totalHeight = lines.length * lineHeight + (lines.length - 1) * gap + (padding.top ?? 0) + (padding.bottom ?? 0)
+  const totalHeight =
+    lines.length * lineHeight +
+    (lines.length - 1) * gap +
+    (padding.top ?? 0) +
+    (padding.bottom ?? 0)
 
   // Layout each line
   let currentY = padding.top ?? 0
@@ -282,7 +286,17 @@ const calculateFlexLayout = (
 
   // Handle wrapping by splitting items into lines
   if (wrap !== FlexWrap.NoWrap && isRowDirection(direction)) {
-    return calculateWrappedLayout(workingItems, containerWidth, containerHeight, props, direction, mainAxisSize, crossAxisSize, gap, padding)
+    return calculateWrappedLayout(
+      workingItems,
+      containerWidth,
+      containerHeight,
+      props,
+      direction,
+      mainAxisSize,
+      crossAxisSize,
+      gap,
+      padding
+    )
   }
 
   // Calculate flex basis for each item
@@ -427,8 +441,8 @@ const calculateContainerDimensions = (
     const contentHeight = Math.max(...flexItems.map(item => getViewSize(item.view).height), 0)
 
     return {
-      width: props.width ?? (paddingH + contentWidth + totalGap),
-      height: props.height ?? (paddingV + contentHeight),
+      width: props.width ?? paddingH + contentWidth + totalGap,
+      height: props.height ?? paddingV + contentHeight,
     }
   } else {
     // Column layout - use flex basis if specified, otherwise natural size
@@ -441,8 +455,8 @@ const calculateContainerDimensions = (
     const contentWidth = Math.max(...flexItems.map(item => getViewSize(item.view).width), 0)
 
     return {
-      width: props.width ?? (paddingH + contentWidth),
-      height: props.height ?? (paddingV + contentHeight + totalGap),
+      width: props.width ?? paddingH + contentWidth,
+      height: props.height ?? paddingV + contentHeight + totalGap,
     }
   }
 }
@@ -519,12 +533,14 @@ export const flexbox = (items: ReadonlyArray<FlexItem | View>, props: FlexboxPro
         if (hasExplicitWidth) {
           return buffer.map(row => row.join('')).join('\n')
         } else {
-          return buffer.map(row => {
-            const line = row.join('')
-            // Only trim if line has non-whitespace content
-            // This preserves gap lines (all spaces) while trimming padding on content lines
-            return /\S/.test(line) ? line.trimEnd() : line
-          }).join('\n')
+          return buffer
+            .map(row => {
+              const line = row.join('')
+              // Only trim if line has non-whitespace content
+              // This preserves gap lines (all spaces) while trimming padding on content lines
+              return /\S/.test(line) ? line.trimEnd() : line
+            })
+            .join('\n')
         }
       }),
     width: totalWidth,

@@ -7,7 +7,7 @@
  */
 
 import { Effect, Duration } from 'effect'
-import { EventBus } from '@tuix/reactive/events/event-bus'
+import { EventBus } from '@tuix/core/events'
 import { ModuleBase, ModuleError } from '@tuix/runtime'
 import type {
   PerformanceReport,
@@ -17,7 +17,7 @@ import type {
   MemoryUsageMetric,
   WorkflowMetrics,
 } from './types'
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { BaseEvent } from '@tuix/core/events'
 
 /**
  * Performance event type

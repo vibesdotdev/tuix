@@ -37,38 +37,29 @@ export function FilterBox(props: FilterBoxProps): JSX.Element {
   const showSearch = props.showSearch ?? true
   const compact = props.compact ?? false
 
-  const presetChips =
-    presets.length > 0
-      ? presets.map(preset => renderPresetChip(preset))
-      : []
+  const presetChips = presets.length > 0 ? presets.map(preset => renderPresetChip(preset)) : []
 
   const searchSummary =
-    showSearch && (searchTerm.length > 0 || props.searchPlaceholder)
-      ? renderSearchSummary()
-      : null
+    showSearch && (searchTerm.length > 0 || props.searchPlaceholder) ? renderSearchSummary() : null
 
   const layoutChildren: (JSX.Element | null)[] = [
     props.title ? (
-      <text style={style().foreground(theme.colors.textBright ?? colors.white).bold()}>
+      <text
+        style={style()
+          .foreground(theme.colors.textBright ?? colors.white)
+          .bold()}
+      >
         {props.title}
       </text>
     ) : null,
 
-    presets.length > 0
-      ? compact
-        ? renderCompactRibbon()
-        : renderPresetSection()
-      : null,
+    presets.length > 0 ? (compact ? renderCompactRibbon() : renderPresetSection()) : null,
 
     searchSummary,
   ]
 
   return (
-    <vstack
-      gap={compact ? 0 : 1}
-      className={props.className}
-      data-component="filter-box"
-    >
+    <vstack gap={compact ? 0 : 1} className={props.className} data-component="filter-box">
       {layoutChildren.filter(Boolean)}
     </vstack>
   )
@@ -88,19 +79,9 @@ export function FilterBox(props: FilterBoxProps): JSX.Element {
       : style().foreground(theme.colors.fg ?? colors.white)
 
     return (
-      <interactive
-        key={preset.name}
-        focusable
-        onClick={() => props.onPresetChange?.(preset.name)}
-      >
-        <hstack
-          gap={1}
-          style={baseStyle.merge(activeStyle)}
-          align="middle"
-        >
-          {preset.icon && (
-            <text aria-hidden="true">{preset.icon}</text>
-          )}
+      <interactive key={preset.name} focusable onClick={() => props.onPresetChange?.(preset.name)}>
+        <hstack gap={1} style={baseStyle.merge(activeStyle)} align="middle">
+          {preset.icon && <text aria-hidden="true">{preset.icon}</text>}
           <text>{preset.label}</text>
         </hstack>
       </interactive>
@@ -110,23 +91,12 @@ export function FilterBox(props: FilterBoxProps): JSX.Element {
   function renderPresetSection(): JSX.Element {
     return (
       <vstack gap={1}>
-        <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
-          Quick Filters
-        </text>
+        <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>Quick Filters</text>
         <hstack gap={1} wrap>
           {presetChips}
           {activePreset && (
-            <interactive
-              focusable
-              onClick={() => props.onPresetChange?.(null)}
-            >
-              <text
-                style={style()
-                  .foreground(colors.red)
-                  .padding(0, 1)}
-              >
-                Clear
-              </text>
+            <interactive focusable onClick={() => props.onPresetChange?.(null)}>
+              <text style={style().foreground(colors.red).padding(0, 1)}>Clear</text>
             </interactive>
           )}
         </hstack>
@@ -138,16 +108,11 @@ export function FilterBox(props: FilterBoxProps): JSX.Element {
     return (
       <hstack gap={1} wrap align="middle">
         {presets.length > 0 && (
-          <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
-            Filter:
-          </text>
+          <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>Filter:</text>
         )}
         {presetChips.length > 0 ? presetChips : null}
         {activePreset && (
-          <interactive
-            focusable
-            onClick={() => props.onPresetChange?.(null)}
-          >
+          <interactive focusable onClick={() => props.onPresetChange?.(null)}>
             <text style={style().foreground(colors.red)}>✕</text>
           </interactive>
         )}
@@ -159,18 +124,12 @@ export function FilterBox(props: FilterBoxProps): JSX.Element {
     const textStyle = style().foreground(theme.colors.textDim ?? colors.gray)
 
     if (searchTerm.length === 0) {
-      return (
-        <text style={textStyle.italic()}>
-          {props.searchPlaceholder ?? 'Search...'}
-        </text>
-      )
+      return <text style={textStyle.italic()}>{props.searchPlaceholder ?? 'Search...'}</text>
     }
 
     return (
       <hstack gap={1} align="middle">
-        <text style={style().foreground(theme.colors.info ?? colors.cyan)}>
-          🔍
-        </text>
+        <text style={style().foreground(theme.colors.info ?? colors.cyan)}>🔍</text>
         <text>{searchTerm}</text>
         {props.onSearchClear && (
           <interactive focusable onClick={() => props.onSearchClear?.()}>
@@ -255,15 +214,18 @@ export function FilterableContent<T extends Record<string, any>>(
 ): JSX.Element {
   const { theme } = useUITheme()
   const activeFilter =
-    props.filters?.find(filter => filter.name === props.activePreset)?.filter ??
-    (() => true)
+    props.filters?.find(filter => filter.name === props.activePreset)?.filter ?? (() => true)
 
   const filteredItems = props.items.filter(activeFilter)
 
   return (
     <vstack gap={1} className={props.className}>
       {props.title && (
-            <text style={style().foreground(theme.colors.textBright ?? colors.white).bold()}>
+        <text
+          style={style()
+            .foreground(theme.colors.textBright ?? colors.white)
+            .bold()}
+        >
           {props.title}
         </text>
       )}
@@ -277,22 +239,18 @@ export function FilterableContent<T extends Record<string, any>>(
 
       {filteredItems.length === 0 ? (
         typeof props.emptyMessage === 'string' ? (
-          <text
-            style={style().foreground(theme.colors.textDim ?? colors.gray)}
-          >
+          <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
             {props.emptyMessage}
           </text>
         ) : (
-          props.emptyMessage ?? (
+          (props.emptyMessage ?? (
             <text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
               No items match the current filters
             </text>
-          )
+          ))
         )
       ) : (
-        <vstack gap={1}>
-          {filteredItems.map((item, index) => props.renderItem(item, index))}
-        </vstack>
+        <vstack gap={1}>{filteredItems.map((item, index) => props.renderItem(item, index))}</vstack>
       )}
     </vstack>
   )

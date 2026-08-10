@@ -195,7 +195,10 @@ export const Snapshot: Component<SnapshotModel, SnapshotMsg> = {
             {
               ...model,
               status: 'complete',
-              message: msg.count > 0 ? `Cleaned ${msg.count} orphaned snapshots` : 'No orphaned snapshots found',
+              message:
+                msg.count > 0
+                  ? `Cleaned ${msg.count} orphaned snapshots`
+                  : 'No orphaned snapshots found',
             },
             [],
           ]
@@ -237,16 +240,18 @@ export const Snapshot: Component<SnapshotModel, SnapshotMsg> = {
           content = vstack(
             bold(text(`Found ${model.snapshots.length} snapshot files:`)),
             text(''),
-            ...model.snapshots.slice(0, 15).map(snapshot =>
-              vstack(
-                bold(text(snapshot.testFile)),
-                text(`  Snapshot: ${snapshot.snapshotFile}`),
-                text(`  Tests: ${snapshot.testCount}`),
-                text(`  Size: ${formatBytes(snapshot.size)}`),
-                text(`  Modified: ${snapshot.modified.toLocaleDateString()}`),
-                text('')
+            ...model.snapshots
+              .slice(0, 15)
+              .map(snapshot =>
+                vstack(
+                  bold(text(snapshot.testFile)),
+                  text(`  Snapshot: ${snapshot.snapshotFile}`),
+                  text(`  Tests: ${snapshot.testCount}`),
+                  text(`  Size: ${formatBytes(snapshot.size)}`),
+                  text(`  Modified: ${snapshot.modified.toLocaleDateString()}`),
+                  text('')
+                )
               )
-            )
           )
 
           if (model.snapshots.length > 15) {
@@ -278,9 +283,13 @@ export const Snapshot: Component<SnapshotModel, SnapshotMsg> = {
               text(`Tests: ${totalTests}`),
               text(`Total Size: ${formatBytes(totalSize)}`),
               text(''),
-              ...model.snapshots.slice(0, 15).map(snapshot =>
-                text(`  ${snapshot.testFile} (${snapshot.testCount} tests, ${formatBytes(snapshot.size)})`)
-              )
+              ...model.snapshots
+                .slice(0, 15)
+                .map(snapshot =>
+                  text(
+                    `  ${snapshot.testFile} (${snapshot.testCount} tests, ${formatBytes(snapshot.size)})`
+                  )
+                )
             )
 
             if (model.snapshots.length > 15) {

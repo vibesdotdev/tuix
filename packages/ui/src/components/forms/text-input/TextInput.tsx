@@ -228,11 +228,7 @@ export function TextInput(props: TextInputProps): JSX.Element {
     const cursorPos = store.cursorPosition()
 
     if (!visible && placeholder) {
-      return (
-        <text style={style().foreground(colors.gray).italic()}>
-          {placeholder}
-        </text>
-      )
+      return <text style={style().foreground(colors.gray).italic()}>{placeholder}</text>
     }
 
     if (!store.isFocused() || !store.showCursor()) {
@@ -249,9 +245,7 @@ export function TextInput(props: TextInputProps): JSX.Element {
       return (
         <hstack>
           {beforeSelection ? <text>{beforeSelection}</text> : null}
-          <text style={style().background(colors.blue).foreground(colors.white)}>
-            {selection}
-          </text>
+          <text style={style().background(colors.blue).foreground(colors.white)}>{selection}</text>
           {afterSelection ? <text>{afterSelection}</text> : null}
         </hstack>
       )
@@ -265,9 +259,7 @@ export function TextInput(props: TextInputProps): JSX.Element {
     return (
       <hstack>
         {beforeCursor ? <text>{beforeCursor}</text> : null}
-        <text style={getCursorStyle(cursorStyle)}>
-          {cursorChar || atCursor}
-        </text>
+        <text style={getCursorStyle(cursorStyle)}>{cursorChar || atCursor}</text>
         {afterCursor ? <text>{afterCursor}</text> : null}
       </hstack>
     )

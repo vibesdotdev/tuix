@@ -29,7 +29,8 @@ export interface SnapshotConfig {
  * Global snapshot configuration
  */
 let globalConfig: SnapshotConfig = {
-  updateSnapshots: process.env.UPDATE_SNAPSHOTS === 'true' || process.argv.includes('--update-snapshots'),
+  updateSnapshots:
+    process.env.UPDATE_SNAPSHOTS === 'true' || process.argv.includes('--update-snapshots'),
   serializers: defaultSerializers,
   storage: createSnapshotStorage(),
 }

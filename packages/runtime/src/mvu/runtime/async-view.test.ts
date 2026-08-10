@@ -17,14 +17,14 @@ describe('Async View Support', () => {
       update: (model, msg) => Effect.succeed([model, []] as const),
 
       // Async view function
-      view: async (model) => {
+      view: async model => {
         // Simulate async operation
         await new Promise(resolve => setTimeout(resolve, 10))
 
         return {
-          render: () => Effect.succeed(`Value: ${model.value}`)
+          render: () => Effect.succeed(`Value: ${model.value}`),
         }
-      }
+      },
     }
 
     // Type check passes - view can return Promise<View>
@@ -45,9 +45,9 @@ describe('Async View Support', () => {
       update: (model, msg) => Effect.succeed([model, []] as const),
 
       // Synchronous view function
-      view: (model) => ({
-        render: () => Effect.succeed(`Count: ${model.count}`)
-      })
+      view: model => ({
+        render: () => Effect.succeed(`Count: ${model.count}`),
+      }),
     }
 
     // Type check passes - view can return View directly

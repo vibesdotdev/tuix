@@ -79,7 +79,8 @@ export class CustomUpdateChecker implements UpdateChecker {
 
         const latestVersion = data.version.replace(/^v/, '')
         const updateAvailable = compareVersions(this.config.currentVersion, latestVersion)
-        const isBreaking = updateAvailable && isBreakingChange(this.config.currentVersion, latestVersion)
+        const isBreaking =
+          updateAvailable && isBreakingChange(this.config.currentVersion, latestVersion)
 
         const result: UpdateCheckResult = {
           version: {
@@ -100,12 +101,11 @@ export class CustomUpdateChecker implements UpdateChecker {
 
         return result
       },
-      catch: (error) =>
-        ({
-          _tag: 'UpdateError' as const,
-          message: `Failed to check custom update URL: ${error}`,
-          cause: error,
-        }),
+      catch: error => ({
+        _tag: 'UpdateError' as const,
+        message: `Failed to check custom update URL: ${error}`,
+        cause: error,
+      }),
     })
   }
 

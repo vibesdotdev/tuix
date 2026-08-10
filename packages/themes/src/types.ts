@@ -19,8 +19,8 @@ export interface ThemeColors {
   tertiary: string
 
   // Base colors (adaptive)
-  bg: string           // Background
-  fg: string           // Foreground (text)
+  bg: string // Background
+  fg: string // Foreground (text)
 
   // Semantic colors
   success: string

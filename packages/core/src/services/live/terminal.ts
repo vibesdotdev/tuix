@@ -6,6 +6,10 @@ import { Effect, Layer, Ref } from 'effect'
 import { TerminalService } from '../terminal'
 import { TerminalError } from '../../types/errors'
 import type { TerminalCapabilities } from '../../types/schemas'
+import { detectCapabilities as detectCapsFromEnv } from '../capabilities/detect'
+import { probeFromEnv, mergeProbeResults } from '../capabilities/da'
+import { parseCursorPositionReport, REQUEST_CURSOR_POSITION } from '../capabilities/cpr'
+import { encodeGraphics } from '../graphics'
 
 // ANSI Escape Sequences
 const ESC = '\x1b'
@@ -114,28 +118,22 @@ export const TerminalServiceLive = Layer.effect(
           }),
       })
 
-    // Helper to detect terminal capabilities
+    // Probe-backed capability detection:
+    // pure env heuristics + TUIX_PROBE_* overrides (shared with DA parse helpers).
+    // Live DA send is optional (TTY); pure protocol is unit-tested in capabilities/da.ts.
     const detectCapabilities = (): TerminalCapabilities => {
       const env = platform.env
-      const colorSupport = (() => {
-        if (env.COLORTERM === 'truecolor') return 'truecolor'
-        if (env.TERM?.includes('256color')) return '256'
-        if (env.TERM && !env.NO_COLOR) return 'basic'
-        return 'none'
-      })()
+      const probe = mergeProbeResults(probeFromEnv(env as Record<string, string | undefined>))
+      const hasProbe = Object.keys(probe).length > 0
 
-      return {
-        colors: colorSupport,
-        unicode: platform.platform !== 'win32', // Simplified check
-        mouse: true, // Most modern terminals support mouse
-        clipboard: false, // Requires additional setup
-        sixel: false, // Image protocol support
-        kitty: env.TERM === 'xterm-kitty',
-        iterm2: env.TERM_PROGRAM === 'iTerm.app',
-        windowTitle: true,
-        columns: platform.stdout.columns ?? 80,
-        rows: platform.stdout.rows ?? 24,
-      }
+      return detectCapsFromEnv({
+        env,
+        platform: platform.platform,
+        columns: platform.stdout.columns,
+        rows: platform.stdout.rows,
+        isTTY: platform.stdin.isTTY,
+        probe: hasProbe ? probe : undefined,
+      })
     }
 
     return {
@@ -236,23 +234,67 @@ export const TerminalServiceLive = Layer.effect(
       bell: write(ANSI.bell),
 
       getCursorPosition: Effect.gen(function* (_) {
-        // Implementation for cursor position retrieval
-        // This requires sending ANSI escape sequence and reading response
-        try {
-          yield* _(write(ANSI.requestCursorPosition))
-          // In a full implementation, we would:
-          // 1. Set stdin to raw mode temporarily
-          // 2. Write the cursor position request sequence
-          // 3. Read the response from stdin
-          // 4. Parse the response (format: \x1b[row;colR)
-          // 5. Restore previous stdin mode
-          // For now, return current size as fallback
-          // Fallback position until parsing is implemented
-          return { x: 1, y: 1 }
-        } catch {
-          // Fallback if cursor position cannot be determined
-          return { x: 1, y: 1 }
-        }
+        // Send DSR request and parse CPR from stdin (raw mode if available)
+        const position = yield* _(
+          Effect.tryPromise({
+            try: () =>
+              new Promise<{ x: number; y: number }>((resolve, reject) => {
+                const stdin = platform.stdin as NodeJS.ReadStream & {
+                  setRawMode?: (v: boolean) => void
+                  isTTY?: boolean
+                }
+                let buf = ''
+                let restored = false
+                const wasRaw = false
+                const timeout = setTimeout(() => {
+                  cleanup()
+                  // Fallback when terminal does not answer (non-TTY/CI)
+                  resolve({ x: 1, y: 1 })
+                }, 100)
+
+                const onData = (chunk: string | Buffer) => {
+                  buf += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
+                  const pos = parseCursorPositionReport(buf)
+                  if (pos) {
+                    cleanup()
+                    resolve(pos)
+                  }
+                }
+
+                const cleanup = () => {
+                  if (restored) return
+                  restored = true
+                  clearTimeout(timeout)
+                  stdin.removeListener?.('data', onData)
+                  try {
+                    if (stdin.isTTY && stdin.setRawMode && !wasRaw) {
+                      // leave raw mode only if we enabled it; Process may already be raw
+                    }
+                  } catch {
+                    /* ignore */
+                  }
+                }
+
+                try {
+                  if (stdin.isTTY && stdin.setRawMode) {
+                    stdin.setRawMode(true)
+                  }
+                  stdin.setEncoding?.('utf8')
+                  stdin.on?.('data', onData)
+                  platform.stdout.write(REQUEST_CURSOR_POSITION)
+                } catch (err) {
+                  cleanup()
+                  reject(err)
+                }
+              }),
+            catch: error =>
+              new TerminalError({
+                operation: 'getCursorPosition',
+                cause: error,
+              }),
+          }).pipe(Effect.catchAll(() => Effect.succeed({ x: 1, y: 1 })))
+        )
+        return position
       }),
 
       setCursorShape: (shape: 'block' | 'underline' | 'bar') =>
@@ -266,6 +308,19 @@ export const TerminalServiceLive = Layer.effect(
 
       setCursorBlink: (enabled: boolean) =>
         write(enabled ? ANSI.cursorBlinkingBlock : ANSI.cursorBlock),
+
+      writeGraphics: image =>
+        Effect.gen(function* (_) {
+          const caps = detectCapabilities()
+          const encoded = encodeGraphics(caps, image)
+          if (!encoded.fallback && encoded.payload) {
+            yield* _(write(encoded.payload))
+          }
+          return {
+            protocol: encoded.protocol,
+            fallback: encoded.fallback,
+          }
+        }),
     }
   })
 )
@@ -313,4 +368,5 @@ export const TerminalServiceTest = Layer.succeed(TerminalService, {
   getCursorPosition: Effect.succeed({ x: 1, y: 1 }),
   setCursorShape: (_shape: 'block' | 'underline' | 'bar') => Effect.void,
   setCursorBlink: (_enabled: boolean) => Effect.void,
+  writeGraphics: _image => Effect.succeed({ protocol: 'none' as const, fallback: true }),
 })

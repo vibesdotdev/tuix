@@ -32,20 +32,22 @@ export default async function ConfigList({ filename, format }: ConfigListProps) 
     const entries = yield* _(
       Effect.all(
         keys.map(key =>
-          storage.get(key).pipe(
-            Effect.map(value => ({ key: key.replace('config.', ''), value }))
-          )
+          storage.get(key).pipe(Effect.map(value => ({ key: key.replace('config.', ''), value })))
         )
       )
     )
 
     return (
       <vstack>
-        <text color="cyan" bold>Configuration Values:</text>
+        <text color="cyan" bold>
+          Configuration Values:
+        </text>
         <text></text>
         {entries.map(({ key, value }) => (
           <hstack key={key}>
-            <text color="blue" style={{ width: 30 }}>{key}</text>
+            <text color="blue" style={{ width: 30 }}>
+              {key}
+            </text>
             <text color="green">{JSON.stringify(value)}</text>
           </hstack>
         ))}

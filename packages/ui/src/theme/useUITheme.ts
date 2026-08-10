@@ -12,7 +12,14 @@ import { colors } from '@tuix/ansi'
 /**
  * Variant types for theme-aware components
  */
-export type ThemeVariant = 'default' | 'primary' | 'success' | 'warning' | 'error' | 'info' | 'secondary'
+export type ThemeVariant =
+  | 'default'
+  | 'primary'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info'
+  | 'secondary'
 
 /**
  * UI theme utilities

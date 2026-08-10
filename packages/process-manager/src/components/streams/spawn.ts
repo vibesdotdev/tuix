@@ -60,6 +60,8 @@ export interface SpawnProps {
   autoRestart?: boolean
   restartDelay?: number
   maxRestarts?: number
+  /** Called before each restart attempt */
+  onRestart?: (attempt: number, max: number) => void
 
   /** Process manager integration */
   managed?: boolean
@@ -187,16 +189,36 @@ export function SpawnComponent(props: SpawnProps): JSX.Element {
     writer.write(encoder.encode(props.stdin)).then(() => writer.close())
   }
 
-  // Handle process exit
+  // Handle process exit + optional auto-restart
+  const maxRestarts = props.maxRestarts ?? 3
+  let restarts = 0
   const exitCode = proc.exited
-  exitCode.then(code => {
+  const handleExit = (code: number) => {
     props.onExit?.(code)
-
-    // Handle auto-restart
-    if (props.autoRestart && code !== 0) {
-      // TODO: Implement restart logic with maxRestarts
+    if (props.autoRestart && code !== 0 && restarts < maxRestarts) {
+      restarts++
+      props.onRestart?.(restarts, maxRestarts)
+      const cmd = Array.isArray(props.command) ? props.command : [props.command]
+      const delay = props.restartDelay ?? 0
+      const spawnAgain = () => {
+        try {
+          const again = Bun.spawn({
+            cmd,
+            cwd: props.cwd,
+            env: props.env,
+            stdout: 'pipe',
+            stderr: 'pipe',
+          })
+          again.exited.then(handleExit)
+        } catch {
+          /* restart failed */
+        }
+      }
+      if (delay > 0) setTimeout(spawnAgain, delay)
+      else spawnAgain()
     }
-  })
+  }
+  exitCode.then(handleExit)
 
   // Use custom render function if provided
   if (props.children) {

@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { Tabs, Tab, SimpleTabs, PillTabs, VerticalTabs } from './Tabs.js'
-import { $state } from '../../../../core/update/reactivity/runes.js'
+import { $state } from '@tuix/reactive'
 
 describe('Tabs Component', () => {
   describe('Basic rendering', () => {
@@ -88,7 +88,7 @@ describe('Tabs Component', () => {
         ],
       })
 
-      expect(activeIndex.value).toBe(1)
+      expect(activeIndex()).toBe(1)
     })
 
     it('should handle uncontrolled active index', () => {

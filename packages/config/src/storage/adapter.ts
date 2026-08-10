@@ -43,9 +43,9 @@ export class StorageConfigAdapter implements Config {
       Effect.flatMap(keys =>
         Effect.all(
           keys.map(key =>
-            this.storage.get(key).pipe(
-              Effect.map(value => [key.replace(`${this.prefix}.`, ''), value] as const)
-            )
+            this.storage
+              .get(key)
+              .pipe(Effect.map(value => [key.replace(`${this.prefix}.`, ''), value] as const))
           )
         )
       ),
@@ -79,10 +79,7 @@ export class StorageConfigAdapter implements Config {
     return this.storage.has(storageKey)
   }
 
-  watch(
-    key: string,
-    callback: (value: any) => void
-  ): Effect.Effect<() => void, ConfigError> {
+  watch(key: string, callback: (value: any) => void): Effect.Effect<() => void, ConfigError> {
     const storageKey = `${this.prefix}.${key}`
 
     return this.storage.watch(storageKey, callback).pipe(

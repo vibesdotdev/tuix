@@ -1,31 +1,38 @@
 # @tuix/platform
 
-Platform services for terminal I/O, input handling, rendering, and storage.
+Public delivery surface for Live Effect services (terminal, input, renderer, storage), capability detection, and graphics encode/decode.
 
-## Status
+## Ownership (v1 honesty)
 
-🚧 **Under Construction** - This package is being created as part of the @tuix/core split refactoring (Phase 7).
+| Layer | Owns |
+|-------|------|
+| **@tuix/core** | Service Tags, pure capabilities/graphics/CPR/DA protocol, **physical Live implementations** under `services/live` |
+| **@tuix/platform** | **Public app-facing facade**: re-exports Live Layers + pure helpers so apps depend on one package |
 
-## Purpose
+Platform does **not** duplicate Live I/O. Apps should import from `@tuix/platform` for LiveServices; tests may provide fakes via the same Tags.
 
-Provides low-level platform services for terminal interaction:
+## Exports
 
-- **TerminalService** - Terminal device I/O (stdin/stdout, raw mode, TTY control)
-- **InputService** - Raw input reading and processing
-- **RendererService** - Output buffering and rendering
-- **StorageService** - Persistent storage operations
-
-## Installation
-
-```bash
-bun add @tuix/platform
-```
+- `PLATFORM_VERSION`
+- `LiveServices`, `TerminalServiceLive`, `InputServiceLive`, `RendererServiceLive`, `StorageServiceLive`
+- Service Tags: `TerminalService`, `InputService`, `RendererService`, `StorageService`
+- Capabilities: `detectCapabilities`, `selectGraphicsProtocol`, CPR + DA (`parsePrimaryDA`, `probeFromEnv`, `mergeProbeResults`)
+- Graphics: `encodeGraphics` / `decodeGraphics` (sixel, kitty, iterm2)
+- `writeGraphicsLive` helper
 
 ## Usage
 
-Coming soon after Phase 7 migration.
+```ts
+import { LiveServices } from '@tuix/platform'
+import { Effect } from 'effect'
 
-## Dependencies
+await Effect.runPromise(myProgram.pipe(Effect.provide(LiveServices)))
+```
 
-- `@tuix/core` - Core types and errors
-- `effect` - Effect system for service implementation
+## Capability detection
+
+1. Env heuristics (`TERM`, `COLORTERM`, `TERM_PROGRAM`, …)
+2. Optional pure DA parse (`parsePrimaryDA`) when a response buffer is available
+3. `TUIX_PROBE_SIXEL|KITTY|ITERM|MOUSE|TRUECOLOR=0|1` overrides (CI / force)
+
+Live startup uses (1)+(3). Full interactive DA round-trip is optional and does not block the pure decision path.

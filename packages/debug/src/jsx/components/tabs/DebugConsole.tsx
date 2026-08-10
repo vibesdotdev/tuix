@@ -13,15 +13,12 @@ export function DebugConsole(): JSX.Element {
 
   return (
     <Flex direction="column">
-      <Text color={color.cyan} bold>💻 Console Output</Text>
+      <Text color={color.cyan} bold>
+        💻 Console Output
+      </Text>
       <Text>{loggerEvents.length} log entries</Text>
       <Text />
-      <Box
-        borderColor={color.gray}
-        borderStyle="single"
-        padding={1}
-        maxHeight={15}
-      >
+      <Box borderColor={color.gray} borderStyle="single" padding={1} maxHeight={15}>
         <Flex direction="column">
           {loggerEvents.slice(-20).map(event => (
             <Text color={LEVEL_COLORS[event.level]}>{event.message}</Text>

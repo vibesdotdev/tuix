@@ -35,7 +35,7 @@ export function Logger({
   level = 'info',
   colorize = true,
   showEmoji = true,
-  children
+  children,
 }: LoggerProps) {
   return (
     <Plugin name="logger" description="Application logging">

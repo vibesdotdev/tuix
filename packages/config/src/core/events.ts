@@ -5,7 +5,7 @@
  * Enables reactive configuration management across the application.
  */
 
-import type { BaseEvent } from '@tuix/reactive/events/event-bus'
+import type { BaseEvent } from '@tuix/core/events'
 
 /**
  * Configuration events

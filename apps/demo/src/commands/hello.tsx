@@ -16,9 +16,7 @@ export interface HelloProps {
 export default function Hello({ name = 'World' }: HelloProps) {
   return (
     <vstack>
-      <text style={{ foreground: colors.green, bold: true }}>
-        👋 Hello, {name}!
-      </text>
+      <text style={{ foreground: colors.green, bold: true }}>👋 Hello, {name}!</text>
       <text style={{ foreground: colors.gray }}>
         Welcome to Tuix - the JSX-powered TUI framework
       </text>

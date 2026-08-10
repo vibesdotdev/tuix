@@ -3,7 +3,13 @@
  */
 
 import { test, expect, describe, beforeEach } from 'bun:test'
-import { serialize, normalizeOutput, stripAnsiCodes, ViewSerializer, StringSerializer } from './serializer'
+import {
+  serialize,
+  normalizeOutput,
+  stripAnsiCodes,
+  ViewSerializer,
+  StringSerializer,
+} from './serializer'
 import { FileSnapshotStorage } from './storage'
 import { toMatchSnapshot, configureSnapshots, setCurrentTestName } from './matcher'
 import { text } from '@tuix/view'

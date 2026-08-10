@@ -4,62 +4,57 @@
  * Interactive TUI for monitoring and managing processes
  */
 
-import { Effect } from "effect";
-import { View, text, vstack, hstack, styledText } from "@tuix/view";
-import { style, color, colors } from "@tuix/ansi";
-import type {
-  ProcessState,
-  ProcessLog,
-  ProcessManagerStats,
-} from "@tuix/process-manager/types";
-import type { ProcessManagerClass } from "@tuix/process-manager/manager";
+import { Effect } from 'effect'
+import { View, text, vstack, hstack, styledText } from '@tuix/view'
+import { style, color, colors } from '@tuix/ansi'
+import type { ProcessState, ProcessLog, ProcessManagerStats } from '@tuix/process-manager/types'
+import type { ProcessManagerClass } from '@tuix/process-manager/manager'
 
 interface ProcessMonitorProps {
-  manager: ProcessManagerClass;
-  refreshInterval?: number;
-  showLogs?: boolean;
-  showStats?: boolean;
-  theme?: "dark" | "light";
+  manager: ProcessManagerClass
+  refreshInterval?: number
+  showLogs?: boolean
+  showStats?: boolean
+  theme?: 'dark' | 'light'
 }
 
 const STATUS_COLORS = {
-  running: "green",
-  stopped: "gray",
-  starting: "yellow",
-  stopping: "yellow",
-  error: "red",
-  crashed: "red",
-} as const;
+  running: 'green',
+  stopped: 'gray',
+  starting: 'yellow',
+  stopping: 'yellow',
+  error: 'red',
+  crashed: 'red',
+} as const
 
 const STATUS_ICONS = {
-  running: "●",
-  stopped: "○",
-  starting: "◐",
-  stopping: "◐",
-  error: "✗",
-  crashed: "✗",
-} as const;
+  running: '●',
+  stopped: '○',
+  starting: '◐',
+  stopping: '◐',
+  error: '✗',
+  crashed: '✗',
+} as const
 
 function formatUptime(ms: number): string {
-  if (ms < 1000) return "0s";
+  if (ms < 1000) return '0s'
 
-  const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+  const seconds = Math.floor(ms / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
 
-  if (days > 0) return `${days}d ${hours % 24}h`;
-  if (hours > 0) return `${hours}h ${minutes % 60}m`;
-  if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
-  return `${seconds}s`;
+  if (days > 0) return `${days}d ${hours % 24}h`
+  if (hours > 0) return `${hours}h ${minutes % 60}m`
+  if (minutes > 0) return `${minutes}m ${seconds % 60}s`
+  return `${seconds}s`
 }
 
 function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes}B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`;
-  if (bytes < 1024 * 1024 * 1024)
-    return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)}GB`;
+  if (bytes < 1024) return `${bytes}B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)}KB`
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)}MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)}GB`
 }
 
 // These helper functions are removed since we're now using simple view functions
@@ -71,82 +66,67 @@ export function ProcessMonitor({
   showStats = true,
 }: ProcessMonitorProps): View {
   // For now, using static data - in a real implementation this would use runes for state management
-  const processes = manager.list();
-  const selectedIndex = 0;
-  const selectedProcess = processes[selectedIndex];
-  const selectedLogs = selectedProcess
-    ? manager.getLogs(selectedProcess.name)
-    : [];
-  const systemStats = showStats
-    ? (manager.stats() as ProcessManagerStats)
-    : null;
-  const lastUpdate = new Date();
+  const processes = manager.list()
+  const selectedIndex = 0
+  const selectedProcess = processes[selectedIndex]
+  const selectedLogs = selectedProcess ? manager.getLogs(selectedProcess.name) : []
+  const systemStats = showStats ? (manager.stats() as ProcessManagerStats) : null
+  const lastUpdate = new Date()
 
   // Create header
   const header = hstack(
-    styledText("🔍 Process Monitor", style().bold().foreground(color.blue)),
-    text("  "),
-    styledText(
-      `Last update: ${lastUpdate.toLocaleTimeString()}`,
-      style().foreground(color.gray)
-    )
-  );
+    styledText('🔍 Process Monitor', style().bold().foreground(color.blue)),
+    text('  '),
+    styledText(`Last update: ${lastUpdate.toLocaleTimeString()}`, style().foreground(color.gray))
+  )
 
   // Create process list header
   const processHeader = hstack(
-    styledText("ST  ", style().bold()),
-    styledText("NAME            ", style().bold()),
-    styledText("STATUS    ", style().bold()),
-    styledText("PID     ", style().bold()),
-    styledText("UPTIME    ", style().bold()),
-    styledText("MEMORY    ", style().bold()),
-    styledText("CPU     ", style().bold()),
-    styledText("RST", style().bold())
-  );
+    styledText('ST  ', style().bold()),
+    styledText('NAME            ', style().bold()),
+    styledText('STATUS    ', style().bold()),
+    styledText('PID     ', style().bold()),
+    styledText('UPTIME    ', style().bold()),
+    styledText('MEMORY    ', style().bold()),
+    styledText('CPU     ', style().bold()),
+    styledText('RST', style().bold())
+  )
 
   // Create process rows
   const processRows = processes.map((process, i) => {
-    const statusColor = STATUS_COLORS[process.status];
-    const statusIcon = STATUS_ICONS[process.status];
-    const uptime = process.startTime
-      ? Date.now() - process.startTime.getTime()
-      : 0;
-    const selected = i === selectedIndex;
+    const statusColor = STATUS_COLORS[process.status]
+    const statusIcon = STATUS_ICONS[process.status]
+    const uptime = process.startTime ? Date.now() - process.startTime.getTime() : 0
+    const selected = i === selectedIndex
 
     return hstack(
-      styledText(
-        statusIcon + "  ",
-        style().foreground(colors[statusColor] ?? color.white)
-      ),
+      styledText(statusIcon + '  ', style().foreground(colors[statusColor] ?? color.white)),
       text(process.name.padEnd(16)),
-      styledText(
-        process.status.padEnd(10),
-        style().foreground(colors[statusColor] ?? color.white)
-      ),
-      text((process.pid || "-").toString().padEnd(8)),
-      text((uptime > 0 ? formatUptime(uptime) : "-").padEnd(10)),
-      text((process.memory ? formatBytes(process.memory) : "-").padEnd(10)),
-      text((process.cpu ? `${process.cpu.toFixed(1)}%` : "-").padEnd(8)),
+      styledText(process.status.padEnd(10), style().foreground(colors[statusColor] ?? color.white)),
+      text((process.pid || '-').toString().padEnd(8)),
+      text((uptime > 0 ? formatUptime(uptime) : '-').padEnd(10)),
+      text((process.memory ? formatBytes(process.memory) : '-').padEnd(10)),
+      text((process.cpu ? `${process.cpu.toFixed(1)}%` : '-').padEnd(8)),
       text(process.restarts.toString())
-    );
-  });
+    )
+  })
 
   // Create controls footer
   const controls = hstack(
-    styledText("↑↓/jk Navigate", style().foreground(color.gray)),
-    styledText("  s Start/Stop", style().foreground(color.gray)),
-    styledText("  r Restart", style().foreground(color.gray)),
-    styledText("  c Clear logs", style().foreground(color.gray)),
-    styledText("  q Quit", style().foreground(color.gray))
-  );
+    styledText('↑↓/jk Navigate', style().foreground(color.gray)),
+    styledText('  s Start/Stop', style().foreground(color.gray)),
+    styledText('  r Restart', style().foreground(color.gray)),
+    styledText('  c Clear logs', style().foreground(color.gray)),
+    styledText('  q Quit', style().foreground(color.gray))
+  )
 
   return vstack(
     header,
-    text(""),
+    text(''),
     processHeader,
-    styledText("─".repeat(80), style().foreground(color.gray)),
+    styledText('─'.repeat(80), style().foreground(color.gray)),
     ...processRows,
-    text(""),
+    text(''),
     controls
-  );
+  )
 }

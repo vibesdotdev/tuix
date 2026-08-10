@@ -39,17 +39,10 @@
   },
   "dependencies": {
     "@tuix/core": "workspace:*",
-    "effect": "^3.17.14",
+    "@tuix/input": "workspace:*",
     "@tuix/reactive": "workspace:*",
-    "@tuix/jsx": "workspace:*",
-    "@tuix/bin": "workspace:*",
-    "@tuix/config": "workspace:*",
-    "@tuix/process-manager": "workspace:*",
-    "@tuix/logger": "workspace:*",
-    "@tuix/ansi": "workspace:*",
-    "@tuix/coordination": "workspace:*",
     "@tuix/view": "workspace:*",
-    "@tuix/input": "workspace:*"
+    "effect": "^3.17.14"
   },
   "devDependencies": {
     "@types/bun": "latest",

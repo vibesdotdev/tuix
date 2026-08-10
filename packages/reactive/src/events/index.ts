@@ -1,6 +1,5 @@
 /**
- * Event bus and domain events
- * @module core/model/events
+ * Reactive event channel definitions
  */
 
-export * from './event-bus'
+export * from './channels'

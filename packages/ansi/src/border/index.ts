@@ -4,11 +4,11 @@
  * Provides various border styles and utilities for drawing boxes
  * and frames in the terminal.
  */
-export * as borders from "./presets"
-export * as Borders from "./presets"
+export * as borders from './presets'
+export * as Borders from './presets'
 export { border, borderPresets } from './presets'
 
-export * as borderUtils from "./utils"
+export * as borderUtils from './utils'
 export {
   borderStyle,
   getBorderFromStyle,

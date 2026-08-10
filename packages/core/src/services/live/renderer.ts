@@ -1,16 +1,16 @@
 /**
  * @since 1.0.0
  */
-import { Effect, Equal, Layer, Option, Ref, pipe } from "effect";
+import { Effect, Equal, Layer, Option, Ref, pipe } from 'effect'
 
-import type { StyleProps as AnsiStyle } from "@tuix/ansi";
-import { stringWidth } from "@tuix/view/string/width";
-import { RendererService } from "../renderer";
-import { TerminalService } from "../terminal";
-import type { View } from "../../../types/core";
-import { RenderError } from "../../types/errors";
-import type { Viewport } from "../../../types/schemas";
-import { toAnsiStyleCode } from "@tuix/ansi";
+import type { StyleProps as AnsiStyle } from '@tuix/ansi'
+import { visualWidth } from '@tuix/ansi'
+import { RendererService } from '../renderer'
+import { TerminalService } from '../terminal'
+import type { View } from '../../../types/core'
+import { RenderError } from '../../types/errors'
+import type { Viewport } from '../../../types/schemas'
+import { toAnsiStyleCode } from '@tuix/ansi'
 
 // -----------------------------------------------------------------------------
 // Models
@@ -23,9 +23,9 @@ import { toAnsiStyleCode } from "@tuix/ansi";
  */
 interface Cell {
   /** The character to be rendered */
-  readonly char: string;
+  readonly char: string
   /** The style to be applied to the character */
-  readonly style: Option.Option<AnsiStyle>;
+  readonly style: Option.Option<AnsiStyle>
 }
 
 /**
@@ -35,11 +35,11 @@ interface Cell {
  */
 interface DiffPatch {
   /** The x-coordinate of the patch */
-  readonly x: number;
+  readonly x: number
   /** The y-coordinate of the patch */
-  readonly y: number;
+  readonly y: number
   /** The cells to be rendered in the patch */
-  readonly cells: ReadonlyArray<Cell>;
+  readonly cells: ReadonlyArray<Cell>
 }
 
 /**
@@ -49,17 +49,17 @@ interface DiffPatch {
  */
 interface RenderLayer {
   /** The unique ID of the layer */
-  readonly id: number;
+  readonly id: number
   /** The name of the layer */
-  readonly name: string;
+  readonly name: string
   /** The z-index of the layer */
-  readonly zIndex: number;
+  readonly zIndex: number
   /** Whether the layer is visible */
-  readonly visible: boolean;
+  readonly visible: boolean
   /** The buffer containing the layer's content */
-  readonly buffer: Buffer;
+  readonly buffer: Buffer
   /** The viewport of the layer */
-  readonly viewport: Viewport;
+  readonly viewport: Viewport
 }
 
 /**
@@ -68,12 +68,12 @@ interface RenderLayer {
  * @internal
  */
 interface RenderStats {
-  framesRendered: number;
-  averageFrameTime: number;
-  lastFrameTime: number;
-  dirtyRegionCount: number;
-  bufferSwitches: number;
-  forcedRedraws: number;
+  framesRendered: number
+  averageFrameTime: number
+  lastFrameTime: number
+  dirtyRegionCount: number
+  bufferSwitches: number
+  forcedRedraws: number
 }
 
 /**
@@ -82,17 +82,122 @@ interface RenderStats {
  * @internal
  */
 interface RenderState {
-  layers: RenderLayer[];
-  viewports: Viewport[];
-  stats: RenderStats;
+  layers: RenderLayer[]
+  viewports: Viewport[]
+  stats: RenderStats
 }
+
+// -----------------------------------------------------------------------------
+// Screen buffer (cell grid) — not Node.js Buffer
+// -----------------------------------------------------------------------------
+
+class ScreenBuffer {
+  readonly width: number
+  readonly height: number
+  private cells: Cell[][]
+
+  constructor(width: number, height: number) {
+    this.width = Math.max(0, width | 0)
+    this.height = Math.max(0, height | 0)
+    this.cells = Array.from({ length: this.height }, () =>
+      Array.from({ length: this.width }, () => ({
+        char: ' ',
+        style: Option.none<AnsiStyle>(),
+      }))
+    )
+  }
+
+  clear(): void {
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        this.cells[y]![x] = { char: ' ', style: Option.none() }
+      }
+    }
+  }
+
+  writeText(x: number, y: number, text: string | { content?: string }): void {
+    const raw =
+      typeof text === 'string'
+        ? text
+        : text && typeof text === 'object' && 'content' in text
+          ? String((text as { content?: string }).content ?? '')
+          : String(text ?? '')
+    const lines = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n')
+    for (let ly = 0; ly < lines.length; ly++) {
+      const row = y + ly
+      if (row < 0 || row >= this.height) continue
+      const line = lines[ly] ?? ''
+      // Strip simple ANSI for cell storage; preserve printable chars
+      const plain = line.replace(/\x1b\[[0-9;]*m/g, '')
+      for (let lx = 0; lx < plain.length; lx++) {
+        const col = x + lx
+        if (col < 0 || col >= this.width) continue
+        this.cells[row]![col] = {
+          char: plain[lx] ?? ' ',
+          style: Option.none(),
+        }
+      }
+    }
+  }
+
+  composite(other: ScreenBuffer, ox: number, oy: number): void {
+    for (let y = 0; y < other.height; y++) {
+      const ty = oy + y
+      if (ty < 0 || ty >= this.height) continue
+      for (let x = 0; x < other.width; x++) {
+        const tx = ox + x
+        if (tx < 0 || tx >= this.width) continue
+        const cell = other.cells[y]![x]!
+        if (cell.char !== ' ' || Option.isSome(cell.style)) {
+          this.cells[ty]![tx] = { ...cell }
+        }
+      }
+    }
+  }
+
+  diff(other: ScreenBuffer): DiffPatch[] {
+    const patches: DiffPatch[] = []
+    const h = Math.min(this.height, other.height)
+    const w = Math.min(this.width, other.width)
+    for (let y = 0; y < h; y++) {
+      let run: Cell[] = []
+      let runX = 0
+      const flush = () => {
+        if (run.length) {
+          patches.push({ x: runX, y, cells: run })
+          run = []
+        }
+      }
+      for (let x = 0; x < w; x++) {
+        const a = this.cells[y]![x]!
+        const b = other.cells[y]![x]!
+        if (a.char !== b.char) {
+          if (!run.length) runX = x
+          run.push(b)
+        } else {
+          flush()
+        }
+      }
+      flush()
+    }
+    return patches
+  }
+
+  toString(): string {
+    return this.cells.map(row => row.map(c => c.char).join('')).join('\n')
+  }
+}
+
+// Type alias used throughout this file
+type Buffer = ScreenBuffer
+const Buffer = ScreenBuffer
 
 // -----------------------------------------------------------------------------
 // Implementation
 // -----------------------------------------------------------------------------
 
 /**
- * The live implementation of the [RendererService](cci:2://file:///Users/aewing/Projects/cinderlink/cli-kit/src/core/types/core.ts:368:0-438:6).
+ * Live RendererService: double-buffered cell renderer.
  *
  * @since 1.0.0
  * @category layers
@@ -100,25 +205,25 @@ interface RenderState {
 export const RendererServiceLive = Layer.effect(
   RendererService,
   Effect.gen(function* (_) {
-    const terminal = yield* _(TerminalService);
+    const terminal = yield* _(TerminalService)
 
     // Get terminal info
-    const defaultSize = yield* _(terminal.getSize);
+    const defaultSize = yield* _(terminal.getSize)
 
     // Create double buffers
     const frontBuffer = yield* _(
-      Ref.make(new Buffer(defaultSize.width ?? 0, defaultSize.height ?? 0))
-    );
+      Ref.make(new Buffer(defaultSize.width ?? 80, defaultSize.height ?? 24))
+    )
     const backBuffer = yield* _(
-      Ref.make(new Buffer(defaultSize.width ?? 0, defaultSize.height ?? 0))
-    );
+      Ref.make(new Buffer(defaultSize.width ?? 80, defaultSize.height ?? 24))
+    )
 
     // Create state
     const initialState: RenderState = {
       layers: [
         {
           id: 0,
-          name: "main",
+          name: 'main',
           zIndex: 0,
           visible: true,
           buffer: new Buffer(defaultSize.width ?? 0, defaultSize.height ?? 0),
@@ -146,71 +251,63 @@ export const RendererServiceLive = Layer.effect(
         bufferSwitches: 0,
         forcedRedraws: 0,
       },
-    };
-    const state = yield* _(Ref.make(initialState));
+    }
+    const state = yield* _(Ref.make(initialState))
 
     const measureText = (
       text: string
-    ): Effect.Effect<
-      { width: number; height: number; lineCount: number },
-      never,
-      never
-    > =>
+    ): Effect.Effect<{ width: number; height: number; lineCount: number }, never, never> =>
       Effect.succeed({
-        width: stringWidth(text),
+        width: visualWidth(text),
         height: 1, // Assuming single line for basic measurement
         lineCount: 1,
-      });
+      })
 
     const beginFrame = Effect.gen(function* (_) {
       // Get current terminal size and update buffers if needed
-      const size = yield* _(terminal.getSize);
-      const back = yield* _(Ref.get(backBuffer));
+      const size = yield* _(terminal.getSize)
+      const back = yield* _(Ref.get(backBuffer))
       if (size.width !== back.width || size.height !== back.height) {
         // Resize buffers
-        const newBack = new Buffer(size.width, size.height);
-        const newFront = new Buffer(size.width, size.height);
-        yield* _(Ref.set(backBuffer, newBack));
-        yield* _(Ref.set(frontBuffer, newFront));
+        const newBack = new Buffer(size.width, size.height)
+        const newFront = new Buffer(size.width, size.height)
+        yield* _(Ref.set(backBuffer, newBack))
+        yield* _(Ref.set(frontBuffer, newFront))
       }
 
       // Clear the back buffer to prepare for new frame
-      back.clear();
-    }).pipe(
-      Effect.catchAll((cause) =>
-        Effect.fail(new RenderError({ phase: "paint", cause }))
-      )
-    );
+      back.clear()
+    }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause }))))
 
     const endFrame = Effect.gen(function* (_) {
-      const front = yield* _(Ref.get(frontBuffer));
-      const back = yield* _(Ref.get(backBuffer));
+      const front = yield* _(Ref.get(frontBuffer))
+      const back = yield* _(Ref.get(backBuffer))
 
       // Composite layers into back buffer
-      yield* _(compositeLayers);
+      yield* _(compositeLayers)
 
       // Diff front and back buffers
-      const diff = front.diff(back);
+      const diff = front.diff(back)
 
       if (diff.length > 0) {
-        yield* _(applyPatches(diff));
+        yield* _(applyPatches(diff))
         yield* _(
-          Ref.update(state, (s) => ({
+          Ref.update(state, s => ({
             ...s,
             stats: {
               ...s.stats,
               dirtyRegionCount: s.stats.dirtyRegionCount + 1,
             },
           }))
-        );
+        )
       }
 
       // Swap buffers
-      yield* _(Ref.set(frontBuffer, back));
-      yield* _(Ref.set(backBuffer, front));
+      yield* _(Ref.set(frontBuffer, back))
+      yield* _(Ref.set(backBuffer, front))
 
       yield* _(
-        Ref.update(state, (s) => ({
+        Ref.update(state, s => ({
           ...s,
           stats: {
             ...s.stats,
@@ -218,199 +315,245 @@ export const RendererServiceLive = Layer.effect(
             bufferSwitches: s.stats.bufferSwitches + 1,
           },
         }))
-      );
-    });
+      )
+    })
 
     const render = (view: View): Effect.Effect<void, RenderError, never> =>
       Effect.gen(function* (_) {
-        const s = yield* _(Ref.get(state));
-        const mainLayer = s.layers.find((l) => l.name === "main");
+        const s = yield* _(Ref.get(state))
+        const mainLayer = s.layers.find(l => l.name === 'main')
         if (mainLayer) {
-          const rendered = yield* _(view.render());
-          mainLayer.buffer.writeText(0, 0, rendered);
+          const rendered = yield* _(view.render())
+          mainLayer.buffer.writeText(0, 0, rendered)
         }
-      }).pipe(
-        Effect.catchAll((cause) =>
-          Effect.fail(new RenderError({ phase: "paint", cause }))
-        )
-      );
+      }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause }))))
 
-    const forceRedraw: Effect.Effect<void, RenderError, never> = Effect.gen(
-      function* (_) {
-        yield* _(
-          Ref.update(state, (s) => ({
-            ...s,
-            stats: { ...s.stats, forcedRedraws: s.stats.forcedRedraws + 1 },
-          }))
-        );
-        // Forcing a redraw is not yet implemented
-      }
-    ).pipe(
-      Effect.catchAll((cause) =>
-        Effect.fail(new RenderError({ phase: "paint", cause }))
+    const forceRedraw: Effect.Effect<void, RenderError, never> = Effect.gen(function* (_) {
+      const front = yield* _(Ref.get(frontBuffer))
+      const back = yield* _(Ref.get(backBuffer))
+      // Mark full buffer dirty by clearing front so next endFrame paints all
+      front.clear()
+      yield* _(Ref.set(frontBuffer, front))
+      // Ensure back has content to diff against on next frame
+      yield* _(Ref.set(backBuffer, back))
+      yield* _(
+        Ref.update(state, s => ({
+          ...s,
+          stats: { ...s.stats, forcedRedraws: s.stats.forcedRedraws + 1 },
+        }))
       )
-    );
+    }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause }))))
 
-    const getStats: Effect.Effect<RenderStats, never, never> = Ref.get(
-      state
-    ).pipe(Effect.map((s) => s.stats));
+    const getStats: Effect.Effect<RenderStats, never, never> = Ref.get(state).pipe(
+      Effect.map(s => s.stats)
+    )
 
-    const getViewports: Effect.Effect<
-      ReadonlyArray<Viewport>,
-      never,
-      never
-    > = Ref.get(state).pipe(Effect.map((s) => s.viewports));
+    const getViewports: Effect.Effect<ReadonlyArray<Viewport>, never, never> = Ref.get(state).pipe(
+      Effect.map(s => s.viewports)
+    )
 
-    const pushViewport = (
-      size: Partial<Viewport>
-    ): Effect.Effect<void, RenderError, never> =>
+    const pushViewport = (size: Partial<Viewport>): Effect.Effect<void, RenderError, never> =>
       Effect.gen(function* (_) {
-        const termSize = yield* _(terminal.getSize);
-        const s = yield* _(Ref.get(state));
+        const termSize = yield* _(terminal.getSize)
+        const s = yield* _(Ref.get(state))
         const current = s.viewports[s.viewports.length - 1] ?? {
           x: 0,
           y: 0,
           width: termSize.width ?? 0,
           height: termSize.height ?? 0,
-        };
+        }
         const newViewport: Viewport = {
           x: size.x ?? current.x,
           y: size.y ?? current.y,
           width: size.width ?? current.width,
           height: size.height ?? current.height,
-        };
+        }
         yield* _(
-          Ref.update(state, (s) => ({
+          Ref.update(state, s => ({
             ...s,
             viewports: [...s.viewports, newViewport],
           }))
-        );
-      }).pipe(
-        Effect.catchAll((cause) =>
-          Effect.fail(new RenderError({ phase: "layout", cause }))
         )
-      );
+      }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'layout', cause }))))
 
-    const popViewport: Effect.Effect<void, never, never> = Ref.update(
-      state,
-      (s) => ({
-        ...s,
-        viewports: s.viewports.slice(0, -1),
-      })
-    );
+    const popViewport: Effect.Effect<void, never, never> = Ref.update(state, s => ({
+      ...s,
+      viewports: s.viewports.slice(0, -1),
+    }))
 
-    const getLayers: Effect.Effect<
-      ReadonlyArray<RenderLayer>,
-      never,
-      never
-    > = Ref.get(state).pipe(Effect.map((s) => s.layers));
+    const getLayers: Effect.Effect<ReadonlyArray<RenderLayer>, never, never> = Ref.get(state).pipe(
+      Effect.map(s => s.layers)
+    )
 
-    const updateLayers = (
-      layers: ReadonlyArray<RenderLayer>
-    ): Effect.Effect<void, never, never> =>
-      Ref.update(state, (s) => ({ ...s, layers: [...layers] }));
+    const updateLayers = (layers: ReadonlyArray<RenderLayer>): Effect.Effect<void, never, never> =>
+      Ref.update(state, s => ({ ...s, layers: [...layers] }))
 
-    const saveState: Effect.Effect<RenderState, never, never> = Ref.get(state);
+    const saveState: Effect.Effect<RenderState, never, never> = Ref.get(state)
 
-    const restoreState = (
-      s: RenderState
-    ): Effect.Effect<void, RenderError, never> =>
+    const restoreState = (s: RenderState): Effect.Effect<void, RenderError, never> =>
       Ref.set(state, s).pipe(
-        Effect.catchAll((cause) =>
-          Effect.fail(new RenderError({ phase: "layout", cause }))
-        )
-      );
+        Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'layout', cause })))
+      )
 
     const renderViewToLayer = (
       view: View,
       layerId: number
     ): Effect.Effect<void, RenderError, never> =>
       Effect.gen(function* (_) {
-        const s = yield* _(Ref.get(state));
-        const layer = s.layers.find((l: RenderLayer) => l.id === layerId);
+        const s = yield* _(Ref.get(state))
+        const layer = s.layers.find((l: RenderLayer) => l.id === layerId)
 
         if (layer) {
-          const rendered = yield* _(view.render());
-          layer.buffer.writeText(0, 0, rendered);
+          const rendered = yield* _(view.render())
+          layer.buffer.writeText(0, 0, rendered)
         }
-      }).pipe(
-        Effect.catchAll((cause) =>
-          Effect.fail(new RenderError({ phase: "paint", cause }))
-        )
-      );
+      }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause }))))
 
-    const compositeLayers: Effect.Effect<void, RenderError, never> = Effect.gen(
-      function* (_) {
-        const s = yield* _(Ref.get(state));
-        const back = yield* _(Ref.get(backBuffer));
-        const sortedLayers = [...s.layers].sort((a, b) => a.zIndex - b.zIndex);
+    const compositeLayers: Effect.Effect<void, RenderError, never> = Effect.gen(function* (_) {
+      const s = yield* _(Ref.get(state))
+      const back = yield* _(Ref.get(backBuffer))
+      const sortedLayers = [...s.layers].sort((a, b) => a.zIndex - b.zIndex)
 
-        for (const layer of sortedLayers) {
-          if (layer.visible) {
-            back.composite(layer.buffer, layer.viewport.x, layer.viewport.y);
-          }
+      for (const layer of sortedLayers) {
+        if (layer.visible) {
+          back.composite(layer.buffer, layer.viewport.x, layer.viewport.y)
         }
       }
-    ).pipe(
-      Effect.catchAll((cause) =>
-        Effect.fail(new RenderError({ phase: "composite", cause }))
-      )
-    );
+    }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'composite', cause }))))
 
     const applyPatches = (
       patches: ReadonlyArray<DiffPatch>
     ): Effect.Effect<void, RenderError, never> =>
       Effect.gen(function* (_) {
-        let currentStyle: Option.Option<AnsiStyle> = Option.none();
-        const caps = yield* _(terminal.getCapabilities);
+        let currentStyle: Option.Option<AnsiStyle> = Option.none()
+        const caps = yield* _(terminal.getCapabilities)
 
         for (const patch of patches) {
-          yield* _(terminal.moveCursor(patch.x, patch.y));
+          yield* _(terminal.moveCursor(patch.x, patch.y))
 
-          let line = "";
+          let line = ''
           for (const cell of patch.cells) {
             if (!Equal.equals(cell.style, currentStyle)) {
               if (line.length > 0) {
-                yield* _(terminal.write(line));
-                line = "";
+                yield* _(terminal.write(line))
+                line = ''
               }
               const styleCode = pipe(
                 cell.style,
-                Option.map((s) => toAnsiStyleCode(s, caps.colorProfile)),
+                Option.map(s => toAnsiStyleCode(s, caps.colorProfile)),
                 Option.getOrElse(() => toAnsiStyleCode({}, caps.colorProfile))
-              );
-              yield* _(terminal.write(styleCode));
-              currentStyle = cell.style;
+              )
+              yield* _(terminal.write(styleCode))
+              currentStyle = cell.style
             }
-            line += cell.char;
+            line += cell.char
           }
 
           if (line.length > 0) {
-            yield* _(terminal.write(line));
+            yield* _(terminal.write(line))
           }
         }
-      }).pipe(
-        Effect.catchAll((cause) =>
-          Effect.fail(new RenderError({ phase: "composite", cause }))
+      }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'composite', cause }))))
+
+    const setViewport = (viewport: Viewport) =>
+      Effect.gen(function* (_) {
+        yield* _(
+          Ref.update(state, s => ({
+            ...s,
+            viewports: s.viewports.length ? [...s.viewports.slice(0, -1), viewport] : [viewport],
+          }))
         )
-      );
+      }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'layout', cause }))))
+
+    const getViewport = Ref.get(state).pipe(
+      Effect.map(
+        s =>
+          s.viewports[s.viewports.length - 1] ?? {
+            x: 0,
+            y: 0,
+            width: 80,
+            height: 24,
+          }
+      )
+    )
+
+    const noop = Effect.void
+    const emptyDirty = Effect.succeed([] as const)
 
     return RendererService.of({
       beginFrame,
       endFrame,
       render,
       forceRedraw,
-      getStats,
+      setViewport,
+      getViewport,
       getViewports,
       pushViewport,
       popViewport,
-      getLayers,
-      updateLayers,
-      saveState,
-      restoreState,
-      renderViewToLayer,
-      compositeLayers,
+      clearDirtyRegions: noop,
+      markDirty: () => noop,
+      getDirtyRegions: emptyDirty as any,
+      optimizeDirtyRegions: noop,
+      getStats,
+      resetStats: Ref.update(state, s => ({
+        ...s,
+        stats: {
+          framesRendered: 0,
+          averageFrameTime: 0,
+          lastFrameTime: 0,
+          dirtyRegionCount: 0,
+          bufferSwitches: 0,
+          forcedRedraws: 0,
+        },
+      })),
+      setProfilingEnabled: () => noop,
+      renderAt: (view, _x, _y) => render(view),
+      renderBatch: views =>
+        Effect.gen(function* (_) {
+          for (const v of views) yield* _(render(v))
+        }),
+      setClipRegion: () => noop,
+      saveState: saveState as any,
+      restoreState: restoreState as any,
       measureText,
-    });
+      wrapText: (t: string) => Effect.succeed(t.split('\n')),
+      truncateText: (t: string, max: number) =>
+        Effect.succeed(t.length <= max ? t : t.slice(0, Math.max(0, max - 1)) + '…'),
+      createLayer: (name, zIndex) =>
+        Ref.update(state, s => ({
+          ...s,
+          layers: [
+            ...s.layers,
+            {
+              id: s.layers.length,
+              name,
+              zIndex,
+              visible: true,
+              buffer: new Buffer(80, 24),
+              viewport: { x: 0, y: 0, width: 80, height: 24 },
+            },
+          ],
+        })).pipe(Effect.asVoid),
+      removeLayer: name =>
+        Ref.update(state, s => ({
+          ...s,
+          layers: s.layers.filter(l => l.name !== name),
+        })).pipe(Effect.asVoid),
+      renderToLayer: (view, name) =>
+        Effect.gen(function* (_) {
+          const s = yield* _(Ref.get(state))
+          const layer = s.layers.find(l => l.name === name)
+          if (layer) {
+            const rendered = yield* _(view.render())
+            layer.buffer.writeText(0, 0, rendered as any)
+          }
+        }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause })))),
+      setLayerVisible: (name, visible) =>
+        Ref.update(state, s => ({
+          ...s,
+          layers: s.layers.map(l => (l.name === name ? { ...l, visible } : l)),
+        })).pipe(Effect.asVoid),
+      compositeLayers,
+    } as any)
   })
-);
+)

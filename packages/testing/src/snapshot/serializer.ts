@@ -121,11 +121,7 @@ export function stripAnsiCodes(str: string): string {
 /**
  * Default serializers in priority order
  */
-export const defaultSerializers: Serializer[] = [
-  ViewSerializer,
-  StringSerializer,
-  ObjectSerializer,
-]
+export const defaultSerializers: Serializer[] = [ViewSerializer, StringSerializer, ObjectSerializer]
 
 /**
  * Serialize a value using the appropriate serializer

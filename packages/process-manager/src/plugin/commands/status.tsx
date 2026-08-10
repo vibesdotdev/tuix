@@ -27,17 +27,21 @@ export function PMStatus(props: PMStatusProps): JSX.Element {
 
   return (
     <box flexDirection="column" gap={2}>
-      {processes.map((proc) => (
+      {processes.map(proc => (
         <Panel
           key={proc.name}
           title={proc.name}
-          variant={proc.status === 'running' ? 'success' : proc.status === 'error' ? 'error' : 'default'}
+          variant={
+            proc.status === 'running' ? 'success' : proc.status === 'error' ? 'error' : 'default'
+          }
           rounded
         >
           <box flexDirection="column" gap={1.5}>
             {/* Status Row */}
             <box flexDirection="row" gap={2} alignItems="center">
-              <text bold color="primary">Status:</text>
+              <text bold color="primary">
+                Status:
+              </text>
               <StatusIndicator
                 status={proc.status === 'running' ? 'active' : 'inactive'}
                 label={proc.status.toUpperCase()}
@@ -48,21 +52,29 @@ export function PMStatus(props: PMStatusProps): JSX.Element {
             {/* PID */}
             {proc.pid && (
               <box flexDirection="row" gap={2}>
-                <text bold color="primary">PID:</text>
+                <text bold color="primary">
+                  PID:
+                </text>
                 <text>{proc.pid}</text>
               </box>
             )}
 
             {/* Command */}
             <box flexDirection="row" gap={2}>
-              <text bold color="primary">Command:</text>
-              <text>{proc.config.command} {proc.config.args?.join(' ')}</text>
+              <text bold color="primary">
+                Command:
+              </text>
+              <text>
+                {proc.config.command} {proc.config.args?.join(' ')}
+              </text>
             </box>
 
             {/* Uptime */}
             {proc.startTime && proc.status === 'running' && (
               <box flexDirection="row" gap={2}>
-                <text bold color="primary">Uptime:</text>
+                <text bold color="primary">
+                  Uptime:
+                </text>
                 <text>{formatUptime(Date.now() - proc.startTime.getTime())}</text>
               </box>
             )}
@@ -70,11 +82,11 @@ export function PMStatus(props: PMStatusProps): JSX.Element {
             {/* Restarts */}
             {proc.restarts > 0 && (
               <box flexDirection="row" gap={2}>
-                <text bold color="primary">Restarts:</text>
+                <text bold color="primary">
+                  Restarts:
+                </text>
                 <text>{proc.restarts}</text>
-                {proc.config.maxRestarts && (
-                  <text dim>/ {proc.config.maxRestarts} max</text>
-                )}
+                {proc.config.maxRestarts && <text dim>/ {proc.config.maxRestarts} max</text>}
               </box>
             )}
 
@@ -89,7 +101,9 @@ export function PMStatus(props: PMStatusProps): JSX.Element {
                     total={proc.config.maxMemory || 1024}
                     label="Memory"
                     showPercentage
-                    variant={proc.memory > (proc.config.maxMemory || 1024) * 0.8 ? 'warning' : 'success'}
+                    variant={
+                      proc.memory > (proc.config.maxMemory || 1024) * 0.8 ? 'warning' : 'success'
+                    }
                   />
                 )}
 
@@ -109,7 +123,9 @@ export function PMStatus(props: PMStatusProps): JSX.Element {
               <>
                 <Divider margin={1} />
                 <box flexDirection="column" gap={0.5}>
-                  <text bold color="error">Last Error:</text>
+                  <text bold color="error">
+                    Last Error:
+                  </text>
                   <text color="error">{proc.lastError}</text>
                 </box>
               </>
@@ -119,12 +135,8 @@ export function PMStatus(props: PMStatusProps): JSX.Element {
             <Divider label="Configuration" margin={1} />
 
             <box flexDirection="row" gap={2} flexWrap="wrap">
-              {proc.config.autorestart && (
-                <Badge variant="info" label="Auto-restart" />
-              )}
-              {proc.config.watch && (
-                <Badge variant="info" label="Watch mode" />
-              )}
+              {proc.config.autorestart && <Badge variant="info" label="Auto-restart" />}
+              {proc.config.watch && <Badge variant="info" label="Watch mode" />}
               {proc.config.group && (
                 <Badge variant="default" label={`Group: ${proc.config.group}`} />
               )}

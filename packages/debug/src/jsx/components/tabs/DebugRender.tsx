@@ -13,7 +13,9 @@ export function DebugRender(): JSX.Element {
 
   return (
     <Flex direction="column">
-      <Text color={color.cyan} bold>🎨 Render Trace</Text>
+      <Text color={color.cyan} bold>
+        🎨 Render Trace
+      </Text>
       <Text>{renderEvents.length} render events</Text>
       <Text />
       {renderEvents.slice(-10).map(event => {

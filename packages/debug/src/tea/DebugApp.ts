@@ -6,7 +6,7 @@
 
 import { Effect } from 'effect'
 import { scopeManager } from '@tuix/jsx/scope/manager'
-import { EventBus } from '@tuix/reactive/events/event-bus'
+import { EventBus } from '@tuix/core/events'
 import type { Component } from '@tuix/core/types'
 import type { View } from '@tuix/core/types'
 import type { JSXElement } from '@tuix/jsx/types'

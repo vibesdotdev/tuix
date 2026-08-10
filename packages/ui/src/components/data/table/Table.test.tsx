@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { Table, DataTable, CompactTable } from './Table.js'
 import type { Column } from './Table.js'
-import { $state } from '../../../../core/update/reactivity/runes.js'
+import { $state } from '@tuix/reactive'
 
 describe('Table Component', () => {
   const testData = [
@@ -47,9 +47,7 @@ describe('Table Component', () => {
         {
           key: 'name',
           label: 'Name',
-          render: value => (
-            <text style={{ foreground: 'blue' }}>{`User: ${value}`}</text>
-          ),
+          render: value => <text style={{ foreground: 'blue' }}>{`User: ${value}`}</text>,
         },
       ]
 
@@ -90,7 +88,7 @@ describe('Table Component', () => {
         selectionMode: 'multi',
       })
 
-      expect(selectedIndices.value).toEqual([0, 2])
+      expect(selectedIndices()).toEqual([0, 2])
     })
   })
 
@@ -107,8 +105,8 @@ describe('Table Component', () => {
       })
 
       expect(component).toBeDefined()
-      expect(sortColumn.value).toBe('age')
-      expect(sortDirection.value).toBe('asc')
+      expect(sortColumn()).toBe('age')
+      expect(sortDirection()).toBe('asc')
     })
   })
 

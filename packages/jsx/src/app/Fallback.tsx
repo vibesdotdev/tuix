@@ -32,7 +32,7 @@ export function Fallback({ component, metadata }: FallbackProps): JSX.Element {
 
   scopeManager.setFallback({
     component,
-    metadata: metadata || {}
+    metadata: metadata || {},
   })
 
   // Return empty text - this is declarative, not rendered directly

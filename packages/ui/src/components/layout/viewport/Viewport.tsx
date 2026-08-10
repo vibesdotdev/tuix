@@ -236,12 +236,9 @@ export const Viewport = (props: ViewportProps) => {
     }
   }
 
-  const borderStyleValue =
-    borderStyle === 'none' ? undefined : border.borderStyle(borderStyle)
+  const borderStyleValue = borderStyle === 'none' ? undefined : border.borderStyle(borderStyle)
 
-  const viewportStyle = (customStyle || style())
-    .width(width)
-    .height(height)
+  const viewportStyle = (customStyle || style()).width(width).height(height)
 
   const styledViewport = (
     <vstack
@@ -290,11 +287,7 @@ export const Viewport = (props: ViewportProps) => {
     }
   }
 
-  return (
-    <interactive onKeyPress={handleKeyPress}>
-      {styledViewport}
-    </interactive>
-  )
+  return <interactive onKeyPress={handleKeyPress}>{styledViewport}</interactive>
 }
 
 // Export types for external use

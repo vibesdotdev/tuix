@@ -26,7 +26,9 @@ export function ScopeProvider(props: ScopeProviderProps): JSX.Element {
   currentScopeStore.set(scope)
 
   if (process.env.DEBUG_SCOPE) {
-    console.log(`[ScopeProvider] Set scope to ${scope.name}, previous was ${previousScope?.name || 'null'}`)
+    console.log(
+      `[ScopeProvider] Set scope to ${scope.name}, previous was ${previousScope?.name || 'null'}`
+    )
   }
 
   // Render children (they will now see this scope as current)

@@ -481,9 +481,7 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
     }
     return (
       props.emptyMessage ?? (
-        <text style={style().foreground(colors.gray).italic()}>
-          No data to display
-        </text>
+        <text style={style().foreground(colors.gray).italic()}>No data to display</text>
       )
     )
   }
@@ -516,7 +514,10 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
     return (
       <vstack style={style().position('absolute').right(0).top(0)}>
         {Array.from({ length: height }, (_, i) => (
-          <text key={i} style={style().foreground(i === thumbPosition ? colors.white : colors.gray)}>
+          <text
+            key={i}
+            style={style().foreground(i === thumbPosition ? colors.white : colors.gray)}
+          >
             {i === thumbPosition ? '█' : '│'}
           </text>
         ))}
@@ -563,9 +564,7 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
           renderEmptyState()
         ) : (
           <box>
-            <vstack>
-              {visibleRows().map((row, index) => renderRow(row, index))}
-            </vstack>
+            <vstack>{visibleRows().map((row, index) => renderRow(row, index))}</vstack>
             {renderScrollbar()}
           </box>
         )}

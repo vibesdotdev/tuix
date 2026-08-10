@@ -40,10 +40,7 @@ export function Tooltip(props: TooltipProps): JSX.Element | null {
   const visible = props.visible !== false
   if (!visible) return null
 
-  const tooltipStyle = style()
-    .background(colors.gray)
-    .foreground(colors.black)
-    .padding(0, 1)
+  const tooltipStyle = style().background(colors.gray).foreground(colors.black).padding(0, 1)
 
   return (
     <box
@@ -52,11 +49,7 @@ export function Tooltip(props: TooltipProps): JSX.Element | null {
       style={tooltipStyle}
       className={props.className}
     >
-      {props.content ? (
-        <text>{props.content}</text>
-      ) : props.children ? (
-        props.children
-      ) : null}
+      {props.content ? <text>{props.content}</text> : props.children ? props.children : null}
     </box>
   )
 }

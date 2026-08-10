@@ -1,0 +1,255 @@
+{
+  "features": [
+    {
+      "id": "FEAT-term-001",
+      "slug": "capability-detection",
+      "title": "Capability detection",
+      "area": "Terminal",
+      "packages": ["@tuix/core", "@tuix/platform"],
+      "summary": "Detect terminal colors, mouse, and graphics from the environment and optional probe data.",
+      "whatItDoes": "detectCapabilities reads environment variables and optional probe results. The function is pure. You can unit-test it without a teletypewriter (TTY). Device Attributes (DA) helpers parse probe responses. TUIX_PROBE_* environment overrides force features on or off in continuous integration (CI).",
+      "howToUse": "Import detectCapabilities from @tuix/platform. Pass env fields such as TERM and COLORTERM. Call parsePrimaryDA when you have a Device Attributes (DA) response buffer. Set TUIX_PROBE_SIXEL, TUIX_PROBE_KITTY, TUIX_PROBE_ITERM, TUIX_PROBE_MOUSE, or TUIX_PROBE_TRUECOLOR to 0 or 1 to override detection.",
+      "subfeatures": [
+        "Probe overrides (TUIX_PROBE_*) + pure DA parse"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "caps.ts",
+        "code": "import {\n  detectCapabilities,\n  parsePrimaryDA,\n  probeFromEnv,\n  mergeProbeResults,\n} from '@tuix/platform'\n\nconst fromDa = parsePrimaryDA('\\x1b[?62;1;4;6;9;15;22;29c')\nconst fromEnvProbe = probeFromEnv(process.env)\nconst probe = mergeProbeResults(fromDa ?? undefined, fromEnvProbe)\n\nconst caps = detectCapabilities({\n  env: {\n    TERM: process.env.TERM,\n    COLORTERM: process.env.COLORTERM,\n    TERM_PROGRAM: process.env.TERM_PROGRAM,\n  },\n  probe,\n})"
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-term-002",
+      "slug": "graphics-encode-decode",
+      "title": "Graphics encode and decode",
+      "area": "Terminal",
+      "packages": ["@tuix/core", "@tuix/platform"],
+      "summary": "Encode and decode terminal images with sixel, Kitty, and iTerm2 protocols.",
+      "whatItDoes": "encodeGraphics picks a protocol from TerminalCapabilities. It emits sixel, Kitty, or iTerm2 payloads. When no protocol fits, fallback is true. Consumers then use cell rendering. decodeGraphics reverses a known or auto-detected payload.",
+      "howToUse": "Import encodeGraphics or the protocol helpers from @tuix/platform. Pass capabilities and image width, height, and pixel data. Check the fallback flag before you write the payload. Call writeGraphicsLive to encode and write through Live TerminalService.",
+      "subfeatures": [
+        "Sixel encode/decode",
+        "Kitty encode/decode",
+        "iTerm2 encode/decode",
+        "Protocol selection + cell fallback"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "graphics.ts",
+        "code": "import {\n  detectCapabilities,\n  encodeGraphics,\n  selectGraphicsProtocol,\n  writeGraphicsLive,\n} from '@tuix/platform'\n\nconst caps = detectCapabilities({ env: process.env })\nconst protocol = selectGraphicsProtocol(caps)\n\nconst pixels = new Uint8Array(16 * 16 * 3)\nconst encoded = encodeGraphics(caps, {\n  data: pixels,\n  width: 16,\n  height: 16,\n  channels: 3,\n  format: 'rgb',\n})\n\nif (!encoded.fallback) {\n  // encoded.protocol is 'sixel' | 'kitty' | 'iterm2'\n  // encoded.payload is the escape sequence string\n}\n\nawait writeGraphicsLive({\n  data: pixels,\n  width: 16,\n  height: 16,\n  channels: 3,\n})"
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-term-003",
+      "slug": "cursor-position-report",
+      "title": "Cursor Position Report",
+      "area": "Terminal",
+      "packages": ["@tuix/core", "@tuix/platform"],
+      "summary": "Request and parse Cursor Position Report (CPR) replies from the terminal.",
+      "whatItDoes": "REQUEST_CURSOR_POSITION is the Control Sequence Introducer (CSI) query for the cursor. parseCursorPositionReport reads a complete reply. accumulateCpr joins multi-chunk input until the reply is complete.",
+      "howToUse": "Write REQUEST_CURSOR_POSITION to the terminal. Feed reply bytes into parseCursorPositionReport or accumulateCpr. Read row and column from the result when the parse succeeds.",
+      "subfeatures": [
+        "CPR parse + multi-chunk accumulate"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "cpr.ts",
+        "code": "import {\n  REQUEST_CURSOR_POSITION,\n  parseCursorPositionReport,\n  accumulateCpr,\n} from '@tuix/platform'\n\n// Write REQUEST_CURSOR_POSITION (\"\\x1b[6n\") to the terminal, then parse replies.\nconst single = parseCursorPositionReport('\\x1b[12;40R')\n// single => { row: 12, col: 40 }\n\nconst multi = accumulateCpr(['\\x1b[1', '4;8R'])\n// multi => { row: 14, col: 8 }"
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-input-001",
+      "slug": "bracketed-paste",
+      "title": "Bracketed paste stream",
+      "area": "Input",
+      "packages": ["@tuix/core"],
+      "summary": "Extract pasted text from bracketed paste sequences in the input stream.",
+      "whatItDoes": "extractBracketedPaste finds a complete paste between start and end sequences. Incomplete pastes return null so the caller can buffer. createPasteAccumulator feeds chunks and emits finished paste strings. Live InputService uses these helpers for pasteEvents.",
+      "howToUse": "Import extractBracketedPaste or createPasteAccumulator from @tuix/core. Push input chunks into the accumulator. Handle each returned paste string as user text, not as key events.",
+      "subfeatures": [
+        "Bracketed paste extract/accumulator"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "paste.ts",
+        "code": "import {\n  BRACKETED_PASTE_START,\n  BRACKETED_PASTE_END,\n  extractBracketedPaste,\n  createPasteAccumulator,\n} from '@tuix/core'\n\nconst once = extractBracketedPaste(\n  `pre${BRACKETED_PASTE_START}hello${BRACKETED_PASTE_END}post`\n)\n// once.paste === 'hello'\n\nconst acc = createPasteAccumulator()\nacc.push(BRACKETED_PASTE_START + 'ab')\nconst pastes = acc.push('cd' + BRACKETED_PASTE_END)\n// pastes => ['abcd']"
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-pty-001",
+      "slug": "interactive-pty",
+      "title": "Interactive Pseudo-Terminal",
+      "area": "Process",
+      "packages": ["@tuix/process-manager"],
+      "summary": "Spawn, write, and resize an interactive Pseudo-Terminal (PTY) process.",
+      "whatItDoes": "spawnPty starts a process under a Pseudo-Terminal (PTY) backend. The default backend wraps node-pty. PtyHandle supports write, resize, onData, onExit, and kill. createMockPtyBackend supplies an in-memory backend for unit tests.",
+      "howToUse": "Import spawnPty from @tuix/process-manager. Pass the command, arguments, and optional size. Subscribe to onData for output. Call resize when the terminal size changes. Use createMockPtyBackend in tests without native modules.",
+      "subfeatures": [
+        "Mock PtyBackend unit tests",
+        "node-pty wrap / spawnPty"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "pty.ts",
+        "code": "import {\n  spawnPty,\n  createMockPtyBackend,\n  setDefaultPtyBackend,\n} from '@tuix/process-manager'\n\n// Production path (node-pty backend)\nconst shell = spawnPty('bash', ['-l'], { cols: 80, rows: 24 })\nshell.onData((data) => process.stdout.write(data))\nshell.write('echo hello\\n')\nshell.resize(120, 40)\n\n// Tests: mock backend with no native PTY\nconst mock = createMockPtyBackend()\nsetDefaultPtyBackend(mock)\nconst handle = spawnPty('echo', ['hi'], {}, mock)\nhandle.write('input')"
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-rt-001",
+      "slug": "runtime-hooks",
+      "title": "Runtime hooks on the MVU loop",
+      "area": "Runtime",
+      "packages": ["@tuix/runtime"],
+      "summary": "Wire lifecycle hooks into the Model-View-Update (MVU) runtime loop.",
+      "whatItDoes": "RuntimeHooks attach side work to init, update, render, commands, subscriptions, messages, errors, and shutdown. onMessage can return null to cancel a message. onSubscription records each subscription for observability. composeHooks merges several hook sets.",
+      "howToUse": "Build a RuntimeHooks object with createHooks or a plain object. Pass hooks into runApp or the runtime config. Return null from onMessage to drop a message. Use composeHooks when plugins each supply their own hooks.",
+      "subfeatures": [
+        "onMessage cancel-via-null",
+        "onError update/render",
+        "onSubscription registration"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "hooks.ts",
+        "code": "import { Effect } from 'effect'\nimport { createHooks, composeHooks, type RuntimeHooks } from '@tuix/runtime'\n\ntype Msg = { type: 'tick' } | { type: 'noise' }\n\nconst filterHooks: RuntimeHooks<unknown, Msg> = {\n  onMessage: (msg) =>\n    Effect.succeed(msg.type === 'noise' ? null : msg),\n  onSubscription: (_sub) =>\n    Effect.sync(() => {\n      /* observability-grade registration */\n    }),\n  onError: (error, context) =>\n    Effect.sync(() => console.error(context, error)),\n}\n\nconst logHooks = createHooks<unknown, Msg>({\n  afterUpdate: (_old, model, msg) =>\n    Effect.sync(() => console.log(msg, model)),\n})\n\nexport const hooks = composeHooks(filterHooks, logHooks)"
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-rt-002",
+      "slug": "error-recovery-circuit-break",
+      "title": "Render and update error recovery",
+      "area": "Runtime",
+      "packages": ["@tuix/runtime"],
+      "summary": "Recover from render and update errors and stop after repeated render failures.",
+      "whatItDoes": "The Model-View-Update (MVU) runtime catches render and update failures. It calls onError with a context string. consecutiveRenderErrors counts failed paints. When the count reaches the limit, the runtime stops the loop.",
+      "howToUse": "Provide an onError hook to log or report failures. Keep render pure so errors stay rare. Rely on the circuit breaker when paints fail in a loop. Do not disable the stop path in production apps.",
+      "subfeatures": [
+        "consecutiveRenderErrors circuit breaker"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "recovery.ts",
+        "code": "import { Effect } from 'effect'\nimport { type RuntimeHooks } from '@tuix/runtime'\n\nconst hooks: RuntimeHooks = {\n  onError: (error, context) =>\n    Effect.sync(() => {\n      // context is 'render' or 'update' (and related paths)\n      console.error(`[mvu ${context}]`, error)\n    }),\n}\n\n// After max consecutive render errors the runtime sets isRunning to false.\n// Pass hooks when you start the app so recovery paths stay observable."
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-jsx-001",
+      "slug": "jsx-compile-bridge",
+      "title": "JSX compile bridge",
+      "area": "JSX",
+      "packages": ["@tuix/jsx"],
+      "summary": "Compile JSX into Model-View-Update (MVU) with detectInteractive, extractModel, and toView.",
+      "whatItDoes": "detectInteractive decides if a component needs a continuous loop. extractModel builds the initial model from options, named runes, or source. extractStateFromSource reads $state and $states from source text. toView turns JSX output into a View for paint.",
+      "howToUse": "Call compileToComponent or runApp on a JSX function. Set extractState to true for named $state fields. Override interactive when heuristics are wrong. Prefer beginModelExtraction with $state(name) for stable model keys under Bun.",
+      "subfeatures": [
+        "extractStateFromSource",
+        "beginModelExtraction / $state(name) / $states"
+      ],
+      "example": {
+        "lang": "tsx",
+        "filename": "compile.tsx",
+        "code": "import {\n  compileToComponent,\n  detectInteractive,\n  extractModel,\n  extractStateFromSource,\n  runApp,\n} from '@tuix/jsx'\nimport { $state } from '@tuix/reactive'\n\nfunction Counter() {\n  const count = $state(0, 'count')\n  return <text>Count: {count()}</text>\n}\n\nconst interactive = detectInteractive(Counter)\nconst model = extractModel(Counter, { extractState: true })\nconst component = compileToComponent(Counter, {\n  extractState: true,\n  interactive: true,\n})\n\nconst fromSource = extractStateFromSource(\n  \"const n = $state(1, 'n')\"\n)\n// fromSource => { n: 1 }\n\nawait runApp(Counter, { interactive: true, extractState: true })"
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-reac-001",
+      "slug": "reactive-runes-mvu-bridge",
+      "title": "Reactive runes and MVU bridge",
+      "area": "Reactive",
+      "packages": ["@tuix/reactive"],
+      "summary": "Use $derived, $bindable, and $states with a Model-View-Update (MVU) $set bridge.",
+      "whatItDoes": "$derived tracks dependencies and recomputes when inputs change. runUntracked reads without tracking. $bindable supports two-way bindings. bindMvuPush routes named $set into a set UserMsg. registerKeyHandler and emitKeyToHandlers deliver keys without a raw stdin loop.",
+      "howToUse": "Create fields with $state(init, name) or $states. Call bindMvuPush from the runtime so $set updates the model. Use beginViewHydration before paint so named runes match the model. Register key handlers once per session.",
+      "subfeatures": [
+        "Dependency-tracked $derived",
+        "untrack / runUntracked",
+        "bindMvuPush named $set → UserMsg",
+        "registerKeyHandler / emitKeyToHandlers"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "runes.ts",
+        "code": "import {\n  $state,\n  $states,\n  $derived,\n  runUntracked,\n  bindMvuPush,\n  beginViewHydration,\n  endViewHydration,\n  registerKeyHandler,\n} from '@tuix/reactive'\n\n// Runtime binds push so named $set becomes { type: 'set', key, value }\nbindMvuPush((msg) => {\n  // forward msg into the MVU message queue\n  console.log(msg.type, msg.key, msg.value)\n})\n\nconst fields = $states({ count: 0, label: 'hi' })\nconst count = $state(0, 'count')\nconst doubled = $derived(() => count() * 2)\n\ncount.$set(3)\nconst peek = runUntracked(() => doubled())\n\nbeginViewHydration({ count: 3, label: 'hi' })\n// paint with hydrated runes\nendViewHydration()\n\nconst off = registerKeyHandler((key) => {\n  if (key === 'q') process.exit(0)\n})"
+      },
+      "status": "Complete"
+    },
+    {
+      "id": "FEAT-plat-001",
+      "slug": "platform-live-services",
+      "title": "Platform LiveServices facade",
+      "area": "Platform",
+      "packages": ["@tuix/platform"],
+      "summary": "Import LiveServices and terminal helpers from one public platform package.",
+      "whatItDoes": "@tuix/platform re-exports Live terminal, input, renderer, and storage layers. It also re-exports capability and graphics helpers. Physical Live implementations live under @tuix/core. Apps depend on the facade. Tests can supply fakes through the same service tags.",
+      "howToUse": "Import LiveServices from @tuix/platform. Provide the layer to Effect programs that need live I/O. Import detectCapabilities and encodeGraphics from the same package. Do not import Live layers from deeper core paths in app code.",
+      "subfeatures": [
+        "LiveServices re-export surface"
+      ],
+      "example": {
+        "lang": "typescript",
+        "filename": "platform.ts",
+        "code": "import { Effect } from 'effect'\nimport {\n  LiveServices,\n  TerminalService,\n  detectCapabilities,\n  PLATFORM_VERSION,\n} from '@tuix/platform'\n\nconst caps = detectCapabilities({ env: process.env })\n\nconst program = Effect.gen(function* () {\n  const term = yield* TerminalService\n  yield* term.write(`Tuix ${PLATFORM_VERSION}\\n`)\n  return caps.colors\n})\n\nawait Effect.runPromise(program.pipe(Effect.provide(LiveServices)))"
+      },
+      "status": "Complete"
+    }
+  ],
+  "areas": [
+    {
+      "slug": "terminal",
+      "title": "Terminal and graphics",
+      "summary": "Detect terminal capabilities. Encode images. Parse Cursor Position Report (CPR) replies.",
+      "featureSlugs": [
+        "capability-detection",
+        "graphics-encode-decode",
+        "cursor-position-report"
+      ]
+    },
+    {
+      "slug": "input",
+      "title": "Input",
+      "summary": "Parse bracketed paste sequences from the terminal input stream.",
+      "featureSlugs": ["bracketed-paste"]
+    },
+    {
+      "slug": "process",
+      "title": "Process",
+      "summary": "Spawn and control interactive Pseudo-Terminal (PTY) processes.",
+      "featureSlugs": ["interactive-pty"]
+    },
+    {
+      "slug": "runtime",
+      "title": "Runtime",
+      "summary": "Hook the Model-View-Update (MVU) loop and recover from render and update errors.",
+      "featureSlugs": [
+        "runtime-hooks",
+        "error-recovery-circuit-break"
+      ]
+    },
+    {
+      "slug": "jsx",
+      "title": "JSX",
+      "summary": "Compile JSX components into Model-View-Update (MVU) views and models.",
+      "featureSlugs": ["jsx-compile-bridge"]
+    },
+    {
+      "slug": "reactive",
+      "title": "Reactive",
+      "summary": "Runes, derived values, and the Model-View-Update (MVU) $set bridge.",
+      "featureSlugs": ["reactive-runes-mvu-bridge"]
+    },
+    {
+      "slug": "platform",
+      "title": "Platform",
+      "summary": "Public LiveServices facade for apps that need live terminal I/O.",
+      "featureSlugs": ["platform-live-services"]
+    }
+  ]
+}
