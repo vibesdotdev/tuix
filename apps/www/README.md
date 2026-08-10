@@ -25,6 +25,27 @@ bun run www:build
 bun run www:preview
 ```
 
+## Production (tuix.vibes.dev)
+
+Infra is declared in `apps/www/deployment.config.ts` (Vibes infra + Cloudflare Workers).
+
+```bash
+# Regenerate wrangler.jsonc from deployment.config.ts
+vibes infra deploy regenerate apps/www
+
+# Deploy (uses CLOUDFLARE_* from vibes secrets; do not export a broken shell token)
+env -u CF_API_TOKEN -u CLOUDFLARE_API_TOKEN \
+  vibes secrets exec --environment local \
+    --with CLOUDFLARE_API_TOKEN \
+    --with CLOUDFLARE_ACCOUNT_ID \
+    -- \
+  vibes infra deploy run apps/www --environment production --branch main
+```
+
+Canonical origin: **https://tuix.vibes.dev**
+
+Source of truth for the product monorepo: **https://github.com/vibesdotdev/tuix**
+
 ## Content
 
 - Marketing routes: `/`, `/features`, `/get-started`, `/packages`
