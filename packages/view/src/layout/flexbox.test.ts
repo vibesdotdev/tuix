@@ -414,4 +414,18 @@ describe('Flexbox Layout', () => {
       expect(renderTime).toBeLessThan(500) // Should be reasonably fast
     })
   })
+
+  describe('ANSI framebuffer', () => {
+    it('keeps truecolor half-blocks as visual cells, not CSI debris', async () => {
+      const cell = '\x1b[38;2;16;185;129m\x1b[48;2;52;211;153m▀'
+      const line = `${cell.repeat(12)}\x1b[0m`
+      const flex = flexbox([text(line)], { direction: FlexDirection.Column })
+      const result = await Effect.runPromise(flex.render())
+      const content = typeof result === 'string' ? result : String(result)
+      expect(content).toContain('\x1b[38;2;16;185;129m')
+      expect(content).toContain('▀')
+      expect([...content].filter(ch => ch === '▀')).toHaveLength(12)
+      expect(flex.width).toBe(12)
+    })
+  })
 })

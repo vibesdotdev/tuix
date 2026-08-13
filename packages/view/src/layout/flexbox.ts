@@ -12,6 +12,7 @@
  */
 
 import { Effect } from 'effect'
+import { parseVisualCells } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
 import {
@@ -474,12 +475,12 @@ const renderChildToBuffer = (
   const lines = content.split('\n')
 
   for (let y = 0; y < lines.length && y < bounds.height; y++) {
-    const line = lines[y] ?? ''
-    const chars = [...line]
+    const cells = parseVisualCells(lines[y] ?? '')
 
-    for (let x = 0; x < chars.length && x < bounds.width; x++) {
+    for (let x = 0; x < cells.length && x < bounds.width; x++) {
       const bufferY = bounds.y + y
       const bufferX = bounds.x + x
+      const cell = cells[x]
 
       if (
         bufferY >= 0 &&
@@ -487,9 +488,9 @@ const renderChildToBuffer = (
         bufferX >= 0 &&
         bufferX < bufferWidth &&
         buffer[bufferY] &&
-        chars[x]
+        cell
       ) {
-        buffer[bufferY][bufferX] = chars[x]
+        buffer[bufferY][bufferX] = `${cell.prefix}${cell.char}`
       }
     }
   }

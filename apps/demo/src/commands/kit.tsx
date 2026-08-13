@@ -1,95 +1,22 @@
 /** @jsxImportSource @tuix/jsx */
 
-import { colors, style } from '@tuix/ansi'
-import {
-  Button,
-  ButtonGroup,
-  Card,
-  CommandPalette,
-  Editor,
-  FileTree,
-  Input,
-  Mark,
-  Select,
-  StatusBar,
-  Textarea,
-} from '@tuix/ui'
+import { Mark, StatusBar } from '@tuix/ui'
 
-export default function Kit() {
+function Kit() {
+  const cols = Math.max(20, process.stdout.columns ?? 120)
+  const rows = Math.max(8, (process.stdout.rows ?? 40) - 1)
+
   return (
-    <vstack>
-      <hstack gap={3}>
-        <Mark frame={0.35} cols={17} rows={9} />
-        <vstack>
-          <text style={style().fg(colors.white).bold()}>Tuix kit</text>
-          <text style={style().fg(colors.gray)}>primitives for a real TUI</text>
-        </vstack>
-        <Mark frame={1} cols={17} rows={9} />
-      </hstack>
-      <text></text>
-      <ButtonGroup>
-        <Button variant="primary">Save</Button>
-        <Button variant="danger">Delete</Button>
-        <Button variant="ghost">Skip</Button>
-      </ButtonGroup>
-      <text></text>
-      <hstack gap={4}>
-        <vstack>
-          <text style={style().fg(colors.cyan).bold()}>Identity</text>
-          <Input value="Ada Lovelace" placeholder="Name" focused />
-          <Select
-            value="ts"
-            options={[
-              { value: 'ts', label: 'TypeScript' },
-              { value: 'js', label: 'JavaScript' },
-            ]}
-          />
-          <Textarea value={'Short note\nSecond line'} rows={2} />
-        </vstack>
-        <vstack>
-          <text style={style().fg(colors.cyan).bold()}>Workspace</text>
-          <FileTree
-            selected="src/app.tsx"
-            nodes={[
-              {
-                id: 'src',
-                name: 'src',
-                children: [
-                  { id: 'src/app.tsx', name: 'app.tsx' },
-                  { id: 'src/kit.tsx', name: 'kit.tsx' },
-                ],
-              },
-            ]}
-          />
-        </vstack>
-        <vstack>
-          <text style={style().fg(colors.cyan).bold()}>Source</text>
-          <Editor language="ts" value={'export const ok = true'} />
-          <Card title="Workers">3 running</Card>
-        </vstack>
-        <vstack>
-          <text style={style().fg(colors.yellow).bold()}>Overlays</text>
-          <CommandPalette
-            open
-            query="sa"
-            items={[
-              { id: 'save', label: 'Save file', hint: '⌘S' },
-              { id: 'quit', label: 'Quit' },
-            ]}
-            selected="save"
-            onPick={() => undefined}
-            onClose={() => undefined}
-          />
-        </vstack>
-      </hstack>
-      <text></text>
+    <flex direction="column">
+      <Mark cols={cols} rows={rows} scale={1} frame={2.2} />
       <StatusBar
-        facts={[{ slot: 'context', value: 'operator workbench' }]}
-        hints={[
-          { keys: '?', label: 'help' },
-          { keys: '/', label: 'commands' },
-        ]}
+        facts={[{ slot: 'context', value: 'flower of life' }]}
+        hints={[{ keys: 'esc', label: 'cancel' }]}
       />
-    </vstack>
+    </flex>
   )
 }
+
+Kit.interactive = true
+
+export default Kit

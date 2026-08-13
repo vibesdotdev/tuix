@@ -10,4 +10,5 @@
 import { runApp } from '@tuix/jsx'
 import App from './app'
 
-await runApp(App)
+const kit = process.argv.includes('kit')
+await runApp(App, { fps: kit ? 2 : 60 })

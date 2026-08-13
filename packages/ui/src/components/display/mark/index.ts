@@ -1,1 +1,1 @@
-export { Mark, renderMarkGrid, type MarkProps } from './Mark'
+export { Mark, renderMark, renderMarkGrid, type MarkProps } from './Mark'

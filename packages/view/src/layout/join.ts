@@ -5,6 +5,7 @@
  */
 
 import { Effect } from 'effect'
+import { sliceVisual } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
 
@@ -209,7 +210,7 @@ export const place = (
         // Horizontal alignment
         const alignedLines = lines.map(line => {
           const lineWidth = stringWidth(line)
-          if (lineWidth >= width) return line.slice(0, width)
+          if (lineWidth >= width) return sliceVisual(line, width)
 
           const space = width - lineWidth
           const left = Math.floor(space * hPos)
