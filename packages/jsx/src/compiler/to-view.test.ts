@@ -42,6 +42,26 @@ describe('JSX → View pipeline', () => {
     expect(content).toContain('Compiled path')
   })
 
+  test('input bind:value unwraps runes', async () => {
+    const { $state } = await import('@tuix/reactive')
+    const name = $state('Ada')
+    const view = toView(jsx('input', { 'bind:value': name, placeholder: 'Name' }))
+    const out = await Effect.runPromise(view.render())
+    const content = typeof out === 'string' ? out : (out as { content: string }).content
+    expect(content).toContain('Ada')
+    expect(content).not.toContain('function')
+  })
+
+  test('hstack gap inserts space between children', async () => {
+    const el = jsxs('hstack', {
+      gap: 2,
+      children: [jsx('text', { children: 'A' }), jsx('text', { children: 'B' })],
+    })
+    const out = await Effect.runPromise(toView(el).render())
+    const content = typeof out === 'string' ? out : (out as { content: string }).content
+    expect(content).toContain('A  B')
+  })
+
   test('button and checkbox intrinsics render cells', async () => {
     const btn = toView(jsx('button', { label: 'Save', focused: true }))
     const chk = toView(jsx('checkbox', { checked: true, label: 'Agree' }))

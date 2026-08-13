@@ -5,6 +5,8 @@
  */
 
 export * from './text-input'
+export * from './textarea'
+export * from './editor'
 export * from './button'
 export * from './file-picker'
 export * from './select'
@@ -15,7 +17,9 @@ export * from './form'
 export * from './toggle'
 
 // Re-export for convenience
-export { TextInput, textInput, passwordInput, emailInput, numberInput } from './text-input'
+export { Input, TextInput, textInput, passwordInput, emailInput, numberInput } from './text-input'
+export { Textarea } from './textarea'
+export { Editor } from './editor'
 export { Button, primaryButton, secondaryButton, ButtonGroup } from './button'
 export { FilePicker } from './file-picker'
 export { Select, select } from './select'

@@ -11,6 +11,7 @@ export * from './status-indicator'
 export * from './divider'
 export * from './large-text'
 export * from './status-bar'
+export * from './card'
 
 // Re-export commonly used components
 export { Text, Heading, Code, Success, Error, Warning, Info } from './text'

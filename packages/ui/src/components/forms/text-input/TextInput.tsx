@@ -1,49 +1,12 @@
-/**
- * TextInput Component - JSX version with reactive state management
- *
- * A fully-featured text input component with:
- * - Reactive state management using Svelte-inspired runes
- * - Multiple echo modes (normal, password, none)
- * - Cursor styles and blinking
- * - Validation and transformation
- * - Keyboard navigation
- *
- * @example
- * ```tsx
- * import { TextInput } from 'tuix/components/forms/text-input'
- *
- * function MyForm() {
- *   const name = $state('')
- *   const password = $state('')
- *
- *   return (
- *     <vstack>
- *       <TextInput
- *         bind:value={name}
- *         placeholder="Enter name..."
- *       />
- *       <TextInput
- *         bind:value={password}
- *         placeholder="Enter password..."
- *         echoMode="password"
- *       />
- *     </vstack>
- *   )
- * }
- * ```
- */
+/** @jsxImportSource @tuix/jsx */
 
-import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
-import type { StateRune, BindableRune } from '@tuix/reactive/runes/runes'
-import { isBindableRune, isStateRune } from '@tuix/reactive/runes/runes'
-import { style, colors, border } from '@tuix/ansi'
-import { createTextInputStore, type TextInputStore } from '../../../stores/textInputStore'
+import type { BindableRune, StateRune } from '@tuix/reactive'
+import { readBound } from '../../../bind'
 
-// Types
 export type EchoMode = 'normal' | 'password' | 'none'
 export type CursorStyle = 'block' | 'underline' | 'bar' | 'blink'
 
-export interface TextInputProps {
+export interface InputProps {
   value?: string
   'bind:value'?: BindableRune<string> | StateRune<string>
   placeholder?: string
@@ -51,255 +14,51 @@ export interface TextInputProps {
   echoMode?: EchoMode
   charLimit?: number
   cursorStyle?: CursorStyle
-  validate?: (value: string) => string | null
-  transform?: (value: string) => string
   onSubmit?: (value: string) => void
   onChange?: (value: string) => void
   onFocus?: () => void
   onBlur?: () => void
-  autoFocus?: boolean
   disabled?: boolean
+  focused?: boolean
   className?: string
 }
 
+export type TextInputProps = InputProps
+
 /**
- * TextInput Component
+ * Single-line field. Composes the `<input>` intrinsic.
+ *
+ * @example
+ * ```tsx
+ * <Input bind:value={name} placeholder="Name" />
+ * ```
  */
-export function TextInput(props: TextInputProps): JSX.Element {
-  // Create store for managing complex input state
-  const store = createTextInputStore({
-    initialValue: props.value || '',
-    charLimit: props.charLimit,
-    validator: props.validate,
-    transformer: props.transform,
-    width: props.width || 30,
-  })
-
-  // Extract bound value if provided
-  const boundValue = props['bind:value']
-
-  // Configuration
-  const width = props.width || 30
-  const placeholder = props.placeholder || ''
-  const echoMode = props.echoMode || 'normal'
-  const cursorStyle = props.cursorStyle || 'bar'
-
-  // Sync bound value with store
-  $effect(() => {
-    if (boundValue && (isBindableRune(boundValue) || isStateRune(boundValue))) {
-      // Update store when bound value changes
-      if (boundValue() !== store.value()) {
-        store.setValue(boundValue())
-      }
-    }
-  })
-
-  // Sync store value back to bound value
-  $effect(() => {
-    if (boundValue && (isBindableRune(boundValue) || isStateRune(boundValue))) {
-      // Update bound value when store changes
-      if (store.value() !== boundValue()) {
-        boundValue.$set(store.value())
-      }
-    }
-
-    // Call onChange callback
-    props.onChange?.(store.value())
-  })
-
-  // Auto-focus effect
-  $effect(() => {
-    if (props.autoFocus) {
-      store.focus()
-    }
-  })
-
-  // Derived state for display
-  const displayValue = $derived(() => {
-    const val = store.value()
-    if (echoMode === 'password') {
-      return '•'.repeat(val.length)
-    } else if (echoMode === 'none') {
-      return ''
-    }
-    return store.displayValue()
-  })
-
-  // Cursor blink effect override for specific styles
-  $effect(() => {
-    if (store.isFocused() && cursorStyle === 'blink') {
-      const interval = setInterval(() => {
-        store.showCursor.$set(!store.showCursor())
-      }, 500)
-
-      return () => clearInterval(interval)
-    }
-  })
-
-  // Event handlers
-  function handleKeyPress(key: string) {
-    if (!store.isFocused() || props.disabled) return
-
-    switch (key) {
-      case 'ArrowLeft':
-        store.moveCursorRelative(-1)
-        break
-
-      case 'ArrowRight':
-        store.moveCursorRelative(1)
-        break
-
-      case 'Home':
-        store.moveCursor(0)
-        break
-
-      case 'End':
-        store.moveCursor(store.value().length)
-        break
-
-      case 'Backspace':
-        store.deleteBackward()
-        break
-
-      case 'Delete':
-        store.deleteForward()
-        break
-
-      case 'Enter':
-        props.onSubmit?.(store.value())
-        break
-
-      case 'a':
-        // Handle Ctrl+A for select all
-        // TODO: Properly handle keyboard events with modifiers
-        // For now, skip Ctrl+A handling until we have proper KeyboardEvent types
-        store.insertText(key)
-        break
-
-      default:
-        // Character input
-        if (key.length === 1) {
-          store.insertText(key)
-        }
-    }
-  }
-
-  // Render
-  const borderColor = store.validationError()
-    ? colors.red
-    : store.isFocused()
-      ? colors.blue
-      : colors.gray
-
-  const showBorder = store.isFocused() || Boolean(store.validationError())
-
-  let inputStyle = style().width(width).minHeight(1).padding(0, 1)
-
-  if (showBorder) {
-    inputStyle = inputStyle.border(border.borderStyle('thin')).borderFg(borderColor)
-  }
-
-  if (props.disabled) {
-    inputStyle = inputStyle.background(colors.gray)
-  }
-
-  const cursorChar = getCursorChar(cursorStyle, store.showCursor())
+export function Input(props: InputProps): JSX.Element {
+  const raw = String(readBound(props['bind:value']) ?? props.value ?? '')
+  const echo = props.echoMode ?? 'normal'
+  const displayed = echo === 'password' ? '•'.repeat(raw.length) : echo === 'none' ? '' : raw
 
   return (
-    <interactive
-      onKeyPress={handleKeyPress}
-      onFocus={() => {
-        store.focus()
-        props.onFocus?.()
-      }}
-      onBlur={() => {
-        store.blur()
-        props.onBlur?.()
-      }}
-      focusable={!props.disabled}
+    <input
       className={props.className}
-    >
-      <box style={inputStyle}>{renderInputContent()}</box>
-    </interactive>
+      value={displayed}
+      placeholder={props.placeholder}
+      focused={props.focused}
+      disabled={props.disabled}
+      bind:value={echo === 'normal' ? props['bind:value'] : undefined}
+      onChange={props.disabled ? undefined : props.onChange}
+      onSubmit={props.disabled ? undefined : props.onSubmit}
+      onFocus={props.onFocus}
+      onBlur={props.onBlur}
+    />
   )
-
-  function renderInputContent(): JSX.Element {
-    const visible = store.visibleText()
-    const cursorPos = store.cursorPosition()
-
-    if (!visible && placeholder) {
-      return <text style={style().foreground(colors.gray).italic()}>{placeholder}</text>
-    }
-
-    if (!store.isFocused() || !store.showCursor()) {
-      return <text>{visible}</text>
-    }
-
-    // Handle selection rendering
-    if (store.hasSelection() && store.selection()) {
-      const [selStart, selEnd] = store.selection()
-      const beforeSelection = visible.slice(0, selStart - store.offset())
-      const selection = visible.slice(selStart - store.offset(), selEnd - store.offset())
-      const afterSelection = visible.slice(selEnd - store.offset())
-
-      return (
-        <hstack>
-          {beforeSelection ? <text>{beforeSelection}</text> : null}
-          <text style={style().background(colors.blue).foreground(colors.white)}>{selection}</text>
-          {afterSelection ? <text>{afterSelection}</text> : null}
-        </hstack>
-      )
-    }
-
-    // Render with cursor
-    const beforeCursor = visible.slice(0, cursorPos)
-    const atCursor = visible[cursorPos] || ' '
-    const afterCursor = visible.slice(cursorPos + 1)
-
-    return (
-      <hstack>
-        {beforeCursor ? <text>{beforeCursor}</text> : null}
-        <text style={getCursorStyle(cursorStyle)}>{cursorChar || atCursor}</text>
-        {afterCursor ? <text>{afterCursor}</text> : null}
-      </hstack>
-    )
-  }
-
-  function getCursorChar(style: CursorStyle, show: boolean): string {
-    if (!show && style === 'blink') return ''
-
-    switch (style) {
-      case 'block':
-        return '█'
-      case 'underline':
-        return '_'
-      case 'bar':
-        return '│'
-      case 'blink':
-        return '│'
-      default:
-        return '│'
-    }
-  }
-
-  function getCursorStyle(cursorStyle: CursorStyle) {
-    switch (cursorStyle) {
-      case 'block':
-        return style().bg(colors.blue).fg(colors.black)
-      case 'underline':
-        return style().underline()
-      default:
-        return style().fg(colors.blue)
-    }
-  }
 }
 
-// Convenience factory functions
-export const textInput = (props: TextInputProps) => <TextInput {...props} />
-export const passwordInput = (props: TextInputProps) => <TextInput {...props} echoMode="password" />
-export const emailInput = (props: TextInputProps) => (
-  <TextInput {...props} placeholder="email@example.com" />
+export const TextInput = Input
+
+export const textInput = (props: InputProps) => <Input {...props} />
+export const passwordInput = (props: InputProps) => <Input {...props} echoMode="password" />
+export const emailInput = (props: InputProps) => (
+  <Input {...props} placeholder={props.placeholder ?? 'email@example.com'} />
 )
-export const numberInput = (props: TextInputProps) => (
-  <TextInput {...props} transform={v => v.replace(/[^0-9]/g, '')} />
-)
+export const numberInput = (props: InputProps) => <Input {...props} />

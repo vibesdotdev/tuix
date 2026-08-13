@@ -770,6 +770,19 @@ const buildStyle = (...inputs: Array<Partial<StyleProps> | undefined>): StyleIns
   return style(merged)
 }
 
+const unwrapProp = (value: unknown): unknown => {
+  if (isBindableRune(value) || isStateRune(value)) {
+    return value()
+  }
+  return value
+}
+
+const stringProp = (value: unknown, fallback = ''): string => {
+  const unwrapped = unwrapProp(value)
+  if (unwrapped == null || typeof unwrapped === 'boolean') return fallback
+  return String(unwrapped)
+}
+
 const toTextContent = (children: unknown[]): string | null => {
   const segments: string[] = []
   for (const child of children) {
@@ -1340,12 +1353,24 @@ function renderJSX(
 
     case 'vstack': {
       const childrenViews = ensureViewArray(validChildren)
+      const gap = toNumber(safeProps.gap) ?? 0
+      if (gap > 0 && childrenViews.length > 1) {
+        const spaced: View[] = []
+        childrenViews.forEach((view, index) => {
+          if (index > 0) {
+            for (let i = 0; i < gap; i++) spaced.push(text(''))
+          }
+          spaced.push(view)
+        })
+        return vstack(...spaced)
+      }
       return vstack(...childrenViews)
     }
 
     case 'hstack': {
       const childrenViews = ensureViewArray(validChildren)
-      return hstack(...childrenViews)
+      const gap = toNumber(safeProps.gap) ?? 0
+      return gap > 0 ? joinViews(childrenViews, gap) : hstack(...childrenViews)
     }
 
     case 'flex': {
@@ -1451,15 +1476,16 @@ function renderJSX(
     }
     case 'text-input':
     case 'input': {
-      const value = String(safeProps.value ?? safeProps['bind:value'] ?? '')
-      const placeholder = String(safeProps.placeholder ?? '')
+      const value = stringProp(safeProps.value ?? safeProps['bind:value'])
+      const placeholder = stringProp(safeProps.placeholder)
       const shown = value.length > 0 ? value : placeholder
       const focused = safeProps.focused === true
       return text(focused ? `▌${shown}▐` : `[${shown}]`)
     }
     case 'textarea': {
-      const value = String(safeProps.value ?? '')
-      return text(value.length ? value : String(safeProps.placeholder ?? ''))
+      const fromChildren = toTextContent(validChildren)
+      const value = stringProp(safeProps.value ?? safeProps['bind:value'] ?? fromChildren)
+      return text(value.length ? value : stringProp(safeProps.placeholder))
     }
     case 'checkbox': {
       const checked = safeProps.checked === true || safeProps.value === true
@@ -1642,7 +1668,12 @@ export namespace JSX {
       focused?: boolean
       'bind:value'?: unknown
     }
-    textarea: { value?: string; placeholder?: string; children?: unknown }
+    textarea: {
+      value?: string
+      placeholder?: string
+      children?: unknown
+      'bind:value'?: unknown
+    }
     checkbox: { checked?: boolean; value?: boolean; label?: string; children?: unknown }
     toggle: { on?: boolean; checked?: boolean; value?: boolean; label?: string; children?: unknown }
     scrollview: { children?: unknown }

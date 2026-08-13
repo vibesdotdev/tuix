@@ -1,11 +1,23 @@
-/**
- * Tests for Modal.tsx
- */
+/** @jsxImportSource @tuix/jsx */
 
-import { describe, test, expect } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
+import { Effect } from 'effect'
+import { toView } from '@tuix/jsx'
+import { Modal } from './Modal'
 
-describe('Modal Component', () => {
-  test('should have tests', () => {
-    expect(true).toBe(true)
+async function paint(node: unknown): Promise<string> {
+  const out = await Effect.runPromise(toView(node).render())
+  return typeof out === 'string' ? out : out.content
+}
+
+describe('Modal', () => {
+  test('accepts open and isOpen', async () => {
+    expect(await paint(<Modal isOpen title="Old" />)).toContain('Old')
+    expect(await paint(<Modal open title="New" />)).toContain('New')
+    expect(await paint(<Modal isOpen={false} title="Hidden" />)).not.toContain('Hidden')
+  })
+
+  test('keeps the close mark off the title', async () => {
+    expect(await paint(<Modal open title="Confirm" />)).toContain('Confirm ×')
   })
 })

@@ -5,11 +5,13 @@
  */
 
 export {
+  Input,
   TextInput,
   textInput,
   passwordInput,
   emailInput,
   numberInput,
+  type InputProps,
   type TextInputProps,
   type EchoMode,
   type CursorStyle,

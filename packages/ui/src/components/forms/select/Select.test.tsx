@@ -1,42 +1,36 @@
-/**
- * Select Component Tests
- */
+/** @jsxImportSource @tuix/jsx */
 
-import { test, expect, describe } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
+import { Effect } from 'effect'
+import { toView } from '@tuix/jsx'
 import { Select } from './Select'
 
-describe('Select Component', () => {
-  test('should create select component', () => {
-    const options = [
-      { value: 'a', label: 'Option A' },
-      { value: 'b', label: 'Option B' },
-    ]
+async function paint(node: unknown): Promise<string> {
+  const out = await Effect.runPromise(toView(node).render())
+  return typeof out === 'string' ? out : out.content
+}
 
-    const component = <Select options={options} value="a" />
-    expect(component).toBeDefined()
+const options = [
+  { value: 'a', label: 'Option A' },
+  { value: 'b', label: 'Option B' },
+]
+
+describe('Select', () => {
+  test('paints the selected label', async () => {
+    const content = await paint(<Select options={options} value="a" />)
+    expect(content).toContain('Option A')
+    expect(content).toContain('▾')
   })
 
-  test('should handle placeholder', () => {
-    const options = [{ value: 'a', label: 'Option A' }]
-
-    const component = <Select options={options} placeholder="Select one..." />
-    expect(component).toBeDefined()
+  test('open lists every option', async () => {
+    const content = await paint(<Select options={options} value="a" open />)
+    expect(content).toContain('Option A')
+    expect(content).toContain('Option B')
+    expect(content).toContain('>')
   })
 
-  test('should handle disabled state', () => {
-    const options = [{ value: 'a', label: 'Option A' }]
-
-    const component = <Select options={options} disabled />
-    expect(component).toBeDefined()
-  })
-
-  test('should handle searchable mode', () => {
-    const options = [
-      { value: 'a', label: 'Option A' },
-      { value: 'b', label: 'Option B' },
-    ]
-
-    const component = <Select options={options} searchable />
-    expect(component).toBeDefined()
+  test('placeholder when empty', async () => {
+    const content = await paint(<Select options={options} placeholder="Select one..." />)
+    expect(content).toContain('Select one...')
   })
 })
