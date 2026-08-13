@@ -36,9 +36,11 @@ export type {
   ThemeColors,
   ThemeTypography,
   ThemeSpacing,
+  ThemeDepth,
   ThemeConfig,
   ThemeError,
 } from './types'
+export { depthOf } from './depth'
 export type { ThemeContext } from './context'
 export type { UseThemeResult } from './useTheme'
 export type { ThemeProviderProps } from './ThemeProvider'

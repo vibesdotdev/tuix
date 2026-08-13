@@ -1,5 +1,7 @@
 /** @jsxImportSource @tuix/jsx */
 
+import { useUITheme } from '../../../theme'
+
 export interface CardProps {
   title?: string
   description?: string
@@ -8,14 +10,21 @@ export interface CardProps {
 }
 
 function CardRoot(props: CardProps): JSX.Element {
+  const { depth, theme } = useUITheme()
   return (
-    <card className={props.className}>
+    <box
+      className={props.className}
+      border="rounded"
+      padding={1}
+      background={depth.surface}
+      borderColor={depth.outset}
+    >
       <vstack>
-        {props.title ? <text>{props.title}</text> : null}
-        {props.description ? <text>{props.description}</text> : null}
+        {props.title ? <text fg={theme.colors.textBright ?? theme.colors.fg}>{props.title}</text> : null}
+        {props.description ? <text fg={theme.colors.textDim}>{props.description}</text> : null}
         {props.children}
       </vstack>
-    </card>
+    </box>
   )
 }
 

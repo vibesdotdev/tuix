@@ -63,6 +63,19 @@ export interface ThemeSpacing {
 }
 
 /**
+ * Background stack. About 5–8% luminance between steps.
+ * Dark themes: inset darker than surface; outset lighter.
+ * Light themes: invert.
+ */
+export interface ThemeDepth {
+  base: string
+  surface: string
+  overlay: string
+  inset: string
+  outset: string
+}
+
+/**
  * Complete theme definition
  */
 export interface Theme {
@@ -71,6 +84,7 @@ export interface Theme {
   colors: ThemeColors
   typography: ThemeTypography
   spacing: ThemeSpacing
+  depth: ThemeDepth
 }
 
 /**

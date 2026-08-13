@@ -47,4 +47,11 @@ export const darkTheme: Theme = {
     margin: 1,
     gap: 1,
   },
+  depth: {
+    base: '#111827',
+    surface: '#1f2937',
+    overlay: '#374151',
+    inset: '#0b1220',
+    outset: '#4b5563',
+  },
 }

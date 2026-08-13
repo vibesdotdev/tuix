@@ -48,4 +48,11 @@ export const vibesTheme: Theme = {
     margin: 1,
     gap: 1,
   },
+  depth: {
+    base: '#000000',
+    surface: '#0c0c0c',
+    overlay: '#161616',
+    inset: '#050505',
+    outset: '#222222',
+  },
 }

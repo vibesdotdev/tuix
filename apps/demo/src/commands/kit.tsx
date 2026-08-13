@@ -9,6 +9,7 @@ import {
   Editor,
   FileTree,
   Input,
+  Mark,
   Select,
   StatusBar,
   Textarea,
@@ -17,9 +18,13 @@ import {
 export default function Kit() {
   return (
     <vstack>
-      <hstack gap={2}>
-        <text style={style().fg(colors.white).bold()}>Tuix kit</text>
-        <text style={style().fg(colors.gray)}>primitives for a real TUI</text>
+      <hstack gap={3}>
+        <Mark frame={0.35} cols={17} rows={9} />
+        <vstack>
+          <text style={style().fg(colors.white).bold()}>Tuix kit</text>
+          <text style={style().fg(colors.gray)}>primitives for a real TUI</text>
+        </vstack>
+        <Mark frame={1} cols={17} rows={9} />
       </hstack>
       <text></text>
       <ButtonGroup>

@@ -49,4 +49,11 @@ export const draculaTheme: Theme = {
     margin: 1,
     gap: 1,
   },
+  depth: {
+    base: '#282a36',
+    surface: '#343746',
+    overlay: '#44475a',
+    inset: '#21222c',
+    outset: '#6272a4',
+  },
 }

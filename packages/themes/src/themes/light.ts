@@ -48,4 +48,11 @@ export const lightTheme: Theme = {
     margin: 1,
     gap: 1,
   },
+  depth: {
+    base: '#ffffff',
+    surface: '#f3f4f6',
+    overlay: '#e5e7eb',
+    inset: '#f9fafb',
+    outset: '#d1d5db',
+  },
 }

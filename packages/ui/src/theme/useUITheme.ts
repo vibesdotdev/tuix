@@ -4,8 +4,8 @@
  * Provides easy access to theme colors and utilities for UI components.
  */
 
-import type { Theme } from '@tuix/themes'
-import { vibesTheme } from '@tuix/themes'
+import type { Theme, ThemeDepth } from '@tuix/themes'
+import { depthOf, vibesTheme } from '@tuix/themes'
 import { $state } from '@tuix/reactive'
 import { colors } from '@tuix/ansi'
 
@@ -48,6 +48,8 @@ export interface UITheme {
     margin: number
     gap: number
   }
+
+  depth: ThemeDepth
 }
 
 /**
@@ -103,6 +105,7 @@ export function useUITheme(): UITheme {
     getColor,
     borderStyle: currentTheme.typography.borderStyle,
     spacing: currentTheme.spacing,
+    depth: depthOf(currentTheme),
   }
 }
 

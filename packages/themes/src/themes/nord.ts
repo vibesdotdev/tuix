@@ -49,4 +49,11 @@ export const nordTheme: Theme = {
     margin: 1,
     gap: 1,
   },
+  depth: {
+    base: '#2e3440',
+    surface: '#3b4252',
+    overlay: '#434c5e',
+    inset: '#242933',
+    outset: '#4c566a',
+  },
 }

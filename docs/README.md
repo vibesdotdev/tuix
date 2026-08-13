@@ -10,6 +10,11 @@ This folder contains architecture, standards, and planning docs for the monorepo
 - [../STATUS.md](../STATUS.md) — implementation status by phase
 - [PRIORITIES.md](./PRIORITIES.md) — priority order and gap-elimination plan
 
+## Visual bar
+
+- [VISUAL-LANGUAGE.md](./VISUAL-LANGUAGE.md) — depth, motion, brand, density
+- [EVIDENCE.md](./EVIDENCE.md) — real PTY PNG or it did not happen
+
 ## Engineering Standards
 
 - [RULES.md](./RULES.md)

@@ -2,6 +2,7 @@
 
 import type { BindableRune, StateRune } from '@tuix/reactive'
 import { readBound } from '../../../bind'
+import { useUITheme } from '../../../theme'
 
 export interface EditorProps {
   value?: string
@@ -22,6 +23,7 @@ export interface EditorProps {
  * ```
  */
 export function Editor(props: EditorProps): JSX.Element {
+  const { depth, theme } = useUITheme()
   const raw = String(readBound(props['bind:value']) ?? props.value ?? '')
   const lines = (raw.length > 0 ? raw : props.placeholder ?? '').split('\n')
   const limit = props.rows && props.rows > 0 ? props.rows : lines.length
@@ -29,13 +31,19 @@ export function Editor(props: EditorProps): JSX.Element {
   const gutter = String(Math.max(visible.length, 1)).length
 
   return (
-    <card className={props.className}>
+    <box
+      className={props.className}
+      border="rounded"
+      padding={1}
+      background={depth.inset}
+      borderColor={depth.outset}
+    >
       <vstack>
-        {props.language ? <text>{props.language}</text> : null}
+        {props.language ? <text fg={theme.colors.textDim}>{props.language}</text> : null}
         {visible.map((line, index) => (
           <text key={index}>{`${String(index + 1).padStart(gutter, ' ')} │ ${line}`}</text>
         ))}
       </vstack>
-    </card>
+    </box>
   )
 }

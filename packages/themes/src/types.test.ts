@@ -108,6 +108,13 @@ describe('@tuix/themes - Types', () => {
         margin: 2,
         gap: 2,
       },
+      depth: {
+        base: '#000000',
+        surface: '#111111',
+        overlay: '#222222',
+        inset: '#080808',
+        outset: '#333333',
+      },
     }
 
     expect(customTheme.name).toBe('custom')

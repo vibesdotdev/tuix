@@ -1,6 +1,7 @@
 /** @jsxImportSource @tuix/jsx */
 
 import type { ThemeVariant } from '../../../theme'
+import { useUITheme } from '../../../theme'
 import { Button } from '../../forms/button/Button'
 
 export interface ModalProps {
@@ -37,6 +38,7 @@ export function Modal(props: ModalProps): JSX.Element | null {
     return null
   }
 
+  const { depth } = useUITheme()
   const showCloseButton = props.showCloseButton ?? true
   const closeOnEscape = props.closeOnEscape ?? true
   const confirmLabel = props.confirmLabel ?? 'Confirm'
@@ -53,7 +55,14 @@ export function Modal(props: ModalProps): JSX.Element | null {
 
   return (
     <interactive className={props.className} focusable onKeyPress={handleKeyPress}>
-      <box border="rounded" padding={1} width={props.width} height={props.height}>
+      <box
+        border="rounded"
+        padding={1}
+        width={props.width}
+        height={props.height}
+        background={depth.overlay}
+        borderColor={depth.outset}
+      >
         <vstack gap={1}>
           <hstack gap={1}>
             {props.title ? <text>{props.title}</text> : null}
