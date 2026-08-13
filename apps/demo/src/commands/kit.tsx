@@ -1,7 +1,7 @@
 /** @jsxImportSource @tuix/jsx */
 
-import { $state, getMvuPush, registerKeyHandler } from '@tuix/reactive'
-import { CommandPalette, Mark, Modal, StatusBar, useUITheme } from '@tuix/ui'
+import { $state, registerKeyHandler } from '@tuix/reactive'
+import { formatStatusBar } from '@tuix/ui'
 
 type Focus = 'sessions' | 'files' | 'composer'
 type Overlay = 'none' | 'command' | 'help'
@@ -50,13 +50,17 @@ const COMMANDS = [
 const FOCUSES: Focus[] = ['sessions', 'files', 'composer']
 
 let keyCleanup: (() => void) | null = null
-let bootTimer = false
 
 function viewport() {
   return {
     cols: Math.max(60, process.stdout.columns ?? 80),
     rows: Math.max(18, process.stdout.rows ?? 24),
   }
+}
+
+function pad(text: string, width: number): string {
+  const clipped = text.length > width ? text.slice(0, Math.max(0, width - 1)) + '…' : text
+  return clipped + ' '.repeat(Math.max(0, width - clipped.length))
 }
 
 function wrap(text: string, width: number): string[] {
@@ -76,11 +80,6 @@ function wrap(text: string, width: number): string[] {
 }
 
 function Kit() {
-  const { theme } = useUITheme()
-  const boot = $state(
-    process.argv.includes('kit') && Boolean(process.stdout.isTTY) && process.env.TUIX_BOOT !== '0',
-    'boot'
-  )
   const focus = $state<Focus>('composer', 'focus')
   const overlay = $state<Overlay>('none', 'overlay')
   const selected = $state(0, 'selected')
@@ -91,30 +90,12 @@ function Kit() {
 
   const { cols, rows } = viewport()
   const compact = cols < 90
-  const sidebar = compact ? 0 : Math.max(20, Math.min(26, Math.floor(cols * 0.26)))
-  const mainW = compact ? cols : Math.max(28, cols - sidebar - 3)
-
-  if (!bootTimer) {
-    bootTimer = true
-    const waitForBridge = () => {
-      if (!getMvuPush()) {
-        setTimeout(waitForBridge, 40)
-        return
-      }
-      setTimeout(() => {
-        if (boot()) boot.$set(false)
-      }, 180)
-    }
-    waitForBridge()
-  }
+  const sideW = compact ? 0 : Math.min(24, Math.max(18, Math.floor(cols * 0.28)))
+  const mainW = compact ? cols : cols - sideW - 1
 
   if (keyCleanup) keyCleanup()
   keyCleanup = registerKeyHandler(key => {
     const k = key
-    if (boot()) {
-      boot.$set(false)
-      return
-    }
     if (overlay() === 'command') {
       if (k === 'Escape' || k === 'escape' || k === 'esc') {
         overlay.$set('none')
@@ -161,9 +142,7 @@ function Kit() {
       if (k === 'k' || k === 'ArrowUp' || k === 'up') {
         selected.$set(Math.max(0, selected() - 1))
         extra.$set([])
-        return
       }
-      if (k === 'Enter' || k === 'enter') focus.$set('composer')
       return
     }
     if (focus() === 'files') {
@@ -171,9 +150,7 @@ function Kit() {
         fileIx.$set(Math.min(FILES.length - 1, fileIx() + 1))
         return
       }
-      if (k === 'k' || k === 'ArrowUp' || k === 'up') {
-        fileIx.$set(Math.max(0, fileIx() - 1))
-      }
+      if (k === 'k' || k === 'ArrowUp' || k === 'up') fileIx.$set(Math.max(0, fileIx() - 1))
       return
     }
     if (focus() === 'composer') {
@@ -192,110 +169,101 @@ function Kit() {
     }
   })
 
-  if (boot()) {
-    return (
-      <flex direction="column">
-        <Mark cols={cols} rows={Math.max(8, rows - 1)} scale={1} frame={2.2} />
-        <StatusBar facts={[{ slot: 'context', value: 'vibes' }]} hints={[{ keys: 'any', label: 'continue' }]} />
-      </flex>
-    )
-  }
-
   const session = SESSIONS[selected()] ?? SESSIONS[0]!
   const thread = [...(THREADS[session.id] ?? []), ...extra()]
-  const threadBudget = Math.max(4, rows - (compact ? 10 : 6))
+  const threadBudget = Math.max(3, rows - 8)
   const threadLines = thread.flatMap(turn => {
     const prefix = turn.role === 'you' ? 'you  ' : 'grok '
-    return wrap(turn.text, mainW - prefix.length - 1).map((line, i) =>
+    return wrap(turn.text, Math.max(16, mainW - 6)).map((line, i) =>
       i === 0 ? `${prefix}${line}` : `     ${line}`
     )
   })
   const visible = threadLines.slice(-threadBudget)
-  const dim = theme.colors.textDim
-  const fg = theme.colors.fg
-  const hi = theme.colors.primary
 
-  const sessionLines = SESSIONS.map((item, i) => {
-    const mark = i === selected() ? '▸ ' : '  '
-    return (
-      <text key={item.id} fg={i === selected() && focus() === 'sessions' ? hi : fg}>
-        {`${mark}${item.title}`}
-      </text>
-    )
-  })
-  const fileLines = FILES.map((name, i) => (
-    <text key={name} fg={i === fileIx() && focus() === 'files' ? hi : fg}>
-      {`${i === fileIx() ? '▸ ' : '  '}${name}`}
-    </text>
-  ))
-  const convo = visible.map((line, i) => (
-    <text key={`${i}`} fg={line.startsWith('you') ? dim : fg}>
-      {line}
-    </text>
-  ))
-  const composer = (
-    <text fg={focus() === 'composer' ? hi : dim}>{`▸ ${draft() || 'say something…'}`}</text>
-  )
+  const lines: string[] = []
+  lines.push(pad(`vibes   ${session.title}   ${SESSIONS.length} sessions`, cols))
+  lines.push(pad('', cols))
 
-  const body = compact ? (
-    <vstack>
-      <text fg={dim}>sessions</text>
-      {sessionLines}
-      <text> </text>
-      {convo}
-    </vstack>
-  ) : (
-    <hstack>
-      <vstack>
-        <text fg={dim}>sessions</text>
-        {sessionLines}
-        <text> </text>
-        <text fg={dim}>files</text>
-        {fileLines}
-      </vstack>
-      <vstack>
-        <text fg={dim}>{session.title}</text>
-        {convo}
-      </vstack>
-    </hstack>
-  )
+  if (compact) {
+    lines.push(pad('sessions', cols))
+    for (const [i, item] of SESSIONS.entries()) {
+      const mark = i === selected() ? '▸ ' : '  '
+      lines.push(pad(`${mark}${item.title}`, cols))
+    }
+    lines.push(pad('', cols))
+    for (const line of visible) lines.push(pad(line, cols))
+  } else {
+    const left: string[] = ['sessions']
+    for (const [i, item] of SESSIONS.entries()) {
+      left.push(`${i === selected() ? '▸ ' : '  '}${item.title}`)
+    }
+    left.push('', 'files')
+    for (const [i, name] of FILES.entries()) {
+      left.push(`${i === fileIx() ? '▸ ' : '  '}${name}`)
+    }
+    const right: string[] = [session.title, ...visible]
+    const height = Math.max(left.length, right.length)
+    for (let i = 0; i < height; i++) {
+      const l = pad(left[i] ?? '', sideW)
+      const r = pad(right[i] ?? '', mainW)
+      lines.push(pad(`${l} ${r}`, cols))
+    }
+  }
 
-  return (
-    <flex direction="column">
-      <text fg={theme.colors.textBright}>{`vibes   ${session.title}   ${SESSIONS.length} sessions`}</text>
-      {body}
-      {composer}
-      <StatusBar
-        facts={[
+  lines.push(pad(`▸ ${draft() || 'say something…'}`, cols))
+  lines.push(
+    pad(
+      formatStatusBar({
+        facts: [
           { slot: 'context', value: session.title },
           { slot: 'file', value: FILES[fileIx()] ?? '' },
           { slot: 'focus', value: focus() },
-        ]}
-        hints={[
-          { keys: 'tab', label: 'focus' },
-          { keys: '/', label: 'command' },
-          { keys: 'esc', label: 'cancel' },
-          { keys: 'enter', label: 'send' },
-          { keys: '?', label: 'help' },
-        ]}
-      />
-      <CommandPalette
-        open={overlay() === 'command'}
-        items={COMMANDS}
-        query={query()}
-        onPick={item => {
-          if (item.id === 'files') focus.$set('files')
-          if (item.id === 'help') overlay.$set('help')
-          else overlay.$set('none')
-          query.$set('')
-        }}
-        onClose={() => overlay.$set('none')}
-      />
-      <Modal open={overlay() === 'help'} title="Keys" onClose={() => overlay.$set('none')}>
-        <text>tab cycles. j/k lists. type to compose. enter sends. / command. esc closes.</text>
-      </Modal>
-    </flex>
+        ],
+        hints: compact
+          ? [
+              { keys: 'tab', label: 'focus' },
+              { keys: '/', label: 'cmd' },
+              { keys: 'esc', label: 'back' },
+            ]
+          : [
+              { keys: 'tab', label: 'focus' },
+              { keys: '/', label: 'command' },
+              { keys: 'esc', label: 'cancel' },
+              { keys: 'enter', label: 'send' },
+              { keys: '?', label: 'help' },
+            ],
+      }),
+      cols
+    )
   )
+
+  if (overlay() === 'command') {
+    const box = [
+      '┌ command ─────────────────────┐',
+      `│ / ${pad(query() || 'type a command…', 26)}│`,
+      ...COMMANDS.map(item => `│   ${pad(`${item.label}  ${item.hint ?? ''}`, 28)}│`),
+      '└──────────────────────────────┘',
+    ]
+    for (let i = 0; i < box.length && i + 2 < lines.length; i++) {
+      lines[i + 2] = pad(box[i]!, cols)
+    }
+  }
+
+  if (overlay() === 'help') {
+    const box = [
+      '┌ keys ────────────────────────┐',
+      '│ tab cycle   j/k lists        │',
+      '│ type compose   enter send    │',
+      '│ / command   esc close        │',
+      '└──────────────────────────────┘',
+    ]
+    for (let i = 0; i < box.length && i + 2 < lines.length; i++) {
+      lines[i + 2] = pad(box[i]!, cols)
+    }
+  }
+
+  const frame = lines.slice(0, rows).join('\n')
+  return <text>{frame}</text>
 }
 
 Kit.interactive = true
