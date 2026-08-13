@@ -1,3 +1,5 @@
+/** @jsxImportSource @tuix/jsx */
+
 /**
  * One-line status bar: ordered facts plus key hints.
  * Consumed by any Tuix app that wants a single owner per fact slot.
