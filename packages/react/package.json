@@ -1,0 +1,42 @@
+{
+  "name": "@tuix/react",
+  "version": "1.0.0-rc.3",
+  "description": "React reconciler host that paints through @tuix/view. Lets React apps use Tuix as the terminal backend.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": ["src", "README.md"],
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./test-utils": {
+      "types": "./src/test-utils.ts",
+      "import": "./src/test-utils.ts",
+      "default": "./src/test-utils.ts"
+    }
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit --pretty false"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "dependencies": {
+    "@tuix/ansi": "file:../ansi",
+    "@tuix/view": "file:../view",
+    "effect": "^3.16.9"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.0.0",
+    "@types/react-test-renderer": "^19.0.0",
+    "react": "^19.0.0",
+    "react-test-renderer": "^19.0.0",
+    "typescript": "^5.3.0"
+  }
+}

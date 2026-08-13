@@ -10,6 +10,7 @@ export * from './badge'
 export * from './status-indicator'
 export * from './divider'
 export * from './large-text'
+export * from './status-bar'
 
 // Re-export commonly used components
 export { Text, Heading, Code, Success, Error, Warning, Info } from './text'
