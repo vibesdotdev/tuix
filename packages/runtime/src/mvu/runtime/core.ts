@@ -55,6 +55,8 @@ export class Runtime<Model, Msg> {
   private consecutiveRenderErrors = 0
   private readonly maxRenderErrors = 5
   private hasRendered: boolean = false
+  private screenReady: boolean = false
+  private dirty: boolean = true
 
   constructor(
     config: RuntimeConfig,
@@ -288,6 +290,12 @@ export class Runtime<Model, Msg> {
           const state = yield* _(Ref.get(this.state))
           if (!state.isRunning) break
 
+          if (!this.dirty && this.screenReady) {
+            yield* _(this.frameScheduler.waitForNextFrame())
+            continue
+          }
+          this.dirty = false
+
           const frame = Effect.gen(
             function* (_) {
               if (this.hooks?.beforeRender) {
@@ -300,7 +308,9 @@ export class Runtime<Model, Msg> {
                   ? yield* _(Effect.promise(() => viewResultOrPromise))
                   : viewResultOrPromise
 
+              yield* _(terminal.write('\x1b[0m'))
               yield* _(terminal.clear)
+              this.screenReady = true
               // Support View.render(), plain strings, or JSX elements (no render)
               let content = ''
               if (typeof viewResult === 'string') {
@@ -453,6 +463,7 @@ export class Runtime<Model, Msg> {
             }
 
             yield* _(this.executeCommands(commands))
+            this.dirty = true
 
             if (this.config.performanceMonitoring) {
               yield* _(
@@ -480,6 +491,12 @@ export class Runtime<Model, Msg> {
                   ? (msg.key as { runes: string }).runes
                   : String((msg.key as { type?: string }).type ?? msg.key ?? '')
             emitKeyToHandlers(keyName)
+            this.dirty = true
+            break
+          }
+
+          case 'WindowResize': {
+            this.dirty = true
             break
           }
 

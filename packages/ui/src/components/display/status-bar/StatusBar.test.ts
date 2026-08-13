@@ -8,7 +8,7 @@ describe('StatusBar', () => {
 				facts: [{ slot: 'context', value: 'main · dirty' }],
 				hints: [{ keys: '?', label: 'help' }]
 			})
-		).toBe('main · dirty · ? help');
+		).toBe('main · dirty  ·  [?] help');
 	});
 
 	it('drops blank facts', () => {

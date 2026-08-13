@@ -4,13 +4,24 @@
 import { Effect, Equal, Layer, Option, Ref, pipe } from 'effect'
 
 import type { StyleProps as AnsiStyle } from '@tuix/ansi'
-import { visualWidth } from '@tuix/ansi'
+import { visualWidth, parseVisualCells, rgb } from '@tuix/ansi'
 import { RendererService } from '../renderer'
 import { TerminalService } from '../terminal'
 import type { View } from '../../../types/core'
 import { RenderError } from '../../types/errors'
 import type { Viewport } from '../../../types/schemas'
 import { toAnsiStyleCode } from '@tuix/ansi'
+
+function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): boolean {
+  if (Option.isNone(a) && Option.isNone(b)) return true
+  if (Option.isNone(a) || Option.isNone(b)) return false
+  const left = a.value
+  const right = b.value
+  return (
+    JSON.stringify(left.foreground ?? null) === JSON.stringify(right.foreground ?? null) &&
+    JSON.stringify(left.background ?? null) === JSON.stringify(right.background ?? null)
+  )
+}
 
 // -----------------------------------------------------------------------------
 // Models
@@ -126,15 +137,21 @@ class ScreenBuffer {
     for (let ly = 0; ly < lines.length; ly++) {
       const row = y + ly
       if (row < 0 || row >= this.height) continue
-      const line = lines[ly] ?? ''
-      // Strip simple ANSI for cell storage; preserve printable chars
-      const plain = line.replace(/\x1b\[[0-9;]*m/g, '')
-      for (let lx = 0; lx < plain.length; lx++) {
+      const cells = parseVisualCells(lines[ly] ?? '')
+      for (let lx = 0; lx < cells.length; lx++) {
         const col = x + lx
         if (col < 0 || col >= this.width) continue
+        const cell = cells[lx]!
+        const style =
+          cell.fg || cell.bg
+            ? Option.some({
+                ...(cell.fg ? { foreground: rgb(cell.fg.r, cell.fg.g, cell.fg.b) } : {}),
+                ...(cell.bg ? { background: rgb(cell.bg.r, cell.bg.g, cell.bg.b) } : {}),
+              })
+            : Option.none<AnsiStyle>()
         this.cells[row]![col] = {
-          char: plain[lx] ?? ' ',
-          style: Option.none(),
+          char: cell.char || ' ',
+          style,
         }
       }
     }
@@ -171,7 +188,7 @@ class ScreenBuffer {
       for (let x = 0; x < w; x++) {
         const a = this.cells[y]![x]!
         const b = other.cells[y]![x]!
-        if (a.char !== b.char) {
+        if (a.char !== b.char || !stylesEqual(a.style, b.style)) {
           if (!run.length) runX = x
           run.push(b)
         } else {

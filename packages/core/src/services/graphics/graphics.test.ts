@@ -76,6 +76,7 @@ describe('encodeGraphics protocol selection', () => {
     })
     expect(r.fallback).toBe(true)
     expect(r.protocol).toBe('none')
+    expect(r.payload).toContain('▀')
   })
   test('uses sixel when capability set', () => {
     const pixels = new Uint8Array(8 * 6).fill(200)
