@@ -770,6 +770,13 @@ const buildStyle = (...inputs: Array<Partial<StyleProps> | undefined>): StyleIns
   return style(merged)
 }
 
+const paintCell = (content: string, props: Record<string, unknown>) => {
+  const fg = props.fg ?? props.color ?? props.foreground
+  const merged = mergeStyleProps(extractStyleProps(props.style), fg ? { foreground: fg as never } : undefined)
+  if (!merged || Object.keys(merged).length === 0) return text(content)
+  return styledText(content, buildStyle(merged))
+}
+
 const unwrapProp = (value: unknown): unknown => {
   if (isBindableRune(value) || isStateRune(value)) {
     return value()
@@ -1472,7 +1479,7 @@ function renderJSX(
       const kids = toTextContent(validChildren)
       const label = kids && kids.length > 0 ? kids : String(safeProps.label ?? 'OK')
       const focused = safeProps.focused === true
-      return text(focused ? `[ ${label} ]` : `( ${label} )`)
+      return paintCell(focused ? `[ ${label} ]` : `( ${label} )`, safeProps)
     }
     case 'text-input':
     case 'input': {
@@ -1480,7 +1487,7 @@ function renderJSX(
       const placeholder = stringProp(safeProps.placeholder)
       const shown = value.length > 0 ? value : placeholder
       const focused = safeProps.focused === true
-      return text(focused ? `▌${shown}▐` : `[${shown}]`)
+      return paintCell(focused ? `▌${shown}▐` : `[${shown}]`, safeProps)
     }
     case 'textarea': {
       const fromChildren = toTextContent(validChildren)

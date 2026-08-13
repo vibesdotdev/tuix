@@ -1,5 +1,6 @@
 /** @jsxImportSource @tuix/jsx */
 
+import { colors } from '@tuix/ansi'
 import type { BindableRune, StateRune } from '@tuix/reactive'
 import { readBound } from '../../../bind'
 
@@ -45,6 +46,7 @@ export function Input(props: InputProps): JSX.Element {
       placeholder={props.placeholder}
       focused={props.focused}
       disabled={props.disabled}
+      fg={props.focused ? colors.cyan : colors.white}
       bind:value={echo === 'normal' ? props['bind:value'] : undefined}
       onChange={props.disabled ? undefined : props.onChange}
       onSubmit={props.disabled ? undefined : props.onSubmit}

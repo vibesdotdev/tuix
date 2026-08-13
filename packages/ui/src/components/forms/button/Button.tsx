@@ -1,5 +1,6 @@
 /** @jsxImportSource @tuix/jsx */
 
+import { colors } from '@tuix/ansi'
 import { labelOf } from '../../../bind'
 
 export type ButtonVariant =
@@ -39,6 +40,26 @@ function decorate(label: string, variant: ButtonVariant): string {
   }
 }
 
+function variantColor(variant: ButtonVariant) {
+  switch (variant) {
+    case 'primary':
+    case 'default':
+      return colors.cyan
+    case 'danger':
+      return colors.red
+    case 'success':
+      return colors.green
+    case 'warning':
+      return colors.yellow
+    case 'info':
+      return colors.blue
+    case 'ghost':
+      return colors.gray
+    default:
+      return colors.white
+  }
+}
+
 /**
  * Action trigger. Composes the `<button>` intrinsic.
  *
@@ -54,7 +75,11 @@ export function Button(props: ButtonProps): JSX.Element {
   const disabled = Boolean(props.disabled || props.loading)
 
   if (variant === 'ghost') {
-    return <text className={props.className}>{decorate(label, variant)}</text>
+    return (
+      <text className={props.className} fg={variantColor(variant)}>
+        {decorate(label, variant)}
+      </text>
+    )
   }
 
   return (
@@ -63,6 +88,7 @@ export function Button(props: ButtonProps): JSX.Element {
       label={decorate(label, variant)}
       focused={props.focused === true || variant === 'primary' || variant === 'default'}
       disabled={disabled}
+      fg={variantColor(variant)}
       onClick={disabled ? undefined : props.onClick}
     />
   )
