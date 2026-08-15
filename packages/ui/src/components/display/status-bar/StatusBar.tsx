@@ -16,16 +16,20 @@ export interface StatusHint {
 export interface StatusBarProps {
   facts?: StatusFact[]
   hints?: StatusHint[]
+  width?: number
 }
 
 export function formatStatusBar(props: StatusBarProps): string {
-  const facts = (props.facts ?? [])
-    .map(fact => fact.value)
-    .filter(value => value.trim().length > 0)
+  const facts = (props.facts ?? []).map(fact => fact.value).filter(value => value.trim().length > 0)
   const hints = (props.hints ?? [])
     .filter(hint => hint.keys && hint.label)
     .map(hint => `[${hint.keys}] ${hint.label}`)
-  return [...facts, ...hints].join('  ·  ')
+  const line = [...facts, ...hints].join('  ·  ')
+  const width = props.width
+  if (typeof width === 'number' && width > 0 && line.length > width) {
+    return `${line.slice(0, Math.max(1, width - 1))}…`
+  }
+  return line
 }
 
 export function StatusBar(props: StatusBarProps): JSX.Element {

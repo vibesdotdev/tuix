@@ -1,7 +1,7 @@
 /**
  * @since 1.0.0
  */
-import { Effect, Equal, Layer, Option, Ref, pipe } from 'effect'
+import { Effect, Layer, Option, Ref, pipe } from 'effect'
 
 import type { StyleProps as AnsiStyle } from '@tuix/ansi'
 import { visualWidth, parseVisualCells, rgb } from '@tuix/ansi'
@@ -281,18 +281,27 @@ export const RendererServiceLive = Layer.effect(
       })
 
     const beginFrame = Effect.gen(function* (_) {
-      // Get current terminal size and update buffers if needed
       const size = yield* _(terminal.getSize)
-      const back = yield* _(Ref.get(backBuffer))
-      if (size.width !== back.width || size.height !== back.height) {
-        // Resize buffers
-        const newBack = new Buffer(size.width, size.height)
-        const newFront = new Buffer(size.width, size.height)
-        yield* _(Ref.set(backBuffer, newBack))
-        yield* _(Ref.set(frontBuffer, newFront))
+      const width = size.width ?? 80
+      const height = size.height ?? 24
+      let back = yield* _(Ref.get(backBuffer))
+      if (width !== back.width || height !== back.height) {
+        back = new Buffer(width, height)
+        yield* _(Ref.set(backBuffer, back))
+        yield* _(Ref.set(frontBuffer, new Buffer(width, height)))
+        yield* _(
+          Ref.update(state, s => ({
+            ...s,
+            layers: s.layers.map(layer => ({
+              ...layer,
+              buffer: new Buffer(width, height),
+              viewport: { ...layer.viewport, width, height },
+            })),
+            viewports: s.viewports.map(vp => ({ ...vp, width, height })),
+          }))
+        )
       }
 
-      // Clear the back buffer to prepare for new frame
       back.clear()
     }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause }))))
 
@@ -446,11 +455,12 @@ export const RendererServiceLive = Layer.effect(
         const caps = yield* _(terminal.getCapabilities)
 
         for (const patch of patches) {
-          yield* _(terminal.moveCursor(patch.x, patch.y))
+          // CUP is 1-based; the cell buffer is 0-based.
+          yield* _(terminal.moveCursor(patch.x + 1, patch.y + 1))
 
           let line = ''
           for (const cell of patch.cells) {
-            if (!Equal.equals(cell.style, currentStyle)) {
+            if (!stylesEqual(cell.style, currentStyle)) {
               if (line.length > 0) {
                 yield* _(terminal.write(line))
                 line = ''
@@ -470,6 +480,7 @@ export const RendererServiceLive = Layer.effect(
             yield* _(terminal.write(line))
           }
         }
+        yield* _(terminal.write('\x1b[0m'))
       }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'composite', cause }))))
 
     const setViewport = (viewport: Viewport) =>

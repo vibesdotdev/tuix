@@ -308,33 +308,30 @@ export class Runtime<Model, Msg> {
                   ? yield* _(Effect.promise(() => viewResultOrPromise))
                   : viewResultOrPromise
 
-              yield* _(terminal.write('\x1b[0m'))
-              yield* _(terminal.clear)
-              this.screenReady = true
-              // Support View.render(), plain strings, or JSX elements (no render)
-              let content = ''
-              if (typeof viewResult === 'string') {
-                content = viewResult
-              } else if (
-                viewResult &&
-                typeof (viewResult as { render?: unknown }).render === 'function'
-              ) {
-                const rendered = yield* _(
-                  (viewResult as { render: () => Effect.Effect<unknown> }).render()
-                )
-                content =
-                  typeof rendered === 'string'
-                    ? rendered
-                    : String((rendered as { content?: string })?.content ?? rendered ?? '')
-              } else if (viewResult != null) {
-                // JSX element or unknown tree — best-effort string (CLI debug)
-                content = String(
-                  (viewResult as { props?: { children?: unknown } }).props?.children ??
-                    (viewResult as { type?: { name?: string } }).type?.name ??
-                    '[view]'
-                )
+              const asView: View =
+                typeof viewResult === 'string'
+                  ? { render: () => Effect.succeed(viewResult) }
+                  : viewResult && typeof (viewResult as { render?: unknown }).render === 'function'
+                    ? (viewResult as View)
+                    : {
+                        render: () =>
+                          Effect.succeed(
+                            String(
+                              (viewResult as { props?: { children?: unknown } })?.props?.children ??
+                                (viewResult as { type?: { name?: string } })?.type?.name ??
+                                '[view]'
+                            )
+                          ),
+                      }
+
+              if (!this.screenReady) {
+                yield* _(terminal.clear)
+                this.screenReady = true
               }
-              yield* _(terminal.write(content))
+
+              yield* _(renderer.beginFrame)
+              yield* _(renderer.render(asView))
+              yield* _(renderer.endFrame)
 
               if (this.hooks?.afterRender) {
                 yield* _(this.hooks.afterRender(viewResult, state.model))

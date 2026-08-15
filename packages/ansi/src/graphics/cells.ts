@@ -18,10 +18,36 @@ export interface VisualCell {
 
 const CSI = /\u001b\[[0-?]*[ -/]*[@-~]/y
 
+const ANSI16: Rgb[] = [
+  { r: 0, g: 0, b: 0 },
+  { r: 128, g: 0, b: 0 },
+  { r: 0, g: 128, b: 0 },
+  { r: 128, g: 128, b: 0 },
+  { r: 0, g: 0, b: 128 },
+  { r: 128, g: 0, b: 128 },
+  { r: 0, g: 128, b: 128 },
+  { r: 192, g: 192, b: 192 },
+  { r: 128, g: 128, b: 128 },
+  { r: 255, g: 0, b: 0 },
+  { r: 0, g: 255, b: 0 },
+  { r: 255, g: 255, b: 0 },
+  { r: 0, g: 0, b: 255 },
+  { r: 255, g: 0, b: 255 },
+  { r: 0, g: 255, b: 255 },
+  { r: 255, g: 255, b: 255 },
+]
+
+function ansi16(index: number): Rgb {
+  return ANSI16[Math.max(0, Math.min(15, index))] ?? ANSI16[7]!
+}
+
 function parseSgr(seq: string, fg?: Rgb, bg?: Rgb): { fg?: Rgb; bg?: Rgb; reset: boolean } {
   if (seq === '\u001b[0m' || seq === '\u001b[m') return { reset: true }
   if (!seq.startsWith('\u001b[') || !seq.endsWith('m')) return { fg, bg, reset: false }
-  const parts = seq.slice(2, -1).split(';').map(n => Number(n))
+  const parts = seq
+    .slice(2, -1)
+    .split(';')
+    .map(n => Number(n))
   let i = 0
   let nextFg = fg
   let nextBg = bg
@@ -31,6 +57,44 @@ function parseSgr(seq: string, fg?: Rgb, bg?: Rgb): { fg?: Rgb; bg?: Rgb; reset:
       nextFg = undefined
       nextBg = undefined
       i += 1
+      continue
+    }
+    if (code === 39) {
+      nextFg = undefined
+      i += 1
+      continue
+    }
+    if (code === 49) {
+      nextBg = undefined
+      i += 1
+      continue
+    }
+    if (code >= 30 && code <= 37) {
+      nextFg = ansi16(code - 30)
+      i += 1
+      continue
+    }
+    if (code >= 90 && code <= 97) {
+      nextFg = ansi16(code - 90 + 8)
+      i += 1
+      continue
+    }
+    if (code >= 40 && code <= 47) {
+      nextBg = ansi16(code - 40)
+      i += 1
+      continue
+    }
+    if (code >= 100 && code <= 107) {
+      nextBg = ansi16(code - 100 + 8)
+      i += 1
+      continue
+    }
+    if ((code === 38 || code === 48) && parts[i + 1] === 5) {
+      const idx = parts[i + 2] ?? 0
+      const rgb = idx < 16 ? ansi16(idx) : { r: idx, g: idx, b: idx }
+      if (code === 38) nextFg = rgb
+      else nextBg = rgb
+      i += 3
       continue
     }
     if ((code === 38 || code === 48) && parts[i + 1] === 2) {
@@ -66,6 +130,7 @@ export function parseVisualCells(line: string): VisualCell[] {
   let i = 0
   let fg: Rgb | undefined
   let bg: Rgb | undefined
+  let active = ''
 
   while (i < line.length) {
     if (line.charCodeAt(i) === 0x1b) {
@@ -76,9 +141,11 @@ export function parseVisualCells(line: string): VisualCell[] {
         if (parsed.reset) {
           fg = undefined
           bg = undefined
+          active = ''
         } else {
           fg = parsed.fg
           bg = parsed.bg
+          active += match[0]
         }
         i = CSI.lastIndex
         continue
@@ -90,7 +157,7 @@ export function parseVisualCells(line: string): VisualCell[] {
     const char = String.fromCodePoint(code)
     i += char.length
     if (char === '\n' || char === '\r') continue
-    cells.push({ char, prefix: prefixOf(fg, bg), fg, bg })
+    cells.push({ char, prefix: active || prefixOf(fg, bg), fg, bg })
   }
 
   return cells
@@ -98,10 +165,40 @@ export function parseVisualCells(line: string): VisualCell[] {
 
 export function joinVisualCells(cells: readonly VisualCell[]): string {
   if (cells.length === 0) return ''
-  return `${cells.map(cell => `${cell.prefix}${cell.char}`).join('')}\x1b[0m`
+  let out = ''
+  let last = ''
+  for (const cell of cells) {
+    if (cell.prefix !== last) {
+      if (last && !cell.prefix) out += '\x1b[0m'
+      out += cell.prefix
+      last = cell.prefix
+    }
+    out += cell.char
+  }
+  if (last) out += '\x1b[0m'
+  return out
 }
 
 export function sliceVisual(line: string, width: number): string {
   const limit = Math.max(0, Math.floor(width))
   return joinVisualCells(parseVisualCells(line).slice(0, limit))
+}
+
+/** Visible columns in a line, ignoring CSI. */
+export function visualCellCount(line: string): number {
+  return parseVisualCells(line).length
+}
+
+/**
+ * Pad or clip a line to `width` visible columns.
+ * Unstyled exact-width text stays a plain string so join tests stay stable.
+ */
+export function padVisual(line: string, width: number): string {
+  const target = Math.max(0, Math.floor(width))
+  if (target === 0) return ''
+  const cells = parseVisualCells(line)
+  const used = cells.length > target ? cells.slice(0, target) : cells
+  let out = joinVisualCells(used)
+  if (used.length < target) out += ' '.repeat(target - used.length)
+  return out
 }

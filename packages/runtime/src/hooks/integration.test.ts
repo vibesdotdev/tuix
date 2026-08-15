@@ -34,7 +34,7 @@ const InputServiceTest = Layer.succeed(InputService, {
 } as any)
 
 const RendererServiceTest = Layer.succeed(RendererService, {
-  render: () => Effect.void,
+  render: (view: { render: () => Effect.Effect<unknown> }) => view.render().pipe(Effect.asVoid),
   beginFrame: Effect.void,
   endFrame: Effect.void,
   forceRedraw: Effect.void,

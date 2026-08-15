@@ -13,7 +13,7 @@ describe('studio-home (Tuix JSX)', () => {
     expect(content).toContain('Make something real')
     expect(content).toContain('Describe what you want to build')
     expect(content).toContain('operator workbench')
-    expect(content).toContain('? help')
+    expect(content).toContain('[?] help')
     expect(content).not.toContain('[object Object]')
   })
 })

@@ -1,7 +1,7 @@
 /** @jsxImportSource @tuix/jsx */
 
 import { $state, registerKeyHandler } from '@tuix/reactive'
-import { formatStatusBar } from '@tuix/ui'
+import { CommandPalette, Modal, StatusBar, useUITheme } from '@tuix/ui'
 
 type Focus = 'sessions' | 'files' | 'composer'
 type Overlay = 'none' | 'command' | 'help'
@@ -58,11 +58,6 @@ function viewport() {
   }
 }
 
-function pad(text: string, width: number): string {
-  const clipped = text.length > width ? text.slice(0, Math.max(0, width - 1)) + '…' : text
-  return clipped + ' '.repeat(Math.max(0, width - clipped.length))
-}
-
 function wrap(text: string, width: number): string[] {
   const max = Math.max(16, width)
   const words = text.split(/\s+/)
@@ -80,6 +75,7 @@ function wrap(text: string, width: number): string[] {
 }
 
 function Kit() {
+  const { theme } = useUITheme()
   const focus = $state<Focus>('composer', 'focus')
   const overlay = $state<Overlay>('none', 'overlay')
   const selected = $state(0, 'selected')
@@ -90,8 +86,10 @@ function Kit() {
 
   const { cols, rows } = viewport()
   const compact = cols < 90
-  const sideW = compact ? 0 : Math.min(24, Math.max(18, Math.floor(cols * 0.28)))
-  const mainW = compact ? cols : cols - sideW - 1
+  const chrome = 3
+  const bodyH = Math.max(4, rows - chrome)
+  const sideW = compact ? cols : Math.min(24, Math.max(18, Math.floor(cols * 0.28)))
+  const mainW = compact ? cols : Math.max(20, cols - sideW)
 
   if (keyCleanup) keyCleanup()
   keyCleanup = registerKeyHandler(key => {
@@ -171,99 +169,118 @@ function Kit() {
 
   const session = SESSIONS[selected()] ?? SESSIONS[0]!
   const thread = [...(THREADS[session.id] ?? []), ...extra()]
-  const threadBudget = Math.max(3, rows - 8)
+  const threadBudget = Math.max(3, bodyH - (compact ? 6 : 2))
   const threadLines = thread.flatMap(turn => {
     const prefix = turn.role === 'you' ? 'you  ' : 'grok '
-    return wrap(turn.text, Math.max(16, mainW - 6)).map((line, i) =>
+    return wrap(turn.text, Math.max(16, mainW - prefix.length - 1)).map((line, i) =>
       i === 0 ? `${prefix}${line}` : `     ${line}`
     )
   })
   const visible = threadLines.slice(-threadBudget)
+  const dim = theme.colors.textDim
+  const fg = theme.colors.fg
+  const hi = theme.colors.primary
 
-  const lines: string[] = []
-  lines.push(pad(`vibes   ${session.title}   ${SESSIONS.length} sessions`, cols))
-  lines.push(pad('', cols))
+  const sessionLines = SESSIONS.map((item, i) => (
+    <text key={item.id} fg={i === selected() && focus() === 'sessions' ? hi : fg}>
+      {`${i === selected() ? '▸ ' : '  '}${item.title}`}
+    </text>
+  ))
+  const fileLines = FILES.map((name, i) => (
+    <text key={name} fg={i === fileIx() && focus() === 'files' ? hi : fg}>
+      {`${i === fileIx() ? '▸ ' : '  '}${name}`}
+    </text>
+  ))
+  const convo = visible.map((line, i) => (
+    <text key={`${i}`} fg={line.startsWith('you') ? dim : fg}>
+      {line}
+    </text>
+  ))
 
-  if (compact) {
-    lines.push(pad('sessions', cols))
-    for (const [i, item] of SESSIONS.entries()) {
-      const mark = i === selected() ? '▸ ' : '  '
-      lines.push(pad(`${mark}${item.title}`, cols))
-    }
-    lines.push(pad('', cols))
-    for (const line of visible) lines.push(pad(line, cols))
-  } else {
-    const left: string[] = ['sessions']
-    for (const [i, item] of SESSIONS.entries()) {
-      left.push(`${i === selected() ? '▸ ' : '  '}${item.title}`)
-    }
-    left.push('', 'files')
-    for (const [i, name] of FILES.entries()) {
-      left.push(`${i === fileIx() ? '▸ ' : '  '}${name}`)
-    }
-    const right: string[] = [session.title, ...visible]
-    const height = Math.max(left.length, right.length)
-    for (let i = 0; i < height; i++) {
-      const l = pad(left[i] ?? '', sideW)
-      const r = pad(right[i] ?? '', mainW)
-      lines.push(pad(`${l} ${r}`, cols))
-    }
-  }
-
-  lines.push(pad(`▸ ${draft() || 'say something…'}`, cols))
-  lines.push(
-    pad(
-      formatStatusBar({
-        facts: [
-          { slot: 'context', value: session.title },
-          { slot: 'file', value: FILES[fileIx()] ?? '' },
-          { slot: 'focus', value: focus() },
-        ],
-        hints: compact
-          ? [
-              { keys: 'tab', label: 'focus' },
-              { keys: '/', label: 'cmd' },
-              { keys: 'esc', label: 'back' },
-            ]
-          : [
-              { keys: 'tab', label: 'focus' },
-              { keys: '/', label: 'command' },
-              { keys: 'esc', label: 'cancel' },
-              { keys: 'enter', label: 'send' },
-              { keys: '?', label: 'help' },
-            ],
-      }),
-      cols
-    )
+  const body = compact ? (
+    <flex direction="column" width={cols} height={bodyH}>
+      <text fg={dim}>sessions</text>
+      {sessionLines}
+      <text> </text>
+      {convo}
+    </flex>
+  ) : (
+    <flex direction="row" width={cols} height={bodyH}>
+      <flex direction="column" width={sideW} height={bodyH}>
+        <text fg={dim}>sessions</text>
+        {sessionLines}
+        <text> </text>
+        <text fg={dim}>files</text>
+        {fileLines}
+      </flex>
+      <flex direction="column" width={mainW} height={bodyH}>
+        <text fg={dim}>{session.title}</text>
+        {convo}
+      </flex>
+    </flex>
   )
 
-  if (overlay() === 'command') {
-    const box = [
-      '┌ command ─────────────────────┐',
-      `│ / ${pad(query() || 'type a command…', 26)}│`,
-      ...COMMANDS.map(item => `│   ${pad(`${item.label}  ${item.hint ?? ''}`, 28)}│`),
-      '└──────────────────────────────┘',
-    ]
-    for (let i = 0; i < box.length && i + 2 < lines.length; i++) {
-      lines[i + 2] = pad(box[i]!, cols)
-    }
-  }
+  const surface =
+    overlay() === 'command' ? (
+      <CommandPalette
+        open
+        items={COMMANDS}
+        query={query()}
+        onPick={item => {
+          if (item.id === 'files') focus.$set('files')
+          if (item.id === 'help') overlay.$set('help')
+          else overlay.$set('none')
+          query.$set('')
+        }}
+        onClose={() => overlay.$set('none')}
+      />
+    ) : overlay() === 'help' ? (
+      <Modal open title="Keys" onClose={() => overlay.$set('none')}>
+        <text>tab cycles. j/k lists. type to compose. enter sends. / command. esc closes.</text>
+      </Modal>
+    ) : (
+      body
+    )
 
-  if (overlay() === 'help') {
-    const box = [
-      '┌ keys ────────────────────────┐',
-      '│ tab cycle   j/k lists        │',
-      '│ type compose   enter send    │',
-      '│ / command   esc close        │',
-      '└──────────────────────────────┘',
-    ]
-    for (let i = 0; i < box.length && i + 2 < lines.length; i++) {
-      lines[i + 2] = pad(box[i]!, cols)
-    }
-  }
-
-  const frame = lines.slice(0, rows).join('\n')
-  return <text>{frame}</text>
+  return (
+    <flex direction="column" width={cols} height={rows}>
+      <text
+        fg={theme.colors.textBright}
+      >{`vibes   ${session.title}   ${SESSIONS.length} sessions`}</text>
+      {surface}
+      <text fg={focus() === 'composer' ? hi : dim}>{`▸ ${draft() || 'say something…'}`}</text>
+      <StatusBar
+        width={cols}
+        facts={
+          compact
+            ? [
+                { slot: 'context', value: session.title },
+                { slot: 'focus', value: focus() },
+              ]
+            : [
+                { slot: 'context', value: session.title },
+                { slot: 'file', value: FILES[fileIx()] ?? '' },
+                { slot: 'focus', value: focus() },
+              ]
+        }
+        hints={
+          compact
+            ? [
+                { keys: 'tab', label: 'focus' },
+                { keys: '/', label: 'cmd' },
+                { keys: 'esc', label: 'back' },
+              ]
+            : [
+                { keys: 'tab', label: 'focus' },
+                { keys: '/', label: 'command' },
+                { keys: 'esc', label: 'cancel' },
+                { keys: 'enter', label: 'send' },
+                { keys: '?', label: 'help' },
+              ]
+        }
+      />
+    </flex>
+  )
 }
 
 Kit.interactive = true

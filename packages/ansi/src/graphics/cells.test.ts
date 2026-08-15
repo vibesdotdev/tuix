@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { parseVisualCells, sliceVisual } from './cells'
+import { parseVisualCells, sliceVisual, padVisual } from './cells'
 import { rgbToHalfBlock } from './halfblock'
 
 describe('visual cells', () => {
@@ -25,5 +25,23 @@ describe('visual cells', () => {
     expect(cells).toHaveLength(2)
     expect(cells.every(cell => cell.char === '▀')).toBe(true)
     expect(sliced).toContain('\x1b[38;2;16;185;129m')
+  })
+
+  test('padVisual pads visible columns and keeps CSI intact', () => {
+    expect(padVisual('Left', 4)).toBe('Left')
+    expect(padVisual('Left', 6)).toBe('Left  ')
+    const red = '\x1b[38;2;255;0;0mHi\x1b[0m'
+    const padded = padVisual(red, 4)
+    expect(parseVisualCells(padded)).toHaveLength(4)
+    expect(padded).toContain('\x1b[38;2;255;0;0m')
+    expect(padded.endsWith('  ')).toBe(true)
+  })
+
+  test('16-color SGR is one cell prefix, not shredded code points', () => {
+    const cells = parseVisualCells('\x1b[31mHi\x1b[0m')
+    expect(cells).toHaveLength(2)
+    expect(cells[0]?.char).toBe('H')
+    expect(cells[0]?.prefix).toContain('\x1b[31m')
+    expect(padVisual('\x1b[31mHi\x1b[0m', 2)).toContain('\x1b[31m')
   })
 })

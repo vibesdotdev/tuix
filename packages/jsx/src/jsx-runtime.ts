@@ -772,7 +772,12 @@ const buildStyle = (...inputs: Array<Partial<StyleProps> | undefined>): StyleIns
 
 const paintCell = (content: string, props: Record<string, unknown>) => {
   const fg = props.fg ?? props.color ?? props.foreground
-  const merged = mergeStyleProps(extractStyleProps(props.style), fg ? { foreground: fg as never } : undefined)
+  const bg = props.bg ?? props.background
+  const merged = mergeStyleProps(
+    extractStyleProps(props.style),
+    fg ? { foreground: fg as never } : undefined,
+    bg ? { background: bg as never } : undefined
+  )
   if (!merged || Object.keys(merged).length === 0) return text(content)
   return styledText(content, buildStyle(merged))
 }
@@ -1237,12 +1242,8 @@ function renderJSX(
   switch (type) {
     case 'text': {
       const textContent = toTextContent(validChildren)
-      const styleProps = extractStyleProps(safeProps.style)
       if (textContent !== null) {
-        if (styleProps) {
-          return styledText(textContent, buildStyle(styleProps))
-        }
-        return text(textContent)
+        return paintCell(textContent, safeProps)
       }
       const views = ensureViewArray(validChildren)
       return views.length === 1 ? views[0] : vstack(...views)
@@ -1399,6 +1400,10 @@ function renderJSX(
       if (typeof columnGap === 'number') flexProps.columnGap = columnGap
       const padding = normalizePadding(safeProps.padding)
       if (padding) flexProps.padding = padding
+      const width = toNumber(safeProps.width)
+      if (typeof width === 'number') flexProps.width = width
+      const height = toNumber(safeProps.height)
+      if (typeof height === 'number') flexProps.height = height
       return flexbox(childrenViews, flexProps)
     }
 

@@ -5,7 +5,7 @@
  */
 
 import { Effect } from 'effect'
-import { sliceVisual } from '@tuix/ansi'
+import { padVisual, sliceVisual } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
 
@@ -77,8 +77,7 @@ export const joinHorizontal = (position: Position, ...views: View[]): View => {
           const lineParts = aligned.map((lines, viewIndex) => {
             const line = lines[i] || ''
             const viewWidth = views[viewIndex]?.width || 0
-            // Pad to view width
-            return line.padEnd(viewWidth)
+            return viewWidth > 0 ? padVisual(line, viewWidth) : line
           })
           const spacer = ' '.repeat(spacing)
           result.push(lineParts.join(spacer))

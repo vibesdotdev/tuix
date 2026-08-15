@@ -56,7 +56,7 @@
 import { Effect } from 'effect'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View, RenderError } from './types'
-import { style as createStyle, renderStyledSync, type Style } from '@tuix/ansi'
+import { style as createStyle, renderStyledSync, padVisual, type Style } from '@tuix/ansi'
 
 // Re-export types for convenience
 export type { View, RenderError } from './types'
@@ -254,7 +254,8 @@ export const hstack = (...views: Array<View | View[]>): View => {
             .map((view, viewIndex) => {
               const segments = contents[viewIndex]!.split('\n')
               const content = segments[lineIndex] || ''
-              return content.padEnd(view.width || 0)
+              const width = view.width || 0
+              return width > 0 ? padVisual(content, width) : content
             })
             .join('')
         )

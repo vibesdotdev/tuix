@@ -1,17 +1,27 @@
-import { describe, expect, it } from 'bun:test';
-import { formatStatusBar } from './StatusBar.tsx';
+import { describe, expect, it } from 'bun:test'
+import { formatStatusBar } from './StatusBar.tsx'
 
 describe('StatusBar', () => {
-	it('joins facts and hints into one line', () => {
-		expect(
-			formatStatusBar({
-				facts: [{ slot: 'context', value: 'main · dirty' }],
-				hints: [{ keys: '?', label: 'help' }]
-			})
-		).toBe('main · dirty  ·  [?] help');
-	});
+  it('joins facts and hints into one line', () => {
+    expect(
+      formatStatusBar({
+        facts: [{ slot: 'context', value: 'main · dirty' }],
+        hints: [{ keys: '?', label: 'help' }],
+      })
+    ).toBe('main · dirty  ·  [?] help')
+  })
 
-	it('drops blank facts', () => {
-		expect(formatStatusBar({ facts: [{ slot: 'context', value: '  ' }] })).toBe('');
-	});
-});
+  it('drops blank facts', () => {
+    expect(formatStatusBar({ facts: [{ slot: 'context', value: '  ' }] })).toBe('')
+  })
+
+  it('clips to width', () => {
+    expect(
+      formatStatusBar({
+        facts: [{ slot: 'context', value: 'rewrite auth' }],
+        hints: [{ keys: '?', label: 'help' }],
+        width: 10,
+      })
+    ).toBe('rewrite a…')
+  })
+})

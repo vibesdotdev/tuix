@@ -23,4 +23,9 @@ describe('kit workbench', () => {
     expect(content).toContain('[tab] focus')
   })
 
+  test('toView paints theme color through official text, not a string frame', async () => {
+    const out = await Effect.runPromise(toView(<Kit />).render())
+    const raw = typeof out === 'string' ? out : out.content
+    expect(raw).toMatch(/\x1b\[/)
+  })
 })

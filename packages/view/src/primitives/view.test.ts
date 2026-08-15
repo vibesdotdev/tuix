@@ -180,6 +180,18 @@ describe('View Primitives', () => {
       expect(result.width).toBe(2) // Max width of combined lines
       expect(result.height).toBe(2)
     })
+
+    it('should keep ANSI when padding a shorter colored column', async () => {
+      const left = styledText('Hi', style({ foreground: color.red }))
+      const right = text('Z')
+      const stacked = hstack(left, right)
+      const result = await Effect.runPromise(stacked.render({} as any))
+      const content = typeof result === 'string' ? result : result.content
+      expect(content).toContain('Hi')
+      expect(content).toContain('Z')
+      expect(content).toContain('\x1b[')
+      expect(content.replace(/\x1b\[[0-9;]*m/g, '')).toBe('HiZ')
+    })
   })
 
   describe('empty', () => {
