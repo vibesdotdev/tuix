@@ -6,6 +6,7 @@
 
 import { describe, it, expect } from 'bun:test'
 import { Effect } from 'effect'
+import { collectOverlays, markOverlay } from '@tuix/core/types'
 import { flexbox } from './flexbox'
 import { text } from '../primitives/view'
 import { FlexDirection, JustifyContent, AlignItems, FlexWrap } from './types'
@@ -412,6 +413,24 @@ describe('Flexbox Layout', () => {
 
       expect(flex.height).toBe(100)
       expect(renderTime).toBeLessThan(500) // Should be reasonably fast
+    })
+  })
+
+  describe('Overlay extraction', () => {
+    it('keeps the workbench in flow and attaches the overlay', async () => {
+      const flex = flexbox([text('sessions'), markOverlay(text('Command')), text('composer')], {
+        direction: FlexDirection.Column,
+        width: 20,
+        height: 4,
+      })
+      const result = await Effect.runPromise(flex.render())
+      const content = typeof result === 'string' ? result : String(result)
+      expect(content).toContain('sessions')
+      expect(content).toContain('composer')
+      expect(content).not.toContain('Command')
+      const overlays = collectOverlays(flex)
+      expect(overlays).toHaveLength(1)
+      expect(await Effect.runPromise(overlays[0]!.view.render())).toBe('Command')
     })
   })
 

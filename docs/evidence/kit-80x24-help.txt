@@ -1,24 +1,24 @@
-vibes   rewrite auth   3 sessions
-╭─────────────────────────────────────────────────────────────────────────────╮
-│                                                                             │
-│ Keys ×                                                                      │
-│                                                                             │
-│ tab cycles. j/k lists. type to compose. enter sends. / command. esc closes. │
-│                                                                             │
-╰─────────────────────────────────────────────────────────────────────────────╯
-▸ say something…
-rewrite auth  ·  composer  ·  [tab] focus  ·  [/] cmd  ·  [esc] back
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+vibes   rewrite auth   3 sessions                                               
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│ Keys ×                                                                       │
+│                                                                              │
+│ tab cycles. j/k lists. type to compose. enter sends. / command. esc closes.  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+you  Show me the owner.                                                         
+grok session/src/tui/sessions-open owns the open path.                          
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+▸ say something…                                                                
+rewrite auth  ·  composer  ·  [tab] focus  ·  [/] cmd  ·  [esc] back            

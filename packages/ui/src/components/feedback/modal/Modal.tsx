@@ -54,30 +54,32 @@ export function Modal(props: ModalProps): JSX.Element | null {
   }
 
   return (
-    <interactive className={props.className} focusable onKeyPress={handleKeyPress}>
-      <box
-        border="rounded"
-        padding={1}
-        width={props.width}
-        height={props.height}
-        background={depth.overlay}
-        borderColor={depth.outset}
-      >
-        <vstack gap={1}>
-          <hstack gap={1}>
-            {props.title ? <text>{props.title}</text> : null}
-            {showCloseButton ? (
-              <interactive onClick={() => props.onClose?.()}>
-                <text>×</text>
-              </interactive>
-            ) : null}
-          </hstack>
-          {props.description ? <text>{props.description}</text> : null}
-          {props.children}
-          {renderFooter()}
-        </vstack>
-      </box>
-    </interactive>
+    <overlay>
+      <interactive className={props.className} focusable onKeyPress={handleKeyPress}>
+        <box
+          border="rounded"
+          padding={1}
+          width={props.width}
+          height={props.height}
+          background={depth.overlay}
+          borderColor={depth.outset}
+        >
+          <vstack gap={1}>
+            <hstack gap={1}>
+              {props.title ? <text>{props.title}</text> : null}
+              {showCloseButton ? (
+                <interactive onClick={() => props.onClose?.()}>
+                  <text>×</text>
+                </interactive>
+              ) : null}
+            </hstack>
+            {props.description ? <text>{props.description}</text> : null}
+            {props.children}
+            {renderFooter()}
+          </vstack>
+        </box>
+      </interactive>
+    </overlay>
   )
 
   function renderFooter(): JSX.Element | null {

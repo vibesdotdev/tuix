@@ -1,40 +1,40 @@
-vibes   rewrite auth   3 sessions
-sessions                rewrite auth
-▸ rewrite auth          you  Login still forks session state on refresh.
-  kit flower            grok Hold the cookie write until set-cookie returns.
-  cutover receipts      you  Show me the owner.
-                        grok session/src/tui/sessions-open owns the open path.
-files
-▸ sessions-open.ts
-  login.ts
-  store.ts
-  SPEC.md
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-▸ say something…
-rewrite auth  ·  sessions-open.ts  ·  composer  ·  [tab] focus  ·  [/] command  ·  [esc] cancel  ·  [enter] send  ·  [?]
+vibes   rewrite auth   3 sessions                                                                                       
+sessions                rewrite auth                                                                                    
+▸ rewrite auth          you  Login still forks session state on refresh.                                                
+  kit flower            grok Hold the cookie write until set-cookie returns.                                            
+  cutover receipts      you  Show me the owner.                                                                         
+                        grok session/src/tui/sessions-open owns the open path.                                          
+files                                                                                                                   
+▸ sessions-open.ts                                                                                                      
+  login.ts                                                                                                              
+  store.ts                                                                                                              
+  SPEC.md                                                                                                               
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+▸ say something…                                                                                                        
+rewrite auth  ·  sessions-open.ts  ·  composer  ·  [tab] focus  ·  [/] command  ·  [esc] cancel  ·  [enter] send  ·  [?…

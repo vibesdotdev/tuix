@@ -13,6 +13,7 @@
 
 import { Effect } from 'effect'
 import { parseVisualCells } from '@tuix/ansi'
+import { attachOverlays, partitionOverlays } from '@tuix/core/types'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
 import {
@@ -497,20 +498,21 @@ const renderChildToBuffer = (
 }
 
 export const flexbox = (items: ReadonlyArray<FlexItem | View>, props: FlexboxProps = {}): View => {
-  // Normalize items to FlexItem
+  // Normalize items to FlexItem and lift overlay-tagged views out of flow.
   const flexItems = items.map(item => ('view' in item ? item : { view: item }))
+  const { flow, overlays } = partitionOverlays(flexItems)
 
   // Calculate container dimensions
-  const { width: totalWidth, height: totalHeight } = calculateContainerDimensions(flexItems, props)
+  const { width: totalWidth, height: totalHeight } = calculateContainerDimensions(flow, props)
 
   // Track if dimensions are explicit (for padding behavior)
   const hasExplicitWidth = props.width !== undefined
 
   // Pre-calculate layout to get actual height (for wrapping)
-  const preLayout = calculateFlexLayout(flexItems, totalWidth, totalHeight, props)
+  const preLayout = calculateFlexLayout(flow, totalWidth, totalHeight, props)
   const actualHeight = preLayout.bounds.height
 
-  return {
+  const view: View = {
     render: () =>
       Effect.gen(function* (_) {
         // Use pre-calculated layout
@@ -547,6 +549,7 @@ export const flexbox = (items: ReadonlyArray<FlexItem | View>, props: FlexboxPro
     width: totalWidth,
     height: actualHeight, // Actual height after wrapping
   }
+  return attachOverlays(view, overlays)
 }
 
 // =============================================================================

@@ -8,6 +8,7 @@ import { visualWidth, parseVisualCells, rgb } from '@tuix/ansi'
 import { RendererService } from '../renderer'
 import { TerminalService } from '../terminal'
 import type { View } from '../../../types/core'
+import { collectOverlays } from '../../types/overlay'
 import { RenderError } from '../../types/errors'
 import type { Viewport } from '../../../types/schemas'
 import { toAnsiStyleCode } from '@tuix/ansi'
@@ -37,6 +38,8 @@ interface Cell {
   readonly char: string
   /** The style to be applied to the character */
   readonly style: Option.Option<AnsiStyle>
+  /** True when this cell was written this frame (spaces included). */
+  readonly painted: boolean
 }
 
 /**
@@ -66,11 +69,11 @@ interface RenderLayer {
   /** The z-index of the layer */
   readonly zIndex: number
   /** Whether the layer is visible */
-  readonly visible: boolean
+  visible: boolean
   /** The buffer containing the layer's content */
-  readonly buffer: Buffer
+  buffer: Buffer
   /** The viewport of the layer */
-  readonly viewport: Viewport
+  viewport: Viewport
 }
 
 /**
@@ -114,6 +117,7 @@ class ScreenBuffer {
       Array.from({ length: this.width }, () => ({
         char: ' ',
         style: Option.none<AnsiStyle>(),
+        painted: false,
       }))
     )
   }
@@ -121,7 +125,7 @@ class ScreenBuffer {
   clear(): void {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        this.cells[y]![x] = { char: ' ', style: Option.none() }
+        this.cells[y]![x] = { char: ' ', style: Option.none(), painted: false }
       }
     }
   }
@@ -152,12 +156,13 @@ class ScreenBuffer {
         this.cells[row]![col] = {
           char: cell.char || ' ',
           style,
+          painted: true,
         }
       }
     }
   }
 
-  composite(other: ScreenBuffer, ox: number, oy: number): void {
+  composite(other: ScreenBuffer, ox: number, oy: number, transparent = false): void {
     for (let y = 0; y < other.height; y++) {
       const ty = oy + y
       if (ty < 0 || ty >= this.height) continue
@@ -165,7 +170,7 @@ class ScreenBuffer {
         const tx = ox + x
         if (tx < 0 || tx >= this.width) continue
         const cell = other.cells[y]![x]!
-        if (cell.char !== ' ' || Option.isSome(cell.style)) {
+        if (!transparent || cell.painted) {
           this.cells[ty]![tx] = { ...cell }
         }
       }
@@ -344,13 +349,69 @@ export const RendererServiceLive = Layer.effect(
       )
     })
 
-    const render = (view: View): Effect.Effect<void, RenderError, never> =>
+    const ensureLayer = (
+      name: string,
+      zIndex: number,
+      width: number,
+      height: number
+    ): Effect.Effect<RenderLayer, never, never> =>
       Effect.gen(function* (_) {
         const s = yield* _(Ref.get(state))
-        const mainLayer = s.layers.find(l => l.name === 'main')
-        if (mainLayer) {
-          const rendered = yield* _(view.render())
-          mainLayer.buffer.writeText(0, 0, rendered)
+        const existing = s.layers.find(l => l.name === name)
+        if (existing) {
+          if (existing.buffer.width !== width || existing.buffer.height !== height) {
+            existing.buffer = new Buffer(width, height)
+            existing.viewport = { ...existing.viewport, width, height }
+          }
+          return existing
+        }
+        const created: RenderLayer = {
+          id: s.layers.length,
+          name,
+          zIndex,
+          visible: true,
+          buffer: new Buffer(width, height),
+          viewport: { x: 0, y: 0, width, height },
+        }
+        yield* _(
+          Ref.update(state, current => ({
+            ...current,
+            layers: [...current.layers, created],
+          }))
+        )
+        return created
+      })
+
+    const paintViewToLayer = (
+      layer: RenderLayer,
+      view: View,
+      x: number,
+      y: number
+    ): Effect.Effect<void, RenderError, never> =>
+      Effect.gen(function* (_) {
+        const rendered = yield* _(view.render())
+        const content =
+          typeof rendered === 'string'
+            ? rendered
+            : String((rendered as { content?: string }).content ?? '')
+        layer.buffer.writeText(x, y, content)
+      })
+
+    const render = (view: View): Effect.Effect<void, RenderError, never> =>
+      Effect.gen(function* (_) {
+        const size = yield* _(terminal.getSize)
+        const width = size.width ?? 80
+        const height = size.height ?? 24
+        const mainLayer = yield* _(ensureLayer('main', 0, width, height))
+        mainLayer.buffer.clear()
+        yield* _(paintViewToLayer(mainLayer, view, 0, 0))
+
+        const overlays = collectOverlays(view)
+        const overlayLayer = yield* _(ensureLayer('overlay', 1, width, height))
+        overlayLayer.buffer.clear()
+        overlayLayer.visible = overlays.length > 0
+        for (const overlay of overlays) {
+          yield* _(paintViewToLayer(overlayLayer, overlay.view, overlay.x, overlay.y))
         }
       }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause }))))
 
@@ -407,8 +468,24 @@ export const RendererServiceLive = Layer.effect(
       viewports: s.viewports.slice(0, -1),
     }))
 
-    const getLayers: Effect.Effect<ReadonlyArray<RenderLayer>, never, never> = Ref.get(state).pipe(
-      Effect.map(s => s.layers)
+    const getLayers: Effect.Effect<
+      ReadonlyArray<{
+        readonly name: string
+        readonly zIndex: number
+        readonly visible: boolean
+        readonly text: string
+      }>,
+      never,
+      never
+    > = Ref.get(state).pipe(
+      Effect.map(s =>
+        s.layers.map(layer => ({
+          name: layer.name,
+          zIndex: layer.zIndex,
+          visible: layer.visible,
+          text: layer.buffer.toString(),
+        }))
+      )
     )
 
     const updateLayers = (layers: ReadonlyArray<RenderLayer>): Effect.Effect<void, never, never> =>
@@ -442,7 +519,7 @@ export const RendererServiceLive = Layer.effect(
 
       for (const layer of sortedLayers) {
         if (layer.visible) {
-          back.composite(layer.buffer, layer.viewport.x, layer.viewport.y)
+          back.composite(layer.buffer, layer.viewport.x, layer.viewport.y, layer.zIndex > 0)
         }
       }
     }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'composite', cause }))))
@@ -548,20 +625,27 @@ export const RendererServiceLive = Layer.effect(
       truncateText: (t: string, max: number) =>
         Effect.succeed(t.length <= max ? t : t.slice(0, Math.max(0, max - 1)) + '…'),
       createLayer: (name, zIndex) =>
-        Ref.update(state, s => ({
-          ...s,
-          layers: [
-            ...s.layers,
-            {
-              id: s.layers.length,
-              name,
-              zIndex,
-              visible: true,
-              buffer: new Buffer(80, 24),
-              viewport: { x: 0, y: 0, width: 80, height: 24 },
-            },
-          ],
-        })).pipe(Effect.asVoid),
+        Effect.gen(function* (_) {
+          const size = yield* _(terminal.getSize)
+          const width = size.width ?? 80
+          const height = size.height ?? 24
+          yield* _(
+            Ref.update(state, s => ({
+              ...s,
+              layers: [
+                ...s.layers,
+                {
+                  id: s.layers.length,
+                  name,
+                  zIndex,
+                  visible: true,
+                  buffer: new Buffer(width, height),
+                  viewport: { x: 0, y: 0, width, height },
+                },
+              ],
+            }))
+          )
+        }).pipe(Effect.asVoid),
       removeLayer: name =>
         Ref.update(state, s => ({
           ...s,
@@ -582,6 +666,7 @@ export const RendererServiceLive = Layer.effect(
           layers: s.layers.map(l => (l.name === name ? { ...l, visible } : l)),
         })).pipe(Effect.asVoid),
       compositeLayers,
+      getLayers,
     } as any)
   })
 )

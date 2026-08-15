@@ -24,33 +24,35 @@ A short-lived React host (`dfe301b`) was added and then dropped
   composer is on the 80×24 PTY grid (`▸ hello`).
 - **Paint path:** `@tuix/runtime` paints through `RendererService`
   (cell buffer + CUP), not a full-clear string dump every frame.
+- **Overlay compositing:** Modal and CommandPalette are overlay-tagged
+  views. Flex lifts them out of flow. The renderer paints an opaque
+  workbench layer and a transparent overlay layer. Command/help sit on
+  the live workbench — no leftover grey well. Proven at 80×24 and 120×40.
+- **Host-fitted columns:** terminal-web honors `?cols=` / `?rows=` and
+  locks the xterm/PTY grid. An 80×24 shot now opens the compact layout
+  (`[/] cmd`), not the wide one.
 - **Layout owner:** `padVisual` / `parseVisualCells` keep 16-color and
   truecolor CSI when joining and clipping. `<text fg>` and `<flex
   width/height>` reach the view layer.
-- **Gates (this checkout):** `bun test` 1184 pass / 0 fail;
+- **Gates (this checkout):** `bun test` 1193 pass / 0 fail;
   `bun run typecheck` ok; `bun run lint` ok; `bun run build` ok;
   `tuix --help` and `tuix version` twice, no `undefined` /
   `[object Object]`.
 
 ## What is not done
 
-- **Host-fitted columns:** terminal-web chooses cols from the xterm
-  fit, so a "80×24" browser viewport can still open the wide layout.
-  The dedicated 80-column proof is the Python PTY grid. Repair the
-  host if a caller needs a locked 80×24.
-- **Overlay leftovers:** command/help boxes sit on empty flex space
-  (grey bars). Next edge is overlay compositing in the renderer, not
-  another string framebuffer.
 - **STATUS.md / CURRENT.md (2025):** the old phase-7 / telemetry plan
   and the generated export dump are retired. `docs/STATUS.md` is still
   an auto-generated tree scan from an older layout — do not treat it as
   current.
 - **React adapter:** not a product. Do not revive it.
+- **RendererService** still no-ops some advanced APIs (clip, dirty
+  regions). The path the runtime actually calls is live.
 
 ## Next edge
 
-Overlay compositing (no leftover flex well behind Modal /
-CommandPalette) and a terminal-web fit that can lock 80×24.
+None named from this close. Overlay compositing and host-fitted columns
+are landed.
 
 ## How to run the workbench
 

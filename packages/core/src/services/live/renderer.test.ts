@@ -250,4 +250,51 @@ describe('Renderer Service Implementation', () => {
       expect(true).toBe(true)
     })
   })
+
+  describe('Overlay compositing', () => {
+    it('paints the overlay layer over a cleared workbench layer', async () => {
+      const { attachOverlays, markOverlay } = await import('../../types/overlay')
+      const workbench = text('sessions\nrewrite auth\ncomposer')
+      const overlay = markOverlay(text('Keys'))
+      const view = attachOverlays(workbench, [{ view: overlay, x: 0, y: 1 }])
+
+      const snapshot = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          yield* renderer.beginFrame
+          yield* renderer.render(view)
+          return yield* renderer.getLayers
+        })
+      )
+
+      const main = snapshot.find(layer => layer.name === 'main')
+      const overlayLayer = snapshot.find(layer => layer.name === 'overlay')
+      expect(main?.text).toContain('sessions')
+      expect(main?.text).toContain('rewrite auth')
+      expect(overlayLayer?.visible).toBe(true)
+      expect(overlayLayer?.text).toContain('Keys')
+    })
+
+    it('covers workbench cells under painted overlay spaces', async () => {
+      const { attachOverlays } = await import('../../types/overlay')
+      const workbench = text('ABCDEFGH')
+      const overlay = { render: () => Effect.succeed('XX  YY'), width: 6, height: 1 }
+      const view = attachOverlays(workbench, [{ view: overlay, x: 1, y: 0 }])
+
+      const snapshot = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          yield* renderer.beginFrame
+          yield* renderer.render(view)
+          yield* renderer.endFrame
+          return yield* renderer.getLayers
+        })
+      )
+
+      const overlayLayer = snapshot.find(layer => layer.name === 'overlay')
+      expect(overlayLayer?.text.startsWith('XX  YY') || overlayLayer?.text.includes('XX  YY')).toBe(
+        true
+      )
+    })
+  })
 })

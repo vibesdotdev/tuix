@@ -68,6 +68,7 @@ const RendererServiceTest = Layer.succeed(RendererService, {
   renderToLayer: () => Effect.void,
   setLayerVisible: () => Effect.void,
   compositeLayers: Effect.void,
+  getLayers: Effect.succeed([]),
 } as any)
 
 const TestServices = Layer.mergeAll(TerminalServiceTest, InputServiceTest, RendererServiceTest)

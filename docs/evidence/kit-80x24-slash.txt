@@ -1,24 +1,24 @@
-vibes   rewrite auth   3 sessions
-╭─────────────────────╮
-│                     │
-│ Command ×           │
-│                     │
-│ ┌─────────────────┐ │
-│ │▌Type a command…▐│ │
-│ └─────────────────┘ │
-│   New session  n    │
-│   Focus files  tab  │
-│   Help  ?           │
-│                     │
-╰─────────────────────╯
-▸ say something…
-rewrite auth  ·  composer  ·  [tab] focus  ·  [/] cmd  ·  [esc] back
-
-
-
-
-
-
-
-
-
+vibes   rewrite auth   3 sessions                                               
+╭─────────────────────╮                                                         
+│                     │                                                         
+│ Command ×           │                                                         
+│                     │                                                         
+│ ┌─────────────────┐ │                                                         
+│ │▌Type a command…▐│ │session state on refresh.                                
+│ └─────────────────┘ │ite until set-cookie returns.                            
+│   New session  n    │                                                         
+│   Focus files  tab  │ssions-open owns the open path.                          
+│   Help  ?           │                                                         
+│                     │                                                         
+╰─────────────────────╯                                                         
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+▸ say something…                                                                
+rewrite auth  ·  composer  ·  [tab] focus  ·  [/] cmd  ·  [esc] back            

@@ -220,7 +220,7 @@ function Kit() {
     </flex>
   )
 
-  const surface =
+  const commandOverlay =
     overlay() === 'command' ? (
       <CommandPalette
         open
@@ -234,20 +234,22 @@ function Kit() {
         }}
         onClose={() => overlay.$set('none')}
       />
-    ) : overlay() === 'help' ? (
-      <Modal open title="Keys" onClose={() => overlay.$set('none')}>
+    ) : null
+  const helpOverlay =
+    overlay() === 'help' ? (
+      <Modal open title="Keys" width={Math.min(cols, 76)} onClose={() => overlay.$set('none')}>
         <text>tab cycles. j/k lists. type to compose. enter sends. / command. esc closes.</text>
       </Modal>
-    ) : (
-      body
-    )
+    ) : null
 
   return (
     <flex direction="column" width={cols} height={rows}>
       <text
         fg={theme.colors.textBright}
       >{`vibes   ${session.title}   ${SESSIONS.length} sessions`}</text>
-      {surface}
+      {body}
+      {commandOverlay}
+      {helpOverlay}
       <text fg={focus() === 'composer' ? hi : dim}>{`▸ ${draft() || 'say something…'}`}</text>
       <StatusBar
         width={cols}

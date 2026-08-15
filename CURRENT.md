@@ -33,8 +33,7 @@ longer a generated export catalog.
   than MVU compiler. It works; it is not the folder shape in
   `VISION.md`.
 - `RendererService` still no-ops some advanced APIs (clip, dirty
-  regions, some layer helpers). The path the runtime actually calls
-  (beginFrame / render / endFrame) is live.
+  regions). Layer create/paint/composite for overlays is live.
 - `ARCHITECTURE.md` is still a 2025 draft. Treat `VISION.md` + this
   file as the current map.
 
@@ -42,4 +41,6 @@ longer a generated export catalog.
 
 `docs/evidence/` holds raw PTY streams, decoded grids, and live
 xterm PNGs of `apps/demo` `kit`. The PNGs are photographs of
-terminal-web's xterm, not a span-to-HTML mock.
+terminal-web's xterm, not a span-to-HTML mock. Overlay shots show
+the workbench through the compositor. The 80×24 xterm shot is a
+locked 80-column grid (compact footer).

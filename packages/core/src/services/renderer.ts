@@ -247,6 +247,20 @@ export class RendererService extends Context.Tag('RendererService')<
      * Composite all layers and render to the terminal.
      */
     readonly compositeLayers: Effect.Effect<void, RenderError, never>
+
+    /**
+     * Snapshot visible layer contents for tests and diagnostics.
+     */
+    readonly getLayers: Effect.Effect<
+      ReadonlyArray<{
+        readonly name: string
+        readonly zIndex: number
+        readonly visible: boolean
+        readonly text: string
+      }>,
+      never,
+      never
+    >
   }
 >() {}
 

@@ -8,6 +8,7 @@
 export * from './cli'
 export * from './errors'
 export * from './core'
+export * from './overlay'
 export * from './guards'
 export * from './messages'
 export * from './schemas'

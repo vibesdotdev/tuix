@@ -6,6 +6,7 @@
  */
 
 import type { View } from '@tuix/core/types'
+import { markOverlay } from '@tuix/core/types'
 import {
   text,
   vstack,
@@ -1407,6 +1408,20 @@ function renderJSX(
       return flexbox(childrenViews, flexProps)
     }
 
+    case 'overlay': {
+      const childrenViews = ensureViewArray(validChildren)
+      const contentView =
+        childrenViews.length === 0
+          ? text('')
+          : childrenViews.length === 1
+            ? childrenViews[0]!
+            : vstack(...childrenViews)
+      return markOverlay(contentView, {
+        x: toNumber(safeProps.x),
+        y: toNumber(safeProps.y),
+      })
+    }
+
     case 'interactive': {
       const childrenViews = ensureViewArray(validChildren)
       const contentView =
@@ -1688,6 +1703,7 @@ export namespace JSX {
     }
     checkbox: { checked?: boolean; value?: boolean; label?: string; children?: unknown }
     toggle: { on?: boolean; checked?: boolean; value?: boolean; label?: string; children?: unknown }
+    overlay: { children?: unknown; x?: number; y?: number }
     scrollview: { children?: unknown }
     viewport: { children?: unknown }
   }
