@@ -1,0 +1,24 @@
+vibes   rewrite auth   3 sessions
+sessions
+▸ rewrite auth
+  kit flower
+  cutover receipts
+
+you  Login still forks session state on refresh.
+grok Hold the cookie write until set-cookie returns.
+you  Show me the owner.
+grok session/src/tui/sessions-open owns the open path.
+
+
+
+
+
+
+
+
+
+
+
+
+▸ say something…
+rewrite auth  ·  composer  ·  [tab] focus  ·  [/] cmd  ·  [esc] back

@@ -5,9 +5,10 @@ This folder contains architecture, standards, and planning docs for the monorepo
 ## Core References
 
 - [../VISION.md](../VISION.md) — target architecture and package boundaries
-- [../CURRENT.md](../CURRENT.md) — generated inventory of current state
-- [../ARCHITECTURE.md](../ARCHITECTURE.md) — architectural design notes
-- [../STATUS.md](../STATUS.md) — implementation status by phase
+- [../CURRENT.md](../CURRENT.md) — living checkout state versus vision
+- [../ARCHITECTURE.md](../ARCHITECTURE.md) — architectural design notes (2025 draft)
+- [../STATUS.md](../STATUS.md) — what works now, updated 2026-08-15
+- [evidence/README.md](./evidence/README.md) — real-PTY kit dumps
 - [PRIORITIES.md](./PRIORITIES.md) — priority order and gap-elimination plan
 
 ## Visual bar

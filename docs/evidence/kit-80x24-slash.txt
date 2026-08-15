@@ -1,0 +1,24 @@
+vibes   rewrite auth   3 sessions
+╭─────────────────────╮
+│                     │
+│ Command ×           │
+│                     │
+│ ┌─────────────────┐ │
+│ │▌Type a command…▐│ │
+│ └─────────────────┘ │
+│   New session  n    │
+│   Focus files  tab  │
+│   Help  ?           │
+│                     │
+╰─────────────────────╯
+▸ say something…
+rewrite auth  ·  composer  ·  [tab] focus  ·  [/] cmd  ·  [esc] back
+
+
+
+
+
+
+
+
+

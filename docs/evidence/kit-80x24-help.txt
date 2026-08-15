@@ -1,0 +1,24 @@
+vibes   rewrite auth   3 sessions
+╭─────────────────────────────────────────────────────────────────────────────╮
+│                                                                             │
+│ Keys ×                                                                      │
+│                                                                             │
+│ tab cycles. j/k lists. type to compose. enter sends. / command. esc closes. │
+│                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────╯
+▸ say something…
+rewrite auth  ·  composer  ·  [tab] focus  ·  [/] cmd  ·  [esc] back
+
+
+
+
+
+
+
+
+
+
+
+
+
+
