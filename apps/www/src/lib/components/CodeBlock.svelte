@@ -29,7 +29,7 @@ const displayLang = $derived(filename || lang || 'code')
 $effect(() => {
   let cancelled = false
   ready = false
-  highlightCode(code, lang).then((result) => {
+  highlightCode(code, lang).then(result => {
     if (!cancelled) {
       html = result
       ready = true

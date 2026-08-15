@@ -15,7 +15,11 @@ export default function App() {
     <vstack>
       <FooPlugin />
       <Command name="hello" description="A friendly greeting" component={HelloCommand} />
-      <Command name="studio-home" description="Vibes Studio home as Tuix JSX" component={StudioHome} />
+      <Command
+        name="studio-home"
+        description="Vibes Studio home as Tuix JSX"
+        component={StudioHome}
+      />
       <Command name="kit" description="KISS kit primitives" component={Kit} />
       <Command name="showcase" description="Show off TUIX components" component={ShowcaseCommand} />
 

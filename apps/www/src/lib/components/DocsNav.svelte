@@ -4,7 +4,7 @@ import { page } from '$app/stores'
 
 const path = $derived($page.url.pathname)
 
-const index = $derived(docsNav.findIndex((item) => item.href === path))
+const index = $derived(docsNav.findIndex(item => item.href === path))
 const prev = $derived(index > 0 ? docsNav[index - 1] : null)
 const next = $derived(index >= 0 && index < docsNav.length - 1 ? docsNav[index + 1] : null)
 </script>

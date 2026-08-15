@@ -2,28 +2,28 @@
 import CodeBlock from '$lib/components/CodeBlock.svelte'
 
 const steps = [
-	{
-		title: '1. Install Bun & clone',
-		lang: 'bash',
-		filename: 'terminal',
-		code: `curl -fsSL https://bun.sh/install | bash
+  {
+    title: '1. Install Bun & clone',
+    lang: 'bash',
+    filename: 'terminal',
+    code: `curl -fsSL https://bun.sh/install | bash
 git clone https://github.com/tuix/tuix.git
 cd tuix && bun install`,
-	},
-	{
-		title: '2. Verify the product suite',
-		lang: 'bash',
-		filename: 'terminal',
-		code: `bun test
+  },
+  {
+    title: '2. Verify the product suite',
+    lang: 'bash',
+    filename: 'terminal',
+    code: `bun test
 bun run typecheck
 bun run lint
 bun packages/bin/src/bin/tuix.ts version`,
-	},
-	{
-		title: '3. Run a minimal app',
-		lang: 'tsx',
-		filename: 'hello.tsx',
-		code: `import { $state } from '@tuix/reactive'
+  },
+  {
+    title: '3. Run a minimal app',
+    lang: 'tsx',
+    filename: 'hello.tsx',
+    code: `import { $state } from '@tuix/reactive'
 import { runApp } from '@tuix/jsx'
 
 function Hello() {
@@ -32,19 +32,19 @@ function Hello() {
 }
 
 await runApp(Hello, { interactive: false })`,
-	},
-	{
-		title: '4. Read the docs',
-		lang: 'bash',
-		filename: 'paths',
-		code: `# In the browser (this site)
+  },
+  {
+    title: '4. Read the docs',
+    lang: 'bash',
+    filename: 'paths',
+    code: `# In the browser (this site)
 # /docs/quickstart
 # /docs/architecture
 
 # In the repo
 # docs/guides/quickstart.md
 # spec/`,
-	},
+  },
 ]
 </script>
 

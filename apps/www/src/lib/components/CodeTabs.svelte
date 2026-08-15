@@ -21,12 +21,12 @@ let {
 let active = $state(tabs[0]?.id ?? '')
 
 $effect(() => {
-  if (!tabs.find((t) => t.id === active) && tabs[0]) {
+  if (!tabs.find(t => t.id === active) && tabs[0]) {
     active = tabs[0].id
   }
 })
 
-const current = $derived(tabs.find((t) => t.id === active) ?? tabs[0])
+const current = $derived(tabs.find(t => t.id === active) ?? tabs[0])
 </script>
 
 <div class="code-tabs" role="region" aria-label={label}>

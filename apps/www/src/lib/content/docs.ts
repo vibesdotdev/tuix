@@ -1,300 +1,301 @@
-import type { DocPage } from "./types"
+import type { DocPage } from './types'
 
 export const docsNav: Array<{ href: string; label: string }> = [
-  { href: "/docs", label: "Overview" },
-  { href: "/docs/tutorials", label: "Tutorials" },
-  { href: "/docs/patterns", label: "Patterns" },
-  { href: "/docs/install", label: "Install" },
-  { href: "/docs/quickstart", label: "Quickstart" },
-  { href: "/docs/architecture", label: "Architecture" },
-  { href: "/docs/cli", label: "CLI" },
-  { href: "/docs/packages", label: "Packages" },
-  { href: "/docs/components", label: "Components" },
-  { href: "/docs/capabilities", label: "Terminal & graphics" },
-  { href: "/docs/testing", label: "Testing" },
-  { href: "/docs/features", label: "Features" },
-  { href: "/docs/coverage", label: "Coverage" },
+  { href: '/docs', label: 'Overview' },
+  { href: '/docs/tutorials', label: 'Tutorials' },
+  { href: '/docs/patterns', label: 'Patterns' },
+  { href: '/docs/install', label: 'Install' },
+  { href: '/docs/quickstart', label: 'Quickstart' },
+  { href: '/docs/architecture', label: 'Architecture' },
+  { href: '/docs/cli', label: 'CLI' },
+  { href: '/docs/packages', label: 'Packages' },
+  { href: '/docs/components', label: 'Components' },
+  { href: '/docs/capabilities', label: 'Terminal & graphics' },
+  { href: '/docs/testing', label: 'Testing' },
+  { href: '/docs/features', label: 'Features' },
+  { href: '/docs/coverage', label: 'Coverage' },
 ]
 
 export const docPages: Record<string, DocPage> = {
-  "install": {
-  "slug": "install",
-  "title": "Install",
-  "description": "Install Tuix with Bun and add the packages for a terminal app.",
-  "sections": [
-    {
-      "heading": "Requirements",
-      "body": "Use Bun 1.1 or newer. Run Tuix on macOS, Linux, or Windows. Use Windows Subsystem for Linux (WSL) for Pseudo-Terminal (PTY) work."
-    },
-    {
-      "heading": "Install from the monorepo",
-      "body": "Clone the repository. Install the dependencies. Run the tests and the type checks.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "git clone https://github.com/tuix/tuix.git\ncd tuix\nbun install\nbun test\nbun run typecheck\nbun run lint"
-    },
-    {
-      "heading": "Add packages to an app",
-      "body": "Workspace packages publish under the @tuix scope. Add the foundation packages for a new app. You can also link packages with Bun workspaces from a local checkout.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "bun add @tuix/platform @tuix/jsx @tuix/runtime @tuix/reactive @tuix/view"
-    },
-    {
-      "heading": "Run the CLI",
-      "body": "Run the tuix command from the monorepo. Use --help to list commands. Use version to print the version string.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "bun run tuix --help\nbun packages/bin/src/bin/tuix.ts version"
-    },
-    {
-      "heading": "What to do next",
-      "body": "Open the Quickstart guide. Build a first JSX app. Then read the Architecture guide for layers and Model-View-Update (MVU)."
-    }
-  ]
-},
-  "quickstart": {
-  "slug": "quickstart",
-  "title": "Quickstart",
-  "description": "Build a terminal app with JSX, named state, and Model-View-Update (MVU).",
-  "sections": [
-    {
-      "heading": "What you build",
-      "body": "Tuix is a terminal UI framework for Bun. You write JSX components. The runtime compiles each component into Model-View-Update (MVU). Side effects run through Effect."
-    },
-    {
-      "heading": "Counter with named state",
-      "body": "Create state with $state and a name. The name keeps the model field after compile under Bun. Call runApp with extractState set to true. The runtime hydrates named state from the model on each paint.",
-      "lang": "tsx",
-      "filename": "counter.tsx",
-      "code": "import { $state } from '@tuix/reactive'\nimport { runApp } from '@tuix/jsx'\n\nfunction Counter() {\n  const count = $state(0, 'count')\n  return (\n    <vstack>\n      <text>Count: {count()}</text>\n    </vstack>\n  )\n}\n\nawait runApp(Counter, { interactive: true, extractState: true })"
-    },
-    {
-      "heading": "Update state",
-      "body": "Use $set to change a named field. $set sends a set message into MVU through bindMvuPush. The next paint reads the new value from the model. You can also create many fields with $states."
-    },
-    {
-      "heading": "Register CLI commands",
-      "body": "Use the Command component for each subcommand. Use Fallback for a bare invocation with no subcommand. Call runApp on the root app component.",
-      "lang": "tsx",
-      "filename": "app.tsx",
-      "code": "import { Command, Fallback, runApp } from '@tuix/jsx'\n\nfunction Version() {\n  return <text>1.0.0</text>\n}\n\nfunction App() {\n  return (\n    <>\n      <Command name=\"version\" description=\"Show version\" component={Version} />\n      <Fallback component={() => <text>Run: app version</text>} />\n    </>\n  )\n}\n\nawait runApp(App)"
-    },
-    {
-      "heading": "Provide live terminal services",
-      "body": "Import LiveServices from @tuix/platform. Provide the layer to Effect programs that need terminal input and output. Live implementations live under @tuix/core. The platform package re-exports them for apps.",
-      "lang": "typescript",
-      "filename": "live.ts",
-      "code": "import { LiveServices, detectCapabilities } from '@tuix/platform'\nimport { Effect } from 'effect'\n\nconst caps = detectCapabilities({\n  env: { TERM: process.env.TERM, COLORTERM: process.env.COLORTERM },\n})\n\nawait Effect.runPromise(myProgram.pipe(Effect.provide(LiveServices)))"
-    },
-    {
-      "heading": "Run the tests",
-      "body": "Run the monorepo suite with bun test. Run architecture tests to check package import direction.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "bun test\nbun test tests/architecture"
-    }
-  ]
-},
-  "architecture": {
-  "slug": "architecture",
-  "title": "Architecture",
-  "description": "Describe Tuix layers, Model-View-Update (MVU) data flow, and I/O ownership.",
-  "sections": [
-    {
-      "heading": "Overview",
-      "body": "Tuix is a Bun-native terminal UI framework. Apps use JSX as the primary authoring form. State and side effects run through an Effect-powered Model-View-Update (MVU) loop."
-    },
-    {
-      "heading": "Layers",
-      "body": "Packages sit in four layers. Foundation holds core, ansi, input, platform, and storage. Runtime holds view, runtime, and reactive. Authoring holds jsx, ui, and themes. Ecosystem holds process-manager, config, testing, bin, and related packages. Lower layers never import higher layers. Architecture tests enforce this rule."
-    },
-    {
-      "heading": "Data flow",
-      "body": "JSX compiles to a component with init, update, and view. The MVU loop owns the model. RuntimeHooks run on the real loop. The renderer and TerminalService write to the terminal. JSX never paints the terminal directly.",
-      "lang": "text",
-      "filename": "data-flow",
-      "code": "JSX component\n  → compileToComponent / toView\n  → Model / Update / View (MVU)  ← RuntimeHooks\n  → Renderer + TerminalService"
-    },
-    {
-      "heading": "Named runes and the model",
-      "body": "Call $state with an initial value and a name. Call $states with a record of named values. Both create model fields. Call $set to push a set message into MVU. During the view phase, beginViewHydration aligns paint with the model."
-    },
-    {
-      "heading": "Terminal I/O ownership",
-      "body": "The core package owns service Tags. It also owns pure capability helpers, graphics helpers, and Live service implementations. The platform package is the public facade. Apps import Live services and capability helpers from @tuix/platform."
-    },
-    {
-      "heading": "Terminal capabilities",
-      "body": "Call detectCapabilities with env data and optional probe results. The function is pure. You can unit-test it without a TTY. The live terminal applies TUIX_PROBE_* environment overrides. Use parsePrimaryDA for Device Attributes probe responses."
-    },
-    {
-      "heading": "PTY",
-      "body": "ProcessManager with config.pty spawns interactive terminals. The production path uses the node-pty backend. Use writePty and resizePty on the manager path."
-    },
-    {
-      "heading": "Specs and quality",
-      "body": "Authoritative design lives under the spec directory. Architecture, runtime, JSX, terminal, quality gates, and catalogs each have a section. Release gates require architecture tests, full bun test, typecheck of delivery entries, and lint across packages, apps, docs, scripts, and tests."
-    }
-  ]
-},
-  "cli": {
-  "slug": "cli",
-  "title": "CLI",
-  "description": "Run the tuix command-line interface for help, version, and dashboard.",
-  "sections": [
-    {
-      "heading": "What the CLI is",
-      "body": "The tuix binary is the framework dogfood CLI. It ships from the @tuix/bin package. Use it to inspect the install and to open interactive tools."
-    },
-    {
-      "heading": "Commands",
-      "body": "Print help with --help. Print the version with version. Open the interactive help explorer with help. Open live system metrics with dashboard.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "tuix --help\ntuix version\ntuix help\ntuix dashboard"
-    },
-    {
-      "heading": "One-shot versus interactive",
-      "body": "One-shot commands exit after paint. Examples are version and --help. Interactive commands use fullscreen Model-View-Update (MVU). Examples are help and dashboard."
-    },
-    {
-      "heading": "Help explorer controls",
-      "body": "In the help explorer, move with the arrow keys or j and k. Confirm with Enter. Quit with q. Selection updates through named $state and bindMvuPush."
-    },
-    {
-      "heading": "Run from the monorepo",
-      "body": "From a monorepo checkout, call the CLI through Bun. Use bun run tuix or the package entry file under packages/bin.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "bun run tuix --help\nbun packages/bin/src/bin/tuix.ts version"
-    }
-  ]
-},
-  "capabilities": {
-  "slug": "capabilities",
-  "title": "Terminal & graphics",
-  "description": "Detect terminal capabilities, encode graphics, and handle input, paste, and PTY.",
-  "sections": [
-    {
-      "heading": "What this guide covers",
-      "body": "Tuix measures what the terminal can do. It selects a graphics protocol. It streams keys, mouse, paste, resize, and focus. It can spawn a Pseudo-Terminal (PTY) for interactive child processes."
-    },
-    {
-      "heading": "detectCapabilities",
-      "body": "Call detectCapabilities with environment variables and optional size or probe data. The function returns a TerminalCapabilities value. The function is pure. Live terminal code can apply TUIX_PROBE_* overrides after detection.",
-      "lang": "typescript",
-      "filename": "caps.ts",
-      "code": "import { detectCapabilities, encodeGraphics, selectGraphicsProtocol } from '@tuix/platform'\n\nconst caps = detectCapabilities({\n  env: process.env as Record<string, string>,\n  columns: process.stdout.columns,\n  rows: process.stdout.rows,\n})\nconst protocol = selectGraphicsProtocol(caps)\nconst encoded = encodeGraphics(\n  { data: pixels, width, height, channels: 3 },\n  caps,\n)"
-    },
-    {
-      "heading": "Graphics protocols",
-      "body": "Call selectGraphicsProtocol with the capabilities value. Call encodeGraphics with pixel data and the same capabilities. The helpers pick a protocol the terminal supports."
-    },
-    {
-      "heading": "Device Attributes probes",
-      "body": "Use parsePrimaryDA helpers on probe responses. Feed the parse result into the same capability shape. This path supports terminals that answer Device Attributes queries."
-    },
-    {
-      "heading": "Input stream",
-      "body": "Live InputService streams keys, mouse, paste, resize, and focus. readLine uses a continuous PubSub subscription. Multi-character lines complete when the user presses Enter. Bracketed paste and focus CSI I/O parse on the live path."
-    },
-    {
-      "heading": "PTY processes",
-      "body": "Set config.pty on ProcessManager to spawn an interactive TTY. The production backend is node-pty. Call writePty to send data. Call resizePty when the terminal size changes."
-    },
-    {
-      "heading": "Where to import",
-      "body": "Import detectCapabilities, encodeGraphics, selectGraphicsProtocol, and LiveServices from @tuix/platform. The core package owns the physical Live implementations and pure helpers."
-    }
-  ]
-},
-  "testing": {
-  "slug": "testing",
-  "title": "Testing",
-  "description": "Run unit tests, architecture checks, and the end-to-end PTY harness.",
-  "sections": [
-    {
-      "heading": "What you test",
-      "body": "Tuix ships unit tests, architecture boundary tests, catalog honesty tests, and an end-to-end harness. Use bun test as the test runner."
-    },
-    {
-      "heading": "Unit and architecture tests",
-      "body": "Run the full monorepo suite with bun test. Run architecture tests to enforce package dependency direction. Run catalog honesty tests to check module status against the catalog.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "bun test\nbun test tests/architecture\nbun test tests/catalog-honesty.test.ts"
-    },
-    {
-      "heading": "End-to-end harness",
-      "body": "Import createTestHarness from @tuix/testing. The harness spawns a PTY session for CLI smoke tests. You can send keys, wait for text, and capture screenshots.",
-      "lang": "typescript",
-      "filename": "e2e.ts",
-      "code": "import { createTestHarness } from '@tuix/testing'\n\nconst session = createTestHarness({ /* options */ })\n// send keys, waitForText, capture screenshots\nawait session.close()"
-    },
-    {
-      "heading": "What architecture tests enforce",
-      "body": "Architecture tests check that lower layers do not import higher layers. They also check source import boundaries for packages. Failures mean a package crossed a layer boundary."
-    },
-    {
-      "heading": "Release gates",
-      "body": "Release gates live in spec/60-quality/RELEASE_GATES.md. Gates require architecture tests, full bun test, typecheck of delivery load and build entries, and lint over packages, apps, docs, scripts, and tests."
-    },
-    {
-      "heading": "How to run checks before a change",
-      "body": "Install dependencies. Run bun test. Run typecheck. Run lint. Fix failures before you merge.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "bun install\nbun test\nbun run typecheck\nbun run lint"
-    }
-  ]
-},
-  "packages": {
-  "slug": "packages",
-  "title": "Packages",
-  "description": "Choose @tuix packages by layer for foundation, runtime, authoring, and ecosystem.",
-  "sections": [
-    {
-      "heading": "Layers",
-      "body": "Tuix packages sit in four layers. Foundation is ansi, core, input, platform, and storage. Runtime is view, runtime, and reactive. Authoring is jsx, ui, and themes. Ecosystem is process-manager, config, logger, coordination, update, telemetry, debug, testing, docs, bin, and app-presets. Lower layers never import higher layers."
-    },
-    {
-      "heading": "Foundation packages",
-      "body": "Use @tuix/core for types, errors, service contracts, Live I/O, capabilities, and graphics. Use @tuix/platform as the public facade for LiveServices and capability helpers. Use @tuix/ansi for colors, styles, and borders. Use @tuix/input for keyboard and mouse parse utilities. Use @tuix/storage for memory and filesystem backends."
-    },
-    {
-      "heading": "Runtime packages",
-      "body": "Use @tuix/view for render and layout primitives. Use @tuix/runtime for the Model-View-Update (MVU) loop, commands, subscriptions, and hooks. Use @tuix/reactive for runes, the $set bridge into MVU, and key handlers."
-    },
-    {
-      "heading": "Authoring packages",
-      "body": "Use @tuix/jsx for the JSX runtime and the compile bridge. Use @tuix/ui for widgets such as Help, LargeText, Viewport, and forms. Use @tuix/themes for theme tokens."
-    },
-    {
-      "heading": "Ecosystem packages",
-      "body": "Use @tuix/process-manager for process lifecycle and PTY. Use @tuix/config for JSON, YAML, TOML, and env config. Use @tuix/testing for harnesses and end-to-end PTY sessions. Use @tuix/bin for the tuix CLI. Other packages cover logging, coordination, updates, telemetry, debug, docs, and app presets."
-    },
-    {
-      "heading": "How to choose a package",
-      "body": "Start with @tuix/platform, @tuix/jsx, @tuix/runtime, @tuix/reactive, and @tuix/view for a typical app. Import Live services and capabilities from platform, not from core. Add @tuix/ui and @tuix/themes when you need widgets and tokens. Add @tuix/process-manager when you spawn PTY children. Add @tuix/config when you load app configuration. Add @tuix/testing when you write harness or end-to-end tests."
-    },
-    {
-      "heading": "Minimal install set",
-      "body": "Add the five packages most apps need. Expand only when a feature requires another package.",
-      "lang": "bash",
-      "filename": "terminal",
-      "code": "bun add @tuix/platform @tuix/jsx @tuix/runtime @tuix/reactive @tuix/view"
-    },
-    {
-      "heading": "Catalog",
-      "body": "Module status and feature IDs live in spec/20-catalog/MODULE_CATALOG.md. Catalog honesty tests enforce that the catalog matches the packages."
-    }
-  ]
-},
+  install: {
+    slug: 'install',
+    title: 'Install',
+    description: 'Install Tuix with Bun and add the packages for a terminal app.',
+    sections: [
+      {
+        heading: 'Requirements',
+        body: 'Use Bun 1.1 or newer. Run Tuix on macOS, Linux, or Windows. Use Windows Subsystem for Linux (WSL) for Pseudo-Terminal (PTY) work.',
+      },
+      {
+        heading: 'Install from the monorepo',
+        body: 'Clone the repository. Install the dependencies. Run the tests and the type checks.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'git clone https://github.com/tuix/tuix.git\ncd tuix\nbun install\nbun test\nbun run typecheck\nbun run lint',
+      },
+      {
+        heading: 'Add packages to an app',
+        body: 'Workspace packages publish under the @tuix scope. Add the foundation packages for a new app. You can also link packages with Bun workspaces from a local checkout.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'bun add @tuix/platform @tuix/jsx @tuix/runtime @tuix/reactive @tuix/view',
+      },
+      {
+        heading: 'Run the CLI',
+        body: 'Run the tuix command from the monorepo. Use --help to list commands. Use version to print the version string.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'bun run tuix --help\nbun packages/bin/src/bin/tuix.ts version',
+      },
+      {
+        heading: 'What to do next',
+        body: 'Open the Quickstart guide. Build a first JSX app. Then read the Architecture guide for layers and Model-View-Update (MVU).',
+      },
+    ],
+  },
+  quickstart: {
+    slug: 'quickstart',
+    title: 'Quickstart',
+    description: 'Build a terminal app with JSX, named state, and Model-View-Update (MVU).',
+    sections: [
+      {
+        heading: 'What you build',
+        body: 'Tuix is a terminal UI framework for Bun. You write JSX components. The runtime compiles each component into Model-View-Update (MVU). Side effects run through Effect.',
+      },
+      {
+        heading: 'Counter with named state',
+        body: 'Create state with $state and a name. The name keeps the model field after compile under Bun. Call runApp with extractState set to true. The runtime hydrates named state from the model on each paint.',
+        lang: 'tsx',
+        filename: 'counter.tsx',
+        code: "import { $state } from '@tuix/reactive'\nimport { runApp } from '@tuix/jsx'\n\nfunction Counter() {\n  const count = $state(0, 'count')\n  return (\n    <vstack>\n      <text>Count: {count()}</text>\n    </vstack>\n  )\n}\n\nawait runApp(Counter, { interactive: true, extractState: true })",
+      },
+      {
+        heading: 'Update state',
+        body: 'Use $set to change a named field. $set sends a set message into MVU through bindMvuPush. The next paint reads the new value from the model. You can also create many fields with $states.',
+      },
+      {
+        heading: 'Register CLI commands',
+        body: 'Use the Command component for each subcommand. Use Fallback for a bare invocation with no subcommand. Call runApp on the root app component.',
+        lang: 'tsx',
+        filename: 'app.tsx',
+        code: 'import { Command, Fallback, runApp } from \'@tuix/jsx\'\n\nfunction Version() {\n  return <text>1.0.0</text>\n}\n\nfunction App() {\n  return (\n    <>\n      <Command name="version" description="Show version" component={Version} />\n      <Fallback component={() => <text>Run: app version</text>} />\n    </>\n  )\n}\n\nawait runApp(App)',
+      },
+      {
+        heading: 'Provide live terminal services',
+        body: 'Import LiveServices from @tuix/platform. Provide the layer to Effect programs that need terminal input and output. Live implementations live under @tuix/core. The platform package re-exports them for apps.',
+        lang: 'typescript',
+        filename: 'live.ts',
+        code: "import { LiveServices, detectCapabilities } from '@tuix/platform'\nimport { Effect } from 'effect'\n\nconst caps = detectCapabilities({\n  env: { TERM: process.env.TERM, COLORTERM: process.env.COLORTERM },\n})\n\nawait Effect.runPromise(myProgram.pipe(Effect.provide(LiveServices)))",
+      },
+      {
+        heading: 'Run the tests',
+        body: 'Run the monorepo suite with bun test. Run architecture tests to check package import direction.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'bun test\nbun test tests/architecture',
+      },
+    ],
+  },
+  architecture: {
+    slug: 'architecture',
+    title: 'Architecture',
+    description: 'Describe Tuix layers, Model-View-Update (MVU) data flow, and I/O ownership.',
+    sections: [
+      {
+        heading: 'Overview',
+        body: 'Tuix is a Bun-native terminal UI framework. Apps use JSX as the primary authoring form. State and side effects run through an Effect-powered Model-View-Update (MVU) loop.',
+      },
+      {
+        heading: 'Layers',
+        body: 'Packages sit in four layers. Foundation holds core, ansi, input, platform, and storage. Runtime holds view, runtime, and reactive. Authoring holds jsx, ui, and themes. Ecosystem holds process-manager, config, testing, bin, and related packages. Lower layers never import higher layers. Architecture tests enforce this rule.',
+      },
+      {
+        heading: 'Data flow',
+        body: 'JSX compiles to a component with init, update, and view. The MVU loop owns the model. RuntimeHooks run on the real loop. The renderer and TerminalService write to the terminal. JSX never paints the terminal directly.',
+        lang: 'text',
+        filename: 'data-flow',
+        code: 'JSX component\n  → compileToComponent / toView\n  → Model / Update / View (MVU)  ← RuntimeHooks\n  → Renderer + TerminalService',
+      },
+      {
+        heading: 'Named runes and the model',
+        body: 'Call $state with an initial value and a name. Call $states with a record of named values. Both create model fields. Call $set to push a set message into MVU. During the view phase, beginViewHydration aligns paint with the model.',
+      },
+      {
+        heading: 'Terminal I/O ownership',
+        body: 'The core package owns service Tags. It also owns pure capability helpers, graphics helpers, and Live service implementations. The platform package is the public facade. Apps import Live services and capability helpers from @tuix/platform.',
+      },
+      {
+        heading: 'Terminal capabilities',
+        body: 'Call detectCapabilities with env data and optional probe results. The function is pure. You can unit-test it without a TTY. The live terminal applies TUIX_PROBE_* environment overrides. Use parsePrimaryDA for Device Attributes probe responses.',
+      },
+      {
+        heading: 'PTY',
+        body: 'ProcessManager with config.pty spawns interactive terminals. The production path uses the node-pty backend. Use writePty and resizePty on the manager path.',
+      },
+      {
+        heading: 'Specs and quality',
+        body: 'Authoritative design lives under the spec directory. Architecture, runtime, JSX, terminal, quality gates, and catalogs each have a section. Release gates require architecture tests, full bun test, typecheck of delivery entries, and lint across packages, apps, docs, scripts, and tests.',
+      },
+    ],
+  },
+  cli: {
+    slug: 'cli',
+    title: 'CLI',
+    description: 'Run the tuix command-line interface for help, version, and dashboard.',
+    sections: [
+      {
+        heading: 'What the CLI is',
+        body: 'The tuix binary is the framework dogfood CLI. It ships from the @tuix/bin package. Use it to inspect the install and to open interactive tools.',
+      },
+      {
+        heading: 'Commands',
+        body: 'Print help with --help. Print the version with version. Open the interactive help explorer with help. Open live system metrics with dashboard.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'tuix --help\ntuix version\ntuix help\ntuix dashboard',
+      },
+      {
+        heading: 'One-shot versus interactive',
+        body: 'One-shot commands exit after paint. Examples are version and --help. Interactive commands use fullscreen Model-View-Update (MVU). Examples are help and dashboard.',
+      },
+      {
+        heading: 'Help explorer controls',
+        body: 'In the help explorer, move with the arrow keys or j and k. Confirm with Enter. Quit with q. Selection updates through named $state and bindMvuPush.',
+      },
+      {
+        heading: 'Run from the monorepo',
+        body: 'From a monorepo checkout, call the CLI through Bun. Use bun run tuix or the package entry file under packages/bin.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'bun run tuix --help\nbun packages/bin/src/bin/tuix.ts version',
+      },
+    ],
+  },
+  capabilities: {
+    slug: 'capabilities',
+    title: 'Terminal & graphics',
+    description: 'Detect terminal capabilities, encode graphics, and handle input, paste, and PTY.',
+    sections: [
+      {
+        heading: 'What this guide covers',
+        body: 'Tuix measures what the terminal can do. It selects a graphics protocol. It streams keys, mouse, paste, resize, and focus. It can spawn a Pseudo-Terminal (PTY) for interactive child processes.',
+      },
+      {
+        heading: 'detectCapabilities',
+        body: 'Call detectCapabilities with environment variables and optional size or probe data. The function returns a TerminalCapabilities value. The function is pure. Live terminal code can apply TUIX_PROBE_* overrides after detection.',
+        lang: 'typescript',
+        filename: 'caps.ts',
+        code: "import { detectCapabilities, encodeGraphics, selectGraphicsProtocol } from '@tuix/platform'\n\nconst caps = detectCapabilities({\n  env: process.env as Record<string, string>,\n  columns: process.stdout.columns,\n  rows: process.stdout.rows,\n})\nconst protocol = selectGraphicsProtocol(caps)\nconst encoded = encodeGraphics(\n  { data: pixels, width, height, channels: 3 },\n  caps,\n)",
+      },
+      {
+        heading: 'Graphics protocols',
+        body: 'Call selectGraphicsProtocol with the capabilities value. Call encodeGraphics with pixel data and the same capabilities. The helpers pick a protocol the terminal supports.',
+      },
+      {
+        heading: 'Device Attributes probes',
+        body: 'Use parsePrimaryDA helpers on probe responses. Feed the parse result into the same capability shape. This path supports terminals that answer Device Attributes queries.',
+      },
+      {
+        heading: 'Input stream',
+        body: 'Live InputService streams keys, mouse, paste, resize, and focus. readLine uses a continuous PubSub subscription. Multi-character lines complete when the user presses Enter. Bracketed paste and focus CSI I/O parse on the live path.',
+      },
+      {
+        heading: 'PTY processes',
+        body: 'Set config.pty on ProcessManager to spawn an interactive TTY. The production backend is node-pty. Call writePty to send data. Call resizePty when the terminal size changes.',
+      },
+      {
+        heading: 'Where to import',
+        body: 'Import detectCapabilities, encodeGraphics, selectGraphicsProtocol, and LiveServices from @tuix/platform. The core package owns the physical Live implementations and pure helpers.',
+      },
+    ],
+  },
+  testing: {
+    slug: 'testing',
+    title: 'Testing',
+    description: 'Run unit tests, architecture checks, and the end-to-end PTY harness.',
+    sections: [
+      {
+        heading: 'What you test',
+        body: 'Tuix ships unit tests, architecture boundary tests, catalog honesty tests, and an end-to-end harness. Use bun test as the test runner.',
+      },
+      {
+        heading: 'Unit and architecture tests',
+        body: 'Run the full monorepo suite with bun test. Run architecture tests to enforce package dependency direction. Run catalog honesty tests to check module status against the catalog.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'bun test\nbun test tests/architecture\nbun test tests/catalog-honesty.test.ts',
+      },
+      {
+        heading: 'End-to-end harness',
+        body: 'Import createTestHarness from @tuix/testing. The harness spawns a PTY session for CLI smoke tests. You can send keys, wait for text, and capture screenshots.',
+        lang: 'typescript',
+        filename: 'e2e.ts',
+        code: "import { createTestHarness } from '@tuix/testing'\n\nconst session = createTestHarness({ /* options */ })\n// send keys, waitForText, capture screenshots\nawait session.close()",
+      },
+      {
+        heading: 'What architecture tests enforce',
+        body: 'Architecture tests check that lower layers do not import higher layers. They also check source import boundaries for packages. Failures mean a package crossed a layer boundary.',
+      },
+      {
+        heading: 'Release gates',
+        body: 'Release gates live in spec/60-quality/RELEASE_GATES.md. Gates require architecture tests, full bun test, typecheck of delivery load and build entries, and lint over packages, apps, docs, scripts, and tests.',
+      },
+      {
+        heading: 'How to run checks before a change',
+        body: 'Install dependencies. Run bun test. Run typecheck. Run lint. Fix failures before you merge.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'bun install\nbun test\nbun run typecheck\nbun run lint',
+      },
+    ],
+  },
+  packages: {
+    slug: 'packages',
+    title: 'Packages',
+    description:
+      'Choose @tuix packages by layer for foundation, runtime, authoring, and ecosystem.',
+    sections: [
+      {
+        heading: 'Layers',
+        body: 'Tuix packages sit in four layers. Foundation is ansi, core, input, platform, and storage. Runtime is view, runtime, and reactive. Authoring is jsx, ui, and themes. Ecosystem is process-manager, config, logger, coordination, update, telemetry, debug, testing, docs, bin, and app-presets. Lower layers never import higher layers.',
+      },
+      {
+        heading: 'Foundation packages',
+        body: 'Use @tuix/core for types, errors, service contracts, Live I/O, capabilities, and graphics. Use @tuix/platform as the public facade for LiveServices and capability helpers. Use @tuix/ansi for colors, styles, and borders. Use @tuix/input for keyboard and mouse parse utilities. Use @tuix/storage for memory and filesystem backends.',
+      },
+      {
+        heading: 'Runtime packages',
+        body: 'Use @tuix/view for render and layout primitives. Use @tuix/runtime for the Model-View-Update (MVU) loop, commands, subscriptions, and hooks. Use @tuix/reactive for runes, the $set bridge into MVU, and key handlers.',
+      },
+      {
+        heading: 'Authoring packages',
+        body: 'Use @tuix/jsx for the JSX runtime and the compile bridge. Use @tuix/ui for widgets such as Help, LargeText, Viewport, and forms. Use @tuix/themes for theme tokens.',
+      },
+      {
+        heading: 'Ecosystem packages',
+        body: 'Use @tuix/process-manager for process lifecycle and PTY. Use @tuix/config for JSON, YAML, TOML, and env config. Use @tuix/testing for harnesses and end-to-end PTY sessions. Use @tuix/bin for the tuix CLI. Other packages cover logging, coordination, updates, telemetry, debug, docs, and app presets.',
+      },
+      {
+        heading: 'How to choose a package',
+        body: 'Start with @tuix/platform, @tuix/jsx, @tuix/runtime, @tuix/reactive, and @tuix/view for a typical app. Import Live services and capabilities from platform, not from core. Add @tuix/ui and @tuix/themes when you need widgets and tokens. Add @tuix/process-manager when you spawn PTY children. Add @tuix/config when you load app configuration. Add @tuix/testing when you write harness or end-to-end tests.',
+      },
+      {
+        heading: 'Minimal install set',
+        body: 'Add the five packages most apps need. Expand only when a feature requires another package.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'bun add @tuix/platform @tuix/jsx @tuix/runtime @tuix/reactive @tuix/view',
+      },
+      {
+        heading: 'Catalog',
+        body: 'Module status and feature IDs live in spec/20-catalog/MODULE_CATALOG.md. Catalog honesty tests enforce that the catalog matches the packages.',
+      },
+    ],
+  },
 }
 
 export function getDoc(slug: string): DocPage | undefined {
   return docPages[slug]
 }
 
-export type { DocPage } from "./types"
+export type { DocPage } from './types'

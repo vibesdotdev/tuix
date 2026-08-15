@@ -2,23 +2,23 @@
 import { page } from '$app/stores'
 
 const links = [
-	{ href: '/features', label: 'Features' },
-	{ href: '/get-started', label: 'Get started' },
-	{ href: '/docs', label: 'Docs' },
-	{ href: '/packages', label: 'Packages' },
+  { href: '/features', label: 'Features' },
+  { href: '/get-started', label: 'Get started' },
+  { href: '/docs', label: 'Docs' },
+  { href: '/packages', label: 'Packages' },
 ]
 
 let open = $state(false)
 
 function current(href: string, path: string) {
-	if (href === '/docs') return path === '/docs' || path.startsWith('/docs/')
-	return path === href
+  if (href === '/docs') return path === '/docs' || path.startsWith('/docs/')
+  return path === href
 }
 
 $effect(() => {
-	// close mobile menu on navigation
-	void $page.url.pathname
-	open = false
+  // close mobile menu on navigation
+  void $page.url.pathname
+  open = false
 })
 </script>
 

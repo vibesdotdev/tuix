@@ -40,7 +40,12 @@ function walk(
       else onSelect?.(node.id)
     }
     const row = (
-      <interactive key={node.id} focusable onClick={handle} onKeyPress={key => key === 'Enter' && handle()}>
+      <interactive
+        key={node.id}
+        focusable
+        onClick={handle}
+        onKeyPress={key => key === 'Enter' && handle()}
+      >
         <text>{line}</text>
       </interactive>
     )
@@ -59,13 +64,6 @@ function walk(
  * ```
  */
 export function FileTree(props: FileTreeProps): JSX.Element {
-  const rows = walk(
-    props.nodes,
-    props.selected,
-    props.expanded,
-    '',
-    props.onSelect,
-    props.onToggle
-  )
+  const rows = walk(props.nodes, props.selected, props.expanded, '', props.onSelect, props.onToggle)
   return <vstack className={props.className}>{rows}</vstack>
 }

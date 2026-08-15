@@ -13,4 +13,3 @@ export * from './content/components'
 export * from './content/coverage'
 export * from './content/patterns'
 export type * from './content/types'
-

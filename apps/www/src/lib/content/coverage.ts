@@ -136,9 +136,9 @@ export const coverageRows: CoverageRow[] = [
 ]
 
 export const coverageSummary = {
-  full: coverageRows.filter((r) => r.docs === 'full').length,
-  partial: coverageRows.filter((r) => r.docs === 'partial').length,
-  gap: coverageRows.filter((r) => r.docs === 'gap').length,
+  full: coverageRows.filter(r => r.docs === 'full').length,
+  partial: coverageRows.filter(r => r.docs === 'partial').length,
+  gap: coverageRows.filter(r => r.docs === 'gap').length,
 }
 
 export const docModel = {

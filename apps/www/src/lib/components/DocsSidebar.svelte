@@ -6,10 +6,10 @@ import { tutorialNav } from '$lib/content/tutorials'
 
 const path = $derived($page.url.pathname)
 
-const corePackages = packageDocs.filter((p) =>
-	['core', 'platform', 'jsx', 'reactive', 'runtime', 'ui', 'process-manager', 'testing'].includes(
-		p.slug,
-	),
+const corePackages = packageDocs.filter(p =>
+  ['core', 'platform', 'jsx', 'reactive', 'runtime', 'ui', 'process-manager', 'testing'].includes(
+    p.slug
+  )
 )
 </script>
 

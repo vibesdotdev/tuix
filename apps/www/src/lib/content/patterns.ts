@@ -81,7 +81,7 @@ await runApp(Screen, { interactive: false })`,
     whyItMatters:
       'Anonymous $state can disappear after compile rewrites. Named fields map to the model. Without hydration, paint can show stale closures.',
     howInTuix:
-      'Use $state(init, \'name\') or $states({ name: init }). Call $set to update. The runtime uses bindMvuPush so named sets become { type: \'set\', key, value }. beginViewHydration(model) runs before view so runes match the model.',
+      "Use $state(init, 'name') or $states({ name: init }). Call $set to update. The runtime uses bindMvuPush so named sets become { type: 'set', key, value }. beginViewHydration(model) runs before view so runes match the model.",
     pitfalls: [
       'Do not rely on unnamed $state for model fields under Bun.',
       'Do not keep critical UI state only in local variables outside the model.',
@@ -489,8 +489,7 @@ await runApp(KeyProbe, { interactive: true, extractState: true })`,
     title: 'Platform facade and Live services',
     kind: 'unique',
     category: 'I/O ownership',
-    summary:
-      'core owns Live implementations. platform is the public facade apps should import.',
+    summary: 'core owns Live implementations. platform is the public facade apps should import.',
     whyItMatters:
       'Wrong imports couple apps to private paths. Tests need stable Tags. Ownership stays clear for architecture gates.',
     howInTuix:
@@ -531,8 +530,7 @@ await runApp(KeyProbe, { interactive: true, extractState: true })`,
     title: 'Interactive child processes (PTY)',
     kind: 'common',
     category: 'Process',
-    summary:
-      'Spawn an interactive Pseudo-Terminal (PTY) for shells and TTY-aware tools.',
+    summary: 'Spawn an interactive Pseudo-Terminal (PTY) for shells and TTY-aware tools.',
     whyItMatters:
       'Plain pipes break password prompts and full-screen child TUIs. PTY preserves a terminal device.',
     howInTuix:
@@ -554,8 +552,7 @@ await runApp(KeyProbe, { interactive: true, extractState: true })`,
     category: 'Runtime',
     summary:
       'Hooks observe the loop. onMessage can cancel work. Render errors can trip a circuit breaker.',
-    whyItMatters:
-      'Production TUIs need observability and safety when update or view fails.',
+    whyItMatters: 'Production TUIs need observability and safety when update or view fails.',
     howInTuix:
       'Pass RuntimeHooks into the runtime. onMessage may return null to cancel. onError and consecutive render error limits protect the session. See FEAT-rt-001 and FEAT-rt-002.',
     pitfalls: [
@@ -573,10 +570,8 @@ await runApp(KeyProbe, { interactive: true, extractState: true })`,
     title: 'Storage and configuration',
     kind: 'common',
     category: 'Data',
-    summary:
-      'Persist keys with storage adapters. Load config from JSON, YAML, TOML, or env.',
-    whyItMatters:
-      'CLIs need user settings and caches without ad-hoc file code in every command.',
+    summary: 'Persist keys with storage adapters. Load config from JSON, YAML, TOML, or env.',
+    whyItMatters: 'CLIs need user settings and caches without ad-hoc file code in every command.',
     howInTuix:
       'Use @tuix/storage for memory and filesystem backends and useStorage. Use @tuix/config for structured load and store. Provide storage through Live services when the app already uses platform layers.',
     pitfalls: [
@@ -606,21 +601,21 @@ export const patternCategories = [
 ] as const
 
 export function getPattern(slug: string): PatternDoc | undefined {
-  return patterns.find((p) => p.slug === slug)
+  return patterns.find(p => p.slug === slug)
 }
 
 export function patternsByCategory(): Array<{ category: string; items: PatternDoc[] }> {
   return patternCategories
-    .map((category) => ({
+    .map(category => ({
       category,
-      items: patterns.filter((p) => p.category === category),
+      items: patterns.filter(p => p.category === category),
     }))
-    .filter((g) => g.items.length > 0)
+    .filter(g => g.items.length > 0)
 }
 
 export function patternHref(slug: string): string {
   return `/docs/patterns/${slug}`
 }
 
-export const uniquePatterns = patterns.filter((p) => p.kind === 'unique')
-export const commonPatterns = patterns.filter((p) => p.kind === 'common')
+export const uniquePatterns = patterns.filter(p => p.kind === 'unique')
+export const commonPatterns = patterns.filter(p => p.kind === 'common')

@@ -8,7 +8,7 @@ const prev = $derived(data.prev)
 const next = $derived(data.next)
 
 function relatedSlug(name: string) {
-	return name.startsWith('@tuix/') ? name.slice('@tuix/'.length) : name
+  return name.startsWith('@tuix/') ? name.slice('@tuix/'.length) : name
 }
 </script>
 

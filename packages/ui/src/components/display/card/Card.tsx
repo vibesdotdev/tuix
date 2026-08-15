@@ -20,7 +20,9 @@ function CardRoot(props: CardProps): JSX.Element {
       borderColor={depth.outset}
     >
       <vstack>
-        {props.title ? <text fg={theme.colors.textBright ?? theme.colors.fg}>{props.title}</text> : null}
+        {props.title ? (
+          <text fg={theme.colors.textBright ?? theme.colors.fg}>{props.title}</text>
+        ) : null}
         {props.description ? <text fg={theme.colors.textDim}>{props.description}</text> : null}
         {props.children}
       </vstack>

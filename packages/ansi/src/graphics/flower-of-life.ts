@@ -147,7 +147,14 @@ export function rasterFlowerOfLife(options: FlowerRasterOptions): Uint8Array {
 
   for (let i = 0; i < 18; i++) {
     const angle = (i / 18) * TAU
-    push(cx + Math.cos(angle) * baseRadius * 2, cy + Math.sin(angle) * baseRadius * 2, baseRadius, 0.58, 0.55, i)
+    push(
+      cx + Math.cos(angle) * baseRadius * 2,
+      cy + Math.sin(angle) * baseRadius * 2,
+      baseRadius,
+      0.58,
+      0.55,
+      i
+    )
   }
   for (let i = 0; i < 12; i++) {
     const angle = (i / 12) * TAU
@@ -156,7 +163,14 @@ export function rasterFlowerOfLife(options: FlowerRasterOptions): Uint8Array {
   }
   for (let i = 0; i < 6; i++) {
     const angle = (i / 6) * TAU
-    push(cx + Math.cos(angle) * baseRadius, cy + Math.sin(angle) * baseRadius, baseRadius, 0.92, 0.95, i + 30)
+    push(
+      cx + Math.cos(angle) * baseRadius,
+      cy + Math.sin(angle) * baseRadius,
+      baseRadius,
+      0.92,
+      0.95,
+      i + 30
+    )
   }
   push(cx, cy, baseRadius, 1, 1, 0)
   const seed = baseRadius * 0.5
@@ -169,7 +183,17 @@ export function rasterFlowerOfLife(options: FlowerRasterOptions): Uint8Array {
   for (const circle of circles) {
     const color = PALETTE[circle.c % PALETTE.length]!
     const wobble = rippleDelta(circle.x, circle.y, cx, cy, time)
-    strokeCircle(out, width, height, circle.x, circle.y, circle.r + wobble, color, circle.a, circle.g)
+    strokeCircle(
+      out,
+      width,
+      height,
+      circle.x,
+      circle.y,
+      circle.r + wobble,
+      color,
+      circle.a,
+      circle.g
+    )
   }
 
   const bloom = baseRadius * 2.15
@@ -180,7 +204,14 @@ export function rasterFlowerOfLife(options: FlowerRasterOptions): Uint8Array {
       if (t <= 0) continue
       addRgb(out, (y * width + x) * 3, 110, 231, 183, t * t * 0.22)
       if (d < seed * 0.85) {
-        addRgb(out, (y * width + x) * 3, HIGHLIGHT[0], HIGHLIGHT[1], HIGHLIGHT[2], (1 - d / (seed * 0.85)) * 0.18)
+        addRgb(
+          out,
+          (y * width + x) * 3,
+          HIGHLIGHT[0],
+          HIGHLIGHT[1],
+          HIGHLIGHT[2],
+          (1 - d / (seed * 0.85)) * 0.18
+        )
       }
     }
   }

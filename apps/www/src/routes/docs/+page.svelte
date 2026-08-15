@@ -4,9 +4,9 @@ import { docsNav } from '$lib/content/docs'
 import { packageDocs, packageHref } from '$lib/content/packages'
 import { featureDocs, featureHref } from '$lib/content/features'
 
-const guideLinks = docsNav.filter((i) => i.href !== '/docs')
-const samplePackages = packageDocs.filter((p) =>
-	['core', 'platform', 'jsx', 'reactive', 'runtime', 'ui'].includes(p.slug),
+const guideLinks = docsNav.filter(i => i.href !== '/docs')
+const samplePackages = packageDocs.filter(p =>
+  ['core', 'platform', 'jsx', 'reactive', 'runtime', 'ui'].includes(p.slug)
 )
 const sampleFeatures = featureDocs.slice(0, 6)
 </script>

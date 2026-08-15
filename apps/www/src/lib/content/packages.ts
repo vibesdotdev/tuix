@@ -14,7 +14,7 @@ export const packageDocs: PackageDoc[] = [
 ] as PackageDoc[]
 
 export const packagesBySlug: Record<string, PackageDoc> = Object.fromEntries(
-  packageDocs.map((p) => [p.slug, p]),
+  packageDocs.map(p => [p.slug, p])
 )
 
 export function getPackage(slug: string): PackageDoc | undefined {
@@ -22,9 +22,7 @@ export function getPackage(slug: string): PackageDoc | undefined {
 }
 
 export function packageHref(nameOrSlug: string): string {
-  const slug = nameOrSlug.startsWith('@tuix/')
-    ? nameOrSlug.slice('@tuix/'.length)
-    : nameOrSlug
+  const slug = nameOrSlug.startsWith('@tuix/') ? nameOrSlug.slice('@tuix/'.length) : nameOrSlug
   return `/packages/${slug}`
 }
 
@@ -36,8 +34,8 @@ export function packagesByLayer(): Array<{ layer: string; packages: PackageDoc[]
     groups.set(pkg.layer, list)
   }
   const ordered = layerOrder
-    .filter((layer) => groups.has(layer))
-    .map((layer) => ({ layer, packages: groups.get(layer)! }))
+    .filter(layer => groups.has(layer))
+    .map(layer => ({ layer, packages: groups.get(layer)! }))
   for (const [layer, packages] of groups) {
     if (!layerOrder.includes(layer as (typeof layerOrder)[number])) {
       ordered.push({ layer, packages })

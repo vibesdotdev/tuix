@@ -1,15 +1,11 @@
 <script lang="ts">
 import DocsSidebar from '$lib/components/DocsSidebar.svelte'
-import {
-	componentDocs,
-	componentsByCategory,
-	componentHref,
-} from '$lib/content/components'
+import { componentDocs, componentsByCategory, componentHref } from '$lib/content/components'
 
 const groups = componentsByCategory()
-const full = componentDocs.filter((c) => c.docs === 'full').length
-const brief = componentDocs.filter((c) => c.docs === 'brief').length
-const none = componentDocs.filter((c) => c.docs === 'none').length
+const full = componentDocs.filter(c => c.docs === 'full').length
+const brief = componentDocs.filter(c => c.docs === 'brief').length
+const none = componentDocs.filter(c => c.docs === 'none').length
 </script>
 
 <svelte:head>

@@ -335,9 +335,7 @@ h1 {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem 1.3rem;
-  transition:
-    border-color 0.12s ease,
-    transform 0.12s ease;
+  transition: border-color 0.12s ease, transform 0.12s ease;
 }
 
 .card:hover {

@@ -3,7 +3,7 @@ import { featureAreas, featureDocs, featureHref } from '$lib/content/features'
 import { packageHref } from '$lib/content/packages'
 
 function pkgSlug(name: string) {
-	return name.startsWith('@tuix/') ? name.slice('@tuix/'.length) : name
+  return name.startsWith('@tuix/') ? name.slice('@tuix/'.length) : name
 }
 </script>
 

@@ -134,7 +134,12 @@ describe('Tuix kit primitives', () => {
       { id: 'quit', label: 'Quit' },
     ]
     const closed = await paint(
-      <CommandPalette open={false} items={items} onPick={() => undefined} onClose={() => undefined} />
+      <CommandPalette
+        open={false}
+        items={items}
+        onPick={() => undefined}
+        onClose={() => undefined}
+      />
     )
     const opened = await paint(
       <CommandPalette

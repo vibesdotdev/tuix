@@ -1,11 +1,6 @@
 <script lang="ts">
 import DocsSidebar from '$lib/components/DocsSidebar.svelte'
-import {
-	commonPatterns,
-	uniquePatterns,
-	patternHref,
-	patterns,
-} from '$lib/content/patterns'
+import { commonPatterns, uniquePatterns, patternHref, patterns } from '$lib/content/patterns'
 </script>
 
 <svelte:head>

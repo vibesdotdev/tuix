@@ -448,16 +448,16 @@ export const componentCategories = [
 ] as const
 
 export function getComponent(slug: string): ComponentDoc | undefined {
-  return componentDocs.find((c) => c.slug === slug)
+  return componentDocs.find(c => c.slug === slug)
 }
 
 export function componentsByCategory(): Array<{ category: string; items: ComponentDoc[] }> {
   return componentCategories
-    .map((category) => ({
+    .map(category => ({
       category,
-      items: componentDocs.filter((c) => c.category === category),
+      items: componentDocs.filter(c => c.category === category),
     }))
-    .filter((g) => g.items.length > 0)
+    .filter(g => g.items.length > 0)
 }
 
 export function componentHref(slug: string): string {

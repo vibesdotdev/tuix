@@ -2,36 +2,36 @@
 import CodeBlock from '$lib/components/CodeBlock.svelte'
 
 const features = [
-	{
-		tag: 'Authoring',
-		title: 'JSX for the terminal',
-		body: 'Write TUIs with familiar JSX. compileToComponent and toView feed the Effect MVU loop — not a parallel render system.',
-	},
-	{
-		tag: 'State',
-		title: 'Runes that hit the model',
-		body: 'Named $state / $states extract under Bun. $set bridges into MVU so re-renders hydrate paint from the model, not ephemeral closures.',
-	},
-	{
-		tag: 'Runtime',
-		title: 'Effect-powered MVU',
-		body: 'init · update · view with RuntimeHooks, subscriptions, error recovery, and a single execution model.',
-	},
-	{
-		tag: 'Terminal',
-		title: 'Caps, graphics, input',
-		body: 'Capability detection, sixel/kitty/iTerm encode, bracketed paste, focus tracking, continuous readLine, and Live services via @tuix/platform.',
-	},
-	{
-		tag: 'Process',
-		title: 'PTY production path',
-		body: 'ProcessManager spawns interactive TTYs with write/resize, auto-restart, and stream helpers.',
-	},
-	{
-		tag: 'Quality',
-		title: 'Gates that match the code',
-		body: 'Architecture boundary tests, full bun test suite, typecheck-v1 delivery entries, and full-tree Biome on source.',
-	},
+  {
+    tag: 'Authoring',
+    title: 'JSX for the terminal',
+    body: 'Write TUIs with familiar JSX. compileToComponent and toView feed the Effect MVU loop — not a parallel render system.',
+  },
+  {
+    tag: 'State',
+    title: 'Runes that hit the model',
+    body: 'Named $state / $states extract under Bun. $set bridges into MVU so re-renders hydrate paint from the model, not ephemeral closures.',
+  },
+  {
+    tag: 'Runtime',
+    title: 'Effect-powered MVU',
+    body: 'init · update · view with RuntimeHooks, subscriptions, error recovery, and a single execution model.',
+  },
+  {
+    tag: 'Terminal',
+    title: 'Caps, graphics, input',
+    body: 'Capability detection, sixel/kitty/iTerm encode, bracketed paste, focus tracking, continuous readLine, and Live services via @tuix/platform.',
+  },
+  {
+    tag: 'Process',
+    title: 'PTY production path',
+    body: 'ProcessManager spawns interactive TTYs with write/resize, auto-restart, and stream helpers.',
+  },
+  {
+    tag: 'Quality',
+    title: 'Gates that match the code',
+    body: 'Architecture boundary tests, full bun test suite, typecheck-v1 delivery entries, and full-tree Biome on source.',
+  },
 ]
 
 const heroCode = `import { $state } from '@tuix/reactive'

@@ -25,7 +25,7 @@ export interface EditorProps {
 export function Editor(props: EditorProps): JSX.Element {
   const { depth, theme } = useUITheme()
   const raw = String(readBound(props['bind:value']) ?? props.value ?? '')
-  const lines = (raw.length > 0 ? raw : props.placeholder ?? '').split('\n')
+  const lines = (raw.length > 0 ? raw : (props.placeholder ?? '')).split('\n')
   const limit = props.rows && props.rows > 0 ? props.rows : lines.length
   const visible = lines.slice(0, limit)
   const gutter = String(Math.max(visible.length, 1)).length

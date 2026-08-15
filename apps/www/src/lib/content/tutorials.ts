@@ -49,10 +49,7 @@ export const tutorials: Tutorial[] = [
       'Start the app with runApp.',
       'Compare JSX with an Effect Model-View-Update (MVU) component.',
     ],
-    prerequisites: [
-      'Install Bun 1.1 or newer.',
-      'Install the Tuix monorepo packages.',
-    ],
+    prerequisites: ['Install Bun 1.1 or newer.', 'Install the Tuix monorepo packages.'],
     packages: ['@tuix/jsx', '@tuix/view', '@tuix/runtime', '@tuix/platform'],
     related: [
       { href: '/packages/jsx', label: '@tuix/jsx' },
@@ -478,7 +475,14 @@ await Effect.runPromise(
       'Keep field values in the model, not only in local closures.',
     ],
     prerequisites: ['Complete the Keys and input tutorial.'],
-    packages: ['@tuix/ui', '@tuix/jsx', '@tuix/reactive', '@tuix/view', '@tuix/runtime', '@tuix/platform'],
+    packages: [
+      '@tuix/ui',
+      '@tuix/jsx',
+      '@tuix/reactive',
+      '@tuix/view',
+      '@tuix/runtime',
+      '@tuix/platform',
+    ],
     related: [
       { href: '/docs/components/form', label: 'Form' },
       { href: '/docs/components/text-input', label: 'TextInput' },
@@ -1102,14 +1106,14 @@ handle.write('input')`,
 ]
 
 export function getTutorial(slug: string): Tutorial | undefined {
-  return tutorials.find((t) => t.slug === slug)
+  return tutorials.find(t => t.slug === slug)
 }
 
 export function tutorialHref(slug: string): string {
   return `/docs/tutorials/${slug}`
 }
 
-export const tutorialNav = tutorials.map((t) => ({
+export const tutorialNav = tutorials.map(t => ({
   href: tutorialHref(t.slug),
   label: `${t.level}. ${t.title}`,
   level: t.level,

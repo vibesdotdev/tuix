@@ -26,7 +26,7 @@ async function getHighlighter(): Promise<Highlighter> {
     loading = createHighlighter({
       themes: ['github-dark-default'],
       langs: [...LANGS],
-    }).then((h) => {
+    }).then(h => {
       highlighter = h
       return h
     })
