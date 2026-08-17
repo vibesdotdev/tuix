@@ -14,6 +14,7 @@ export interface ModalProps {
   readonly variant?: ThemeVariant
   readonly showCloseButton?: boolean
   readonly closeOnEscape?: boolean
+  /** Not yet wired: dismissal via a backdrop click needs overlay hit-testing. */
   readonly closeOnBackdrop?: boolean
   readonly onClose?: () => void
   readonly onConfirm?: () => void

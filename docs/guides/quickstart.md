@@ -5,10 +5,9 @@ Build a minimal terminal app with JSX, runes, and Effect MVU.
 ## Counter
 
 ```tsx
-import { Effect } from 'effect'
+/** @jsxImportSource @tuix/jsx */
 import { $state } from '@tuix/reactive'
-import { compileToComponent, runApp } from '@tuix/jsx'
-import { LiveServices } from '@tuix/platform'
+import { Fallback, runApp } from '@tuix/jsx'
 
 function Counter() {
   const count = $state(0, 'count')
@@ -19,18 +18,18 @@ function Counter() {
   )
 }
 
-// Compile → MVU component, hydrate named $state from model
-const component = compileToComponent(Counter, {
-  extractState: true,
-  interactive: true,
-})
+export default function App() {
+  return <Fallback component={Counter} />
+}
 
-await Effect.runPromise(
-  runApp(Counter, { interactive: true }).pipe(Effect.provide(LiveServices))
-)
+await runApp(App, { interactive: true })
 ```
 
 Named `$state(0, 'count')` or `$states({ count: 0 })` is required under Bun so the model field survives compile. Updates use `$set`, which bridges into MVU via `bindMvuPush` so the next paint hydrates correctly.
+
+`runApp` routes by argv (see the CLI section below), so a bare component renders
+behind a `Fallback` when no command is given. `compileToComponent` remains available
+for embedding a JSX surface inside an existing Effect program.
 
 ## CLI app with commands
 

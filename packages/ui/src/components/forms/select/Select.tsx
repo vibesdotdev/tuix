@@ -1,7 +1,9 @@
 /** @jsxImportSource @tuix/jsx */
 
+import { $state } from '@tuix/reactive'
 import type { BindableRune, StateRune } from '@tuix/reactive'
 import { readBound } from '../../../bind'
+import { Input } from '../text-input/TextInput'
 
 export interface SelectOption<T = string> {
   value: T
@@ -25,8 +27,14 @@ export interface SelectProps<T = string> {
   className?: string
 }
 
+function matches<T>(option: SelectOption<T>, query: string): boolean {
+  if (query.length === 0) return true
+  return option.label.toLowerCase().includes(query.toLowerCase())
+}
+
 /**
- * Closed field that shows the current option. Pass `open` to list the rest.
+ * Closed field that shows the current option. Pass `open` to list the rest;
+ * with `searchable`, an inline query field filters the list.
  *
  * @example
  * ```tsx
@@ -38,6 +46,8 @@ export function Select<T = string>(props: SelectProps<T>): JSX.Element {
   const selected = props.options.find(option => Object.is(option.value, current))
   const label = selected?.label ?? props.placeholder ?? 'Select…'
   const disabled = Boolean(props.disabled)
+  const searchable = Boolean(props.searchable) && Boolean(props.open)
+  const query = $state('', 'select-query')
 
   function pick(option: SelectOption<T>) {
     if (disabled || option.disabled) return
@@ -45,6 +55,10 @@ export function Select<T = string>(props: SelectProps<T>): JSX.Element {
     bound?.$set(option.value)
     props.onChange?.(option.value)
   }
+
+  const visible = searchable
+    ? props.options.filter(option => matches(option, query()))
+    : props.options
 
   return (
     <vstack className={props.className}>
@@ -55,8 +69,11 @@ export function Select<T = string>(props: SelectProps<T>): JSX.Element {
         onFocus={props.onFocus}
         onBlur={props.onBlur}
       />
+      {searchable ? (
+        <Input bind:value={query} placeholder="Filter…" focused width={props.width} />
+      ) : null}
       {props.open
-        ? props.options.map(option => {
+        ? visible.map(option => {
             const active = Object.is(option.value, current)
             const mark = active ? '> ' : option.disabled ? '· ' : '  '
             return (

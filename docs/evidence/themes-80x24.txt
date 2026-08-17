@@ -1,0 +1,24 @@
+
+
+   ╭─────────────────────────────────────────────────────────────────────────╮
+   │                                                                         │
+   │TUIX Themes                                                              │
+   │Six built-in themes. Swatches: brand + semantic colors,                  │
+   │ then depth stack base ▁ surface ▂ overlay ▃ inset ▄ outset ▅.           │
+   │────────────────────────────────────────                                 │
+   │● vibes Modern dark theme with green accents                             │
+   │ ██████████████ ▁▂▃▄▅                                                    │
+   │  dark High contrast dark theme with vibrant accents                     │
+   │ ██████████████ ▁▂▃▄▅                                                    │
+   │  light Clean light theme optimized for daytime use                      │
+   │ ██████████████ ▁▂▃▄▅                                                    │
+   │  nord Arctic, north-bluish color palette                                │
+   │ ██████████████ ▁▂▃▄▅                                                    │
+   │  dracula Dark theme with vibrant colors                                 │
+   │ ██████████████ ▁▂▃▄▅                                                    │
+   │  gruvbox Retro groove palette with warm, earthy contrast                │
+   │ ██████████████ ▁▂▃▄▅                                                    │
+   │────────────────────────────────────────                                 │
+   │Switch at runtime with setUITheme() or ThemeProvider.                    │
+   │                                                                         │
+   ╰─────────────────────────────────────────────────────────────────────────╯

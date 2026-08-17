@@ -5,10 +5,9 @@ The official TUIX command-line interface showcasing the framework's capabilities
 ## Features
 
 - ✨ **Modern UI** - Clean panels with rounded borders, vibes theme (black, white, green)
-- 🎨 **Theme-aware** - All components use the vibes theme automatically
+- 🎨 **Theme-aware** - All components render through theme tokens; `tuix themes` previews every palette
 - 📊 **Live Dashboard** - Real-time system metrics with progress bars
 - 📚 **Interactive Help** - Browse commands with keyboard navigation
-- 🔌 **Plugin Integration** - Config, Logger, Process Manager, Testing, and more
 - 🚀 **Fast** - Built with Bun for maximum performance
 
 ## Installation
@@ -64,32 +63,16 @@ Live system status with:
 - Runtime information
 - Auto-updating metrics
 
-### Plugin Commands
-
-All plugin commands are available through the TUIX CLI:
+### Theme Gallery
 
 ```bash
-# Config management
-tuix config get <key>
-tuix config set <key> <value>
-tuix config list
-
-# Logging
-tuix logs view
-tuix logs clear
-tuix logs export
-
-# Process management
-tuix pm list
-tuix pm start <name>
-tuix pm stop <name>
-tuix pm restart <name>
-
-# Testing
-tuix test
-tuix test dashboard
-tuix test watch
+tuix themes
 ```
+
+Lists every built-in theme (`vibes`, `dark`, `light`, `nord`, `dracula`, `gruvbox`)
+with brand/semantic color swatches and the five-step depth stack. Pair with the
+[theming guide](../../docs/guides/theming.md) to switch themes at runtime with
+`setUITheme()` from `@tuix/ui`.
 
 ## Architecture
 
@@ -113,20 +96,6 @@ All commands use the new modern components:
 - **StatusIndicator** - Service health with pulse animation
 - **Divider** - Visual separators
 - **ProgressBar** - Resource usage meters
-
-### Plugin Composition
-
-```tsx
-<ConfigPlugin>
-  <LoggerPlugin>
-    <ProcessManagerPlugin>
-      <TestingPlugin>
-        <Command name="..." component={...} />
-      </TestingPlugin>
-    </ProcessManagerPlugin>
-  </LoggerPlugin>
-</ConfigPlugin>
-```
 
 ## Vibes Theme
 
@@ -233,7 +202,8 @@ packages/bin/
 │       ├── welcome.tsx   # Welcome screen
 │       ├── version.tsx   # Version info
 │       ├── help.tsx      # Interactive help
-│       └── dashboard.tsx # Status dashboard
+│       ├── dashboard.tsx # Status dashboard
+│       └── themes.tsx    # Theme gallery
 ├── package.json
 ├── tsconfig.json
 └── README.md

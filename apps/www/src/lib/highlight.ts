@@ -1,4 +1,11 @@
-import { createHighlighter, type Highlighter, type BundledLanguage } from 'shiki'
+import {
+  createHighlighter,
+  type Highlighter,
+  type BundledLanguage,
+  type SpecialLanguage,
+} from 'shiki'
+
+type HighlightLang = BundledLanguage | SpecialLanguage
 
 const LANGS = [
   'typescript',
@@ -9,7 +16,6 @@ const LANGS = [
   'shell',
   'json',
   'markdown',
-  'text',
   'diff',
   'toml',
   'yaml',
@@ -34,8 +40,8 @@ async function getHighlighter(): Promise<Highlighter> {
   return loading
 }
 
-function normalizeLang(lang: string): BundledLanguage {
-  const map: Record<string, BundledLanguage> = {
+function normalizeLang(lang: string): HighlightLang {
+  const map: Record<string, HighlightLang> = {
     ts: 'typescript',
     tsx: 'tsx',
     js: 'javascript',
@@ -50,7 +56,7 @@ function normalizeLang(lang: string): BundledLanguage {
     txt: 'text',
   }
   const key = lang.toLowerCase().trim()
-  return (map[key] ?? (LANGS.includes(key as BundledLanguage) ? key : 'text')) as BundledLanguage
+  return map[key] ?? (LANGS.includes(key as (typeof LANGS)[number]) ? key : 'text')
 }
 
 /** Infer language from a short label or file-ish filename. */

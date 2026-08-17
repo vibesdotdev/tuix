@@ -14,7 +14,7 @@
           "body": "Clone the repository. Install the dependencies. Run the tests and the type checks.",
           "lang": "bash",
           "filename": "terminal",
-          "code": "git clone https://github.com/tuix/tuix.git\ncd tuix\nbun install\nbun test\nbun run typecheck\nbun run lint"
+          "code": "git clone https://github.com/vibesdotdev/tuix.git\ncd tuix\nbun install\nbun test\nbun run typecheck\nbun run lint"
         },
         {
           "heading": "Add packages to an app",

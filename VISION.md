@@ -58,6 +58,12 @@ Every statement below describes the target state once ongoing refactors are comp
 - All intrinsics replaced by component exports; only `<text>/<box>/<flex>` come from runtime.
 - Organized by vertical feature directories (e.g., `components/forms/`, `components/layout/`).
 - Depends on `@tuix/reactive` for internal state runes when needed.
+- Widget families: layout (Box/Flex/Panel/Viewport), forms (Input/Select/Checkbox/…),
+  feedback (Modal/Toast/Spinner/ProgressBar/Skeleton/Alert), display (Text/Card/Badge/
+  StatusBar/Kbd/Avatar/Mark), data (Table/List/Sparkline/FileTree), navigation
+  (Tabs/Help/CommandPalette).
+- Widgets take color only from `theme.colors` / `theme.depth`; the app can swap the
+  live theme at runtime via `setUITheme()` and every consumer repaints.
 
 ### `@tuix/process-manager`
 - Stream/view coordination for running child processes inside Tuix apps.
@@ -67,7 +73,11 @@ Every statement below describes the target state once ongoing refactors are comp
 ### Other Packages
 - `@tuix/config`: configuration loading, template management.
 - `@tuix/debug`: instrumented logging, debug toggles.
-- `@tuix/themes`: declarative theme definitions consumed by `@tuix/ui`.
+- `@tuix/themes`: declarative theme definitions consumed by `@tuix/ui`. One unified
+  color schema across every built-in theme (dark, light, nord, dracula, gruvbox,
+  vibes); five-step `theme.depth` stacks; Effect-scoped `ThemeContext` plus the
+  global `setUITheme` rune for runtime switching. Theming guide:
+  `docs/guides/theming.md`.
 - `@tuix/testing`: shared test utilities, custom matchers.
 - `@tuix/logger`, `@tuix/platform`, `@tuix/storage`, etc. each encapsulate their own service with no JSX/runtime leakage.
 

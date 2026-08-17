@@ -58,6 +58,26 @@ export interface UITheme {
 const globalTheme = $state<Theme>(vibesTheme)
 
 /**
+ * Switch the theme every `useUITheme` consumer renders with.
+ *
+ * @example
+ * ```tsx
+ * import { setUITheme } from '@tuix/ui'
+ * import { nordTheme } from '@tuix/themes'
+ *
+ * setUITheme(nordTheme)
+ * ```
+ */
+export function setUITheme(theme: Theme): void {
+  globalTheme.$set(theme)
+}
+
+/** Restore the default vibes theme. */
+export function resetUITheme(): void {
+  globalTheme.$set(vibesTheme)
+}
+
+/**
  * Hook for theme-aware UI components
  *
  * @example

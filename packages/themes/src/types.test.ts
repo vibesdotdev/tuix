@@ -3,8 +3,8 @@
  */
 
 import { test, expect, describe } from 'bun:test'
-import type { Theme, ThemeColors, ThemeConfig } from './types'
-import { darkTheme, lightTheme, nordTheme, draculaTheme } from './themes'
+import type { Theme } from './types'
+import { darkTheme, lightTheme, nordTheme, draculaTheme, gruvboxTheme, vibesTheme } from './themes'
 
 describe('@tuix/themes - Types', () => {
   test('darkTheme has all required fields', () => {
@@ -35,26 +35,53 @@ describe('@tuix/themes - Types', () => {
     expect(draculaTheme.spacing).toBeDefined()
   })
 
-  test('all themes have required color properties', () => {
-    const themes = [darkTheme, lightTheme, nordTheme, draculaTheme]
+  test('gruvboxTheme has all required fields', () => {
+    expect(gruvboxTheme.name).toBe('gruvbox')
+    expect(gruvboxTheme.colors).toBeDefined()
+    expect(gruvboxTheme.typography).toBeDefined()
+    expect(gruvboxTheme.spacing).toBeDefined()
+  })
+
+  test('vibesTheme has all required fields', () => {
+    expect(vibesTheme.name).toBe('vibes')
+    expect(vibesTheme.colors).toBeDefined()
+    expect(vibesTheme.typography).toBeDefined()
+    expect(vibesTheme.spacing).toBeDefined()
+  })
+
+  test('all themes conform to the unified color schema', () => {
+    const themes = [darkTheme, lightTheme, nordTheme, draculaTheme, gruvboxTheme, vibesTheme]
 
     for (const theme of themes) {
       const c = theme.colors as Record<string, string | undefined>
       expect(c.primary).toBeDefined()
       expect(c.secondary).toBeDefined()
+      expect(c.tertiary).toBeDefined()
+      expect(c.bg).toBeDefined()
+      expect(c.fg).toBeDefined()
       expect(c.success).toBeDefined()
+      expect(c.danger).toBeDefined()
       expect(c.warning).toBeDefined()
+      expect(c.info).toBeDefined()
       expect(c.border).toBeDefined()
-      // Surface tokens: dark uses bg/fg; others use background/text
-      expect(c.bg ?? c.background).toBeDefined()
-      expect(c.fg ?? c.text).toBeDefined()
-      expect(c.danger ?? c.error).toBeDefined()
-      expect(c.tertiary ?? c.accent).toBeDefined()
+      expect(c.textDim).toBeDefined()
+    }
+  })
+
+  test('all themes have a full depth stack', () => {
+    const themes = [darkTheme, lightTheme, nordTheme, draculaTheme, gruvboxTheme, vibesTheme]
+
+    for (const theme of themes) {
+      expect(theme.depth.base).toMatch(/^#/)
+      expect(theme.depth.surface).toMatch(/^#/)
+      expect(theme.depth.overlay).toMatch(/^#/)
+      expect(theme.depth.inset).toMatch(/^#/)
+      expect(theme.depth.outset).toMatch(/^#/)
     }
   })
 
   test('all themes have typography settings', () => {
-    const themes = [darkTheme, lightTheme, nordTheme, draculaTheme]
+    const themes = [darkTheme, lightTheme, nordTheme, draculaTheme, gruvboxTheme, vibesTheme]
 
     for (const theme of themes) {
       expect(typeof theme.typography.bold).toBe('boolean')
@@ -65,7 +92,7 @@ describe('@tuix/themes - Types', () => {
   })
 
   test('all themes have spacing settings', () => {
-    const themes = [darkTheme, lightTheme, nordTheme, draculaTheme]
+    const themes = [darkTheme, lightTheme, nordTheme, draculaTheme, gruvboxTheme, vibesTheme]
 
     for (const theme of themes) {
       expect(typeof theme.spacing.padding).toBe('number')
@@ -81,18 +108,17 @@ describe('@tuix/themes - Types', () => {
       colors: {
         primary: '#ff0000',
         secondary: '#00ff00',
-        accent: '#0000ff',
-        muted: '#888888',
-        background: '#000000',
-        backgroundAlt: '#111111',
+        tertiary: '#0000ff',
+        bg: '#000000',
+        fg: '#ffffff',
         success: '#00ff00',
+        danger: '#ff0000',
         warning: '#ffff00',
-        error: '#ff0000',
         info: '#0000ff',
         border: '#333333',
+        borderSubtle: '#222222',
         selection: '#444444',
         highlight: '#555555',
-        text: '#ffffff',
         textDim: '#888888',
         textBright: '#ffffff',
       },

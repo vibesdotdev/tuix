@@ -27,16 +27,29 @@ export interface ButtonProps {
   type?: 'button' | 'submit' | 'cancel'
 }
 
-function decorate(label: string, variant: ButtonVariant): string {
-  switch (variant) {
-    case 'danger':
-      return `! ${label}`
-    case 'success':
-      return `✓ ${label}`
-    case 'warning':
-      return `! ${label}`
+function decorate(label: string, variant: ButtonVariant, size: ButtonSize): string {
+  const marked = (() => {
+    switch (variant) {
+      case 'danger':
+        return `! ${label}`
+      case 'success':
+        return `✓ ${label}`
+      case 'warning':
+        return `! ${label}`
+      default:
+        return label
+    }
+  })()
+  switch (size) {
+    case 'small':
+      return marked
+    case 'large':
+      return `  ${marked}  `
+    case 'medium':
+      return ` ${marked} `
+    case 'default':
     default:
-      return label
+      return marked
   }
 }
 
@@ -70,14 +83,16 @@ function variantColor(variant: ButtonVariant) {
  */
 export function Button(props: ButtonProps): JSX.Element {
   const variant = props.variant ?? 'secondary'
+  const size = props.size ?? 'default'
   const raw = labelOf(props.children, props.label ?? '')
   const label = props.loading ? `… ${raw}` : raw
   const disabled = Boolean(props.disabled || props.loading)
+  const decorated = decorate(label, variant, size)
 
   if (variant === 'ghost') {
     return (
       <text className={props.className} fg={variantColor(variant)}>
-        {decorate(label, variant)}
+        {decorated}
       </text>
     )
   }
@@ -85,7 +100,7 @@ export function Button(props: ButtonProps): JSX.Element {
   return (
     <button
       className={props.className}
-      label={decorate(label, variant)}
+      label={decorated}
       focused={props.focused === true || variant === 'primary' || variant === 'default'}
       disabled={disabled}
       fg={variantColor(variant)}

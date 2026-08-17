@@ -120,6 +120,16 @@ $effect(() => {
 
 	.nav-cta {
 		margin-left: 0.5rem;
+		/* Reinforce ink on green — global CSS also sets this; keep local belt */
+		color: var(--accent-ink) !important;
+		background: var(--accent);
+		font-weight: 700;
+	}
+
+	.nav-cta:hover {
+		color: var(--accent-ink) !important;
+		background: var(--accent-hover);
+		text-decoration: none;
 	}
 
 	@media (max-width: 760px) {
@@ -146,13 +156,15 @@ $effect(() => {
 			display: flex;
 		}
 
-		.nav a {
+		.nav a:not(.btn) {
 			padding: 0.7rem 0.85rem;
 		}
 
 		.nav-cta {
-			margin: 0.5rem 0 0;
+			margin: 0.65rem 0 0;
 			justify-content: center;
+			width: 100%;
 		}
 	}
 </style>
+

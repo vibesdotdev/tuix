@@ -21,3 +21,24 @@ terminal-web xterm running the same command.
 | `kit-80x24-slash.png` | Command palette over the workbench, no leftover well |
 | `kit-80x24-help.png` | Keys modal over the workbench, thread still visible |
 | `kit-120x40-idle.png` | Live xterm, two columns, full footer |
+
+Captured 2026-08-17 from real 80×24 and 120×40 PTYs (node-pty, raw
+stream + decoded grid; swatch colors are truecolor SGR in the `.bin`,
+the `.txt` grid drops SGR):
+
+```sh
+cd apps/demo && bun src/index.ts widgets   # widget gallery
+cd packages/bin && bun src/bin/tuix.ts themes  # theme gallery
+```
+
+| File | What it shows |
+| --- | --- |
+| `widgets-80x24.{bin,txt}` | Widget gallery: Kbd, Avatar, Sparkline, Skeleton, Alert at 80×24 |
+| `widgets-120x40.{bin,txt}` | Widget gallery at 120×40 incl. Toast row |
+| `themes-80x24.{bin,txt}` | Six themes with brand + depth swatches (truecolor in `.bin`) |
+| `themes-120x40.{bin,txt}` | Theme gallery at full width |
+
+The kit footer after the 2026-08-17 StatusBar segment refactor was
+re-verified against `kit-80x24-idle.txt`: same facts, same separators,
+same clip — tone is opt-in and defaults to the dim text used in the
+shipped shots.

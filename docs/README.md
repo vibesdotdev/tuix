@@ -11,6 +11,13 @@ This folder contains architecture, standards, and planning docs for the monorepo
 - [evidence/README.md](./evidence/README.md) — real-PTY kit dumps
 - [PRIORITIES.md](./PRIORITIES.md) — priority order and gap-elimination plan
 
+## Guides
+
+- [guides/install.md](./guides/install.md) — Bun install, monorepo, CLI
+- [guides/quickstart.md](./guides/quickstart.md) — first JSX + MVU app
+- [guides/architecture.md](./guides/architecture.md) — layers, data flow, gates
+- [guides/theming.md](./guides/theming.md) — tokens, depth, runtime theme switching
+
 ## Visual bar
 
 - [VISUAL-LANGUAGE.md](./VISUAL-LANGUAGE.md) — depth, motion, brand, density

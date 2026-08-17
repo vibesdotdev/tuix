@@ -8,6 +8,7 @@ import { $state, $derived } from '@tuix/reactive'
 import { Effect } from 'effect'
 import type { Theme } from './types'
 import { ThemeContext } from './context'
+import { vibesTheme } from './themes/vibes'
 
 /**
  * Theme hook result
@@ -77,9 +78,7 @@ export function useTheme(): UseThemeResult {
     )
   ).catch(() => {})
 
-  const theme = $derived(
-    () => currentTheme() || ({ name: 'dark', colors: {}, typography: {}, spacing: {} } as Theme)
-  )
+  const theme = $derived(() => currentTheme() || vibesTheme)
   const themeNames = $derived(() => availableThemes())
 
   function setTheme(newTheme: Theme) {

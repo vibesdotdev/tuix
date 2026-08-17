@@ -2,6 +2,48 @@
 
 A Bun-native TUI framework for building terminal apps with JSX, reactive runes, and an Effect-powered runtime.
 
+**Site:** <https://tuix.vibes.dev> · **Repo:** <https://github.com/vibesdotdev/tuix>
+
+## Quickstart
+
+```bash
+bun install
+
+# interactive kit workbench (real PTY demo)
+cd apps/demo && bun src/index.ts kit
+
+# theme gallery
+bun packages/bin/src/bin/tuix.ts themes
+```
+
+```tsx
+/** @jsxImportSource @tuix/jsx */
+import { $state } from '@tuix/reactive'
+import { Fallback, runApp } from '@tuix/jsx'
+import { Button, useUITheme } from '@tuix/ui'
+
+function Counter() {
+  const count = $state(0, 'count')
+  const { theme } = useUITheme()
+  return (
+    <box border="rounded" padding={1}>
+      <text fg={theme.colors.primary}>{`Count: ${count()}`}</text>
+      <Button variant="primary" onClick={() => count.$set(count() + 1)}>
+        Increment
+      </Button>
+    </box>
+  )
+}
+
+export default function App() {
+  return <Fallback component={Counter} />
+}
+
+await runApp(App, { interactive: true })
+```
+
+Guides: [install](./docs/guides/install.md) · [quickstart](./docs/guides/quickstart.md) · [architecture](./docs/guides/architecture.md) · [theming](./docs/guides/theming.md)
+
 ## Overview
 
 TUIX combines:

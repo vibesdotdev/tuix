@@ -4,6 +4,7 @@ import HelloCommand from './commands/hello-test'
 import StudioHome from './commands/studio-home'
 import Kit from './commands/kit'
 import ShowcaseCommand from './commands/showcase'
+import Widgets from './commands/widgets'
 import AIChatDemo from './commands/ai-chat-demo'
 import DashboardDemo from './commands/dashboard-demo'
 import AIChatInteractive from './commands/ai-chat-interactive'
@@ -22,6 +23,11 @@ export default function App() {
       />
       <Command name="kit" description="KISS kit primitives" component={Kit} />
       <Command name="showcase" description="Show off TUIX components" component={ShowcaseCommand} />
+      <Command
+        name="widgets"
+        description="New widget gallery (Kbd, Avatar, Sparkline, Skeleton, Alert, Toast)"
+        component={Widgets}
+      />
 
       {/* Config plugin - demonstrates args/flags pattern */}
       <Plugin name="config" description="Manage configuration">

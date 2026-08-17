@@ -7,6 +7,11 @@
 import { Context, Effect, Layer } from 'effect'
 import type { Theme, ThemeError } from './types'
 import { darkTheme } from './themes/dark'
+import { lightTheme } from './themes/light'
+import { nordTheme } from './themes/nord'
+import { draculaTheme } from './themes/dracula'
+import { gruvboxTheme } from './themes/gruvbox'
+import { vibesTheme } from './themes/vibes'
 
 /**
  * Theme context service
@@ -52,11 +57,11 @@ class ThemeContextImpl implements ThemeContext {
 
   constructor(defaultTheme?: Theme, customThemes?: Record<string, Theme>) {
     // Register built-in themes
-    const { darkTheme, lightTheme, nordTheme, draculaTheme, vibesTheme } = require('./themes')
     this.themes.set('dark', darkTheme)
     this.themes.set('light', lightTheme)
     this.themes.set('nord', nordTheme)
     this.themes.set('dracula', draculaTheme)
+    this.themes.set('gruvbox', gruvboxTheme)
     this.themes.set('vibes', vibesTheme)
 
     // Register custom themes

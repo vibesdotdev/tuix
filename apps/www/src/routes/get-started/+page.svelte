@@ -7,7 +7,7 @@ const steps = [
     lang: 'bash',
     filename: 'terminal',
     code: `curl -fsSL https://bun.sh/install | bash
-git clone https://github.com/tuix/tuix.git
+git clone https://github.com/vibesdotdev/tuix.git
 cd tuix && bun install`,
   },
   {

@@ -1,6 +1,6 @@
 # TUIX Implementation Status
 
-Last updated: 2026-08-15
+Last updated: 2026-08-17
 
 This file is the living status of the Tuix checkout on `grok/react-adapter`.
 It replaces the 2025-10-09 "Phase 6 Complete" note, which described a
@@ -51,12 +51,25 @@ A short-lived React host (`dfe301b`) was added and then dropped
 
 ## Next edge
 
-None named from this close. Overlay compositing and host-fitted columns
-are landed.
+- `Modal.closeOnBackdrop` needs overlay hit-testing before it can be
+  honest; `Form` still stubs `collectFormData`.
+- Found while shooting theme evidence: character-level line wrap can
+  split an SGR sequence across wrapped lines (visible as a literal
+  `1m` when a bold run wraps). Repro: narrow StaticLayout panel +
+  `<Text bold>`. Wrap should be escape-aware.
+- PNG shots (live xterm) still needed for the widget/theme galleries;
+  raw PTY streams + decoded grids for both are in `docs/evidence/`.
 
 ## How to run the workbench
 
 ```sh
 cd apps/demo
 bun src/index.ts kit
+```
+
+## How to run the widget gallery
+
+```sh
+cd apps/demo
+bun src/index.ts widgets
 ```

@@ -48,6 +48,11 @@ export { Badge } from './components/display/badge/index.js'
 export { StatusIndicator } from './components/display/status-indicator/index.js'
 export { Divider } from './components/display/divider/index.js'
 export { ProgressBar } from './components/feedback/progress-bar/index.js'
+export { Kbd, KbdHint } from './components/display/kbd/index.js'
+export { Avatar } from './components/display/avatar/index.js'
+export { Skeleton, SkeletonText } from './components/feedback/skeleton/index.js'
+export { Alert } from './components/feedback/alert/index.js'
+export { Sparkline, sparklineBars } from './components/data/sparkline/index.js'
 
 // Layout patterns
 export { StaticLayout } from './components/layout/static-layout/StaticLayout.js'

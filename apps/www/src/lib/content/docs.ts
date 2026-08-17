@@ -7,6 +7,7 @@ export const docsNav: Array<{ href: string; label: string }> = [
   { href: '/docs/install', label: 'Install' },
   { href: '/docs/quickstart', label: 'Quickstart' },
   { href: '/docs/architecture', label: 'Architecture' },
+  { href: '/docs/theming', label: 'Theming' },
   { href: '/docs/cli', label: 'CLI' },
   { href: '/docs/packages', label: 'Packages' },
   { href: '/docs/components', label: 'Components' },
@@ -31,7 +32,7 @@ export const docPages: Record<string, DocPage> = {
         body: 'Clone the repository. Install the dependencies. Run the tests and the type checks.',
         lang: 'bash',
         filename: 'terminal',
-        code: 'git clone https://github.com/tuix/tuix.git\ncd tuix\nbun install\nbun test\nbun run typecheck\nbun run lint',
+        code: 'git clone https://github.com/vibesdotdev/tuix.git\ncd tuix\nbun install\nbun test\nbun run typecheck\nbun run lint',
       },
       {
         heading: 'Add packages to an app',
@@ -289,6 +290,56 @@ export const docPages: Record<string, DocPage> = {
       {
         heading: 'Catalog',
         body: 'Module status and feature IDs live in spec/20-catalog/MODULE_CATALOG.md. Catalog honesty tests enforce that the catalog matches the packages.',
+      },
+    ],
+  },
+  theming: {
+    slug: 'theming',
+    title: 'Theming',
+    description: 'Theme tokens, depth stacks, and switching themes at runtime.',
+    sections: [
+      {
+        heading: 'The rules',
+        body: 'Widgets never hardcode hex. Color and background come from theme.colors. Layered surfaces come from theme.depth. Depth steps sit 5-8% luminance apart; dark themes inset darker than surface and outset lighter, light themes invert.',
+      },
+      {
+        heading: 'Built-in themes',
+        body: '@tuix/themes ships six themes that all share one color schema: vibes (pure black, white, green), dark, light, nord, dracula, and gruvbox. Preview all of them with the themes command.',
+        lang: 'bash',
+        filename: 'terminal',
+        code: 'bun packages/bin/src/bin/tuix.ts themes',
+      },
+      {
+        heading: 'Use tokens in widgets',
+        body: 'useUITheme is the hook widgets use. It reads the global theme rune, so every consumer repaints when the theme changes.',
+        lang: 'tsx',
+        filename: 'panel.tsx',
+        code: "import { useUITheme } from '@tuix/ui'\n\nfunction Panel() {\n  const { theme, depth, getColor } = useUITheme()\n  return (\n    <box background={depth.surface} borderColor={theme.colors.border}>\n      <text fg={getColor('primary')}>Hello</text>\n    </box>\n  )\n}",
+      },
+      {
+        heading: 'Switch at runtime',
+        body: 'setUITheme swaps the global theme rune. resetUITheme returns to the vibes default. Every useUITheme consumer repaints.',
+        lang: 'tsx',
+        filename: 'switch.tsx',
+        code: "import { setUITheme, resetUITheme } from '@tuix/ui'\nimport { nordTheme } from '@tuix/themes'\n\nsetUITheme(nordTheme)\nresetUITheme()",
+      },
+      {
+        heading: 'Effect-scoped context',
+        body: 'Apps that run an Effect layer can use ThemeProvider and useTheme from @tuix/themes instead of the global rune. useTheme returns the current theme plus setTheme, setThemeByName, and themeNames.',
+        lang: 'tsx',
+        filename: 'provider.tsx',
+        code: "import { ThemeProvider } from '@tuix/themes'\n\n<ThemeProvider config={{ defaultTheme: 'dracula' }}>\n  <MyApp />\n</ThemeProvider>",
+      },
+      {
+        heading: 'Custom themes',
+        body: 'A theme is data: the full color schema (brand, base, semantic, UI, and text colors), typography, spacing, and a five-step depth stack (base, surface, overlay, inset, outset). Ship real depth steps; there is no fallback luminance computation. See docs/guides/theming.md in the repository for a complete custom theme example.',
+      },
+      {
+        heading: 'Status bar tones',
+        body: 'StatusBar facts accept a tone: muted by default, or default, warning, danger, and success. Tones map to theme colors, so a failing CI fact stays red in every theme.',
+        lang: 'tsx',
+        filename: 'status.tsx',
+        code: "<StatusBar\n  facts={[\n    { slot: 'branch', value: 'main', tone: 'default' },\n    { slot: 'ci', value: 'failing', tone: 'danger' },\n  ]}\n/>",
       },
     ],
   },

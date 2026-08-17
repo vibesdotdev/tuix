@@ -54,6 +54,7 @@ export function HelpCommand(): JSX.Element {
         { name: 'version', description: 'Show TUIX version and system information' },
         { name: 'help', description: 'Interactive help explorer' },
         { name: 'dashboard', description: 'System status dashboard with live metrics' },
+        { name: 'themes', description: 'List built-in themes with color and depth swatches' },
       ],
       plugins: [],
     }

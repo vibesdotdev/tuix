@@ -11,29 +11,28 @@ export const draculaTheme: Theme = {
   name: 'dracula',
   description: 'Dark theme with vibrant colors',
   colors: {
-    // Foreground colors
+    // Brand colors
     primary: '#8be9fd', // Cyan
     secondary: '#bd93f9', // Purple
-    accent: '#ff79c6', // Pink
-    muted: '#6272a4', // Comment
+    tertiary: '#ff79c6', // Pink
 
-    // Background colors
-    background: '#282a36', // Background
-    backgroundAlt: '#44475a', // Current Line
+    // Base colors (dark theme)
+    bg: '#282a36', // Background
+    fg: '#f8f8f2', // Foreground
 
     // Semantic colors
     success: '#50fa7b', // Green
+    danger: '#ff5555', // Red
     warning: '#f1fa8c', // Yellow
-    error: '#ff5555', // Red
     info: '#8be9fd', // Cyan
 
-    // UI element colors
+    // UI element colors (derived)
     border: '#44475a', // Current Line
+    borderSubtle: '#343746', // Deeper current line
     selection: '#44475a', // Selection
     highlight: '#44475a', // Current Line
 
-    // Text colors
-    text: '#f8f8f2', // Foreground
+    // Text variations (derived)
     textDim: '#6272a4', // Comment
     textBright: '#ffffff', // White
   },

@@ -65,18 +65,17 @@ describe('@tuix/themes - Context', () => {
       colors: {
         primary: '#ff0000',
         secondary: '#00ff00',
-        accent: '#0000ff',
-        muted: '#888888',
-        background: '#000000',
-        backgroundAlt: '#111111',
+        tertiary: '#0000ff',
+        bg: '#000000',
+        fg: '#ffffff',
         success: '#00ff00',
+        danger: '#ff0000',
         warning: '#ffff00',
-        error: '#ff0000',
         info: '#0000ff',
         border: '#333333',
+        borderSubtle: '#222222',
         selection: '#444444',
         highlight: '#555555',
-        text: '#ffffff',
         textDim: '#888888',
         textBright: '#ffffff',
       },
@@ -91,6 +90,13 @@ describe('@tuix/themes - Context', () => {
         padding: 1,
         margin: 1,
         gap: 1,
+      },
+      depth: {
+        base: '#000000',
+        surface: '#111111',
+        overlay: '#222222',
+        inset: '#080808',
+        outset: '#333333',
       },
     }
 
@@ -115,6 +121,8 @@ describe('@tuix/themes - Context', () => {
     expect(names).toContain('light')
     expect(names).toContain('nord')
     expect(names).toContain('dracula')
+    expect(names).toContain('gruvbox')
+    expect(names).toContain('vibes')
   })
 
   test('can register themes via config', async () => {
@@ -123,18 +131,17 @@ describe('@tuix/themes - Context', () => {
       colors: {
         primary: '#ff0000',
         secondary: '#00ff00',
-        accent: '#0000ff',
-        muted: '#888888',
-        background: '#000000',
-        backgroundAlt: '#111111',
+        tertiary: '#0000ff',
+        bg: '#000000',
+        fg: '#ffffff',
         success: '#00ff00',
+        danger: '#ff0000',
         warning: '#ffff00',
-        error: '#ff0000',
         info: '#0000ff',
         border: '#333333',
+        borderSubtle: '#222222',
         selection: '#444444',
         highlight: '#555555',
-        text: '#ffffff',
         textDim: '#888888',
         textBright: '#ffffff',
       },
@@ -149,6 +156,13 @@ describe('@tuix/themes - Context', () => {
         padding: 1,
         margin: 1,
         gap: 1,
+      },
+      depth: {
+        base: '#000000',
+        surface: '#111111',
+        overlay: '#222222',
+        inset: '#080808',
+        outset: '#333333',
       },
     }
 

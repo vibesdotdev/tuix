@@ -1,7 +1,7 @@
 {
   "name": "@tuix/ui",
   "version": "1.0.0-rc.3",
-  "description": "UI components and layouts for Cinderlink",
+  "description": "Terminal UI component kit for Tuix: widgets, forms, feedback, and layout",
   "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",

@@ -7,6 +7,12 @@
 import { Effect, Layer } from 'effect'
 import type { Theme, ThemeConfig } from './types'
 import { createThemeLayer, ThemeContext } from './context'
+import { darkTheme } from './themes/dark'
+import { lightTheme } from './themes/light'
+import { nordTheme } from './themes/nord'
+import { draculaTheme } from './themes/dracula'
+import { gruvboxTheme } from './themes/gruvbox'
+import { vibesTheme } from './themes/vibes'
 
 /**
  * ThemeProvider props
@@ -51,12 +57,13 @@ export function ThemeProvider(props: ThemeProviderProps): JSX.Element {
   // Get default theme
   let defaultTheme: Theme | undefined
   if (config.defaultTheme) {
-    const { darkTheme, lightTheme, nordTheme, draculaTheme } = require('./themes')
     const builtInThemes: Record<string, Theme> = {
       dark: darkTheme,
       light: lightTheme,
       nord: nordTheme,
       dracula: draculaTheme,
+      gruvbox: gruvboxTheme,
+      vibes: vibesTheme,
     }
     defaultTheme = builtInThemes[config.defaultTheme]
   }

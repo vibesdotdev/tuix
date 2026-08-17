@@ -5,6 +5,7 @@
 | [Install](./install.md) | Bun install, monorepo, CLI |
 | [Quickstart](./quickstart.md) | First JSX + MVU app |
 | [Architecture](./architecture.md) | Layers, data flow, gates |
+| [Theming](./theming.md) | Tokens, depth, runtime theme switching |
 
 Product marketing + docs site (SvelteKit): `apps/www` — run `bun run www:dev` from the monorepo root.
 

@@ -20,13 +20,16 @@ UI packages contain components and utilities for building user interfaces.
 
 ## Usage
 
-```typescript
-import { /* exports */ } from '@tuix/ui'
+```tsx
+import { Button, Input, Modal, Kbd, Sparkline, useUITheme } from '@tuix/ui'
 ```
 
 ## API Reference
 
 - **Default**: `./src/index.ts`
+- Categories: `components/data`, `components/display`, `components/feedback`,
+  `components/forms`, `components/layout`, `components/navigation`,
+  `components/system`
 
 ## Examples
 
@@ -38,7 +41,7 @@ This package is part of the TUIX monorepo. For development:
 
 ```bash
 # Clone the monorepo
-git clone https://github.com/cinderlink/tuix.git
+git clone https://github.com/vibesdotdev/tuix.git
 cd tuix
 
 # Install dependencies
@@ -54,10 +57,10 @@ bun run typecheck
 
 ## Related Packages
 
-- [@tuix/core](packages/core/README.md) - Core TUIX framework with MVU architecture, reactivity, and coordination
-- [@tuix/config](packages/config/README.md) - Configuration management system with multiple sources and validation
-- [@tuix/jsx-runtime](packages/jsx-runtime/README.md) - Custom JSX runtime for TUIX applications with TypeScript support
-- [@tuix/runtime](packages/runtime/README.md) - Runtime system for TUIX applications with fiber scheduling
+- [@tuix/core](../core/README.md) - Core TUIX framework with MVU architecture, reactivity, and coordination
+- [@tuix/config](../config/README.md) - Configuration management system with multiple sources and validation
+- [@tuix/jsx](../jsx/README.md) - JSX runtime for TUIX applications with TypeScript support
+- [@tuix/runtime](../runtime/README.md) - Runtime system for TUIX applications with fiber scheduling
 - [@tuix/process-manager](packages/process-manager/README.md) - Process management and service coordination for development workflows
 
 ## License

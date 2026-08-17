@@ -11,7 +11,7 @@
  *
  * @example
  * ```tsx
- * import { Viewport } from 'tuix/components/containers/viewport'
+ * import { Viewport } from '@tuix/ui'
  *
  * function MyScrollableContent() {
  *   return (

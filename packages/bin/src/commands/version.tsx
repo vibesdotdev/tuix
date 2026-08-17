@@ -50,7 +50,7 @@ export function VersionCommand(): JSX.Element {
           <Box direction="horizontal">
             <Text bold>Website:</Text>
             <Text> </Text>
-            <Text color={theme.info}>https://tuix.dev</Text>
+            <Text color={theme.info}>https://tuix.vibes.dev</Text>
           </Box>
           <Box direction="horizontal">
             <Text bold>License:</Text>
@@ -60,7 +60,7 @@ export function VersionCommand(): JSX.Element {
           <Box direction="horizontal">
             <Text bold>Repository:</Text>
             <Text> </Text>
-            <Text color={theme.info}>https://github.com/tuix/tuix</Text>
+            <Text color={theme.info}>https://github.com/vibesdotdev/tuix</Text>
           </Box>
         </Box>
       </Box>

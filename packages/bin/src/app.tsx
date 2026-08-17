@@ -9,6 +9,7 @@ import { WelcomeScreen } from './commands/welcome'
 import { VersionCommand } from './commands/version'
 import { HelpCommand } from './commands/help'
 import { DashboardCommand } from './commands/dashboard'
+import { ThemesCommand } from './commands/themes'
 
 /**
  * Main TUIX CLI application
@@ -37,6 +38,12 @@ export function TuixApp(): JSX.Element {
         description="System status dashboard with live metrics"
         component={DashboardCommand}
         interactive
+      />
+
+      <Command
+        name="themes"
+        description="List built-in themes with color and depth swatches"
+        component={ThemesCommand}
       />
 
       {/* Fallback: show welcome screen when no command matches */}

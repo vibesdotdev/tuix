@@ -33,7 +33,7 @@ export function packagesByLayer(): Array<{ layer: string; packages: PackageDoc[]
     list.push(pkg)
     groups.set(pkg.layer, list)
   }
-  const ordered = layerOrder
+  const ordered: Array<{ layer: string; packages: PackageDoc[] }> = layerOrder
     .filter(layer => groups.has(layer))
     .map(layer => ({ layer, packages: groups.get(layer)! }))
   for (const [layer, packages] of groups) {
