@@ -6,6 +6,7 @@ const links = [
   { href: '/get-started', label: 'Get started' },
   { href: '/docs', label: 'Docs' },
   { href: '/packages', label: 'Packages' },
+  { href: '/search', label: 'Search' },
 ]
 
 let open = $state(false)

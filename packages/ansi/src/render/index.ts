@@ -25,22 +25,94 @@ const toProps = (style: Style | StyleProps): StyleProps =>
 const applyTransform = (text: string, props: StyleProps): string =>
   props.transform ? props.transform(text) : text
 
+const CSI_RE = /^\x1b\[[0-9;?<=>!]*[A-Za-z]/
+const OSC_RE = /^\x1b\][^\x07]*(?:\x07|\x1b\\)/
+const ESC_OTHER_RE = /^\x1b./
+
+interface WrapToken {
+  /** Printable text (possibly zero-length when the token is only an escape). */
+  text: string
+  /** Escape prefix (SGR state or other control) attached before `text`. */
+  escape: string
+  /** True when the escape is an SGR sequence (`m` final byte). */
+  sgr: boolean
+}
+
+/**
+ * Split a styled line into tokens whose escapes are never split.
+ * Each token is one escape sequence plus the printable run that follows it.
+ */
+function tokenizeForWrap(line: string): WrapToken[] {
+  const tokens: WrapToken[] = []
+  let index = 0
+  let pendingEscape = ''
+  let pendingSgr = false
+  let text = ''
+
+  const flush = () => {
+    if (pendingEscape || text) {
+      tokens.push({ text, escape: pendingEscape, sgr: pendingSgr })
+    }
+    pendingEscape = ''
+    pendingSgr = false
+    text = ''
+  }
+
+  while (index < line.length) {
+    const rest = line.slice(index)
+    if (rest.startsWith('\x1b')) {
+      const match = CSI_RE.exec(rest) ?? OSC_RE.exec(rest) ?? ESC_OTHER_RE.exec(rest)
+      const seq = match ? match[0] : '\x1b'
+      flush()
+      pendingEscape = seq
+      pendingSgr = seq.endsWith('m') && seq.startsWith('\x1b[')
+      index += seq.length
+      continue
+    }
+    text += line[index]
+    index += 1
+  }
+  flush()
+  return tokens
+}
+
+/**
+ * Wrap a styled line to `width` visible columns.
+ *
+ * Escape sequences are zero width, never split across rows, and SGR state
+ * is re-emitted at the start of every continuation row so styling survives
+ * the wrap (the closing reset stays on the final row).
+ */
 const wrapLine = (line: string, width: number): string[] => {
   if (visualWidth(line) <= width || width <= 0) return [line]
 
   const result: string[] = []
+  let activeSgr = ''
   let buffer = ''
   let currentWidth = 0
 
-  for (const char of [...line]) {
-    const charWidth = visualWidth(char)
-    if (currentWidth + charWidth > width && buffer) {
-      result.push(buffer)
-      buffer = char
-      currentWidth = charWidth
-    } else {
-      buffer += char
-      currentWidth += charWidth
+  const breakRow = (firstChar: string, charWidth: number) => {
+    result.push(buffer)
+    buffer = activeSgr + firstChar
+    currentWidth = charWidth
+  }
+
+  for (const token of tokenizeForWrap(line)) {
+    if (token.escape) {
+      buffer += token.escape
+      if (token.sgr) {
+        // Reset closes the run; anything else extends active state.
+        activeSgr = token.escape === RESET ? '' : token.escape
+      }
+    }
+    for (const char of [...token.text]) {
+      const charWidth = Bun.stringWidth(char)
+      if (currentWidth + charWidth > width && buffer) {
+        breakRow(char, charWidth)
+      } else {
+        buffer += char
+        currentWidth += charWidth
+      }
     }
   }
 

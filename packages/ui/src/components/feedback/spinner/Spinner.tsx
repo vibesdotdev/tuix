@@ -24,6 +24,7 @@
 
 import { $state, $effect } from '@tuix/reactive/runes/runes'
 import { style, colors } from '@tuix/ansi'
+import { useUITheme } from '../../../theme'
 
 // Types
 export type SpinnerType = 'dots' | 'line' | 'circle' | 'bounce' | 'pulse' | 'wave'
@@ -71,23 +72,19 @@ export function Spinner(props: SpinnerProps): JSX.Element {
     return () => clearInterval(interval)
   })
 
-  // Size styles
-  const sizeStyles = {
-    small: { fontSize: 12 },
-    medium: { fontSize: 16 },
-    large: { fontSize: 24 },
-  }
+  // Terminal cells have no font size — size maps to glyph wrapping, never web px.
+  const glyph = frames[frameIndex.value]
+  const frame = size === 'large' ? `[ ${glyph} ]` : glyph
 
   // Render
   const spinnerStyle = style({
     foreground: spinnerColor,
-    ...sizeStyles[size],
   })
 
   if (props.text) {
     return (
       <hstack gap={1} className={props.className} align="middle">
-        <text style={spinnerStyle}>{frames[frameIndex.value]}</text>
+        <text style={spinnerStyle}>{frame}</text>
         <text>{props.text}</text>
       </hstack>
     )
@@ -95,7 +92,7 @@ export function Spinner(props: SpinnerProps): JSX.Element {
 
   return (
     <text style={spinnerStyle} className={props.className}>
-      {frames[frameIndex.value]}
+      {frame}
     </text>
   )
 }
@@ -143,24 +140,18 @@ export function LoadingOverlay(props: {
     return props.children ?? <text />
   }
 
+  const { depth, theme } = useUITheme()
+
   return (
-    <box
-      style={style({
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.7)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      })}
-    >
-      <vstack align="center" gap={2}>
-        <Spinner size="large" {...props.spinnerProps} />
-        {props.message && <text style={style({ foreground: colors.white })}>{props.message}</text>}
-      </vstack>
-    </box>
+    <overlay>
+      <interactive focusable>
+        <box border="rounded" padding={1} background={depth.overlay} borderColor={depth.outset}>
+          <vstack align="center" gap={2}>
+            <Spinner size="large" {...props.spinnerProps} />
+            {props.message && <text fg={theme.colors.textBright}>{props.message}</text>}
+          </vstack>
+        </box>
+      </interactive>
+    </overlay>
   )
 }

@@ -16,6 +16,7 @@ export async function GET() {
     '/get-started',
     '/packages',
     '/docs',
+    '/search',
     '/docs/tutorials',
     '/docs/patterns',
     '/docs/components',

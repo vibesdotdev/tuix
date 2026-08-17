@@ -140,7 +140,19 @@ export const componentDocs: ComponentDoc[] = [
     package: '@tuix/ui',
     summary: 'Scroll a box of content with keyboard or mouse.',
     whenToUse: 'Use ScrollableBox when content exceeds the visible area.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'log-view.tsx',
+      code: `import { ScrollableBox } from '@tuix/ui'
+
+<ScrollableBox
+  title="Logs"
+  items={logLines}
+  height={12}
+  renderItem={(line) => <text>{line}</text>}
+/>`,
+    },
   },
   // Forms
   {
@@ -209,7 +221,21 @@ const name = $state('', 'name')
     package: '@tuix/ui',
     summary: 'Switch a setting between two states.',
     whenToUse: 'Use Toggle for feature flags and compact boolean UI.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'toggle.tsx',
+      code: `import { $state } from '@tuix/reactive'
+import { Toggle } from '@tuix/ui'
+
+const telemetry = $state(false, 'telemetry')
+
+<Toggle
+  bind:checked={telemetry}
+  label="Share crash reports"
+  onChange={(on) => saveSetting('telemetry', on)}
+/>`,
+    },
   },
   {
     slug: 'confirm',
@@ -255,7 +281,21 @@ function Profile() {
     package: '@tuix/ui',
     summary: 'Browse and select a file path in the terminal.',
     whenToUse: 'Use FilePicker for open and save path selection.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'file-picker.tsx',
+      code: `import { $state } from '@tuix/reactive'
+import { FilePicker } from '@tuix/ui'
+
+const path = $state('', 'path')
+
+<FilePicker
+  bind:value={path}
+  cwd={process.cwd()}
+  onPick={(file) => path.$set(file)}
+/>`,
+    },
   },
   // Data
   {
@@ -302,7 +342,18 @@ const items = ['Developer', 'Operator', 'Admin']
     package: '@tuix/ui',
     summary: 'Filter a data set with a search box.',
     whenToUse: 'Use FilterBox above tables and long lists.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'filter-box.tsx',
+      code: `import { $state } from '@tuix/reactive'
+import { FilterBox, List } from '@tuix/ui'
+
+const query = $state('', 'query')
+
+<FilterBox bind:query={query} placeholder="Filter processes…" />
+<List items={procs.filter(p => p.includes(query()))} />`,
+    },
   },
   // Feedback
   {
@@ -325,12 +376,27 @@ const items = ['Developer', 'Operator', 'Admin']
   },
   {
     slug: 'toast',
-    name: 'Toast',
+    name: 'Toast / ToastViewport',
     category: 'Feedback',
     package: '@tuix/ui',
     summary: 'Show a short transient notification.',
     whenToUse: 'Use Toast for success and error notices that auto-dismiss.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'toast.tsx',
+      code: `import { createToastStore, ToastViewport } from '@tuix/ui'
+
+const toasts = createToastStore({ maxVisible: 3 })
+
+async function save() {
+  await writeBuffer()
+  toasts.success('Saved')
+}
+
+// Render once per surface; drive it with push helpers.
+<ToastViewport store={toasts} />`,
+    },
   },
   {
     slug: 'tooltip',
@@ -339,7 +405,24 @@ const items = ['Developer', 'Operator', 'Admin']
     package: '@tuix/ui',
     summary: 'Show helper text near a focused control.',
     whenToUse: 'Use Tooltip for keyboard hints and field help.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'tooltip.tsx',
+      code: `import { $state } from '@tuix/reactive'
+import { Tooltip } from '@tuix/ui'
+
+const showHint = $state(false, 'showHint')
+
+<text>buffer</text>
+<Tooltip
+  visible={showHint()}
+  placement="below"
+  content="Write the buffer to disk"
+  duration={4000}
+  onHide={() => showHint.$set(false)}
+/>`,
+    },
   },
   {
     slug: 'spinner',
@@ -348,7 +431,14 @@ const items = ['Developer', 'Operator', 'Admin']
     package: '@tuix/ui',
     summary: 'Show an indeterminate busy indicator.',
     whenToUse: 'Use Spinner while you wait for a long Effect or network call.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'spinner.tsx',
+      code: `import { Spinner } from '@tuix/ui'
+
+<Spinner type="dots" text="Indexing workspace…" speed={80} />`,
+    },
   },
   // Navigation
   {
@@ -367,7 +457,18 @@ const items = ['Developer', 'Operator', 'Admin']
     package: '@tuix/ui',
     summary: 'Switch between labeled panels.',
     whenToUse: 'Use Tabs for multi-section screens in one view.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'tabs.tsx',
+      code: `import { Tabs, Tab } from '@tuix/ui'
+
+<Tabs activeIndex={0} onTabChange={(i) => switchPane(i)}>
+  <Tab label="Overview">{overviewPane}</Tab>
+  <Tab label="Logs">{logPane}</Tab>
+  <Tab label="Config" badge="2">{configPane}</Tab>
+</Tabs>`,
+    },
   },
   // System
   {
@@ -377,7 +478,15 @@ const items = ['Developer', 'Operator', 'Admin']
     package: '@tuix/ui',
     summary: 'Signal a clean application exit from the widget tree.',
     whenToUse: 'Use Exit when a screen should end the interactive session.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'exit.tsx',
+      code: `import { Exit } from '@tuix/ui'
+
+// Renders the farewell line, then exits after the paint lands.
+<Exit code={0} delay={500}>Bye — buffers flushed.</Exit>`,
+    },
   },
   // JSX app components
   {
@@ -412,7 +521,19 @@ const items = ['Developer', 'Operator', 'Admin']
     package: '@tuix/jsx',
     summary: 'Register a plugin scope with nested commands.',
     whenToUse: 'Use Plugin to group related commands under one path.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'plugin.tsx',
+      code: `import { Plugin, Command } from '@tuix/jsx'
+
+<Plugin name="config" description="Manage configuration">
+  <Command name="get" description="Print one value" component={ConfigGet} />
+  <Command name="set" description="Set one value" component={ConfigSet} />
+</Plugin>
+
+// Routes: tuix config get <key>, tuix config set <key> <value>`,
+    },
   },
   {
     slug: 'scope',
@@ -421,7 +542,17 @@ const items = ['Developer', 'Operator', 'Admin']
     package: '@tuix/jsx',
     summary: 'Define a named scope for routing and reactive state.',
     whenToUse: 'Use Scope for nested command trees and scoped state.',
-    docs: 'none',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'scope.tsx',
+      code: `import { Scope } from '@tuix/jsx'
+
+// Scope names the route node and gives nested $state keys a home.
+<Scope name="deploy" description="Ship the current branch">
+  <DeployScreen />
+</Scope>`,
+    },
   },
   // JSX intrinsics
   {
@@ -432,6 +563,140 @@ const items = ['Developer', 'Operator', 'Admin']
     summary: 'Built-in JSX elements that compile to view nodes.',
     whenToUse: 'Use primitives for layout when you do not need full widgets.',
     docs: 'brief',
+  },
+  // New widget families (2026-08-17)
+  {
+    slug: 'kbd',
+    name: 'Kbd / KbdHint',
+    category: 'Display',
+    package: '@tuix/ui',
+    summary: 'Render a keyboard chip: [/] or [^K] with an optional label.',
+    whenToUse: 'Use Kbd in footers, help rows, and hint lines.',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'kbd.tsx',
+      code: `import { Kbd, KbdHint } from '@tuix/ui'
+
+<KbdHint keys="/" label="commands" />
+<KbdHint keys="ctrl+k" label="clear" />
+<Kbd keys="esc" />`,
+    },
+  },
+  {
+    slug: 'avatar',
+    name: 'Avatar',
+    category: 'Display',
+    package: '@tuix/ui',
+    summary: 'Identity mark with initials or a glyph and a stable per-name color.',
+    whenToUse: 'Use Avatar in session lists and mention rows.',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'avatar.tsx',
+      code: `import { Avatar } from '@tuix/ui'
+
+<Avatar name="Ada Lovelace" />      // [AL] — accent hashed from the name
+<Avatar name="Grace Hopper" size="small" />
+<Avatar glyph="✿" size="large" />   // ( ✿ )`,
+    },
+  },
+  {
+    slug: 'accordion',
+    name: 'Accordion',
+    category: 'Display',
+    package: '@tuix/ui',
+    summary: 'Folded sections with a keyboard cursor and disclosure marks.',
+    whenToUse: 'Use Accordion for settings groups and collapsible detail.',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'accordion.tsx',
+      code: `import { Accordion } from '@tuix/ui'
+
+<Accordion
+  defaultOpen={0}
+  items={[
+    { title: 'Session', children: '3 open · rewrite auth active' },
+    { title: 'Files', children: 'sessions-open.ts · login.ts' },
+  ]}
+/>`,
+    },
+  },
+  {
+    slug: 'sparkline',
+    name: 'Sparkline',
+    category: 'Data',
+    package: '@tuix/ui',
+    summary: 'One-line chart of block glyphs scaled to the series.',
+    whenToUse: 'Use Sparkline for latency, throughput, and trend chips.',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'sparkline.tsx',
+      code: `import { Sparkline } from '@tuix/ui'
+
+<Sparkline values={latencyHistory} label="p99 ms" />
+<Sparkline values={opsPerSec} variant="line" width={20} />`,
+    },
+  },
+  {
+    slug: 'skeleton',
+    name: 'Skeleton / SkeletonText',
+    category: 'Feedback',
+    package: '@tuix/ui',
+    summary: 'Static loading placeholder that never animates or steals keys.',
+    whenToUse: 'Use Skeleton while data loads, in place of the real content.',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'skeleton.tsx',
+      code: `import { Skeleton, SkeletonText } from '@tuix/ui'
+
+{loading
+  ? <SkeletonText lines={3} width={28} />
+  : <Content />}`,
+    },
+  },
+  {
+    slug: 'alert',
+    name: 'Alert',
+    category: 'Feedback',
+    package: '@tuix/ui',
+    summary: 'Inline non-modal callout with an accent border and glyph.',
+    whenToUse: 'Use Alert for persistent context (read-only, degraded).',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'alert.tsx',
+      code: `import { Alert } from '@tuix/ui'
+
+<Alert variant="warning" title="Read-only">
+  Workspace is in review mode.
+</Alert>`,
+    },
+  },
+  {
+    slug: 'breadcrumbs',
+    name: 'Breadcrumbs',
+    category: 'Navigation',
+    package: '@tuix/ui',
+    summary: 'Path trail with dim ancestors and a bright leaf.',
+    whenToUse: 'Use Breadcrumbs in file browsers and nested screens.',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'breadcrumbs.tsx',
+      code: `import { Breadcrumbs } from '@tuix/ui'
+
+<Breadcrumbs
+  items={[
+    { label: 'apps' },
+    { label: 'demo' },
+    { label: 'kit.tsx' },
+  ]}
+/>`,
+    },
   },
 ]
 

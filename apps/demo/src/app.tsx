@@ -6,6 +6,7 @@ import Kit from './commands/kit'
 import ShowcaseCommand from './commands/showcase'
 import Widgets from './commands/widgets'
 import AIChatDemo from './commands/ai-chat-demo'
+import AIChatClean from './commands/ai-chat-clean'
 import DashboardDemo from './commands/dashboard-demo'
 import AIChatInteractive from './commands/ai-chat-interactive'
 import DashboardInteractive from './commands/dashboard-interactive'
@@ -46,6 +47,11 @@ export default function App() {
         name="ai-chat-static"
         description="Static AI chat demo (non-interactive)"
         component={AIChatDemo}
+      />
+      <Command
+        name="ai-chat-clean"
+        description="Clean vibes-style AI chat (thin borders, purple accent)"
+        component={AIChatClean}
       />
 
       {/* Dashboard demos */}

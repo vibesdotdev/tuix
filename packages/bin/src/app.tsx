@@ -9,7 +9,7 @@ import { WelcomeScreen } from './commands/welcome'
 import { VersionCommand } from './commands/version'
 import { HelpCommand } from './commands/help'
 import { DashboardCommand } from './commands/dashboard'
-import { ThemesCommand } from './commands/themes'
+import { ThemesCommand, ThemesPreviewCommand } from './commands/themes'
 
 /**
  * Main TUIX CLI application
@@ -44,6 +44,13 @@ export function TuixApp(): JSX.Element {
         name="themes"
         description="List built-in themes with color and depth swatches"
         component={ThemesCommand}
+      />
+
+      <Command
+        name="themes-preview"
+        description="Cycle built-in themes live with arrow keys"
+        component={ThemesPreviewCommand}
+        interactive
       />
 
       {/* Fallback: show welcome screen when no command matches */}

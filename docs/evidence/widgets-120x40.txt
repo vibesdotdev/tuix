@@ -1,5 +1,13 @@
 Widget gallery
 
+— Breadcrumbs
+apps › demo › src › kit.tsx
+
+— Accordion
+▾ Session
+3 open · rewrite auth active
+▸ Files
+
 — Kbd + KbdHint
 [/] commands  [?] help  [^K] clear
 
@@ -30,11 +38,3 @@ Widget gallery
 
 ┌──────────────────────────┐
 │✖ Build failed on 2 tests.│
-└──────────────────────────┘
-
-— Toast
-┌───────────┐  ┌───────┐  ┌──────────────┐  ┌─────────┐
-│ℹ Connected│  │✓ Saved│  │⚠ Retry queued│  │✖ Offline│
-└───────────┘  └───────┘  └──────────────┘  └─────────┘
-
-┌───────────────────────────────────────────────────────────────────────────────────┐

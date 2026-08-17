@@ -2,5 +2,5 @@
  * Form Component Exports
  */
 
-export { Form, form } from './Form'
-export type { FormProps, FormField } from './Form'
+export { Form, form, collectFormData, validateFormFields } from './Form'
+export type { FormProps, FormFieldDef, FormFields } from './Form'

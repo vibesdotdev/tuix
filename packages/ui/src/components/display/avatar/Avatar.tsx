@@ -24,8 +24,29 @@ export function initialsOf(name: string): string {
   return (words[0]![0]! + words[1]![0]!).toUpperCase()
 }
 
+/** Deterministic 31-bit hash of a string (FNV-1a). */
+function hashOf(name: string): number {
+  let hash = 0x811c9dc5
+  for (let i = 0; i < name.length; i++) {
+    hash ^= name.charCodeAt(i)
+    hash = Math.imul(hash, 0x01000193)
+  }
+  return Math.abs(hash)
+}
+
 /**
- * Identity mark for a person or entity. Initials by default, glyph on request.
+ * Stable theme accent for a name — same name, same color, every paint.
+ * Picks from the palette by name hash so identities are distinguishable
+ * without inventing colors outside the theme.
+ */
+export function avatarAccent(name: string, palette: readonly string[]): string {
+  if (palette.length === 0) throw new Error('avatarAccent requires a non-empty palette')
+  return palette[hashOf(name) % palette.length]!
+}
+
+/**
+ * Identity mark for a person or entity. Initials by default, glyph on
+ * request. The accent is deterministic per name, drawn from theme colors.
  *
  * @example
  * ```tsx
@@ -35,10 +56,20 @@ export function initialsOf(name: string): string {
 export function Avatar(props: AvatarProps): JSX.Element {
   const { theme } = useUITheme()
   const size = props.size ?? 'medium'
-  const mark = props.glyph ?? initialsOf(props.name ?? '')
+  const name = props.name ?? ''
+  const mark = props.glyph ?? initialsOf(name)
   const wrapped = size === 'small' ? mark : size === 'large' ? `( ${mark} )` : `[${mark}]`
+  const palette = [
+    theme.colors.primary,
+    theme.colors.secondary,
+    theme.colors.tertiary,
+    theme.colors.info,
+    theme.colors.warning,
+  ]
+  const accent = name ? avatarAccent(name, palette) : theme.colors.primary
+
   return (
-    <text className={props.className} fg={theme.colors.primary}>
+    <text className={props.className} fg={accent}>
       {wrapped}
     </text>
   )

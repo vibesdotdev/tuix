@@ -36,10 +36,10 @@ longer a generated export catalog.
   regions). Layer create/paint/composite for overlays is live.
 - `Modal.closeOnBackdrop` is declared but not wired — backdrop
   dismissal needs overlay hit-testing first.
-- `Form` still stubs child collection; validation helpers exist but
-  `onSubmit` receives nothing.
-- `ARCHITECTURE.md` is still a 2025 draft. Treat `VISION.md` + this
-  file as the current map.
+- ~~`Form` still stubs child collection~~ (fixed 2026-08-17: declared
+  fields contract with `collectFormData` / `validateFormFields`).
+- ~~`ARCHITECTURE.md` is still a 2025 draft~~ (rewritten 2026-08-17 as a
+  current-state layer map). Treat `VISION.md` + this file as the map.
 
 ## 2026-08-17 additions
 
@@ -60,6 +60,37 @@ longer a generated export catalog.
 - Site: OG/Twitter meta + canonical, sitemap.xml + robots, branded
   404, theming guide page, real PTY screenshots on the homepage,
   single-source version string, GitHub URLs corrected.
+
+## 2026-08-17 evening additions
+
+- Escape-aware line wrap in `@tuix/ansi` (`renderStyled`): escapes are
+  zero-width tokens, never split across rows, SGR state re-emitted on
+  continuations. Kills the literal-`1m` leak class.
+- `Form` real contract: declared `fields` (live getters + rules) with
+  `collectFormData` / `validateFormFields`; ctrl/meta+enter submits.
+- `CommandPalette` + `Select`: built-in ↑/↓/j/k cursor, Enter picks,
+  Esc closes (`Select.onClose` added).
+- `ToastViewport` + `createToastStore`: queued stack, maxVisible,
+  timed auto-dismiss.
+- New widgets: `Accordion` (folded sections + cursor),
+  `Breadcrumbs` (dim ancestors / bright leaf), `Tooltip` v2 (placement
+  + duration + theme tokens). `Avatar` gained deterministic per-name
+  accent (`avatarAccent`).
+- `Spinner`/`LoadingOverlay` de-webbed (no `fontSize`, no CSS
+  `position`/`rgba` — overlay tag + depth tokens). `Exit` defers
+  process exit past the render walk.
+- `tuix themes-preview` (interactive): ↑/↓ repaints the live theme
+  through `setUITheme`; proven in a driven PTY.
+- CLI version single-sourced from `package.json` (`VERSION`).
+- Kit dogfoods new widgets: Avatars per session, tone facts, KbdHint
+  rows in the help modal. Demo: dead `hello.tsx` removed,
+  `ai-chat-clean` wired as a command.
+- `ARCHITECTURE.md` rewritten as a current-state layer map (2025 draft
+  retired).
+- Site: all 11 `docs:'none'` component pages now carry examples; 8 new
+  widget catalog entries; `/search` page (client-side index over every
+  guide/tutorial/package/pattern/component/feature); fonts self-hosted
+  (no Google Fonts request); full static prerender (117 HTML pages).
 
 ## Evidence
 

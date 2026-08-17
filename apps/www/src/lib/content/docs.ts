@@ -2,6 +2,7 @@ import type { DocPage } from './types'
 
 export const docsNav: Array<{ href: string; label: string }> = [
   { href: '/docs', label: 'Overview' },
+  { href: '/search', label: 'Search' },
   { href: '/docs/tutorials', label: 'Tutorials' },
   { href: '/docs/patterns', label: 'Patterns' },
   { href: '/docs/install', label: 'Install' },

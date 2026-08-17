@@ -1,7 +1,7 @@
 /** @jsxImportSource @tuix/jsx */
 
 import { $state, registerKeyHandler } from '@tuix/reactive'
-import { CommandPalette, Modal, StatusBar, useUITheme } from '@tuix/ui'
+import { Avatar, CommandPalette, KbdHint, Modal, StatusBar, useUITheme } from '@tuix/ui'
 
 type Focus = 'sessions' | 'files' | 'composer'
 type Overlay = 'none' | 'command' | 'help'
@@ -182,9 +182,13 @@ function Kit() {
   const hi = theme.colors.primary
 
   const sessionLines = SESSIONS.map((item, i) => (
-    <text key={item.id} fg={i === selected() && focus() === 'sessions' ? hi : fg}>
-      {`${i === selected() ? '▸ ' : '  '}${item.title}`}
-    </text>
+    <hstack key={item.id} gap={1}>
+      <text fg={i === selected() && focus() === 'sessions' ? hi : dim}>
+        {i === selected() ? '▸' : ' '}
+      </text>
+      <Avatar glyph={item.id === 'auth' ? '⚡' : item.id === 'flower' ? '✿' : '📦'} size="small" />
+      <text fg={i === selected() && focus() === 'sessions' ? hi : fg}>{item.title}</text>
+    </hstack>
   ))
   const fileLines = FILES.map((name, i) => (
     <text key={name} fg={i === fileIx() && focus() === 'files' ? hi : fg}>
@@ -238,7 +242,14 @@ function Kit() {
   const helpOverlay =
     overlay() === 'help' ? (
       <Modal open title="Keys" width={Math.min(cols, 76)} onClose={() => overlay.$set('none')}>
-        <text>tab cycles. j/k lists. type to compose. enter sends. / command. esc closes.</text>
+        <vstack gap={0}>
+          <KbdHint keys="tab" label="cycle focus" />
+          <KbdHint keys="j/k" label="list nav" />
+          <KbdHint keys="enter" label="send turn" />
+          <KbdHint keys="/" label="command palette" />
+          <KbdHint keys="?" label="this help" />
+          <KbdHint keys="esc" label="close overlay" />
+        </vstack>
       </Modal>
     ) : null
 
@@ -256,13 +267,13 @@ function Kit() {
         facts={
           compact
             ? [
-                { slot: 'context', value: session.title },
-                { slot: 'focus', value: focus() },
+                { slot: 'context', value: session.title, tone: 'default' },
+                { slot: 'focus', value: focus(), tone: 'muted' },
               ]
             : [
-                { slot: 'context', value: session.title },
-                { slot: 'file', value: FILES[fileIx()] ?? '' },
-                { slot: 'focus', value: focus() },
+                { slot: 'context', value: session.title, tone: 'default' },
+                { slot: 'file', value: FILES[fileIx()] ?? '', tone: 'muted' },
+                { slot: 'focus', value: focus(), tone: 'muted' },
               ]
         }
         hints={

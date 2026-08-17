@@ -2,8 +2,10 @@
 
 import { style } from '@tuix/ansi'
 import {
+  Accordion,
   Alert,
   Avatar,
+  Breadcrumbs,
   Kbd,
   KbdHint,
   Skeleton,
@@ -34,6 +36,22 @@ export default function Widgets() {
       <text style={style().bold()} fg={theme.colors.textBright}>
         Widget gallery
       </text>
+
+      <Section title="Breadcrumbs">
+        <Breadcrumbs
+          items={[{ label: 'apps' }, { label: 'demo' }, { label: 'src' }, { label: 'kit.tsx' }]}
+        />
+      </Section>
+
+      <Section title="Accordion">
+        <Accordion
+          defaultOpen={0}
+          items={[
+            { title: 'Session', children: '3 open · rewrite auth active' },
+            { title: 'Files', children: 'sessions-open.ts · login.ts · store.ts' },
+          ]}
+        />
+      </Section>
 
       <Section title="Kbd + KbdHint">
         <hstack gap={2}>

@@ -77,8 +77,8 @@ export const coverageRows: CoverageRow[] = [
   {
     area: 'UI components',
     item: 'Tabs, Toast, Spinner, FilePicker, Toggle, …',
-    docs: 'gap',
-    note: 'Exported from @tuix/ui but no dedicated prop/API pages yet.',
+    docs: 'partial',
+    note: 'Every catalog component now has a page with a usage example. Prop tables still thin.',
     href: '/docs/components',
   },
   // Methods / APIs

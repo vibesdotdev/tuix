@@ -1,56 +1,71 @@
 /**
- * Tooltip Component - Tooltip popup for terminal UI
+ * Tooltip Component - inline hint anchored to a target line
  *
- * A simple tooltip component for displaying helpful information.
- * Note: This is a basic implementation - advanced features like hover detection,
- * positioning, and auto-hide will be added in future versions.
+ * Renders above or below the target as a themed callout with a caret.
+ * `duration` auto-hides (requires `onHide`); pairing with focus state
+ * (`visible={focused}`) is the idiomatic terminal pattern — there is no
+ * hover in a TTY.
  *
  * @example
  * ```tsx
  * import { Tooltip } from '@tuix/ui'
  *
- * function HelpText() {
- *   const showHelp = $state(false)
- *
- *   return (
- *     <>
- *       <Button onHover={() => showHelp.$set(true)}>
- *         Hover me
- *       </Button>
- *       <Tooltip visible={showHelp()} content="This is a helpful tooltip!" />
- *     </>
- *   )
- * }
+ * <hstack gap={1}>
+ *   <text>save</text>
+ *   <Tooltip visible={showTip} placement="below" content="Write the buffer to disk" />
+ * </hstack>
  * ```
  */
 
-import { style, colors, Borders } from '@tuix/ansi'
+/** @jsxImportSource @tuix/jsx */
+
+import { $effect } from '@tuix/reactive'
+import { useUITheme } from '../../../theme'
+
+export type TooltipPlacement = 'above' | 'below'
 
 export interface TooltipProps {
   visible?: boolean
   content?: string
+  /** Render the caret above (default) or below the body. */
+  placement?: TooltipPlacement
+  /** Auto-hide after this many ms. Requires `onHide`. */
+  duration?: number
+  onHide?: () => void
   children?: JSX.Element | JSX.Element[]
   className?: string
 }
 
 /**
- * Tooltip Component - Simple tooltip display
+ * Tooltip Component - themed inline hint with placement
  */
 export function Tooltip(props: TooltipProps): JSX.Element | null {
   const visible = props.visible !== false
   if (!visible) return null
 
-  const tooltipStyle = style().background(colors.gray).foreground(colors.black).padding(0, 1)
+  const { theme, depth } = useUITheme()
+  const placement = props.placement ?? 'above'
+
+  if (props.duration && props.onHide) {
+    const hide = props.onHide
+    $effect(() => {
+      const timer = setTimeout(() => hide(), props.duration)
+      return () => clearTimeout(timer)
+    })
+  }
+
+  const caret = placement === 'above' ? '╰─╌' : '╭─╌'
 
   return (
-    <box
-      border={Borders.Thin}
-      borderColor={colors.gray}
-      style={tooltipStyle}
-      className={props.className}
-    >
-      {props.content ? <text>{props.content}</text> : props.children ? props.children : null}
-    </box>
+    <vstack className={props.className}>
+      {placement === 'above' ? <text fg={theme.colors.textDim}>{caret}</text> : null}
+      <box border="thin" borderColor={theme.colors.border} background={depth.surface} padding={0}>
+        <text fg={theme.colors.fg}>
+          {props.content ? props.content : props.children ? props.children : null}
+        </text>
+      </box>
+      {placement === 'below' ? <text fg={theme.colors.textDim}>{caret}</text> : null}
+    </vstack>
   )
 }
 

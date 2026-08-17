@@ -1,45 +1,90 @@
 /**
  * Form Component - Form container with validation
  *
+ * Fields are declared, not scraped from children. Each field is a getter
+ * (usually a rune read) plus optional validation, so submit always sees
+ * live values:
+ *
  * @example
  * ```tsx
- * import { Form, TextInput, Button } from '@tuix/ui'
+ * import { Form, Input, Button } from '@tuix/ui'
+ * import { required, minLength } from '@tuix/ui/validation'
  *
  * function LoginForm() {
  *   const username = $state('')
  *   const password = $state('')
  *
- *   const handleSubmit = (data: Record<string, any>) => {
- *     console.log('Form submitted:', data)
- *   }
- *
  *   return (
- *     <Form onSubmit={handleSubmit}>
- *       <TextInput bind:value={username} label="Username" required />
- *       <TextInput bind:value={password} label="Password" type="password" required />
- *       <Button type="submit">Login</Button>
+ *     <Form
+ *       fields={{
+ *         username: { value: () => username(), required: true, validate: minLength(3) },
+ *         password: { value: () => password(), required: true },
+ *       }}
+ *       onSubmit={data => login(data.username, data.password)}
+ *     >
+ *       <Input bind:value={username} placeholder="Username" />
+ *       <Input bind:value={password} placeholder="Password" />
+ *       <Button variant="primary" type="submit">Login</Button>
  *     </Form>
  *   )
  * }
  * ```
  */
 
-import { $state, $derived } from '@tuix/reactive/runes/runes'
+import { $state } from '@tuix/reactive/runes/runes'
 import { style, colors, border } from '@tuix/ansi'
 
-export interface FormField {
-  name: string
-  value: any
+export interface FormFieldDef<T = unknown> {
+  /** Live value getter — usually `() => rune()`. */
+  value: () => T
+  /** Treat empty strings / null / undefined as errors. */
   required?: boolean
-  validate?: (value: any) => string | null
+  /** Extra rule returning an error message or null. */
+  validate?: (value: T) => string | null
 }
 
+export type FormFields = Record<string, FormFieldDef>
+
 export interface FormProps {
+  /** Declared fields collected into the submit payload. */
+  fields?: FormFields
   onSubmit?: (data: Record<string, any>) => void | Promise<void>
   onValidationError?: (errors: Record<string, string>) => void
   children?: any
   className?: string
   showErrors?: boolean
+}
+
+/** Read every declared field's live value. */
+export function collectFormData(fields: FormFields): Record<string, any> {
+  const data: Record<string, any> = {}
+  for (const [name, field] of Object.entries(fields)) {
+    try {
+      data[name] = field.value()
+    } catch {
+      /* a dead getter contributes nothing */
+    }
+  }
+  return data
+}
+
+function isEmpty(value: unknown): boolean {
+  return value === null || value === undefined || (typeof value === 'string' && value.trim() === '')
+}
+
+/** Run required + per-field rules; returns field → message. */
+export function validateFormFields(fields: FormFields): Record<string, string> {
+  const formErrors: Record<string, string> = {}
+  for (const [name, field] of Object.entries(fields)) {
+    const value = field.value()
+    if (field.required && isEmpty(value)) {
+      formErrors[name] = 'This field is required'
+      continue
+    }
+    const message = field.validate?.(value) ?? null
+    if (message) formErrors[name] = message
+  }
+  return formErrors
 }
 
 /**
@@ -48,33 +93,15 @@ export interface FormProps {
 export function Form(props: FormProps): JSX.Element {
   const isSubmitting = $state(false)
   const errors = $state<Record<string, string>>({})
-  const touched = $state<Record<string, boolean>>({})
 
   const showErrors = props.showErrors ?? true
-
-  // Collect form data from children
-  function collectFormData(): Record<string, any> {
-    // In a real implementation, this would traverse children
-    // and collect data from form inputs
-    // For now, return empty object
-    return {}
-  }
-
-  // Validate all fields
-  function validateForm(): Record<string, string> {
-    const formErrors: Record<string, string> = {}
-
-    // In a real implementation, this would validate all form fields
-    // based on their validation rules
-
-    return formErrors
-  }
+  const fields = props.fields ?? {}
 
   // Handle form submission
   async function handleSubmit() {
     if (isSubmitting()) return
 
-    const formErrors = validateForm()
+    const formErrors = validateFormFields(fields)
     errors.$set(formErrors)
 
     if (Object.keys(formErrors).length > 0) {
@@ -85,7 +112,7 @@ export function Form(props: FormProps): JSX.Element {
     isSubmitting.$set(true)
 
     try {
-      const data = collectFormData()
+      const data = collectFormData(fields)
       await props.onSubmit?.(data)
     } catch (error) {
       console.error('Form submission error:', error)
@@ -94,9 +121,10 @@ export function Form(props: FormProps): JSX.Element {
     }
   }
 
-  // Keyboard handler
+  // Keyboard handler: ctrl+enter / meta+enter submits
   function handleKeyPress(key: string) {
-    if (key === 'Enter' && (key.includes('Ctrl') || key.includes('Meta'))) {
+    const lower = key.toLowerCase()
+    if (lower === 'ctrl+enter' || lower === 'meta+enter' || lower === 'command+enter') {
       handleSubmit()
     }
   }

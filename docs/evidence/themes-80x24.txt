@@ -3,8 +3,8 @@
    ╭─────────────────────────────────────────────────────────────────────────╮
    │                                                                         │
    │TUIX Themes                                                              │
-   │Six built-in themes. Swatches: brand + semantic colors,                  │
-   │ then depth stack base ▁ surface ▂ overlay ▃ inset ▄ outset ▅.           │
+   │Six built-in themes. Swatches: brand + semantic colors, then depth stack │
+   │base ▁ surface ▂ overlay ▃ inset ▄ outset ▅.                             │
    │────────────────────────────────────────                                 │
    │● vibes Modern dark theme with green accents                             │
    │ ██████████████ ▁▂▃▄▅                                                    │
@@ -19,6 +19,6 @@
    │  gruvbox Retro groove palette with warm, earthy contrast                │
    │ ██████████████ ▁▂▃▄▅                                                    │
    │────────────────────────────────────────                                 │
-   │Switch at runtime with setUITheme() or ThemeProvider.                    │
+   │Run in a TTY for the interactive preview (up/down repaints the live theme│
+   │).                                                                       │
    │                                                                         │
-   ╰─────────────────────────────────────────────────────────────────────────╯

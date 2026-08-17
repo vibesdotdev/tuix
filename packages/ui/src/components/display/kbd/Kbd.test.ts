@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import { formatKeys } from './Kbd.tsx'
-import { initialsOf } from '../avatar/Avatar.tsx'
+import { initialsOf, avatarAccent } from '../avatar/Avatar.tsx'
 import { skeletonLine } from '../../feedback/skeleton/Skeleton.tsx'
 import { sparklineBars } from '../../data/sparkline/Sparkline.tsx'
 
@@ -35,6 +35,24 @@ describe('Avatar.initialsOf', () => {
 
   it('handles blank names', () => {
     expect(initialsOf('   ')).toBe('?')
+  })
+})
+
+describe('Avatar.avatarAccent', () => {
+  it('is stable per name', () => {
+    const palette = ['#a', '#b', '#c']
+    expect(avatarAccent('ada', palette)).toBe(avatarAccent('ada', palette))
+  })
+
+  it('picks from the palette only', () => {
+    const palette = ['#a', '#b', '#c']
+    for (const name of ['ada', 'grace', 'linus', 'x', 'y', 'z']) {
+      expect(palette).toContain(avatarAccent(name, palette))
+    }
+  })
+
+  it('throws on an empty palette', () => {
+    expect(() => avatarAccent('ada', [])).toThrow()
   })
 })
 

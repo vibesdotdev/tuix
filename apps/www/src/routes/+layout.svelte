@@ -11,12 +11,8 @@ const canonical = $derived(`${siteOrigin}${page.url.pathname === '/' ? '' : page
 </script>
 
 <svelte:head>
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-	<link
-		href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
-		rel="stylesheet"
-	/>
+	<link rel="preload" href="/fonts/ibmplexsans-var.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
+	<link rel="preload" href="/fonts/ibmplexmono-400.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 	<title>Tuix</title>
 	<meta name="description" content="Tuix — Bun-native terminal UI framework with JSX, reactive runes, and Effect MVU." />
 	<link rel="canonical" href={canonical} />

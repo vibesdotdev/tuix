@@ -52,13 +52,14 @@ A short-lived React host (`dfe301b`) was added and then dropped
 ## Next edge
 
 - `Modal.closeOnBackdrop` needs overlay hit-testing before it can be
-  honest; `Form` still stubs `collectFormData`.
-- Found while shooting theme evidence: character-level line wrap can
-  split an SGR sequence across wrapped lines (visible as a literal
-  `1m` when a bold run wraps). Repro: narrow StaticLayout panel +
-  `<Text bold>`. Wrap should be escape-aware.
-- PNG shots (live xterm) still needed for the widget/theme galleries;
-  raw PTY streams + decoded grids for both are in `docs/evidence/`.
+  honest.
+- ~~Escape-aware line wrap~~ (fixed 2026-08-17 evening: `wrapLine` in
+  `@tuix/ansi` tokenizes escapes, never splits them, re-emits SGR state
+  on continuation rows; regression-tested and re-verified against live
+  PTY paint — zero literal-`1m` leaks).
+- `RendererService` clip/dirty regions still partially no-op.
+- PNG shots (live xterm) still wanted for the widget/theme galleries;
+  raw PTY streams + decoded grids are in `docs/evidence/`.
 
 ## How to run the workbench
 
@@ -72,4 +73,11 @@ bun src/index.ts kit
 ```sh
 cd apps/demo
 bun src/index.ts widgets
+```
+
+## How to preview themes live
+
+```sh
+cd packages/bin
+bun src/bin/tuix.ts themes-preview
 ```

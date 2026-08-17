@@ -1,1 +1,8 @@
-export { Avatar, avatar, initialsOf, type AvatarProps, type AvatarSize } from './Avatar.tsx'
+export {
+  Avatar,
+  avatar,
+  initialsOf,
+  avatarAccent,
+  type AvatarProps,
+  type AvatarSize,
+} from './Avatar.tsx'

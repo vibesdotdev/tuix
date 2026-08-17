@@ -33,12 +33,19 @@ cd packages/bin && bun src/bin/tuix.ts themes  # theme gallery
 
 | File | What it shows |
 | --- | --- |
-| `widgets-80x24.{bin,txt}` | Widget gallery: Kbd, Avatar, Sparkline, Skeleton, Alert at 80×24 |
+| `widgets-80x24.{bin,txt}` | Widget gallery: Breadcrumbs, Accordion, Kbd, Avatar, Sparkline, Skeleton, Alert at 80×24 |
 | `widgets-120x40.{bin,txt}` | Widget gallery at 120×40 incl. Toast row |
 | `themes-80x24.{bin,txt}` | Six themes with brand + depth swatches (truecolor in `.bin`) |
 | `themes-120x40.{bin,txt}` | Theme gallery at full width |
 
+`themes-preview` (interactive) was driven in a live PTY: pressing `j`
+switches the whole screen to the dark palette — title fact, cursor row,
+and status bar all repaint through `setUITheme` (verified by decoded
+grid; stream not archived).
+
 The kit footer after the 2026-08-17 StatusBar segment refactor was
 re-verified against `kit-80x24-idle.txt`: same facts, same separators,
 same clip — tone is opt-in and defaults to the dim text used in the
-shipped shots.
+shipped shots. The 2026-08-17 evening captures refresh `kit-*` (now
+with per-session Avatars and tone facts) and `widgets-*` (now leading
+with Breadcrumbs + Accordion).

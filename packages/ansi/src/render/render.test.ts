@@ -18,6 +18,36 @@ describe('Render utilities', () => {
     expect(result.startsWith('\x1b[')).toBe(true)
   })
 
+  test('wrap never splits an escape sequence', () => {
+    // Escape lands exactly on the wrap boundary; the row break must not
+    // slice into it (regression: literal "1m" leaking onto the next row).
+    const result = renderStyledSync(
+      'x'.repeat(30) + '\x1b[1mvibes',
+      {},
+      { width: 30, wrapText: true }
+    )
+    const rows = result.split('\n')
+    for (const row of rows) {
+      expect(row).not.toMatch(/(^|[^[])1m/) // no literal 1m without a full CSI before it
+    }
+    expect(rows.length).toBeGreaterThan(1)
+    expect(rows[1]).toContain('vibes')
+  })
+
+  test('wrap re-emits SGR state on continuation rows', () => {
+    const result = renderStyledSync(
+      '\x1b[1m' + 'word '.repeat(12) + '\x1b[0m',
+      {},
+      { width: 30, wrapText: true }
+    )
+    const rows = result.split('\n')
+    expect(rows.length).toBeGreaterThan(1)
+    for (const row of rows) {
+      expect(row.startsWith('\x1b[1m')).toBe(true)
+    }
+    expect(rows[rows.length - 1].endsWith('\x1b[0m')).toBe(true)
+  })
+
   test('applies foreground color sequences', () => {
     const result = renderStyledSync('Hello', style().fg(colors.red))
     expect(result).toContain('\u001b[')

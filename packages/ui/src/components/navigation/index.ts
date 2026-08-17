@@ -7,3 +7,4 @@
 export * from './tabs'
 export * from './help'
 export * from './command-palette'
+export * from './breadcrumbs'

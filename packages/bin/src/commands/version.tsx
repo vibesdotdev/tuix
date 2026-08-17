@@ -6,11 +6,12 @@
 
 import { StaticLayout, Text, Box, Badge, Divider } from '@tuix/ui'
 import { vibesTheme } from '@tuix/themes'
+import { VERSION } from '../version'
 
 const theme = vibesTheme.colors
 
 export function VersionCommand(): JSX.Element {
-  const version = '1.0.0-rc.3'
+  const version = VERSION
   const buildDate = new Date().toISOString().split('T')[0]
 
   return (
