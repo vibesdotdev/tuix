@@ -16,10 +16,13 @@ const deployment = createAppDeployment({
   provider: 'cloudflare-workers',
   runtime: 'edge',
   build: {
-    workspaceRootDir: '.',
+    // Runner chdirs into the app dir before build; commands must be
+    // relative to apps/www. Install still runs at the repo root
+    // (workspaceRootDir below) where the bun lockfile lives.
+    workspaceRootDir: '../..',
     appDir: 'apps/www',
     installCommand: 'bun install --frozen-lockfile',
-    buildCommand: 'bun run --cwd apps/www build',
+    buildCommand: 'bun run build',
     outputDir: 'apps/www/.svelte-kit/cloudflare',
   },
   origins: [
