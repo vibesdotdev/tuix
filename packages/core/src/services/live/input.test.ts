@@ -70,6 +70,46 @@ describe('Input Service Implementation', () => {
       expect('\x1b[M'.startsWith('\x1b[M')).toBe(true)
     })
 
+    it('parseBuffer decodes X10 coordinates with the +32 bias removed', async () => {
+      const keyPub = await Effect.runPromise(PubSub.unbounded<KeyEvent>())
+      const mousePub = await Effect.runPromise(PubSub.unbounded<MouseEvent>())
+
+      // Subscribe before publishing: PubSub delivers only to active subscribers.
+      const collecting = Effect.runPromise(
+        Stream.fromPubSub(mousePub).pipe(Stream.take(1), Stream.runCollect, Effect.scoped)
+      )
+      await new Promise(resolve => setTimeout(resolve, 5))
+
+      // X10: ESC [ M <32+0> <32+9> <32+4> → left press at (9,4)
+      const seq = `\x1b[M${String.fromCharCode(32)}${String.fromCharCode(32 + 9)}${String.fromCharCode(32 + 4)}`
+      parseBuffer(seq, keyPub, mousePub)
+
+      const events = await collecting.then(chunk => Array.from(chunk))
+      const ev = events[0]
+      expect(ev?.type).toBe('press')
+      expect(ev?.button).toBe('left')
+      expect(ev?.x).toBe(9)
+      expect(ev?.y).toBe(4)
+    })
+
+    it('parseBuffer reports X10 button code 3 as release with no button', async () => {
+      const keyPub = await Effect.runPromise(PubSub.unbounded<KeyEvent>())
+      const mousePub = await Effect.runPromise(PubSub.unbounded<MouseEvent>())
+
+      const collecting = Effect.runPromise(
+        Stream.fromPubSub(mousePub).pipe(Stream.take(1), Stream.runCollect, Effect.scoped)
+      )
+      await new Promise(resolve => setTimeout(resolve, 5))
+
+      const seq = `\x1b[M${String.fromCharCode(32 + 3)}${String.fromCharCode(32 + 1)}${String.fromCharCode(32 + 1)}`
+      parseBuffer(seq, keyPub, mousePub)
+
+      const events = await collecting.then(chunk => Array.from(chunk))
+      const ev = events[0]
+      expect(ev?.type).toBe('release')
+      expect(ev?.button).toBe('none')
+    })
+
     it('should recognize wheel button bits in SGR', () => {
       const wheel = '\x1b[<64;1;1M'
       expect(wheel.includes('<64')).toBe(true)

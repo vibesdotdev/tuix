@@ -66,13 +66,81 @@ export function Scope(props: ScopeProps): JSX.Element {
   // Register this scope FIRST (so it's in the registration order)
   currentScopeStore.register(scopeDef)
 
-  // THEN get all children that were registered BEFORE this scope
-  // In JSX, children evaluate before parents
-  const childScopes = currentScopeStore.getChildren(scopeDef)
+  // Plugins: force child command registration during the walk. Plugin
+  // content renders route-gated, so nested <Command> descriptors would
+  // otherwise never evaluate and `plugin child` routes would not exist.
+  const isPlugin = props.type === 'plugin'
+  if (isPlugin) {
+    const visited = new Set<unknown>()
+    const invokeScopeDescriptor = (node: unknown): void => {
+      const descriptor = node as {
+        type?: unknown
+        props?: Record<string, unknown> & { name?: unknown }
+      }
+      if (typeof descriptor?.type !== 'function' || typeof descriptor.props?.name !== 'string') {
+        return
+      }
+      if (visited.has(node)) return
+      visited.add(node)
+      try {
+        // Function components like Command() return a <Scope> descriptor;
+        // registration happens when Scope() itself runs, so chase the
+        // returned descriptor one more hop.
+        const result = (descriptor.type as (p: unknown) => unknown)(descriptor.props)
+        const inner = result as { type?: unknown; props?: Record<string, unknown> }
+        if (typeof inner?.type === 'function' && typeof inner.props?.name === 'string') {
+          if (!visited.has(result)) {
+            visited.add(result)
+            try {
+              ;(inner.type as (p: unknown) => unknown)(inner.props)
+            } catch {
+              /* inner registration is best-effort */
+            }
+          }
+        }
+      } catch {
+        /* child registration is best-effort during the walk */
+      }
+    }
+    const registerChildScopes = (node: unknown, depth = 0): void => {
+      if (node == null || typeof node === 'boolean' || depth > 4) return
+      if (Array.isArray(node)) {
+        for (const child of node) registerChildScopes(child, depth)
+        return
+      }
+      invokeScopeDescriptor(node)
+      const descriptor = node as { props?: { children?: unknown } }
+      registerChildScopes(descriptor?.props?.children, depth + 1)
+    }
+    registerChildScopes(props.children)
+  }
+
+  // THEN link children. JSX evaluates children before parents, but the
+  // global registration order cannot tell *whose* children they were —
+  // every scope registered earlier looks identical. The descriptor tree
+  // knows: walk props.children and collect nested scope names.
+  const childScopeNames = new Set<string>()
+  const collectScopeNames = (node: unknown): void => {
+    if (node == null || typeof node === 'boolean') return
+    if (Array.isArray(node)) {
+      for (const child of node) collectScopeNames(child)
+      return
+    }
+    const descriptor = node as { props?: { name?: unknown; children?: unknown } }
+    const name = descriptor?.props?.name
+    if (typeof name === 'string' && name.length > 0) {
+      childScopeNames.add(name)
+    }
+    collectScopeNames(descriptor?.props?.children)
+  }
+  collectScopeNames(props.children)
+
+  const childScopes = currentScopeStore
+    .getRegistrationOrder()
+    .filter(child => child !== scopeDef && childScopeNames.has(child.name))
 
   // Only link if we're a Plugin (type='plugin') - Plugins can have child Commands
   // Commands don't link to other Commands (they're siblings)
-  const isPlugin = props.type === 'plugin'
   if (scopeDef.executable && isPlugin && childScopes.length > 0) {
     // Link all unlinked children to this plugin
     for (const child of childScopes) {

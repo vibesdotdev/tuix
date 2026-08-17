@@ -54,7 +54,7 @@ export async function runApp(jsxComponent: JSXComponent, config: JSXRunConfig = 
   const rootTree = jsxComponent()
   try {
     void toView(rootTree)
-    scopeManager.resolveScopePaths?.()
+    scopeManager.fixScopePaths?.()
   } catch (e) {
     if (config.debug) console.warn('scope registration render:', e)
   }

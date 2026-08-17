@@ -120,6 +120,15 @@ const wrapLine = (line: string, width: number): string[] => {
   return result
 }
 
+/**
+ * Wrap a styled line to `width` visible columns.
+ *
+ * Escape sequences are zero width, never split across rows, and SGR state
+ * is re-emitted at the start of every continuation row so styling survives
+ * the wrap (the closing reset stays on the final row).
+ */
+export const wrapStyledLine = (line: string, width: number): string[] => wrapLine(line, width)
+
 const wrapLines = (lines: string[], width: number | undefined, shouldWrap: boolean): string[] => {
   if (!width || !shouldWrap) return lines
   return lines.flatMap(line => wrapLine(line, width))

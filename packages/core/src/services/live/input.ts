@@ -11,6 +11,11 @@ import { BRACKETED_PASTE_START, BRACKETED_PASTE_END, extractBracketedPaste } fro
 import { applyKeyToLine, readLineFromQueue } from '../input/line'
 import { drainFocusEvents, type FocusEvent } from '../input/focus'
 
+/** Longest-first sequence table, computed once at module load. */
+const SORTED_SEQUENCES = Array.from(ANSI_SEQUENCES.entries()).sort(
+  (a, b) => b[0].length - a[0].length
+)
+
 /**
  * Platform abstraction for input operations
  */
@@ -83,16 +88,18 @@ const parseMouseEvent = (sequence: string): MouseEvent | null => {
   // Basic X10 mouse protocol: ESC [ M <button+32> <x+32> <y+32>
   match = sequence.match(/^\x1b\[M(.)(.)(.)/)
   if (match) {
-    const info = match[1]?.charCodeAt(0) ?? 32 - 32
-    const x = match[2]?.charCodeAt(0) ?? 32 - 32
-    const y = match[3]?.charCodeAt(0) ?? 32 - 32
+    // Coordinates and button code are transmitted as single bytes biased by 32.
+    const info = (match[1]?.charCodeAt(0) ?? 32) - 32
+    const x = (match[2]?.charCodeAt(0) ?? 32) - 32
+    const y = (match[3]?.charCodeAt(0) ?? 32) - 32
 
     const button = info & 0x03
     const shift = !!(info & 0x04)
     const alt = !!(info & 0x08)
     const ctrl = !!(info & 0x10)
     const motion = !!(info & 0x20)
-    const release = !!(info & (0x03 === 3))
+    // X10 has no release event: button code 3 means "no button" (release).
+    const release = (info & 0x03) === 3
 
     let buttonName: MouseEvent['button']
     let eventType: MouseEvent['type']
@@ -195,11 +202,7 @@ export const parseBuffer = (
 
     // Check for known ANSI sequences (longest first)
     let matched = false
-    const sortedSequences = Array.from(ANSI_SEQUENCES.entries()).sort(
-      (a, b) => b[0].length - a[0].length
-    )
-
-    for (const [seq, partial] of sortedSequences) {
+    for (const [seq, partial] of SORTED_SEQUENCES) {
       if (buffer.startsWith(seq)) {
         const keyEvent: KeyEvent = {
           type: partial.type || KeyType.Runes,

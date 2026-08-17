@@ -61,6 +61,55 @@ longer a generated export catalog.
   404, theming guide page, real PTY screenshots on the homepage,
   single-source version string, GitHub URLs corrected.
 
+## 2026-08-17 night additions
+
+Correctness (all regression-tested):
+- `ConfigStorage` fixed: every method misused `Ref.get` as a value (8
+  crashers); `loadFromFile`/`saveToFile`/`clear`/`watchConfig` now real.
+  `watchConfig` honors its Effect-of-Effect contract with mtime checks.
+- `ModuleBase.getState()` added — `registry.getStats()` called a
+  nonexistent method and threw.
+- X10 mouse decode: +32 bias was never subtracted (coords off by 32)
+  and `(info & (0x03 === 3))` precedence bug made every press a
+  "release".
+- ANSI key table no longer re-sorted per keystroke.
+- `compiler/runApp` called `scopeManager.resolveScopePaths?.()` — the
+  method is `fixScopePaths`; the optional call silently never ran.
+- `getCursorPosition` no longer leaves the terminal stuck in raw mode.
+- `MasterDetailPattern`/`DataFlowPattern` (view coordination) crashed on
+  a missing eventBus; the bus now rides on the coordination record and
+  DataFlow actually propagates to the next participant.
+- telemetry perf flush: requeue on failure now goes through the typed
+  failure channel instead of `throw` inside `Effect.sync` (a die).
+
+Renderer honesty (core `RendererServiceLive`):
+- Dirty regions real: markDirty/getDirtyRegions/optimize (rect union
+  merge)/clear.
+- `renderAt` respects x/y and the clip rect (content clipped to region).
+- `renderBatch` paints all views into one frame instead of destructively
+  rendering only the last.
+- `wrapText` honors width escape-aware (reuses the ansi wrap);
+  `truncateText` is visual-width-aware; `measureText` counts lines;
+  frame-time stats actually update; layer ids monotonic; `removeLayer`
+  protects `main`.
+
+New widgets: `Slider` (track/quantize/keyboard) and `Menu`
+(cursor/separators/hints, overlay-friendly). Widget gallery updated.
+
+Testing: PTY e2e harness gained a VT100 screen emulator
+(`decodeScreen`) with `waitForScreenText`/`getScreen`/`getScreenLine`,
+`sendText`, and `resize` — assertions now target the decoded grid, not
+the escape stream. (Live PTY drives run via the node evidence script;
+node-pty inside `bun test` segfaults on this machine.)
+
+Docs: install.md clone URL fixed; RULES.md de-Cinderlinked and status
+workflow corrected; STANDARDS.md references exist; PLUGINS.md rewritten
+around the real Command/Plugin/Fallback tags.
+
+Site: theming tutorial (10th); Slider + Menu catalog entries (50
+components); EditLink on all doc/package/tutorial/pattern/component/
+feature pages; 120 prerendered pages.
+
 ## 2026-08-17 evening additions
 
 - Escape-aware line wrap in `@tuix/ansi` (`renderStyled`): escapes are

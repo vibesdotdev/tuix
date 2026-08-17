@@ -1103,6 +1103,109 @@ handle.write('input')`,
       },
     ],
   },
+  {
+    slug: 'theming-and-tokens',
+    title: 'Theming and tokens',
+    level: 4,
+    levelLabel: 'Intermediate',
+    summary: 'Paint one widget tree in six palettes without touching widget code.',
+    outcome: 'The screen repaints in a new palette when you switch the theme at runtime.',
+    goals: [
+      'Read color and depth from theme tokens instead of hex literals.',
+      'Switch the live theme with setUITheme.',
+      'Preview every built-in palette with the tuix CLI.',
+    ],
+    prerequisites: [
+      'Finish the forms and lists tutorial.',
+      'Read the theming guide for the token schema.',
+    ],
+    packages: ['@tuix/ui', '@tuix/themes'],
+    related: [
+      { href: '/docs/theming', label: 'Theming guide' },
+      { href: '/packages/themes', label: '@tuix/themes' },
+      { href: '/packages/ui', label: '@tuix/ui' },
+      { href: '/docs/components/kbd', label: 'Kbd component' },
+    ],
+    steps: [
+      {
+        heading: 'What you build',
+        body: 'You render a small panel from tokens only. Then you cycle every built-in theme and the panel repaints. You do not change the widget code.',
+      },
+      {
+        heading: 'Take color from the hook',
+        body: 'Call useUITheme inside the widget. Read theme.colors for accents and theme.depth for surfaces. Never write a hex literal in a widget.',
+      },
+      {
+        heading: 'Switch at runtime',
+        body: 'Call setUITheme with another built-in theme. Every useUITheme consumer repaints because the theme is one global rune.',
+      },
+      {
+        heading: 'Preview the palettes',
+        body: 'Run the theme gallery from the CLI. Press j and k. The whole screen repaints in each palette. This proves the token path end to end.',
+      },
+    ],
+    approaches: [
+      {
+        id: 'jsx',
+        label: 'JSX',
+        lang: 'tsx',
+        filename: 'themes.tsx',
+        note: 'Product path. One global rune drives every widget.',
+        code: `/** @jsxImportSource @tuix/jsx */
+import { $state, registerKeyHandler } from '@tuix/reactive'
+import { Kbd, StatusBar, setUITheme, useUITheme } from '@tuix/ui'
+import {
+  vibesTheme, darkTheme, nordTheme, draculaTheme,
+} from '@tuix/themes'
+
+const PALETTES = [vibesTheme, darkTheme, nordTheme, draculaTheme]
+
+function PalettePanel() {
+  const { theme, depth } = useUITheme()
+  const index = $state(0, 'palette')
+
+  registerKeyHandler(key => {
+    if (key === 'j') {
+      const next = (index() + 1) % PALETTES.length
+      index.$set(next)
+      setUITheme(PALETTES[next]!)
+    }
+    if (key === 'k') {
+      const next = (index() - 1 + PALETTES.length) % PALETTES.length
+      index.$set(next)
+      setUITheme(PALETTES[next]!)
+    }
+  })
+
+  return (
+    <box border="rounded" background={depth.surface} borderColor={theme.colors.border}>
+      <text fg={theme.colors.primary}>{theme.name}</text>
+      <text fg={theme.colors.textDim}>tokens only — no hex in widgets</text>
+      <StatusBar
+        facts={[{ slot: 'theme', value: theme.name, tone: 'default' }]}
+        hints={[{ keys: 'j/k', label: 'cycle palette' }]}
+      />
+    </box>
+  )
+}
+
+export default PalettePanel`,
+      },
+      {
+        id: 'cli',
+        label: 'CLI preview',
+        lang: 'bash',
+        filename: 'terminal',
+        note: 'The tuix CLI ships the same loop as a command.',
+        code: `cd packages/bin
+bun src/bin/tuix.ts themes-preview
+
+# j / k  cycle palettes (whole screen repaints)
+# enter  prints the setUITheme snippet
+# r      resets to vibes`,
+      },
+    ],
+  },
 ]
 
 export function getTutorial(slug: string): Tutorial | undefined {

@@ -38,10 +38,26 @@ cd packages/bin && bun src/bin/tuix.ts themes  # theme gallery
 | `themes-80x24.{bin,txt}` | Six themes with brand + depth swatches (truecolor in `.bin`) |
 | `themes-120x40.{bin,txt}` | Theme gallery at full width |
 
-`themes-preview` (interactive) was driven in a live PTY: pressing `j`
-switches the whole screen to the dark palette — title fact, cursor row,
-and status bar all repaint through `setUITheme` (verified by decoded
-grid; stream not archived).
+Captured 2026-08-17 (night) from real PTYs — plugin routing fix proof:
+
+```sh
+cd apps/demo && bun src/index.ts config list
+```
+
+| File | What it shows |
+| --- | --- |
+| `config-list-80x24.{bin,txt}` | `config list` rendering values — plugin child routes work (registration → parent link → nested path → route match) |
+
+The night batch also refreshed `widgets-*` (unchanged content, re-captured
+after the scope/routing changes to prove no regression).
+
+`themes-preview` (interactive) remains the live theme-switch proof from
+the evening batch: pressing `j` switches the whole screen to the dark
+palette — title fact, cursor row, and status bar all repaint through
+`setUITheme` (verified by decoded grid; stream not archived).
+
+The `themes-preview` (interactive) drive from the evening batch remains
+the live theme-switch proof.
 
 The kit footer after the 2026-08-17 StatusBar segment refactor was
 re-verified against `kit-80x24-idle.txt`: same facts, same separators,

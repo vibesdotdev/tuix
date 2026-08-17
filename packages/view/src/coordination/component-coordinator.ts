@@ -49,6 +49,7 @@ export class ComponentCoordinator {
           startTime: new Date(),
           state: 'active',
           eventUnsubscribes: [],
+          eventBus: this.eventBus,
         }
 
         // Set up event handlers for this coordination
@@ -169,6 +170,8 @@ interface ActiveCoordination {
   startTime: Date
   state: 'active' | 'stopping' | 'stopped'
   eventUnsubscribes: (() => void)[]
+  /** Bus the coordination publishes through (patterns need it to react). */
+  eventBus: EventBus
 }
 
 interface ActiveCoordinationInfo {
@@ -185,17 +188,10 @@ export const MasterDetailPattern: CoordinationPattern = {
   name: 'Master-Detail Coordination',
   eventTypes: ['component-selection', 'component-update'],
 
-  initialize: coordination =>
-    Effect.sync(() => {
-      console.log(
-        `Master-Detail coordination initialized for ${coordination.participants.join(', ')}`
-      )
-    }),
+  initialize: () => Effect.void,
 
   handleEvent: (event, coordination) =>
     Effect.gen(function* () {
-      const eventBus = (coordination as { eventBus?: EventBus }).eventBus // TODO: Better pattern access
-
       if (event.type === 'component-selection') {
         const masterId = coordination.config.masterId as string
         const detailId = coordination.config.detailId as string
@@ -203,7 +199,7 @@ export const MasterDetailPattern: CoordinationPattern = {
         const componentEvent = event as BaseEvent & { componentId?: string; selectedItem?: unknown }
         if (componentEvent.componentId === masterId) {
           // Master selected something, update detail
-          yield* eventBus.publish('component-update', {
+          yield* coordination.eventBus.publish('component-update', {
             type: 'detail-update',
             source: 'master-detail-pattern',
             timestamp: new Date(),
@@ -224,10 +220,7 @@ export const MasterDetailPattern: CoordinationPattern = {
       : false
   },
 
-  cleanup: () =>
-    Effect.sync(() => {
-      console.log('Master-Detail coordination cleaned up')
-    }),
+  cleanup: () => Effect.void,
 }
 
 export const DataFlowPattern: CoordinationPattern = {
@@ -235,23 +228,31 @@ export const DataFlowPattern: CoordinationPattern = {
   name: 'Data Flow Coordination',
   eventTypes: ['data-changed', 'data-request'],
 
-  initialize: coordination =>
-    Effect.sync(() => {
-      console.log(
-        `Data flow coordination initialized for ${coordination.participants.join(' -> ')}`
-      )
-    }),
+  initialize: () => Effect.void,
 
   handleEvent: (event, coordination) =>
     Effect.gen(function* () {
       if (event.type === 'data-changed') {
-        const componentEvent = event as BaseEvent & { componentId?: string }
+        const componentEvent = event as BaseEvent & {
+          componentId?: string
+          data?: unknown
+        }
         if (componentEvent.componentId) {
           const sourceIndex = coordination.participants.indexOf(componentEvent.componentId)
           if (sourceIndex >= 0 && sourceIndex < coordination.participants.length - 1) {
             // Propagate to next component in flow
             const nextComponent = coordination.participants[sourceIndex + 1]
-            // TODO: Emit data update to next component
+            yield* coordination.eventBus.publish('data-changed', {
+              type: 'data-changed',
+              source: 'data-flow-pattern',
+              timestamp: new Date(),
+              id: generateId(),
+              payload: {
+                targetId: nextComponent,
+                fromId: componentEvent.componentId,
+                data: componentEvent.data,
+              },
+            } as unknown as BaseEvent)
           }
         }
       }
@@ -264,8 +265,5 @@ export const DataFlowPattern: CoordinationPattern = {
       : false
   },
 
-  cleanup: () =>
-    Effect.sync(() => {
-      console.log('Data flow coordination cleaned up')
-    }),
+  cleanup: () => Effect.void,
 }

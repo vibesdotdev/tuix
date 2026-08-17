@@ -241,11 +241,13 @@ export const TerminalServiceLive = Layer.effect(
               new Promise<{ x: number; y: number }>((resolve, reject) => {
                 const stdin = platform.stdin as NodeJS.ReadStream & {
                   setRawMode?: (v: boolean) => void
+                  isRaw?: boolean
                   isTTY?: boolean
                 }
                 let buf = ''
                 let restored = false
-                const wasRaw = false
+                // Remember whether *we* flipped raw mode so cleanup restores it.
+                const wasRaw = Boolean(stdin.isRaw)
                 const timeout = setTimeout(() => {
                   cleanup()
                   // Fallback when terminal does not answer (non-TTY/CI)
@@ -268,7 +270,8 @@ export const TerminalServiceLive = Layer.effect(
                   stdin.removeListener?.('data', onData)
                   try {
                     if (stdin.isTTY && stdin.setRawMode && !wasRaw) {
-                      // leave raw mode only if we enabled it; Process may already be raw
+                      // Restore only the raw mode we enabled.
+                      stdin.setRawMode(false)
                     }
                   } catch {
                     /* ignore */

@@ -1,5 +1,6 @@
 <script lang="ts">
 import DocsSidebar from '$lib/components/DocsSidebar.svelte'
+import EditLink from '$lib/components/EditLink.svelte'
 import CodeTabs from '$lib/components/CodeTabs.svelte'
 import { tutorialHref } from '$lib/content/tutorials'
 import { packageHref } from '$lib/content/packages'
@@ -113,7 +114,8 @@ function pkgSlug(name: string) {
 				</a>
 			{/if}
 		</nav>
-	</article>
+		<EditLink />
+</article>
 </div>
 
 <style>

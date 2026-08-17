@@ -5,6 +5,8 @@ import { Effect, Layer, Option, Ref, pipe } from 'effect'
 
 import type { StyleProps as AnsiStyle } from '@tuix/ansi'
 import { visualWidth, parseVisualCells, rgb } from '@tuix/ansi'
+import { wrapStyledLine } from '@tuix/ansi'
+import { truncate } from '@tuix/ansi'
 import { RendererService } from '../renderer'
 import { TerminalService } from '../terminal'
 import type { View } from '../../../types/core'
@@ -276,16 +278,59 @@ export const RendererServiceLive = Layer.effect(
     }
     const state = yield* _(Ref.make(initialState))
 
+    // Dirty-region tracking (real): markDirty appends, optimizeDirtyRegions
+    // merges overlapping/adjacent rects, clearDirtyRegions resets after paint.
+    let dirtyRegions: Array<{ x: number; y: number; width: number; height: number }> = []
+
+    function mergeDirtyRegions(
+      regions: Array<{ x: number; y: number; width: number; height: number }>
+    ): Array<{ x: number; y: number; width: number; height: number }> {
+      const merged: Array<{ x: number; y: number; width: number; height: number }> = []
+      for (const region of regions) {
+        const overlapping = merged.findIndex(
+          existing =>
+            region.x <= existing.x + existing.width &&
+            existing.x <= region.x + region.width &&
+            region.y <= existing.y + existing.height &&
+            existing.y <= region.y + region.height
+        )
+        if (overlapping === -1) {
+          merged.push({ ...region })
+          continue
+        }
+        const existing = merged[overlapping]!
+        const x = Math.min(existing.x, region.x)
+        const y = Math.min(existing.y, region.y)
+        merged[overlapping] = {
+          x,
+          y,
+          width: Math.max(existing.x + existing.width, region.x + region.width) - x,
+          height: Math.max(existing.y + existing.height, region.y + region.height) - y,
+        }
+      }
+      return merged
+    }
+
+    // Frame timing (real): beginFrame stamps, endFrame computes the delta.
+    const frameStartRef: { ts: number | null } = { ts: null }
+
+    // Monotonic layer ids so create/remove/create never collides.
+    let nextLayerId = initialState.layers.length
+
+    // Clip region: applied by renderAt so writes stay inside the rect.
+    let clipRegion: { x: number; y: number; width: number; height: number } | null = null
+
     const measureText = (
       text: string
     ): Effect.Effect<{ width: number; height: number; lineCount: number }, never, never> =>
-      Effect.succeed({
-        width: visualWidth(text),
-        height: 1, // Assuming single line for basic measurement
-        lineCount: 1,
+      Effect.sync(() => {
+        const lines = text.split('\n')
+        const width = Math.max(0, ...lines.map(line => visualWidth(line)))
+        return { width, height: lines.length, lineCount: lines.length }
       })
 
     const beginFrame = Effect.gen(function* (_) {
+      frameStartRef.ts = Date.now()
       const size = yield* _(terminal.getSize)
       const width = size.width ?? 80
       const height = size.height ?? 24
@@ -311,6 +356,8 @@ export const RendererServiceLive = Layer.effect(
     }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause }))))
 
     const endFrame = Effect.gen(function* (_) {
+      const frameStart = frameStartRef.ts
+      const frameElapsed = frameStart ? Date.now() - frameStart : 0
       const front = yield* _(Ref.get(frontBuffer))
       const back = yield* _(Ref.get(backBuffer))
 
@@ -344,6 +391,12 @@ export const RendererServiceLive = Layer.effect(
             ...s.stats,
             framesRendered: s.stats.framesRendered + 1,
             bufferSwitches: s.stats.bufferSwitches + 1,
+            lastFrameTime: frameElapsed,
+            averageFrameTime:
+              s.stats.framesRendered === 0
+                ? frameElapsed
+                : (s.stats.averageFrameTime * s.stats.framesRendered + frameElapsed) /
+                  (s.stats.framesRendered + 1),
           },
         }))
       )
@@ -595,10 +648,17 @@ export const RendererServiceLive = Layer.effect(
       getViewports,
       pushViewport,
       popViewport,
-      clearDirtyRegions: noop,
-      markDirty: () => noop,
-      getDirtyRegions: emptyDirty as any,
-      optimizeDirtyRegions: noop,
+      clearDirtyRegions: Effect.sync(() => {
+        dirtyRegions = []
+      }),
+      markDirty: region =>
+        Effect.sync(() => {
+          dirtyRegions.push({ ...region })
+        }),
+      getDirtyRegions: Effect.sync(() => dirtyRegions.slice() as any),
+      optimizeDirtyRegions: Effect.sync(() => {
+        dirtyRegions = mergeDirtyRegions(dirtyRegions)
+      }),
       getStats,
       resetStats: Ref.update(state, s => ({
         ...s,
@@ -612,30 +672,80 @@ export const RendererServiceLive = Layer.effect(
         },
       })),
       setProfilingEnabled: () => noop,
-      renderAt: (view, _x, _y) => render(view),
+      renderAt: (view, x, y) =>
+        Effect.gen(function* (_) {
+          const size = yield* _(terminal.getSize)
+          const width = size.width ?? 80
+          const height = size.height ?? 24
+          const mainLayer = yield* _(ensureLayer('main', 0, width, height))
+          const rendered = yield* _(view.render())
+          const content =
+            typeof rendered === 'string'
+              ? rendered
+              : String((rendered as { content?: string }).content ?? '')
+
+          let lines = content.split('\n')
+          if (clipRegion) {
+            // Keep only the portion of the paint that intersects the clip rect.
+            lines = lines.map((line, index) => {
+              const lineY = y + index
+              if (lineY < clipRegion!.y || lineY >= clipRegion!.y + clipRegion!.height) return ''
+              const start = Math.max(0, clipRegion!.x - x)
+              const end = Math.min(line.length, clipRegion!.x + clipRegion!.width - x)
+              return start >= end ? '' : line.slice(start, end)
+            })
+          }
+          mainLayer.buffer.writeText(x, y, lines.join('\n'))
+        }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause })))),
       renderBatch: views =>
         Effect.gen(function* (_) {
-          for (const v of views) yield* _(render(v))
+          const size = yield* _(terminal.getSize)
+          const width = size.width ?? 80
+          const height = size.height ?? 24
+          const mainLayer = yield* _(ensureLayer('main', 0, width, height))
+          mainLayer.buffer.clear()
+          // Stack views vertically without clearing between paints —
+          // a batch is one frame, not N destructive frames.
+          let cursorY = 0
+          for (const view of views) {
+            const rendered = yield* _(view.render())
+            const content =
+              typeof rendered === 'string'
+                ? rendered
+                : String((rendered as { content?: string }).content ?? '')
+            mainLayer.buffer.writeText(0, cursorY, content)
+            const lines = content.split('\n').length
+            cursorY += lines
+            if (cursorY >= height) break
+          }
+        }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause })))),
+      setClipRegion: region =>
+        Effect.sync(() => {
+          clipRegion = region ? { ...region } : null
         }),
-      setClipRegion: () => noop,
       saveState: saveState as any,
       restoreState: restoreState as any,
       measureText,
-      wrapText: (t: string) => Effect.succeed(t.split('\n')),
-      truncateText: (t: string, max: number) =>
-        Effect.succeed(t.length <= max ? t : t.slice(0, Math.max(0, max - 1)) + '…'),
+      wrapText: (text: string, width?: number) =>
+        Effect.succeed(
+          width && width > 0
+            ? text.split('\n').flatMap(line => wrapStyledLine(line, width))
+            : text.split('\n')
+        ),
+      truncateText: (text: string, maxWidth: number) => Effect.succeed(truncate(text, maxWidth)),
       createLayer: (name, zIndex) =>
         Effect.gen(function* (_) {
           const size = yield* _(terminal.getSize)
           const width = size.width ?? 80
           const height = size.height ?? 24
+          const id = nextLayerId++
           yield* _(
             Ref.update(state, s => ({
               ...s,
               layers: [
                 ...s.layers,
                 {
-                  id: s.layers.length,
+                  id,
                   name,
                   zIndex,
                   visible: true,
@@ -647,10 +757,17 @@ export const RendererServiceLive = Layer.effect(
           )
         }).pipe(Effect.asVoid),
       removeLayer: name =>
-        Ref.update(state, s => ({
-          ...s,
-          layers: s.layers.filter(l => l.name !== name),
-        })).pipe(Effect.asVoid),
+        Effect.sync(() => {
+          if (name === 'main') return
+        }).pipe(
+          Effect.zipRight(
+            Ref.update(state, s => ({
+              ...s,
+              layers: name === 'main' ? s.layers : s.layers.filter(l => l.name !== name),
+            }))
+          ),
+          Effect.asVoid
+        ),
       renderToLayer: (view, name) =>
         Effect.gen(function* (_) {
           const s = yield* _(Ref.get(state))

@@ -2,6 +2,7 @@
 import DocsSidebar from '$lib/components/DocsSidebar.svelte'
 import DocsNav from '$lib/components/DocsNav.svelte'
 import CodeBlock from '$lib/components/CodeBlock.svelte'
+import EditLink from '$lib/components/EditLink.svelte'
 
 let { data } = $props()
 const doc = $derived(data.doc)
@@ -32,5 +33,6 @@ const doc = $derived(data.doc)
 			{/if}
 		{/each}
 		<DocsNav />
+		<EditLink />
 	</article>
 </div>

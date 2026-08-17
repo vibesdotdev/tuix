@@ -39,9 +39,9 @@ export const coverageRows: CoverageRow[] = [
   // Tutorials
   {
     area: 'Tutorials',
-    item: 'Progressive path (hello → PTY)',
+    item: 'Progressive path (hello → PTY → theming)',
     docs: 'full',
-    note: 'Nine tutorials: routing, keys, forms, layout, async, live, PTY.',
+    note: 'Ten tutorials: routing, keys, forms, layout, async, live, PTY, theming.',
     href: '/docs/tutorials',
   },
   // Patterns

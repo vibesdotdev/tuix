@@ -1,0 +1,23 @@
+Configuration
+
+api.key        ***secret***
+api.url        https://api.example.com
+debug          true
+log.level      info
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -698,6 +698,58 @@ const showHint = $state(false, 'showHint')
 />`,
     },
   },
+  {
+    slug: 'slider',
+    name: 'Slider',
+    category: 'Forms',
+    package: '@tuix/ui',
+    summary: 'Range control with a block track, handle, and optional steps.',
+    whenToUse: 'Use Slider for volumes, percentages, and any 0..1 setting.',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'slider.tsx',
+      code: `import { $state } from '@tuix/reactive'
+import { Slider } from '@tuix/ui'
+
+const volume = $state(0.4, 'volume')
+
+<Slider
+  value={volume()}
+  steps={10}
+  label="volume"
+  showValue
+  onChange={v => volume.$set(v)}
+/>`,
+    },
+  },
+  {
+    slug: 'menu',
+    name: 'Menu',
+    category: 'Navigation',
+    package: '@tuix/ui',
+    summary: 'Popup menu with cursor navigation, separators, and hints.',
+    whenToUse: 'Use Menu inside an overlay for context actions on a target.',
+    docs: 'brief',
+    example: {
+      lang: 'tsx',
+      filename: 'menu.tsx',
+      code: `import { Menu } from '@tuix/ui'
+
+<overlay>
+  <Menu
+    title="Session"
+    items={[
+      { id: 'rename', label: 'Rename', hint: 'r' },
+      { id: 'sep', label: '', separator: true },
+      { id: 'delete', label: 'Delete', hint: 'D' },
+    ]}
+    onPick={item => runAction(item.id)}
+    onClose={close}
+  />
+</overlay>`,
+    },
+  },
 ]
 
 export const componentCategories = [

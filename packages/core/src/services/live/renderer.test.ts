@@ -49,6 +49,103 @@ describe('Renderer Service Implementation', () => {
     })
   })
 
+  describe('Dirty regions (real)', () => {
+    it('markDirty records regions; clear empties them', async () => {
+      const result = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          yield* renderer.markDirty({ x: 0, y: 0, width: 5, height: 1 })
+          yield* renderer.markDirty({ x: 10, y: 2, width: 4, height: 2 })
+          const two = yield* renderer.getDirtyRegions
+          yield* renderer.optimizeDirtyRegions
+          const stillTwo = yield* renderer.getDirtyRegions
+          yield* renderer.markDirty({ x: 4, y: 0, width: 4, height: 1 })
+          yield* renderer.optimizeDirtyRegions
+          const merged = yield* renderer.getDirtyRegions
+          yield* renderer.clearDirtyRegions
+          const empty = yield* renderer.getDirtyRegions
+          return { two, stillTwo, merged, empty }
+        })
+      )
+      expect(result.two.length).toBe(2)
+      expect(result.stillTwo.length).toBe(2) // disjoint rects do not merge
+      expect(result.merged.length).toBe(2) // the new one merged into the first
+      expect(result.merged[0]?.width).toBe(8) // union spans cells 0..7
+      expect(result.empty.length).toBe(0)
+    })
+  })
+
+  describe('Text helpers (real)', () => {
+    it('wrapText honors width across styled text', async () => {
+      const lines = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          return yield* renderer.wrapText('word '.repeat(10).trim(), 20)
+        })
+      )
+      expect(lines.length).toBeGreaterThan(1)
+      for (const line of lines) {
+        // Every wrapped row respects the width budget.
+        expect(line.replace(/\x1b\[[0-9;]*m/g, '').length).toBeLessThanOrEqual(20)
+      }
+    })
+
+    it('wrapText without width splits only on newlines', async () => {
+      const lines = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          return yield* renderer.wrapText('a\nb')
+        })
+      )
+      expect(lines).toEqual(['a', 'b'])
+    })
+
+    it('truncateText is visual-width aware', async () => {
+      const out = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          return yield* renderer.truncateText('●●●●●next', 5)
+        })
+      )
+      expect(out.length).toBeLessThanOrEqual(8) // 5 glyphs + '...'
+    })
+
+    it('measureText counts lines', async () => {
+      const m = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          return yield* renderer.measureText('one\ntwo\nthree')
+        })
+      )
+      expect(m.lineCount).toBe(3)
+      expect(m.height).toBe(3)
+      expect(m.width).toBe(5)
+    })
+  })
+
+  describe('Layer lifecycle', () => {
+    it('createLayer/removeLayer keeps ids unique and main protected', async () => {
+      const result = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          yield* renderer.createLayer('hud', 5)
+          yield* renderer.createLayer('tmp', 6)
+          yield* renderer.removeLayer('tmp')
+          yield* renderer.createLayer('tmp2', 6)
+          yield* renderer.removeLayer('main') // must be a no-op
+          const layers = yield* renderer.getLayers
+          return layers.map(l => l.name)
+        })
+      )
+      const names = result
+      expect(new Set(names).size).toBe(names.length)
+      expect(names.includes('main')).toBe(true)
+      expect(names.includes('tmp2')).toBe(true)
+      expect(names.includes('tmp')).toBe(false)
+      expect(names.includes('hud')).toBe(true)
+    })
+  })
+
   describe('Viewport rendering', () => {
     it('should push viewport bounds', async () => {
       const viewport = { x: 0, y: 0, width: 20, height: 10 }

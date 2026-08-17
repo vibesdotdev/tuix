@@ -8,7 +8,7 @@
 ## From monorepo (development)
 
 ```bash
-git clone https://github.com/tuix/tuix.git
+git clone https://github.com/vibesdotdev/tuix.git
 cd tuix
 bun install
 bun test

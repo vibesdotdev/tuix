@@ -1,5 +1,6 @@
 <script lang="ts">
 import CodeBlock from '$lib/components/CodeBlock.svelte'
+import EditLink from '$lib/components/EditLink.svelte'
 import { packageHref } from '$lib/content/packages'
 
 let { data } = $props()

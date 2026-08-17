@@ -4,8 +4,8 @@
 
 ### TypeScript Requirements
 
-- **Strict Mode**: Always enabled in tsconfig.src.json with full strict checks
-- **Environment Types**: All env vars typed in types/process-env.d.ts
+- **Strict Mode**: Always enabled in the root tsconfig.json with full strict checks
+- **Environment Types**: All env vars accessed via typed helpers or zod schemas
 - **Type Coverage**: 100% of exports must be typed
 - **Discriminated Unions**: Use for all message/event types
 - **Generic Constraints**: Always specify constraints on generics

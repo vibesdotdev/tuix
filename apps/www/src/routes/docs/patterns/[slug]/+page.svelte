@@ -1,5 +1,6 @@
 <script lang="ts">
 import DocsSidebar from '$lib/components/DocsSidebar.svelte'
+import EditLink from '$lib/components/EditLink.svelte'
 import CodeTabs from '$lib/components/CodeTabs.svelte'
 import { patternHref } from '$lib/content/patterns'
 
@@ -77,7 +78,8 @@ const next = $derived(data.next)
 				</a>
 			{/if}
 		</nav>
-	</article>
+		<EditLink />
+</article>
 </div>
 
 <style>

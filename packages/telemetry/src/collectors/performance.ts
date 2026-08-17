@@ -117,18 +117,18 @@ export class PerformanceCollector {
         this.metrics = []
 
         yield* this.transport.sendPerformance(metricsToSend).pipe(
-          Effect.catchAll(error =>
-            Effect.sync(() => {
-              // Put metrics back if send failed
-              this.metrics = metricsToSend.concat(this.metrics)
-              throw error
-            })
-          ),
           Effect.mapError((error: any) => ({
             _tag: 'TelemetryError' as const,
             message: `Failed to flush performance metrics: ${error.message || error}`,
             cause: error,
-          }))
+          })),
+          Effect.tapError(error =>
+            // Put metrics back on failure — via the failure channel, not a die.
+            Effect.sync(() => {
+              this.metrics = metricsToSend.concat(this.metrics)
+              return error
+            })
+          )
         )
       }.bind(this)
     )

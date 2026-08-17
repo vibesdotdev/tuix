@@ -57,7 +57,14 @@ A short-lived React host (`dfe301b`) was added and then dropped
   `@tuix/ansi` tokenizes escapes, never splits them, re-emits SGR state
   on continuation rows; regression-tested and re-verified against live
   PTY paint — zero literal-`1m` leaks).
-- `RendererService` clip/dirty regions still partially no-op.
+- ~~`RendererService` clip/dirty regions no-op~~ (fixed 2026-08-17
+  night: dirty-region tracking, clip-respecting `renderAt`,
+  non-destructive `renderBatch`, width-aware `wrapText`/`truncateText`,
+  multi-line `measureText`, live frame-time stats).
+- `setProfilingEnabled` is still a no-op; `saveState`/`restoreState`
+  return the full state despite the interface saying void.
+- view `optimized-renderer.performRender` still simulates output —
+  needs a real View render callback.
 - PNG shots (live xterm) still wanted for the widget/theme galleries;
   raw PTY streams + decoded grids are in `docs/evidence/`.
 

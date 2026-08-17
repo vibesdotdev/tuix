@@ -4,7 +4,7 @@
  * Manages application configuration files
  */
 
-import { Effect, Ref, Stream } from 'effect'
+import { Effect, Ref } from 'effect'
 import { StorageError } from '../../../types/errors/base'
 import { StorageUtils } from '../../storage'
 import * as fs from 'node:fs/promises'
@@ -21,9 +21,10 @@ export class ConfigStorage {
    * Get a configuration value by key
    */
   get<T = unknown>(key: string): Effect.Effect<T | null, StorageError> {
-    return Effect.sync(() => {
-      const map = Ref.get(this.configStore)
-      return map.get(key) as T | null
+    const store = this.configStore
+    return Effect.gen(function* () {
+      const map = yield* Ref.get(store)
+      return (map.get(key) as T | null) ?? null
     })
   }
 
@@ -31,10 +32,11 @@ export class ConfigStorage {
    * Set a configuration value by key
    */
   set<T = unknown>(key: string, value: T): Effect.Effect<void, StorageError> {
-    return Effect.sync(() => {
-      const map = Ref.get(this.configStore)
+    const store = this.configStore
+    return Effect.gen(function* () {
+      const map = yield* Ref.get(store)
       map.set(key, value)
-      Ref.set(this.configStore, map)
+      yield* Ref.set(store, map)
     })
   }
 
@@ -42,20 +44,29 @@ export class ConfigStorage {
    * Load configuration from a file
    */
   loadFromFile(path: string): Effect.Effect<void, StorageError> {
-    return Effect.tryPromise({
-      try: async () => {
-        const data = await fs.readFile(path, 'utf-8')
-        const config = JSON.parse(data)
-        const map = new Map<string, unknown>(Object.entries(config))
-        Ref.set(this.configStore, map)
-      },
-      catch: error =>
-        new StorageError({
-          path,
-          operation: 'read',
-          cause: error,
-          message: `Failed to load configuration from ${path}`,
-        }),
+    const store = this.configStore
+    return Effect.gen(function* () {
+      const data = yield* Effect.tryPromise({
+        try: () => fs.readFile(path, 'utf-8'),
+        catch: error =>
+          new StorageError({
+            path,
+            operation: 'read',
+            cause: error,
+            message: `Failed to load configuration from ${path}`,
+          }),
+      })
+      const config = yield* Effect.try({
+        try: () => JSON.parse(data) as Record<string, unknown>,
+        catch: error =>
+          new StorageError({
+            path,
+            operation: 'parse',
+            cause: error,
+            message: `Failed to parse configuration from ${path}`,
+          }),
+      })
+      yield* Ref.set(store, new Map<string, unknown>(Object.entries(config)))
     })
   }
 
@@ -63,19 +74,20 @@ export class ConfigStorage {
    * Save configuration to a file
    */
   saveToFile(path: string): Effect.Effect<void, StorageError> {
-    return Effect.tryPromise({
-      try: async () => {
-        const map = Ref.get(this.configStore)
-        const config = Object.fromEntries(map)
-        await fs.writeFile(path, JSON.stringify(config, null, 2), 'utf-8')
-      },
-      catch: error =>
-        new StorageError({
-          path,
-          operation: 'write',
-          cause: error,
-          message: `Failed to save configuration to ${path}`,
-        }),
+    const store = this.configStore
+    return Effect.gen(function* () {
+      const map = yield* Ref.get(store)
+      const config = Object.fromEntries(map)
+      yield* Effect.tryPromise({
+        try: () => fs.writeFile(path, JSON.stringify(config, null, 2), 'utf-8'),
+        catch: error =>
+          new StorageError({
+            path,
+            operation: 'write',
+            cause: error,
+            message: `Failed to save configuration to ${path}`,
+          }),
+      })
     })
   }
 
@@ -83,24 +95,33 @@ export class ConfigStorage {
    * Get all configuration keys
    */
   keys(): Effect.Effect<IterableIterator<string>, never> {
-    return Effect.sync(() => Ref.get(this.configStore).keys())
+    const store = this.configStore
+    return Effect.gen(function* () {
+      const map = yield* Ref.get(store)
+      return map.keys()
+    })
   }
 
   /**
    * Check if a key exists
    */
   has(key: string): Effect.Effect<boolean, never> {
-    return Effect.sync(() => Ref.get(this.configStore).has(key))
+    const store = this.configStore
+    return Effect.gen(function* () {
+      const map = yield* Ref.get(store)
+      return map.has(key)
+    })
   }
 
   /**
    * Delete a configuration key
    */
   delete(key: string): Effect.Effect<void, StorageError> {
-    return Effect.sync(() => {
-      const map = Ref.get(this.configStore)
+    const store = this.configStore
+    return Effect.gen(function* () {
+      const map = yield* Ref.get(store)
       map.delete(key)
-      Ref.set(this.configStore, map)
+      yield* Ref.set(store, map)
     })
   }
 
@@ -108,9 +129,7 @@ export class ConfigStorage {
    * Clear all configuration
    */
   clear(): Effect.Effect<void, never> {
-    return Effect.sync(() => {
-      Ref.set(this.configStore, new Map())
-    })
+    return Ref.set(this.configStore, new Map())
   }
 
   /**
@@ -267,41 +286,42 @@ export class ConfigStorage {
   }
 
   /**
-   * Watch configuration file for changes
+   * Watch configuration file for changes.
+   *
+   * Returns an Effect-of-Effect matching the `StorageService` contract:
+   * each time the inner effect is re-run it stats the file and, if the
+   * mtime moved, loads the fresh validated config; otherwise it returns
+   * the last value seen. Consumers poll by re-running the inner effect.
    */
   watchConfig<T>(
     appName: string,
     schema: z.ZodSchema<T>
   ): Effect.Effect<Effect.Effect<T, StorageError>, StorageError> {
-    return Effect.gen(function* (_) {
-      const configPath = yield* _(this.getConfigPath(appName))
-      const self = this
+    const self = this
+    return Effect.gen(function* () {
+      const configPath = yield* self.getConfigPath(appName)
+      let lastMtime: number | null = null
+      let lastValue: T = yield* self.loadConfig(appName, schema, {} as T)
+      let seeded = false
 
-      // Effect that yields latest config; watches via polling when file exists
-      return Effect.gen(function* (_) {
-        // Initial load
-        let current = yield* _(self.loadConfig(appName, schema, {} as T))
+      const readMtime = (): Promise<number | null> =>
+        fs
+          .stat(configPath)
+          .then(stat => stat.mtimeMs)
+          .catch(() => null)
 
-        // Poll for mtime changes (Bun-friendly; no native fs.watch required)
-        try {
-          const file = Bun.file(configPath)
-          if (yield* _(Effect.tryPromise({ try: () => file.exists(), catch: () => false }))) {
-            const firstStat = yield* _(
-              Effect.tryPromise({
-                try: async () => (await file.stat?.()) ?? null,
-                catch: () => null,
-              })
-            )
-            // Single re-check cycle for consumers that re-run the effect
-            if (firstStat) {
-              current = yield* _(self.loadConfig(appName, schema, current as T))
-            }
-          }
-        } catch {
-          /* keep initial */
+      return Effect.gen(function* () {
+        if (!seeded) {
+          seeded = true
+          lastMtime = yield* Effect.promise(readMtime)
+          return lastValue
         }
-
-        return current
+        const mtime = yield* Effect.promise(readMtime)
+        if (mtime === null) return lastValue
+        if (lastMtime !== null && mtime === lastMtime) return lastValue
+        lastMtime = mtime
+        lastValue = yield* self.loadConfig(appName, schema, lastValue)
+        return lastValue
       })
     })
   }

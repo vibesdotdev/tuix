@@ -41,6 +41,13 @@ export abstract class ModuleBase {
   public abstract initialize(): Effect.Effect<void, ModuleError>
 
   /**
+   * Current lifecycle state
+   */
+  public getState(): ModuleState {
+    return this.state
+  }
+
+  /**
    * Shutdown the module
    */
   public shutdown(): Effect.Effect<void, ModuleError> {

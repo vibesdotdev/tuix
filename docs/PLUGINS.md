@@ -1,341 +1,77 @@
-# Tuix Framework Plugins
+# Tuix CLI Plugins & Commands
 
-## Core Plugins
+How command routing and plugin grouping actually work in this checkout.
+The old version of this file described a `@tuix/plugins/*` package family
+and a `tuix plugin install` workflow that never shipped — it is retired.
+What exists is simpler and lives in `@tuix/jsx`.
 
-### 🔐 auth
-**Purpose**: Authentication and authorization for CLI applications
-**Status**: Stable
-**Documentation**: [plugins/auth/readme.md](plugins/auth/readme.md)
+## The three authoring tags
 
-Features:
-- User login/logout
-- Token management
-- Permission checking
-- Session persistence
-- Security middleware
+```tsx
+import { Command, Plugin, Fallback } from '@tuix/jsx'
 
-Usage:
-```typescript
-import { authPlugin } from '@tuix/plugins/auth'
+export default function App() {
+  return (
+    <>
+      <Command name="version" description="Show version" component={Version} />
+      <Command name="help" description="Help explorer" component={Help} interactive />
 
-// Login command
-cli.command('login', authPlugin.commands.login)
+      <Plugin name="config" description="Manage configuration">
+        <Command name="get" description="Get one value" component={ConfigGet} />
+        <Command name="set" description="Set one value" component={ConfigSet} />
+      </Plugin>
 
-// Check authentication
-const user = await authPlugin.services.auth.getCurrentUser()
-```
-
-## Plugin Architecture
-
-### Plugin Structure
-```typescript
-export interface Plugin {
-  name: string
-  version: string
-  
-  // Lifecycle hooks
-  install(context: PluginContext): Promise<void>
-  uninstall?(): Promise<void>
-  
-  // Configuration
-  config?: PluginConfig
-  
-  // Dependencies
-  requires?: string[]
-  provides?: string[]
+      <Fallback component={Welcome} />
+    </>
+  )
 }
 ```
 
-### Plugin Context
-```typescript
-interface PluginContext {
-  // Core services
-  logger: Logger
-  config: Config
-  events: EventEmitter
-  
-  // Registration methods
-  registerCommand(cmd: Command): void
-  registerHook(hook: Hook): void
-  registerService(service: Service): void
-  
-  // Plugin communication
-  getPlugin(name: string): Plugin
-  callPlugin(name: string, method: string, ...args: any[]): any
-}
+- **`<Command>`** registers an executable route (`tuix <name>`). Set
+  `interactive` for full-screen surfaces; omit it for one-shot renders
+  that print and exit.
+- **`<Plugin>`** is a scope that groups commands under a path prefix
+  (`tuix config get <key>`). It is the only grouping mechanism — there is
+  no separate plugin registry, installer, or marketplace.
+- **`<Fallback>`** renders when argv matches no route (bare `tuix` or an
+  unknown path).
+
+## Routing
+
+`runApp` (from `@tuix/jsx`) parses `process.argv` into a route
+(`activeRouteStore.initFromArgv()`), walks the JSX tree once so every
+`Command`/`Plugin` registers its scope with the global scope manager,
+then renders the matching scope's component. Longest-prefix wins; extra
+path segments become positional args; `--flags` are parsed with type
+coercion. Interactivity is decided by the *active surface* (`interactive`
+on the matched command, or detected from the fallback), not by the root
+component's name.
+
+## Scope internals
+
+`Command` and `Plugin` are thin wrappers over `<Scope>`. Scopes:
+
+- register into the global `ScopeManager` (children before parents),
+- link plugins to parents via `metadata._parentScopeId`,
+- get path fixes applied after registration (`fixScopePaths`),
+- gate rendering on `activeRouteStore.matches(path)`.
+
+## What "plugin packages" means here
+
+Ecosystem packages (`@tuix/config`, `@tuix/logger`, `@tuix/process-manager`,
+`@tuix/telemetry`, `@tuix/update`, `@tuix/debug`) each export a module +
+JSX components you can wire into your app's runtime bootstrap.
+`@tuix/app-presets` provides factories that compose them:
+
+```ts
+import { createAppPreset } from '@tuix/app-presets'
 ```
 
-## Creating Plugins
+See [MODULES.md](./MODULES.md) for the package map and
+[MODULE_CATALOG.md](../spec/20-catalog/MODULE_CATALOG.md) for status.
 
-### Basic Plugin Template
-```typescript
-import { definePlugin } from '@tuix/cli/plugin'
-import { z } from 'zod'
+## Testing routes
 
-export const myPlugin = definePlugin({
-  metadata: {
-    name: 'my-plugin',
-    version: '1.0.0',
-    description: 'Description of what this plugin does',
-    author: 'Your Name'
-  },
-  
-  commands: {
-    myCommand: {
-      description: 'Description of the command',
-      args: {
-        input: z.string().describe('Input parameter')
-      },
-      handler: async (args) => {
-        // Command implementation
-        return `Processed: ${args.input}`
-      }
-    }
-  },
-  
-  hooks: {
-    beforeCommand: async (command, args) => {
-      // Pre-command logic
-    },
-    afterCommand: async (command, result) => {
-      // Post-command logic
-    }
-  },
-  
-  services: {
-    myService: {
-      doSomething: async () => {
-        // Service implementation
-      }
-    }
-  },
-  
-  configSchema: z.object({
-    setting: z.string().default('default-value')
-  }),
-  
-  install: async (context) => {
-    console.log('Plugin installed')
-  },
-  
-  uninstall: async (context) => {
-    console.log('Plugin uninstalled')
-  }
-})
-```
-
-### Plugin Configuration
-```typescript
-export const myPlugin = definePlugin({
-  configSchema: z.object({
-    apiKey: z.string().describe('API key for external service'),
-    timeout: z.number().default(5000).describe('Request timeout in ms'),
-    retries: z.number().default(3).describe('Number of retry attempts')
-  }),
-  
-  // Plugin implementation uses validated config
-  commands: {
-    apiCall: {
-      handler: async (args, context) => {
-        const config = context.config // Typed and validated
-        // Use config.apiKey, config.timeout, etc.
-      }
-    }
-  }
-})
-```
-
-## Plugin Development Guidelines
-
-### Best Practices
-1. **Isolation**: Plugins should be self-contained
-2. **Dependencies**: Declare all dependencies explicitly
-3. **Configuration**: Use schema validation
-4. **Errors**: Handle errors gracefully
-5. **Cleanup**: Always implement uninstall
-6. **Documentation**: Complete API documentation
-
-### Testing Plugins
-```typescript
-import { createTestContext } from '@tuix/plugins/testing'
-
-describe('MyPlugin', () => {
-  it('should install correctly', async () => {
-    const context = createTestContext()
-    await myPlugin.install(context)
-    
-    expect(context.hasCommand('my-command')).toBe(true)
-  })
-  
-  it('should handle commands', async () => {
-    const result = await myPlugin.commands.myCommand.handler({
-      input: 'test'
-    })
-    
-    expect(result).toBe('Processed: test')
-  })
-})
-```
-
-### Plugin Communication
-```typescript
-// Event-based communication
-context.events.on('user:login', (userData) => {
-  // React to events from other plugins
-})
-
-context.events.emit('myPlugin:action', { data: 'value' })
-
-// Direct service calls
-const authService = context.getPlugin('auth').services.auth
-const user = await authService.getCurrentUser()
-```
-
-## Plugin Registry
-
-### Official Plugins
-Maintained by the Tuix team:
-- **auth**: Authentication and authorization
-- **logger**: Enhanced logging capabilities
-- **process-manager**: Process management (in core)
-- **config**: Configuration management (in core)
-
-### Community Plugins
-Submit your plugin for listing:
-1. Follow plugin guidelines
-2. Include comprehensive tests
-3. Provide documentation
-4. Submit PR to registry
-
-### Plugin Discovery
-```bash
-# List available plugins
-tuix plugin list
-
-# Search for plugins
-tuix plugin search logging
-
-# Install plugin
-tuix plugin install @community/plugin-name
-```
-
-## Plugin Lifecycle
-
-### Installation Flow
-1. Validate plugin compatibility
-2. Check dependencies
-3. Load configuration
-4. Call install hook
-5. Register plugin services
-6. Emit installation event
-
-### Uninstallation Flow
-1. Check dependent plugins
-2. Call uninstall hook
-3. Remove registered services
-4. Clean up resources
-5. Emit uninstallation event
-
-### Update Flow
-1. Check version compatibility
-2. Call uninstall on old version
-3. Install new version
-4. Migrate configuration
-5. Verify functionality
-
-## Security Considerations
-
-### Plugin Permissions
-Future feature for plugin isolation:
-```typescript
-export const myPlugin = definePlugin({
-  permissions: {
-    fs: ['read'],
-    net: ['https://api.example.com'],
-    process: false,
-    env: ['NODE_ENV']
-  },
-  
-  // Plugin implementation
-})
-```
-
-### Security Best Practices
-- **Validate Inputs**: All user inputs and external data
-- **Limit Scope**: Request minimal permissions needed
-- **Error Handling**: Don't expose internal details
-- **Secure Storage**: Use proper file permissions for sensitive data
-- **Rate Limiting**: Implement for external API calls
-
-## Performance Guidelines
-
-### Lazy Loading
-```typescript
-export const myPlugin = definePlugin({
-  features: {
-    heavyFeature: () => import('./heavy-feature')
-  },
-  
-  commands: {
-    heavy: {
-      handler: async (args) => {
-        const feature = await import('./heavy-feature')
-        return feature.process(args)
-      }
-    }
-  }
-})
-```
-
-### Resource Management
-- **Memory**: Monitor and limit usage
-- **Connections**: Close when done
-- **Timers**: Clean up in uninstall
-- **Caching**: Use appropriate TTL
-
-## Troubleshooting
-
-### Common Issues
-
-#### Plugin Won't Load
-1. **Check Dependencies**: Verify all required dependencies are installed
-2. **Configuration**: Validate plugin configuration schema
-3. **Permissions**: Ensure proper file/network permissions
-4. **Logs**: Check plugin installation logs
-
-#### Command Not Found
-1. **Registration**: Verify command is properly registered
-2. **Naming**: Check for naming conflicts with other plugins
-3. **Scope**: Ensure plugin is loaded in correct context
-
-#### Performance Issues
-1. **Profiling**: Use built-in performance monitoring
-2. **Lazy Loading**: Defer expensive operations
-3. **Caching**: Implement appropriate caching strategies
-4. **Resources**: Monitor memory and CPU usage
-
-### Debug Mode
-```bash
-# Enable plugin debugging
-DEBUG=tuix:plugins tuix run
-
-# Verbose plugin information
-tuix plugin list --verbose
-
-# Test plugin installation
-tuix plugin test my-plugin
-```
-
-## Future Features
-
-### Plugin Marketplace
-- **Discovery**: Search and browse plugins
-- **Reviews**: Community ratings and feedback
-- **Versioning**: Semantic versioning support
-- **Updates**: Automatic update notifications
-
-### Enhanced Security
-- **Sandboxing**: Plugin execution isolation
-- **Permissions**: Fine-grained permission system
-- **Auditing**: Plugin behavior monitoring
-- **Signing**: Plugin signature verification
+`@tuix/docs` can extract a command catalog from a JSX app
+(`extractAppDoc`) — this is what `tuix help` renders. The demo app
+(`apps/demo/src/app.tsx`) is the reference wiring.
