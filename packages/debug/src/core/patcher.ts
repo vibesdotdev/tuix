@@ -21,6 +21,7 @@ export interface PatchOptions {
 }
 
 let patchesApplied = false
+let patchesPromise: Promise<void> = Promise.resolve()
 
 export function applyDebugPatches(options: PatchOptions = {}) {
   if (patchesApplied) return
@@ -35,13 +36,42 @@ export function applyDebugPatches(options: PatchOptions = {}) {
 
   debug.system('Applying debug patches')
 
+  // Sync patches land immediately.
   if (patchScope) patchScopeManager()
-  if (patchJSX) patchJSXRuntime()
-  if (patchRender) patchRenderSystem()
-  if (patchLogger) patchLoggerModule()
-
-  // Install error handlers
   installErrorHandlers()
+
+  // Async patches (dynamic imports) must complete before the app renders
+  // or they race startup — callers can await applyDebugPatchesAsync.
+  const pending: Array<Promise<void>> = []
+  if (patchJSX) pending.push(patchJSXRuntime())
+  if (patchRender) pending.push(patchRenderSystem())
+  if (patchLogger) pending.push(patchLoggerModule())
+  patchesPromise = Promise.all(pending).then(
+    () => {},
+    error => {
+      debug.error('Debug patches failed to apply', error as Error)
+    }
+  )
+}
+
+/**
+ * Apply debug patches and wait for the async ones (JSX/runtime/logger
+ * module patches) to finish. Await this before starting the app when
+ * patches must be in place for first render.
+ */
+export async function applyDebugPatchesAsync(options: PatchOptions = {}) {
+  applyDebugPatches(options)
+  await patchesPromise
+}
+
+/**
+ * Test helper: clear the applied flag so a fresh patch set can be
+ * applied in a new test context. Already-installed monkey-patches are
+ * not reverted.
+ */
+export function resetDebugPatchFlag(): void {
+  patchesApplied = false
+  patchesPromise = Promise.resolve()
 }
 
 function patchScopeManager() {

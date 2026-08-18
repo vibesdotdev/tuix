@@ -166,6 +166,7 @@ class ActiveRouteStore {
       ...current,
       ...route,
     })
+    this.emitChange()
   }
 
   /**
@@ -177,6 +178,7 @@ class ActiveRouteStore {
       ...current,
       path,
     })
+    this.emitChange()
   }
 
   /**
@@ -220,12 +222,33 @@ class ActiveRouteStore {
   }
 
   /**
-   * Subscribe to route changes
+   * Subscribe to route changes.
+   *
+   * The store is a reactive rune, so most consumers re-read it inside
+   * render. This subscription exists for imperative listeners: the
+   * callback fires immediately with the current route (replay) and on
+   * every subsequent navigate/set.
    */
   subscribe(callback: (route: ActiveRoute) => void): () => void {
-    // In a real implementation, this would set up a subscription
-    // For now, we'll rely on the reactive system
-    return () => {}
+    const listeners = this.listeners ?? (this.listeners = new Set())
+    listeners.add(callback)
+    // Replay current value so late subscribers get state.
+    callback(this.route())
+    return () => {
+      listeners.delete(callback)
+    }
+  }
+
+  private emitChange(): void {
+    if (!this.listeners) return
+    const route = this.route()
+    for (const listener of this.listeners) {
+      try {
+        listener(route)
+      } catch {
+        /* one bad listener must not break routing */
+      }
+    }
   }
 }
 

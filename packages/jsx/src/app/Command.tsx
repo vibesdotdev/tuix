@@ -5,6 +5,7 @@
  */
 
 import { Scope } from '../scope/components'
+import { withLifecycle } from '@tuix/reactive/jsx-lifecycle'
 import type { JSX } from '../jsx-runtime'
 import type { ArgDef, FlagDef } from '../scope/types'
 
@@ -108,8 +109,6 @@ export function Command(props: CommandProps): JSX.Element {
     (component
       ? ({
           render: () => {
-            // Import withLifecycle at the top if not already imported
-            const { withLifecycle } = require('@tuix/reactive/jsx-lifecycle')
             const wrappedComponent = withLifecycle(component)
             const result = wrappedComponent({})
             return result.render()

@@ -5,6 +5,7 @@
  */
 
 import * as path from 'path'
+import { pathToFileURL } from 'url'
 import { ConfigObject, ConfigLoader } from '../types'
 
 /**
@@ -13,7 +14,13 @@ import { ConfigObject, ConfigLoader } from '../types'
 export class JSONLoader implements ConfigLoader {
   canLoad(filePath: string): boolean {
     const ext = path.extname(filePath).toLowerCase()
-    return ext === '.json' || filePath.endsWith('rc')
+    const base = path.basename(filePath)
+    return (
+      ext === '.json' ||
+      // rc files: `.foorc`, `foo.rc` — not any path that merely ends in "rc".
+      (base.startsWith('.') && base.endsWith('rc')) ||
+      ext === '.rc'
+    )
   }
 
   async load(filePath: string): Promise<ConfigObject> {
@@ -69,11 +76,10 @@ export class TypeScriptLoader implements ConfigLoader {
 
   async load(filePath: string): Promise<ConfigObject> {
     try {
-      // Clear module cache to get fresh config
-      delete require.cache[filePath]
-
-      // Import the module
-      const module = await import(filePath)
+      // `import()` ignores require.cache; cache-bust with a per-load
+      // query string so config edits are picked up without a restart.
+      const url = pathToFileURL(path.resolve(filePath)).href
+      const module = await import(`${url}?t=${Date.now()}`)
 
       // Handle various export formats
       const config = module.default || module.config || module

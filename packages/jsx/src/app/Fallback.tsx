@@ -5,6 +5,9 @@
  * If not provided, auto-generated help is shown instead.
  */
 
+import { scopeManager } from '../scope/manager'
+import { text } from '@tuix/view'
+
 export interface FallbackProps {
   /**
    * Component to render when no command matches
@@ -27,9 +30,6 @@ export interface FallbackProps {
  */
 export function Fallback({ component, metadata }: FallbackProps): JSX.Element {
   // Register this as the fallback in scope manager
-  const { scopeManager } = require('../scope/manager')
-  const { text } = require('@tuix/view')
-
   scopeManager.setFallback({
     component,
     metadata: metadata || {},
