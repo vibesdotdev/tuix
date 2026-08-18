@@ -12,7 +12,7 @@
  */
 
 import { Effect } from 'effect'
-import { parseVisualCells } from '@tuix/ansi'
+import { parseVisualCells, joinVisualCells } from '@tuix/ansi'
 import { attachOverlays, partitionOverlays } from '@tuix/core/types'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
@@ -468,7 +468,7 @@ const calculateContainerDimensions = (
  * Render child view into 2D buffer
  */
 const renderChildToBuffer = (
-  buffer: string[][],
+  buffer: Array<Array<{ char: string; prefix: string }>>,
   content: string,
   bounds: LayoutRect,
   bufferWidth: number,
@@ -492,7 +492,7 @@ const renderChildToBuffer = (
         buffer[bufferY] &&
         cell
       ) {
-        buffer[bufferY][bufferX] = `${cell.prefix}${cell.char}`
+        buffer[bufferY][bufferX] = { char: cell.char || ' ', prefix: cell.prefix || '' }
       }
     }
   }
@@ -519,10 +519,12 @@ export const flexbox = (items: ReadonlyArray<FlexItem | View>, props: FlexboxPro
         // Use pre-calculated layout
         const layout = preLayout
 
-        // Create a 2D buffer for rendering (use actual height from layout)
-        const buffer: string[][] = Array(actualHeight)
+        // Create a 2D buffer for rendering (use actual height from layout).
+        // Cells carry their SGR prefix so the join can run-length encode
+        // styling instead of emitting the escape before every character.
+        const buffer: Array<Array<{ char: string; prefix: string }>> = Array(actualHeight)
           .fill(null)
-          .map(() => Array(totalWidth).fill(' '))
+          .map(() => Array(totalWidth).fill({ char: ' ', prefix: '' }))
 
         // Render each child into the buffer
         for (const child of layout.children) {
@@ -531,15 +533,16 @@ export const flexbox = (items: ReadonlyArray<FlexItem | View>, props: FlexboxPro
           renderChildToBuffer(buffer, contentStr, child.bounds, totalWidth, actualHeight)
         }
 
-        // Convert buffer to string
+        // Convert buffer to string with run-length encoded SGR via
+        // joinVisualCells (a prefix is emitted once per style run).
         // If no explicit width, trim trailing spaces ONLY on lines with content
         // If explicit width, keep padding (fixed-size container)
         if (hasExplicitWidth) {
-          return buffer.map(row => row.join('')).join('\n')
+          return buffer.map(row => joinVisualCells(row)).join('\n')
         } else {
           return buffer
             .map(row => {
-              const line = row.join('')
+              const line = joinVisualCells(row)
               // Only trim if line has non-whitespace content
               // This preserves gap lines (all spaces) while trimming padding on content lines
               return /\S/.test(line) ? line.trimEnd() : line

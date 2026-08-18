@@ -4,6 +4,8 @@ import HelloCommand from './commands/hello-test'
 import StudioHome from './commands/studio-home'
 import Kit from './commands/kit'
 import Forms from './commands/forms'
+import Tasks from './commands/tasks'
+import Dash from './commands/dash'
 import ShowcaseCommand from './commands/showcase'
 import Widgets from './commands/widgets'
 import AIChatDemo from './commands/ai-chat-demo'
@@ -28,6 +30,16 @@ export default function App() {
         name="forms"
         description="bind:value + focus ring + modal backdrop (live proof)"
         component={Forms}
+      />
+      <Command
+        name="tasks"
+        description="Task board — filters, focus-ring input, scrim confirm"
+        component={Tasks}
+      />
+      <Command
+        name="dash"
+        description="Live dashboard — sparklines, bars, service status"
+        component={Dash}
       />
       <Command name="showcase" description="Show off TUIX components" component={ShowcaseCommand} />
       <Command

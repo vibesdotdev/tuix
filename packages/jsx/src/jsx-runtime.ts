@@ -1424,6 +1424,7 @@ function renderJSX(
       return markOverlay(contentView, {
         x: toNumber(safeProps.x),
         y: toNumber(safeProps.y),
+        scrim: safeProps.scrim === true || safeProps.scrim === 'true',
       })
     }
 

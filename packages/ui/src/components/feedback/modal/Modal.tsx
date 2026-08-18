@@ -17,6 +17,10 @@ export interface ModalProps {
   readonly closeOnEscape?: boolean
   /** Dismiss via a click that misses the painted overlay (backdrop hit-testing). */
   readonly closeOnBackdrop?: boolean
+  /** Dim the surface beneath the modal (default true). */
+  readonly scrim?: boolean
+  /** 'center' (default) centers vertically; 'top' floats near the top (palettes). */
+  readonly placement?: 'center' | 'top'
   readonly onClose?: () => void
   readonly onConfirm?: () => void
   readonly onCancel?: () => void
@@ -73,10 +77,14 @@ export function Modal(props: ModalProps): JSX.Element | null {
   const originX =
     props.width != null ? Math.max(0, Math.floor((cols - props.width) / 2)) : undefined
   const originY =
-    props.height != null ? Math.max(0, Math.floor((rows - props.height) / 2)) : undefined
+    props.placement === 'top'
+      ? 2
+      : props.height != null
+        ? Math.max(0, Math.floor((rows - props.height) / 2))
+        : undefined
 
   return (
-    <overlay x={originX} y={originY}>
+    <overlay x={originX} y={originY} scrim={props.scrim !== false}>
       <interactive className={props.className} focusable onKeyPress={handleKeyPress}>
         <box
           border="rounded"

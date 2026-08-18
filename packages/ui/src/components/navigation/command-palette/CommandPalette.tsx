@@ -92,6 +92,8 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element | null {
       title={props.title ?? 'Command'}
       onClose={props.onClose}
       showCloseButton
+      placement="top"
+      width={props.width ?? 40}
       className={props.className}
     >
       <vstack>

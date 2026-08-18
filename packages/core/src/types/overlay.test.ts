@@ -19,7 +19,7 @@ describe('overlay metadata', () => {
   test('markOverlay tags a view without changing its paint', async () => {
     const marked = markOverlay(view('Keys'), { x: 3, y: 2 })
     expect(isOverlayView(marked)).toBe(true)
-    expect(overlaySpec(marked)).toEqual({ view: marked, x: 3, y: 2 })
+    expect(overlaySpec(marked)).toEqual({ view: marked, x: 3, y: 2, scrim: false })
     expect(await Effect.runPromise(marked.render())).toBe('Keys')
   })
 

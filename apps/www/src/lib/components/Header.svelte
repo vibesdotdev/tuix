@@ -3,6 +3,7 @@ import { page } from '$app/stores'
 
 const links = [
   { href: '/features', label: 'Features' },
+  { href: '/gallery', label: 'Gallery' },
   { href: '/get-started', label: 'Get started' },
   { href: '/docs', label: 'Docs' },
   { href: '/packages', label: 'Packages' },

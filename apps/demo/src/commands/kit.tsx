@@ -255,9 +255,13 @@ function Kit() {
 
   return (
     <flex direction="column" width={cols} height={rows}>
-      <text
-        fg={theme.colors.textBright}
-      >{`vibes   ${session.title}   ${SESSIONS.length} sessions`}</text>
+      <hstack gap={1}>
+        <text bg={theme.colors.primary} fg={theme.colors.bg}>
+          {' vibes '}
+        </text>
+        <text fg={theme.colors.textBright}>{session.title}</text>
+        <text fg={dim}>{`${SESSIONS.length} sessions`}</text>
+      </hstack>
       {body}
       {commandOverlay}
       {helpOverlay}

@@ -26,6 +26,37 @@ function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): 
   )
 }
 
+/** Blend factor for scrim cells — how much light survives beneath a modal. */
+const SCRIM_KEEP = 0.45
+
+function scaleColor(c: unknown, keep: number): unknown {
+  if (!c || typeof c !== 'object') return c
+  const col = c as { type?: string; r?: number; g?: number; b?: number; value?: string }
+  if (col.type === 'rgb' && typeof col.r === 'number') {
+    return rgb(Math.round(col.r * keep), Math.round(col.g! * keep), Math.round(col.b! * keep))
+  }
+  return col
+}
+
+/** Dim a composited cell (scrim): scale its fg/bg toward black. */
+function dimCell(cell: Cell): Cell {
+  if (Option.isNone(cell.style)) {
+    // No style: emit an explicit dark background so the scrim is visible
+    // even over default-colored text beneath.
+    return { char: cell.char, style: Option.some({ background: rgb(6, 8, 11) }), painted: true }
+  }
+  const s = cell.style.value
+  return {
+    char: cell.char,
+    style: Option.some({
+      ...s,
+      foreground: scaleColor(s.foreground, SCRIM_KEEP) as AnsiStyle['foreground'],
+      background: scaleColor(s.background, SCRIM_KEEP) as AnsiStyle['background'],
+    }),
+    painted: true,
+  }
+}
+
 // -----------------------------------------------------------------------------
 // Models
 // -----------------------------------------------------------------------------
@@ -42,6 +73,8 @@ interface Cell {
   readonly style: Option.Option<AnsiStyle>
   /** True when this cell was written this frame (spaces included). */
   readonly painted: boolean
+  /** Scrim cell: blend whatever is beneath toward the dim floor (modal backdrop). */
+  readonly scrim?: boolean
 }
 
 /**
@@ -133,6 +166,23 @@ class ScreenBuffer {
   }
 
   /**
+   * Fill every cell with a scrim marker (modal backdrop). Composite blends
+   * whatever is beneath toward the dim floor instead of covering it.
+   */
+  fillScrim(): void {
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        this.cells[y]![x] = {
+          char: ' ',
+          style: Option.none(),
+          painted: true,
+          scrim: true,
+        }
+      }
+    }
+  }
+
+  /**
    * Bounding box of the inked region (overlay hit-testing). Leading padding
    * spaces from flow positioning are ignored — a click targets ink, and a
    * modal lifted out of flow carries its position as leading whitespace.
@@ -200,7 +250,11 @@ class ScreenBuffer {
         if (tx < 0 || tx >= this.width) continue
         const cell = other.cells[y]![x]!
         if (!transparent || cell.painted) {
-          this.cells[ty]![tx] = { ...cell }
+          if (cell.scrim) {
+            this.cells[ty]![tx] = dimCell(this.cells[ty]![tx]!)
+          } else {
+            this.cells[ty]![tx] = { ...cell }
+          }
         }
       }
     }
@@ -532,6 +586,11 @@ export const RendererServiceLive = Layer.effect(
         const overlayLayer = yield* _(ensureLayer('overlay', 1, width, height))
         overlayLayer.buffer.clear()
         overlayLayer.visible = overlays.length > 0
+        // Any scrim overlay dims the entire surface before content paints
+        // on top of the dimmed layer.
+        if (overlays.some(o => o.scrim)) {
+          overlayLayer.buffer.fillScrim()
+        }
         for (const overlay of overlays) {
           yield* _(paintViewToLayer(overlayLayer, overlay.view, overlay.x, overlay.y))
         }

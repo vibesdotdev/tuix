@@ -12,12 +12,15 @@ export const DEFAULT_OVERLAY_ORIGIN = { x: 0, y: 1 } as const
 export interface OverlayOrigin {
   readonly x: number
   readonly y: number
+  /** Dim the surface beneath the overlay (modal scrim). */
+  readonly scrim?: boolean
 }
 
 export interface OverlaySpec {
   readonly view: View
   readonly x: number
   readonly y: number
+  readonly scrim?: boolean
 }
 
 type OverlayCarrier = View & {
@@ -35,6 +38,7 @@ export function markOverlay(view: View, origin: Partial<OverlayOrigin> = {}): Vi
     value: {
       x: origin.x ?? DEFAULT_OVERLAY_ORIGIN.x,
       y: origin.y ?? DEFAULT_OVERLAY_ORIGIN.y,
+      scrim: origin.scrim ?? false,
     },
     enumerable: false,
     writable: false,
@@ -50,7 +54,7 @@ export function overlaySpec(view: View): OverlaySpec {
   const origin = isOverlayView(view)
     ? (view[OVERLAY_METADATA] ?? DEFAULT_OVERLAY_ORIGIN)
     : DEFAULT_OVERLAY_ORIGIN
-  return { view, x: origin.x, y: origin.y }
+  return { view, x: origin.x, y: origin.y, scrim: origin.scrim ?? false }
 }
 
 export function collectOverlays(view: unknown): OverlaySpec[] {
