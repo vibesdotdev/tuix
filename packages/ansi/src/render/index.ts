@@ -102,7 +102,7 @@ const wrapLine = (line: string, width: number): string[] => {
       buffer += token.escape
       if (token.sgr) {
         // Reset closes the run; anything else extends active state.
-        activeSgr = token.escape === RESET ? '' : token.escape
+        activeSgr = token.escape === RESET ? '' : activeSgr + token.escape
       }
     }
     for (const char of [...token.text]) {

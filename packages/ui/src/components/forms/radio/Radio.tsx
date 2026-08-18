@@ -89,9 +89,12 @@ export function Radio<T = string>(props: RadioProps<T>): JSX.Element {
         break
 
       case 'Enter':
-      case ' ':
-        selectOption(props.options[focusedIndex()].value)
+      case ' ': {
+        const idx = Math.min(focusedIndex(), props.options.length - 1)
+        const option = props.options[idx]
+        if (option) selectOption(option.value)
         break
+      }
     }
   }
 

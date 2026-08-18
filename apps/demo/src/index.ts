@@ -11,4 +11,5 @@ import { runApp } from '@tuix/jsx'
 import App from './app'
 
 const kit = process.argv.includes('kit')
-await runApp(App, { fps: kit ? 12 : 60 })
+const forms = process.argv.includes('forms')
+await runApp(App, { fps: kit ? 12 : 60, enableMouse: forms })

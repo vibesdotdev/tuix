@@ -1,6 +1,7 @@
 /** @jsxImportSource @tuix/jsx */
 
 import { useUITheme } from '../../../theme'
+import { stringWidth } from '@tuix/view/string/width'
 
 export type StatusTone = 'default' | 'muted' | 'warning' | 'danger' | 'success'
 
@@ -47,18 +48,28 @@ export function formatStatusBarSegments(props: StatusBarProps): StatusSegment[] 
 
 /** Clip segments to `width` visible columns, appending `…` when cut. */
 export function clipStatusBarSegments(segments: StatusSegment[], width: number): StatusSegment[] {
-  const total = segments.reduce((sum, segment) => sum + segment.text.length, 0)
+  // Use visual width (not UTF-16 length) so wide glyphs count correctly.
+  const total = segments.reduce((sum, segment) => sum + stringWidth(segment.text), 0)
   if (typeof width !== 'number' || width <= 0 || total <= width) return segments
 
   let budget = Math.max(1, width - 1)
   const clipped: StatusSegment[] = []
   for (const segment of segments) {
     if (budget <= 0) break
-    if (segment.text.length <= budget) {
+    const segmentWidth = stringWidth(segment.text)
+    if (segmentWidth <= budget) {
       clipped.push(segment)
-      budget -= segment.text.length
+      budget -= segmentWidth
     } else {
-      clipped.push({ text: segment.text.slice(0, budget), tone: segment.tone })
+      let text = ''
+      let used = 0
+      for (const char of segment.text) {
+        const charWidth = stringWidth(char)
+        if (used + charWidth > budget) break
+        text += char
+        used += charWidth
+      }
+      clipped.push({ text, tone: segment.tone })
       budget = 0
     }
   }

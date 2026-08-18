@@ -6,7 +6,7 @@
  */
 
 import type { JSX } from '@tuix/jsx'
-import { style, colors, border, type Style } from '@tuix/ansi'
+import { style, colors, borderStyle, type Style } from '@tuix/ansi'
 import { useUITheme } from '../../../theme'
 import { Box } from '../box'
 import { Viewport } from '../viewport'
@@ -166,16 +166,16 @@ function resolveBorderStyle(
   switch (target) {
     case 'single':
     case 'light':
-      return border.borderStyle('thin')
+      return borderStyle('thin')
     case 'double':
-      return border.borderStyle('double')
+      return borderStyle('double')
     case 'rounded':
-      return border.borderStyle('rounded')
+      return borderStyle('rounded')
     case 'thick':
     case 'heavy':
-      return border.borderStyle('thick')
+      return borderStyle('thick')
     default:
-      return border.borderStyle('thin')
+      return borderStyle('thin')
   }
 }
 

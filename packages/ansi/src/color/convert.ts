@@ -132,6 +132,26 @@ export function rgbToAnsi(r: number, g: number, b: number): number {
 }
 
 /**
+ * Downgrade a ColorDef to a basic ANSI 16 color code.
+ * Codes 0-15 pass through; higher ANSI256 codes decompose via colorToRgb.
+ */
+function rgbToAnsiFromColor(c: ColorDef): number {
+  if (c.type === 'ansi256' && c.code < 16) return c.code
+  const { r, g, b } = colorToRgb(c)
+  return rgbToAnsi(r, g, b)
+}
+
+/**
+ * Convert a basic ANSI 16 color code to its SGR parameter
+ * (30-37 / 90-97 for foreground, 40-47 / 100-107 for background).
+ */
+function ansi16Code(code: number, background: boolean): number {
+  const base = background ? 40 : 30
+  const brightBase = background ? 100 : 90
+  return code < 8 ? base + code : brightBase + (code - 8)
+}
+
+/**
  * Convert color to ANSI escape sequence
  */
 export function toAnsiSequence(c: ColorDef, profile: ColorProfile, background = false): string {
@@ -143,21 +163,14 @@ export function toAnsiSequence(c: ColorDef, profile: ColorProfile, background = 
 
     case 'ansi':
       if (profile === ColorProfile.NoColor) return ''
-      return `\x1b[${prefix}${c.code}m`
+      return `\x1b[${ansi16Code(c.code, background)}m`
 
     case 'ansi256':
       if (profile === ColorProfile.NoColor) return ''
       if (profile === ColorProfile.ANSI) {
-        // Downgrade to 16 colors
-        const basic =
-          c.code < 16
-            ? c.code
-            : rgbToAnsi(
-                ((c.code - 16) % 36) * 51,
-                (Math.floor((c.code - 16) / 36) % 6) * 51,
-                Math.floor((c.code - 16) / 216) * 51
-              )
-        return `\x1b[${prefix}${basic}m`
+        // Downgrade to 16 colors via the same decomposition as colorToRgb
+        const basic = rgbToAnsiFromColor(c)
+        return `\x1b[${ansi16Code(basic, background)}m`
       }
       return `\x1b[${prefix}8;5;${c.code}m`
 

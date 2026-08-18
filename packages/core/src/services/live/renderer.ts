@@ -4,7 +4,7 @@
 import { Effect, Layer, Option, Ref, pipe } from 'effect'
 
 import type { StyleProps as AnsiStyle } from '@tuix/ansi'
-import { visualWidth, parseVisualCells, rgb } from '@tuix/ansi'
+import { visualWidth, parseVisualCells, joinVisualCells, rgb } from '@tuix/ansi'
 import { wrapStyledLine } from '@tuix/ansi'
 import { truncate } from '@tuix/ansi'
 import { RendererService } from '../renderer'
@@ -132,6 +132,33 @@ class ScreenBuffer {
     }
   }
 
+  /**
+   * Bounding box of the inked region (overlay hit-testing). Leading padding
+   * spaces from flow positioning are ignored — a click targets ink, and a
+   * modal lifted out of flow carries its position as leading whitespace.
+   * Returns null when nothing was inked this frame.
+   */
+  contentBounds(): { x: number; y: number; width: number; height: number } | null {
+    let minX = this.width
+    let minY = this.height
+    let maxX = -1
+    let maxY = -1
+    for (let y = 0; y < this.height; y++) {
+      const row = this.cells[y]!
+      for (let x = 0; x < this.width; x++) {
+        const cell = row[x]!
+        if (cell.painted && cell.char !== ' ') {
+          if (x < minX) minX = x
+          if (y < minY) minY = y
+          if (x > maxX) maxX = x
+          if (y > maxY) maxY = y
+        }
+      }
+    }
+    if (maxX < 0) return null
+    return { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 }
+  }
+
   writeText(x: number, y: number, text: string | { content?: string }): void {
     const raw =
       typeof text === 'string'
@@ -216,6 +243,24 @@ class ScreenBuffer {
 type Buffer = ScreenBuffer
 const Buffer = ScreenBuffer
 
+/**
+ * Clip a styled line to the [start, end) visual-column range without
+ * cutting escape sequences mid-way. Wide cells straddling a boundary
+ * are dropped whole.
+ */
+const clipLineVisual = (line: string, start: number, end: number): string => {
+  const cells = parseVisualCells(line)
+  const kept: typeof cells = []
+  let col = 0
+  for (const cell of cells) {
+    const cellWidth = Bun.stringWidth(cell.char)
+    if (col >= start && col + cellWidth <= end) kept.push(cell)
+    col += cellWidth
+    if (col >= end) break
+  }
+  return joinVisualCells(kept)
+}
+
 // -----------------------------------------------------------------------------
 // Implementation
 // -----------------------------------------------------------------------------
@@ -277,6 +322,10 @@ export const RendererServiceLive = Layer.effect(
       },
     }
     const state = yield* _(Ref.make(initialState))
+    /** Bounds of the painted overlay layer (backdrop hit-testing). */
+    const overlayBounds = yield* _(
+      Ref.make<{ x: number; y: number; width: number; height: number } | null>(null)
+    )
 
     // Dirty-region tracking (real): markDirty appends, optimizeDirtyRegions
     // merges overlapping/adjacent rects, clearDirtyRegions resets after paint.
@@ -320,6 +369,13 @@ export const RendererServiceLive = Layer.effect(
     // Clip region: applied by renderAt so writes stay inside the rect.
     let clipRegion: { x: number; y: number; width: number; height: number } | null = null
 
+    // Profiling toggle: when enabled, per-frame timings accumulate into
+    // a ring buffer exposed through getStats-adjacent logs. The stats
+    // themselves always update; profiling only controls the retention.
+    let profilingEnabled = false
+    const frameTimeHistory: number[] = []
+    const FRAME_HISTORY = 120
+
     const measureText = (
       text: string
     ): Effect.Effect<{ width: number; height: number; lineCount: number }, never, never> =>
@@ -332,8 +388,8 @@ export const RendererServiceLive = Layer.effect(
     const beginFrame = Effect.gen(function* (_) {
       frameStartRef.ts = Date.now()
       const size = yield* _(terminal.getSize)
-      const width = size.width ?? 80
-      const height = size.height ?? 24
+      const width = size.width && size.width > 0 ? size.width : 80
+      const height = size.height && size.height > 0 ? size.height : 24
       let back = yield* _(Ref.get(backBuffer))
       if (width !== back.width || height !== back.height) {
         back = new Buffer(width, height)
@@ -358,11 +414,24 @@ export const RendererServiceLive = Layer.effect(
     const endFrame = Effect.gen(function* (_) {
       const frameStart = frameStartRef.ts
       const frameElapsed = frameStart ? Date.now() - frameStart : 0
+      if (profilingEnabled) {
+        frameTimeHistory.push(frameElapsed)
+        if (frameTimeHistory.length > FRAME_HISTORY) frameTimeHistory.shift()
+      }
       const front = yield* _(Ref.get(frontBuffer))
       const back = yield* _(Ref.get(backBuffer))
 
       // Composite layers into back buffer
       yield* _(compositeLayers)
+
+      // Track the painted overlay extent for backdrop hit-testing.
+      {
+        const s = yield* _(Ref.get(state))
+        const overlay = s.layers.find(l => l.name === 'overlay')
+        yield* _(
+          Ref.set(overlayBounds, overlay && overlay.visible ? overlay.buffer.contentBounds() : null)
+        )
+      }
 
       // Diff front and back buffers
       const diff = front.diff(back)
@@ -453,8 +522,8 @@ export const RendererServiceLive = Layer.effect(
     const render = (view: View): Effect.Effect<void, RenderError, never> =>
       Effect.gen(function* (_) {
         const size = yield* _(terminal.getSize)
-        const width = size.width ?? 80
-        const height = size.height ?? 24
+        const width = size.width && size.width > 0 ? size.width : 80
+        const height = size.height && size.height > 0 ? size.height : 24
         const mainLayer = yield* _(ensureLayer('main', 0, width, height))
         mainLayer.buffer.clear()
         yield* _(paintViewToLayer(mainLayer, view, 0, 0))
@@ -550,6 +619,16 @@ export const RendererServiceLive = Layer.effect(
       Ref.set(state, s).pipe(
         Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'layout', cause })))
       )
+
+    // One-deep save/restore stack backing the interface's plain effects.
+    let stateSnapshot: RenderState | null = null
+    const saveStateVoid: Effect.Effect<void, RenderError, never> = Effect.gen(function* (_) {
+      stateSnapshot = yield* _(Ref.get(state))
+    })
+    const restoreStateVoid: Effect.Effect<void, RenderError, never> = Effect.gen(function* (_) {
+      if (!stateSnapshot) return
+      yield* _(restoreState(stateSnapshot))
+    })
 
     const renderViewToLayer = (
       view: View,
@@ -671,12 +750,16 @@ export const RendererServiceLive = Layer.effect(
           forcedRedraws: 0,
         },
       })),
-      setProfilingEnabled: () => noop,
+      setProfilingEnabled: enabled =>
+        Effect.sync(() => {
+          profilingEnabled = enabled
+          if (!enabled) frameTimeHistory.length = 0
+        }),
       renderAt: (view, x, y) =>
         Effect.gen(function* (_) {
           const size = yield* _(terminal.getSize)
-          const width = size.width ?? 80
-          const height = size.height ?? 24
+          const width = size.width && size.width > 0 ? size.width : 80
+          const height = size.height && size.height > 0 ? size.height : 24
           const mainLayer = yield* _(ensureLayer('main', 0, width, height))
           const rendered = yield* _(view.render())
           const content =
@@ -687,12 +770,14 @@ export const RendererServiceLive = Layer.effect(
           let lines = content.split('\n')
           if (clipRegion) {
             // Keep only the portion of the paint that intersects the clip rect.
+            // Slicing is visual-cell aware so SGR prefixes are never cut
+            // mid-escape and re-emitted intact for the surviving columns.
             lines = lines.map((line, index) => {
               const lineY = y + index
               if (lineY < clipRegion!.y || lineY >= clipRegion!.y + clipRegion!.height) return ''
               const start = Math.max(0, clipRegion!.x - x)
-              const end = Math.min(line.length, clipRegion!.x + clipRegion!.width - x)
-              return start >= end ? '' : line.slice(start, end)
+              const end = Math.min(visualWidth(line), clipRegion!.x + clipRegion!.width - x)
+              return start >= end ? '' : clipLineVisual(line, start, end)
             })
           }
           mainLayer.buffer.writeText(x, y, lines.join('\n'))
@@ -700,31 +785,25 @@ export const RendererServiceLive = Layer.effect(
       renderBatch: views =>
         Effect.gen(function* (_) {
           const size = yield* _(terminal.getSize)
-          const width = size.width ?? 80
-          const height = size.height ?? 24
+          const width = size.width && size.width > 0 ? size.width : 80
+          const height = size.height && size.height > 0 ? size.height : 24
           const mainLayer = yield* _(ensureLayer('main', 0, width, height))
           mainLayer.buffer.clear()
-          // Stack views vertically without clearing between paints —
-          // a batch is one frame, not N destructive frames.
-          let cursorY = 0
-          for (const view of views) {
+          // A batch is one frame, not N destructive frames — paint every
+          // item at its own coordinates instead of stacking at (0, 0).
+          for (const { view, x, y } of views) {
             const rendered = yield* _(view.render())
-            const content =
-              typeof rendered === 'string'
-                ? rendered
-                : String((rendered as { content?: string }).content ?? '')
-            mainLayer.buffer.writeText(0, cursorY, content)
-            const lines = content.split('\n').length
-            cursorY += lines
-            if (cursorY >= height) break
+            mainLayer.buffer.writeText(x, y, rendered)
           }
         }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause })))),
       setClipRegion: region =>
         Effect.sync(() => {
           clipRegion = region ? { ...region } : null
         }),
-      saveState: saveState as any,
-      restoreState: restoreState as any,
+      // The interface models save/restore as plain effects (a one-deep
+      // state stack).
+      saveState: saveStateVoid,
+      restoreState: restoreStateVoid,
       measureText,
       wrapText: (text: string, width?: number) =>
         Effect.succeed(
@@ -736,8 +815,8 @@ export const RendererServiceLive = Layer.effect(
       createLayer: (name, zIndex) =>
         Effect.gen(function* (_) {
           const size = yield* _(terminal.getSize)
-          const width = size.width ?? 80
-          const height = size.height ?? 24
+          const width = size.width && size.width > 0 ? size.width : 80
+          const height = size.height && size.height > 0 ? size.height : 24
           const id = nextLayerId++
           yield* _(
             Ref.update(state, s => ({
@@ -768,13 +847,13 @@ export const RendererServiceLive = Layer.effect(
           ),
           Effect.asVoid
         ),
-      renderToLayer: (view, name) =>
+      renderToLayer: (name: string, view: View, x = 0, y = 0) =>
         Effect.gen(function* (_) {
           const s = yield* _(Ref.get(state))
           const layer = s.layers.find(l => l.name === name)
           if (layer) {
             const rendered = yield* _(view.render())
-            layer.buffer.writeText(0, 0, rendered as any)
+            layer.buffer.writeText(x, y, rendered)
           }
         }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause })))),
       setLayerVisible: (name, visible) =>
@@ -784,6 +863,7 @@ export const RendererServiceLive = Layer.effect(
         })).pipe(Effect.asVoid),
       compositeLayers,
       getLayers,
+      getOverlayBounds: Ref.get(overlayBounds),
     } as any)
   })
 )

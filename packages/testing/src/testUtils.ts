@@ -19,6 +19,7 @@ import type {
   Cmd,
 } from '@tuix/core/types'
 import { TerminalError, InputError, RenderError, StorageError } from '@tuix/core/types/errors'
+import { visualWidth, wrapStyledLine, truncate } from '@tuix/ansi'
 
 // =============================================================================
 // Test Environment
@@ -414,18 +415,19 @@ export const createMockRendererService = (): MockRendererService => {
     restoreState: Effect.sync(() => {}),
 
     measureText: (text: string) =>
-      Effect.succeed({
-        width: text.length,
-        height: 1,
-        lineCount: 1,
+      Effect.sync(() => {
+        const lines = text.split('\n')
+        const width = Math.max(0, ...lines.map(line => visualWidth(line)))
+        return { width, height: lines.length, lineCount: lines.length }
       }),
 
-    wrapText: (text: string, width: number, _options) => Effect.succeed([text.slice(0, width)]),
+    wrapText: (text: string, width: number, _options) =>
+      Effect.succeed(
+        width > 0 ? text.split('\n').flatMap(line => wrapStyledLine(line, width)) : text.split('\n')
+      ),
 
     truncateText: (text: string, width: number, ellipsis = '...') =>
-      Effect.succeed(
-        text.length <= width ? text : text.slice(0, width - ellipsis.length) + ellipsis
-      ),
+      Effect.succeed(visualWidth(text) <= width ? text : truncate(text, width, ellipsis)),
 
     createLayer: (_name, _zIndex) => Effect.sync(() => {}),
     removeLayer: _name => Effect.sync(() => {}),
@@ -436,6 +438,7 @@ export const createMockRendererService = (): MockRendererService => {
       }),
     setLayerVisible: (_layerName, _visible) => Effect.sync(() => {}),
     compositeLayers: Effect.sync(() => {}),
+    getOverlayBounds: Effect.succeed(null),
 
     // Testing utilities
     getLastFrame: () => {

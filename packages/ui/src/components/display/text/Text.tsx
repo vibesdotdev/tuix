@@ -31,7 +31,7 @@
  */
 
 import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
-import { style, colors, color, parseColor, type Style, type Color } from '@tuix/ansi'
+import { style, colors, color, parseColor, Style, type StyleProps, type Color } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view/string/width'
 
 export interface TextProps {
@@ -84,15 +84,20 @@ function childrenToText(children: TextProps['children'] | unknown): string {
   return String(children)
 }
 
+/** Extract mergeable props from a Style instance or plain style object. */
+function styleToProps(value: Style | undefined): Partial<StyleProps> {
+  if (!value) return {}
+  if (value instanceof Style) return value.toProps()
+  return { ...value }
+}
+
 export function Text(props: TextProps): JSX.Element {
   // Convert children to string (arrays must not use Array#toString → "a,b")
   const content = childrenToText(props.children)
 
   // Computed style
   const textStyle = $derived(() => {
-    const baseStyle: Style = {
-      ...props.style,
-    }
+    const baseStyle: Partial<StyleProps> = styleToProps(props.style)
 
     // Colors - map to correct property names (foreground/background) and convert strings
     if (props.color) baseStyle.foreground = parseColor(props.color)
@@ -110,15 +115,14 @@ export function Text(props: TextProps): JSX.Element {
     if (props.italic) baseStyle.italic = true
     if (props.underline) baseStyle.underline = true
     if (props.strikethrough) baseStyle.strikethrough = true
-    if (props.dim) baseStyle.dim = true
-    if (props.bright) baseStyle.bright = true
-    if (props.inverse) baseStyle.inverse = true
+    if (props.dim) baseStyle.faint = true
+    if (props.inverse) baseStyle.reverse = true
 
     // Effects
     if (props.blink) baseStyle.blink = true
 
     // Layout
-    if (props.align) baseStyle.textAlign = props.align
+    if (props.align) baseStyle.align = props.align
     if (props.width) baseStyle.width = props.width
 
     return style(baseStyle)
@@ -221,7 +225,7 @@ function RainbowText(props: TextProps): JSX.Element {
 
   $effect(() => {
     const interval = setInterval(() => {
-      colorIndex.$set((colorIndex() + 1) % colors.length)
+      colorIndex.$set((colorIndex() + 1) % rainbowColors.length)
     }, 100)
 
     return () => clearInterval(interval)

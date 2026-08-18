@@ -50,6 +50,22 @@ describe('ANSI core utilities', () => {
     expect(truncate('短い', 4)).toBe('短い')
   })
 
+  test('truncate keeps styling when nothing is truncated', () => {
+    expect(truncate('\u001b[31mred\u001b[0m', 10)).toBe('\u001b[31mred\u001b[0m')
+  })
+
+  test('truncate keeps SGR prefix across the cut', () => {
+    const result = truncate('\u001b[1mhello world\u001b[0m', 8)
+    expect(visualWidth(result)).toBe(8)
+    expect(result.startsWith('\u001b[1m')).toBe(true)
+    expect(result).toContain('...')
+  })
+
+  test('truncate slices the suffix itself when it cannot fit', () => {
+    expect(truncate('hello', 2)).toBe('..')
+    expect(visualWidth(truncate('hello', 2))).toBe(2)
+  })
+
   test('pad adds spacing according to alignment', () => {
     expect(pad('hi', 4)).toBe('hi  ')
     expect(pad('hi', 4, 'right')).toBe('  hi')

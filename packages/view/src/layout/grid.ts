@@ -9,7 +9,9 @@
  */
 
 import { Effect } from 'effect'
+import { parseVisualCells } from '@tuix/ansi'
 import type { View } from '@tuix/view/types'
+import { unwrapRendered } from '@tuix/view/primitives/view'
 import {
   type GridProps,
   type GridItem,
@@ -34,9 +36,12 @@ const calculateAutoSize = (
   totalFractions: number,
   fractionSize: number
 ): number => {
-  // Auto tracks should take up remaining space after fixed tracks
-  // For now, treat as 1fr but with a minimum size
-  return Math.max(fractionSize, 10)
+  // Auto behaves as 1fr: take its share of the container. The old
+  // floor of 10 ignored the container height and pushed tracks past
+  // the buffer edge (items silently clipped).
+  void availableSize
+  void totalFractions
+  return Math.max(1, Math.floor(fractionSize))
 }
 
 /**
@@ -127,12 +132,12 @@ const renderChildToGridBuffer = (
   const lines = content.split('\n')
 
   for (let y = 0; y < lines.length && y < bounds.height; y++) {
-    const line = lines[y] ?? ''
-    const chars = [...line]
+    const cells = parseVisualCells(lines[y] ?? '')
 
-    for (let x = 0; x < chars.length && x < bounds.width; x++) {
+    for (let x = 0; x < cells.length && x < bounds.width; x++) {
       const bufferY = bounds.y + y
       const bufferX = bounds.x + x
+      const cell = cells[x]
 
       if (
         bufferY >= 0 &&
@@ -140,9 +145,9 @@ const renderChildToGridBuffer = (
         bufferX >= 0 &&
         bufferX < bufferWidth &&
         buffer[bufferY] &&
-        chars[x]
+        cell
       ) {
-        buffer[bufferY][bufferX] = chars[x] ?? ' '
+        buffer[bufferY][bufferX] = `${cell.prefix}${cell.char}`
       }
     }
   }
@@ -272,11 +277,13 @@ const getCellBounds = (
     }
   }
 
-  // Handle explicit placement
-  let colStart = 0
-  let colEnd = 1
-  let rowStart = 0
-  let rowEnd = 1
+  // Handle explicit placement. When column/row is not specified, the
+  // start defaults to auto-placement order (the child's index) so that
+  // span-only placements (e.g. span(view, 2, 1)) still position correctly.
+  let colStart = itemIndex % columnCount
+  let rowStart = Math.floor(itemIndex / columnCount)
+  let colEnd: number
+  let rowEnd: number
 
   if (placement.column !== undefined) {
     if (typeof placement.column === 'number') {
@@ -286,6 +293,8 @@ const getCellBounds = (
       colStart = placement.column.start
       colEnd = placement.column.end
     }
+  } else {
+    colEnd = colStart + (placement.columnSpan ?? 1)
   }
 
   if (placement.row !== undefined) {
@@ -296,6 +305,8 @@ const getCellBounds = (
       rowStart = placement.row.start
       rowEnd = placement.row.end
     }
+  } else {
+    rowEnd = rowStart + (placement.rowSpan ?? 1)
   }
 
   return { colStart, colEnd, rowStart, rowEnd }
@@ -344,10 +355,16 @@ const calculateGridLayout = (
   const columnSizes = calculateTrackSizes(template.columns, availableWidth, columnGap)
   const columnPositions = calculateTrackPositions(columnSizes, columnGap)
 
-  // Calculate row sizing based on template or auto-generate
+  // Calculate row sizing based on template or auto-generate.
   const rowCount = Math.ceil(items.length / template.columns.length)
-  const rows =
-    template.rows.length > 0 ? template.rows : generateAutoRows(rowCount, availableHeight)
+  // The template may declare fewer rows than the items need (e.g.
+  // `columns(n)` ships one row); extend with auto tracks so overflow
+  // items get a real cell instead of a zero-height clip.
+  const templateRows = template.rows.length > 0 ? [...template.rows] : []
+  while (templateRows.length < rowCount) {
+    templateRows.push({ type: 'auto' })
+  }
+  const rows = templateRows
 
   const rowSizes = calculateTrackSizes(rows, availableHeight, rowGap)
   const rowPositions = calculateTrackPositions(rowSizes, rowGap)
@@ -454,7 +471,7 @@ export const grid = (items: ReadonlyArray<GridItem | View>, props: GridProps = {
 
         // Render each child into the buffer
         for (const child of layout.children) {
-          const content = yield* _(child.view.render())
+          const content = unwrapRendered(yield* _(child.view.render()))
           renderChildToGridBuffer(buffer, content, child.bounds, totalWidth, totalHeight)
         }
 

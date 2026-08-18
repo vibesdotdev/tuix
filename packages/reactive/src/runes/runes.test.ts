@@ -1,6 +1,23 @@
 import { test, expect, describe } from 'bun:test'
 import { $state, $derived, $bindable, isBindableRune } from './runes'
-import { untrack } from './jsx-lifecycle'
+import { untrack, tick, initComponent } from './jsx-lifecycle'
+
+describe('tick', () => {
+  test('resolves after pending updates flush (real promise, not an Effect)', async () => {
+    let resolved = false
+    const p = tick().then(() => {
+      resolved = true
+    })
+    expect(resolved).toBe(false)
+    await p
+    expect(resolved).toBe(true)
+  })
+
+  test('coalesces concurrent tick() calls into one flush', async () => {
+    initComponent()
+    await Promise.all([tick(), tick(), tick()])
+  })
+})
 
 describe('$state', () => {
   test('get/set/update', () => {
@@ -35,6 +52,29 @@ describe('$derived', () => {
     a.$set(2)
     expect(d()).toBe(2)
     expect(calls).toBe(2)
+  })
+
+  test('nested derivations recompute when the inner dependency changes', () => {
+    const inner = $state(2)
+    const mid = $derived(() => inner() * 10)
+    const outer = $derived(() => mid() + 2)
+    expect(outer()).toBe(22)
+    inner.$set(10)
+    expect(mid()).toBe(100)
+    expect(outer()).toBe(102)
+  })
+
+  test('derived runes are subscribable', () => {
+    const count = $state(1)
+    const doubled = $derived(() => count() * 2)
+    const seen: number[] = []
+    const stop = doubled.$subscribe(v => seen.push(v))
+    expect(seen).toEqual([2])
+    count.$set(3)
+    expect(seen).toEqual([2, 6])
+    stop()
+    count.$set(4)
+    expect(seen).toEqual([2, 6])
   })
 })
 

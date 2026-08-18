@@ -28,6 +28,7 @@
     "typecheck": "tsc --noEmit --pretty false"
   },
   "dependencies": {
+    "@tuix/ansi": "workspace:*",
     "@tuix/core": "workspace:*",
     "@tuix/input": "workspace:*",
     "@tuix/runtime": "workspace:*",

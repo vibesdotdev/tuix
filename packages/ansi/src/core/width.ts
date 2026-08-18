@@ -1,4 +1,5 @@
 import { stripAnsi } from './strip'
+import { joinVisualCells, parseVisualCells } from '../graphics/cells'
 
 /**
  * Calculate the visual width of a string in terminal columns
@@ -14,28 +15,29 @@ export const visualWidth = (input: string): number => {
   return Bun.stringWidth(cleaned)
 }
 
+const sliceByWidth = (input: string, maxWidth: number): string => {
+  const cells = parseVisualCells(input)
+  let width = 0
+  let used = 0
+  for (; used < cells.length; used++) {
+    const cell = cells[used]!
+    const charWidth = Bun.stringWidth(cell.char)
+    if (width + charWidth > maxWidth) break
+    width += charWidth
+  }
+  return joinVisualCells(cells.slice(0, used))
+}
+
 export const truncate = (input: string, maxWidth: number, suffix = '...'): string => {
   if (maxWidth <= 0) return ''
 
   const inputWidth = visualWidth(input)
-  if (inputWidth <= maxWidth) return stripAnsi(input)
+  if (inputWidth <= maxWidth) return input
 
   const suffixWidth = visualWidth(suffix)
-  const target = Math.max(0, maxWidth - suffixWidth)
+  if (suffixWidth >= maxWidth) return sliceByWidth(suffix, maxWidth)
 
-  let width = 0
-  let result = ''
-  const cleaned = stripAnsi(input)
-
-  // Iterate through grapheme clusters for proper emoji/character handling
-  for (const char of cleaned) {
-    const charWidth = Bun.stringWidth(char)
-    if (width + charWidth > target) break
-    width += charWidth
-    result += char
-  }
-
-  return result + suffix
+  return sliceByWidth(input, maxWidth - suffixWidth) + suffix
 }
 
 export const pad = (

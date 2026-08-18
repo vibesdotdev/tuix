@@ -24,9 +24,15 @@ async function paint(node: unknown): Promise<string> {
 describe('Tuix kit primitives', () => {
   test('Button paints primary and danger labels', async () => {
     const primary = await paint(<Button variant="primary">Save</Button>)
+    const focused = await paint(
+      <Button variant="primary" focused>
+        Save
+      </Button>
+    )
     const danger = await paint(<Button variant="danger">Delete</Button>)
     expect(primary).toContain('Save')
-    expect(primary).toContain('[')
+    expect(primary).toContain('(')
+    expect(focused).toContain('[')
     expect(danger).toContain('Delete')
     expect(danger).toContain('!')
     expect(primary).not.toContain('[object Object]')

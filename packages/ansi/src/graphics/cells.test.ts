@@ -44,4 +44,25 @@ describe('visual cells', () => {
     expect(cells[0]?.prefix).toContain('\x1b[31m')
     expect(padVisual('\x1b[31mHi\x1b[0m', 2)).toContain('\x1b[31m')
   })
+
+  test('256-color indices decode via the 6x6x6 cube and grayscale ramp', () => {
+    // 196 = pure red in the color cube
+    const red = parseVisualCells('\x1b[38;5;196mX\x1b[0m')
+    expect(red[0]?.fg).toEqual({ r: 255, g: 0, b: 0 })
+    // 21 = pure blue
+    const blue = parseVisualCells('\x1b[38;5;21mX\x1b[0m')
+    expect(blue[0]?.fg).toEqual({ r: 0, g: 0, b: 255 })
+    // 244 = mid gray on the 232-255 ramp
+    const gray = parseVisualCells('\x1b[38;5;244mX\x1b[0m')
+    expect(gray[0]?.fg).toEqual({ r: 128, g: 128, b: 128 })
+  })
+
+  test('non-SGR escapes are ignored, not emitted into cells', () => {
+    const cells = parseVisualCells('\x1b[31mA\x1b[2JB\x1b]0;title\x07C')
+    expect(cells).toHaveLength(3)
+    expect(cells.map(cell => cell.char).join('')).toBe('ABC')
+    // cursor-erase and OSC sequences must not leak into cell prefixes
+    expect(cells[1]?.prefix).not.toContain('\x1b[2J')
+    expect(cells[2]?.prefix).not.toContain('\x1b]')
+  })
 })

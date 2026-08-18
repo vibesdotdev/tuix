@@ -2,6 +2,7 @@
 
 import type { ThemeVariant } from '../../../theme'
 import { useUITheme } from '../../../theme'
+import { registerOverlayKeyHandler, registerBackdropHandler } from '@tuix/reactive'
 import { Button } from '../../forms/button/Button'
 
 export interface ModalProps {
@@ -14,7 +15,7 @@ export interface ModalProps {
   readonly variant?: ThemeVariant
   readonly showCloseButton?: boolean
   readonly closeOnEscape?: boolean
-  /** Not yet wired: dismissal via a backdrop click needs overlay hit-testing. */
+  /** Dismiss via a click that misses the painted overlay (backdrop hit-testing). */
   readonly closeOnBackdrop?: boolean
   readonly onClose?: () => void
   readonly onConfirm?: () => void
@@ -42,6 +43,7 @@ export function Modal(props: ModalProps): JSX.Element | null {
   const { depth } = useUITheme()
   const showCloseButton = props.showCloseButton ?? true
   const closeOnEscape = props.closeOnEscape ?? true
+  const closeOnBackdrop = props.closeOnBackdrop ?? false
   const confirmLabel = props.confirmLabel ?? 'Confirm'
   const cancelLabel = props.cancelLabel ?? 'Cancel'
 
@@ -49,13 +51,32 @@ export function Modal(props: ModalProps): JSX.Element | null {
     if ((key === 'Escape' || key === 'escape') && closeOnEscape) {
       props.onClose?.()
     }
-    if (key === 'Enter' || key === ' ') {
+    if (key === 'Enter' || key === 'enter' || key === ' ') {
       props.onConfirm?.()
     }
   }
 
+  // While open, the modal owns keys (overlay priority) and — with
+  // closeOnBackdrop — dismisses on clicks that miss the painted overlay.
+  // Registrations are re-made every render and swept after each frame.
+  registerOverlayKeyHandler(key => {
+    handleKeyPress(key)
+    return false
+  })
+  if (closeOnBackdrop) {
+    registerBackdropHandler(() => props.onClose?.())
+  }
+
+  // Center the overlay when explicit dimensions allow computing an origin.
+  const cols = Math.max(60, process.stdout.columns ?? 80)
+  const rows = Math.max(24, process.stdout.rows ?? 24)
+  const originX =
+    props.width != null ? Math.max(0, Math.floor((cols - props.width) / 2)) : undefined
+  const originY =
+    props.height != null ? Math.max(0, Math.floor((rows - props.height) / 2)) : undefined
+
   return (
-    <overlay>
+    <overlay x={originX} y={originY}>
       <interactive className={props.className} focusable onKeyPress={handleKeyPress}>
         <box
           border="rounded"

@@ -6,14 +6,8 @@
  */
 
 import { Effect } from 'effect'
-import {
-  ScopeDef,
-  ScopeState,
-  ScopeStatus,
-  ScopeError,
-  ScopeNotFoundError,
-  ScopeExistsError,
-} from './types'
+import type { ScopeDef, ScopeState, ScopeStatus } from './types'
+import { ScopeError, ScopeNotFoundError, ScopeExistsError } from './types'
 import { getGlobalEventBus } from '@tuix/core/events'
 import { getGlobalRegistry } from '@tuix/core'
 
@@ -394,6 +388,7 @@ export class ScopeManager {
   clear(): void {
     this.scopes.clear()
     this.activeScopes.clear()
+    this.fallback = null
   }
 
   /**
@@ -601,20 +596,6 @@ export class ScopeManager {
    */
   clearFallback(): void {
     this.fallback = null
-  }
-}
-
-/**
- * Scope error types
- */
-export class ScopeError extends Error {
-  constructor(
-    message: string,
-    public scopeId?: string,
-    public cause?: unknown
-  ) {
-    super(message)
-    this.name = 'ScopeError'
   }
 }
 

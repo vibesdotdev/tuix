@@ -10,7 +10,7 @@
 
 import { Effect } from 'effect'
 import type { View, AppServices } from '@tuix/view/types'
-import { View as ViewCore } from '@tuix/view/primitives/view'
+import { View as ViewCore, unwrapRendered } from '@tuix/view/primitives/view'
 
 // =============================================================================
 // Types
@@ -193,7 +193,7 @@ export const dynamicVBox = (
         for (let i = 0; i < children.length; i++) {
           const child = children[i]
           if (child) {
-            const rendered = yield* _(child.render())
+            const rendered = unwrapRendered(yield* _(child.render()))
             renderedChildren.push({ rendered, index: i })
           }
         }
@@ -224,7 +224,7 @@ export const heightAwareContainer = (
   return {
     render: () =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(content.render())
+        const rendered = unwrapRendered(yield* _(content.render()))
         const lines = rendered.split('\n')
         const actualHeight = lines.length
 
@@ -256,7 +256,7 @@ export const paddedContainer = (
   return {
     render: () =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(content.render())
+        const rendered = unwrapRendered(yield* _(content.render()))
         const lines = rendered.split('\n')
 
         // Add left/right padding to each line
@@ -315,7 +315,7 @@ export const scrollableView = (
   return {
     render: () =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(content.render())
+        const rendered = unwrapRendered(yield* _(content.render()))
         const lines = rendered.split('\n')
 
         // Extract viewport

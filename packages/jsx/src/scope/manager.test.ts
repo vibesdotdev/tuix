@@ -219,6 +219,7 @@ describe('ScopeManager', () => {
         path: ['app'],
         type: 'component',
         name: 'Clearable',
+        children: [],
       }
 
       await Effect.runPromise(scopeManager.registerScope(scopeDef))
@@ -226,6 +227,17 @@ describe('ScopeManager', () => {
 
       scopeManager.clear()
       expect(scopeManager.getAllScopes()).toHaveLength(0)
+    })
+
+    test('should clear fallback on clear() so it does not leak into the next app run', () => {
+      scopeManager.setFallback({
+        component: () => null,
+        metadata: { from: 'previous-app' },
+      })
+      expect(scopeManager.getFallback()).not.toBeNull()
+
+      scopeManager.clear()
+      expect(scopeManager.getFallback()).toBeNull()
     })
   })
 })

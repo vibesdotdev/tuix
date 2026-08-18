@@ -2,23 +2,29 @@
  * Tabs Component Tests
  */
 
-import { describe, it, expect, beforeEach } from 'bun:test'
+import { describe, it, expect } from 'bun:test'
+import { Effect } from 'effect'
+import { toView } from '@tuix/jsx'
 import { Tabs, Tab, SimpleTabs, PillTabs, VerticalTabs } from './Tabs.js'
 import { $state } from '@tuix/reactive'
+
+async function paint(node: unknown): Promise<string> {
+  const view = toView(node)
+  const out = await Effect.runPromise(view.render())
+  return typeof out === 'string' ? out : out.content
+}
 
 describe('Tabs Component', () => {
   describe('Basic rendering', () => {
     it('should render tabs with content', () => {
       const component = Tabs({
         children: [
-          Tab({
-            label: 'Tab 1',
-            children: <text>Content 1</text>,
-          }),
-          Tab({
-            label: 'Tab 2',
-            children: <text>Content 2</text>,
-          }),
+          <Tab label="Tab 1">
+            <text>Content 1</text>
+          </Tab>,
+          <Tab label="Tab 2">
+            <text>Content 2</text>
+          </Tab>,
         ],
       })
 
@@ -29,16 +35,12 @@ describe('Tabs Component', () => {
     it('should render tabs with icons', () => {
       const component = Tabs({
         children: [
-          Tab({
-            label: 'Settings',
-            icon: '⚙️',
-            children: <text>Settings content</text>,
-          }),
-          Tab({
-            label: 'Profile',
-            icon: '👤',
-            children: <text>Profile content</text>,
-          }),
+          <Tab label="Settings" icon="⚙️">
+            <text>Settings content</text>
+          </Tab>,
+          <Tab label="Profile" icon="👤">
+            <text>Profile content</text>
+          </Tab>,
         ],
       })
 
@@ -48,43 +50,54 @@ describe('Tabs Component', () => {
     it('should render tabs with badges', () => {
       const component = Tabs({
         children: [
-          Tab({
-            label: 'Messages',
-            badge: 5,
-            children: <text>Messages content</text>,
-          }),
-          Tab({
-            label: 'Notifications',
-            badge: 'New',
-            children: <text>Notifications content</text>,
-          }),
+          <Tab label="Messages" badge={5}>
+            <text>Messages content</text>
+          </Tab>,
+          <Tab label="Notifications" badge="New">
+            <text>Notifications content</text>
+          </Tab>,
         ],
       })
 
       expect(component).toBeDefined()
+    })
+
+    it('should paint labels and content from real JSX children', async () => {
+      const content = await paint(
+        <Tabs>
+          <Tab label="Alpha">
+            <text>Alpha content</text>
+          </Tab>
+          <Tab label="Beta">
+            <text>Beta content</text>
+          </Tab>
+        </Tabs>
+      )
+
+      expect(content).toContain('Alpha')
+      expect(content).toContain('Beta')
+      expect(content).toContain('Alpha content')
+      expect(content).not.toContain('[tab]')
+      expect(content).not.toContain('[object Object]')
     })
   })
 
   describe('Tab selection', () => {
     it('should handle controlled active index', () => {
       const activeIndex = $state(1)
-      let changeCalled = false
 
       const component = Tabs({
         activeIndex,
         onTabChange: index => {
-          changeCalled = true
           expect(index).toBe(0)
         },
         children: [
-          Tab({
-            label: 'Tab 1',
-            children: <text>Content 1</text>,
-          }),
-          Tab({
-            label: 'Tab 2',
-            children: <text>Content 2</text>,
-          }),
+          <Tab label="Tab 1">
+            <text>Content 1</text>
+          </Tab>,
+          <Tab label="Tab 2">
+            <text>Content 2</text>
+          </Tab>,
         ],
       })
 
@@ -94,14 +107,12 @@ describe('Tabs Component', () => {
     it('should handle uncontrolled active index', () => {
       const component = Tabs({
         children: [
-          Tab({
-            label: 'Tab 1',
-            children: <text>Content 1</text>,
-          }),
-          Tab({
-            label: 'Tab 2',
-            children: <text>Content 2</text>,
-          }),
+          <Tab label="Tab 1">
+            <text>Content 1</text>
+          </Tab>,
+          <Tab label="Tab 2">
+            <text>Content 2</text>
+          </Tab>,
         ],
       })
 
@@ -119,16 +130,12 @@ describe('Tabs Component', () => {
           expect(index).toBeGreaterThanOrEqual(0)
         },
         children: [
-          Tab({
-            label: 'Closeable Tab',
-            closeable: true,
-            children: <text>Can be closed</text>,
-          }),
-          Tab({
-            label: 'Fixed Tab',
-            closeable: false,
-            children: <text>Cannot be closed</text>,
-          }),
+          <Tab label="Closeable Tab" closeable>
+            <text>Can be closed</text>
+          </Tab>,
+          <Tab label="Fixed Tab" closeable={false}>
+            <text>Cannot be closed</text>
+          </Tab>,
         ],
       })
 
@@ -138,20 +145,34 @@ describe('Tabs Component', () => {
     it('should handle disabled tabs', () => {
       const component = Tabs({
         children: [
-          Tab({
-            label: 'Active Tab',
-            disabled: false,
-            children: <text>Active content</text>,
-          }),
-          Tab({
-            label: 'Disabled Tab',
-            disabled: true,
-            children: <text>Disabled content</text>,
-          }),
+          <Tab label="Active Tab" disabled={false}>
+            <text>Active content</text>
+          </Tab>,
+          <Tab label="Disabled Tab" disabled>
+            <text>Disabled content</text>
+          </Tab>,
         ],
       })
 
       expect(component).toBeDefined()
+    })
+
+    it('should not recurse forever when moving focus with all tabs disabled', () => {
+      const component = Tabs({
+        autoFocus: true,
+        children: [
+          <Tab label="A" disabled>
+            <text>A</text>
+          </Tab>,
+          <Tab label="B" disabled>
+            <text>B</text>
+          </Tab>,
+        ],
+      })
+
+      const onKeyPress = (component.props as { onKeyPress: (key: string) => void }).onKeyPress
+      expect(typeof onKeyPress).toBe('function')
+      expect(() => onKeyPress('ArrowRight')).not.toThrow()
     })
   })
 
@@ -160,14 +181,12 @@ describe('Tabs Component', () => {
       const component = Tabs({
         orientation: 'horizontal',
         children: [
-          Tab({
-            label: 'Tab 1',
-            children: <text>Content 1</text>,
-          }),
-          Tab({
-            label: 'Tab 2',
-            children: <text>Content 2</text>,
-          }),
+          <Tab label="Tab 1">
+            <text>Content 1</text>
+          </Tab>,
+          <Tab label="Tab 2">
+            <text>Content 2</text>
+          </Tab>,
         ],
       })
 
@@ -178,14 +197,12 @@ describe('Tabs Component', () => {
       const component = Tabs({
         orientation: 'vertical',
         children: [
-          Tab({
-            label: 'Tab 1',
-            children: <text>Content 1</text>,
-          }),
-          Tab({
-            label: 'Tab 2',
-            children: <text>Content 2</text>,
-          }),
+          <Tab label="Tab 1">
+            <text>Content 1</text>
+          </Tab>,
+          <Tab label="Tab 2">
+            <text>Content 2</text>
+          </Tab>,
         ],
       })
 
@@ -201,10 +218,9 @@ describe('Tabs Component', () => {
         const component = Tabs({
           tabPosition: position,
           children: [
-            Tab({
-              label: 'Tab',
-              children: <text>Content</text>,
-            }),
+            <Tab label="Tab">
+              <text>Content</text>
+            </Tab>,
           ],
         })
 
@@ -217,14 +233,12 @@ describe('Tabs Component', () => {
     it('should render SimpleTabs', () => {
       const component = SimpleTabs({
         children: [
-          Tab({
-            label: 'Simple 1',
-            children: <text>Content 1</text>,
-          }),
-          Tab({
-            label: 'Simple 2',
-            children: <text>Content 2</text>,
-          }),
+          <Tab label="Simple 1">
+            <text>Content 1</text>
+          </Tab>,
+          <Tab label="Simple 2">
+            <text>Content 2</text>
+          </Tab>,
         ],
       })
 
@@ -235,14 +249,12 @@ describe('Tabs Component', () => {
     it('should render PillTabs', () => {
       const component = PillTabs({
         children: [
-          Tab({
-            label: 'Pill 1',
-            children: <text>Content 1</text>,
-          }),
-          Tab({
-            label: 'Pill 2',
-            children: <text>Content 2</text>,
-          }),
+          <Tab label="Pill 1">
+            <text>Content 1</text>
+          </Tab>,
+          <Tab label="Pill 2">
+            <text>Content 2</text>
+          </Tab>,
         ],
       })
 
@@ -253,14 +265,12 @@ describe('Tabs Component', () => {
     it('should render VerticalTabs', () => {
       const component = VerticalTabs({
         children: [
-          Tab({
-            label: 'Vertical 1',
-            children: <text>Content 1</text>,
-          }),
-          Tab({
-            label: 'Vertical 2',
-            children: <text>Content 2</text>,
-          }),
+          <Tab label="Vertical 1">
+            <text>Content 1</text>
+          </Tab>,
+          <Tab label="Vertical 2">
+            <text>Content 2</text>
+          </Tab>,
         ],
       })
 

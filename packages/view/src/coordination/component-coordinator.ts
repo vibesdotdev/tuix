@@ -93,7 +93,7 @@ export class ComponentCoordinator {
 
         // Clean up event handlers
         for (const unsubscribe of coordination.eventUnsubscribes) {
-          unsubscribe()
+          yield* unsubscribe()
         }
 
         // Execute pattern cleanup
@@ -169,7 +169,7 @@ interface ActiveCoordination {
   config: Record<string, unknown>
   startTime: Date
   state: 'active' | 'stopping' | 'stopped'
-  eventUnsubscribes: (() => void)[]
+  eventUnsubscribes: (() => Effect.Effect<void, never>)[]
   /** Bus the coordination publishes through (patterns need it to react). */
   eventBus: EventBus
 }

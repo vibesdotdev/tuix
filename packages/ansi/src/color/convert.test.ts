@@ -247,6 +247,18 @@ describe('toAnsiSequence', () => {
     expect(result).toMatch(/\[3[0-9]m/) // Foreground ANSI
   })
 
+  test('should map bright ANSI codes 8-15 to 90-97 / 100-107', () => {
+    expect(toAnsiSequence(ansi(9), ColorProfile.ANSI, false)).toBe('\x1b[91m')
+    expect(toAnsiSequence(ansi(8), ColorProfile.ANSI, true)).toBe('\x1b[100m')
+  })
+
+  test('should downgrade ansi256 to a sensible basic color', () => {
+    // 196 is pure red in the 6x6x6 cube; the ANSI downgrade must be red.
+    expect(toAnsiSequence(ansi256(196), ColorProfile.ANSI, false)).toBe('\x1b[31m')
+    // 21 is pure blue.
+    expect(toAnsiSequence(ansi256(21), ColorProfile.ANSI, false)).toBe('\x1b[34m')
+  })
+
   test('should return empty for NoColor profile', () => {
     const color = rgb(255, 0, 0)
     const result = toAnsiSequence(color, ColorProfile.NoColor, false)

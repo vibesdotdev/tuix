@@ -1,15 +1,14 @@
 /**
  * ScopeFallback Component
  *
- * Renders when scope is active but no ScopeContent will render.
- * This is where help text typically appears.
+ * Renders when a scope is active but none of its child scopes will
+ * render. This is where help text typically appears.
  */
 
-import { scopeManager } from '../../manager'
+import { scopeManager } from '../manager'
+import { activeRouteStore } from '../stores/activeRoute.store'
 import { jsx } from '@tuix/jsx'
 import type { JSX } from '@tuix/jsx'
-// Don't import CLI components directly - this violates module boundaries
-// Instead, accept a fallback component as a prop
 
 export interface ScopeFallbackProps {
   scopeId: string
@@ -19,12 +18,13 @@ export interface ScopeFallbackProps {
 export function ScopeFallback(props: ScopeFallbackProps): JSX.Element {
   const { scopeId, fallback } = props
 
-  // Skip child checking during registration phase to avoid blocking
-  // During runtime, this would check if child scopes will render
-  const anyChildWillRender = false // Skip during registration
+  // A child of this scope matching the active route means real content
+  // renders — the fallback should stay out of the way.
+  const anyChildWillRender = scopeManager
+    .getAllScopes()
+    .some(scope => scope.parentId === scopeId && activeRouteStore.matches(scope.path ?? []))
 
   if (anyChildWillRender) {
-    // A child will render - don't show fallback
     return jsx('text', { children: '' })
   }
 

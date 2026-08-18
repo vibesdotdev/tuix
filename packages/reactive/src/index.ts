@@ -42,6 +42,24 @@ export type {
   BindableOptions,
   MvuSetMsg,
 } from './runes/runes'
+export {
+  registerFocusable,
+  unregisterFocusable,
+  getFocusedId,
+  setFocusedId,
+  isFocused,
+  cycleFocus,
+  focusCount,
+  dispatchFocusedKey,
+  sweepFocusables,
+  resetFocus,
+  registerOverlayKeyHandler,
+  registerBackdropHandler,
+  dispatchOverlayKey,
+  hasOverlayKeyHandlers,
+  dispatchBackdropClick,
+} from './runes/focus'
+export type { ScopedKeyHandler } from './runes/focus'
 export * from './runes/events'
 export * from './runes/module'
 export * from './runes/jsx-lifecycle'

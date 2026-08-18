@@ -3,6 +3,7 @@ import FooPlugin from './plugin/foo'
 import HelloCommand from './commands/hello-test'
 import StudioHome from './commands/studio-home'
 import Kit from './commands/kit'
+import Forms from './commands/forms'
 import ShowcaseCommand from './commands/showcase'
 import Widgets from './commands/widgets'
 import AIChatDemo from './commands/ai-chat-demo'
@@ -23,6 +24,11 @@ export default function App() {
         component={StudioHome}
       />
       <Command name="kit" description="KISS kit primitives" component={Kit} />
+      <Command
+        name="forms"
+        description="bind:value + focus ring + modal backdrop (live proof)"
+        component={Forms}
+      />
       <Command name="showcase" description="Show off TUIX components" component={ShowcaseCommand} />
       <Command
         name="widgets"

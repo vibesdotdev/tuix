@@ -6,7 +6,7 @@
 
 import { style, colors } from '@tuix/ansi'
 import { Box } from '../../layout/box'
-import { useUITheme, type ThemeVariant, getBackgroundColor, getTextColor } from '../../../theme'
+import { useUITheme, type ThemeVariant, getBackgroundColor } from '../../../theme'
 
 /**
  * Badge props
@@ -45,10 +45,12 @@ export function Badge(props: BadgeProps): JSX.Element {
 
   const variant = props.variant || 'default'
   const bgColor = getBackgroundColor(variant, theme) ?? theme.colors.selection ?? colors.gray
+  // Filled variants use the variant color as background, so text must contrast:
+  // paint with the theme background color instead of the same variant color.
   const textColor =
     variant === 'default'
       ? (theme.colors.textBright ?? theme.colors.fg ?? colors.white)
-      : (getTextColor(variant, theme) ?? theme.colors.bg ?? colors.black)
+      : (theme.colors.bg ?? colors.black)
 
   const content = props.icon ? `${props.icon} ${props.label}` : props.label
 

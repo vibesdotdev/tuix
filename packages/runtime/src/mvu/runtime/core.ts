@@ -8,7 +8,14 @@ import { Effect, Queue, Fiber, Ref, FiberRef, Layer, Context, Duration, Stream }
 import type { Component, View, Update, Command } from '@tuix/core/types'
 import { TerminalService, InputService, RendererService } from '@tuix/core/services'
 import { KeyUtils } from '@tuix/input/keyboard'
-import { bindMvuPush, emitKeyToHandlers, clearKeyHandlers } from '@tuix/reactive'
+import {
+  bindMvuPush,
+  emitKeyToHandlers,
+  clearKeyHandlers,
+  sweepFocusables,
+  resetFocus,
+  dispatchBackdropClick,
+} from '@tuix/reactive'
 import type { RuntimeConfig, RuntimeState, SystemMsg, RuntimeMetrics } from './types'
 import { RuntimeError } from './types'
 import { FrameScheduler, TimerManager, CommandScheduler } from './scheduler'
@@ -53,6 +60,13 @@ export class Runtime<Model, Msg> {
   private renderFiber?: Fiber.RuntimeFiber<void>
   /** Consecutive render failures (success resets). Stops app after maxRenderErrors. */
   private consecutiveRenderErrors = 0
+  /** Overlay-layer bounds effect captured from the renderer (backdrop hit-testing). */
+  private overlayBoundsEffect: Effect.Effect<{
+    x: number
+    y: number
+    width: number
+    height: number
+  } | null> | null = null
   private readonly maxRenderErrors = 5
   private hasRendered: boolean = false
   private screenReady: boolean = false
@@ -99,6 +113,26 @@ export class Runtime<Model, Msg> {
         const terminal = yield* _(TerminalService)
         const input = yield* _(InputService)
         const renderer = yield* _(RendererService)
+        this.overlayBoundsEffect = renderer.getOverlayBounds ?? null
+
+        // Route SIGINT/SIGTERM through the message queue so the runtime shuts
+        // down and restores the terminal. A second signal force-exits so a
+        // wedged app can always be killed by the user. Handlers are removed
+        // in the cleanup path below.
+        let signalCount = 0
+        const onSignal = () => {
+          signalCount++
+          if (signalCount > 1) {
+            process.exit(130)
+          }
+          Effect.runFork(Queue.offer(this.messageQueue, { _tag: 'Quit' as const }))
+        }
+        yield* _(
+          Effect.sync(() => {
+            process.on('SIGINT', onSignal)
+            process.on('SIGTERM', onSignal)
+          })
+        )
 
         try {
           // Initialize terminal
@@ -154,6 +188,9 @@ export class Runtime<Model, Msg> {
         } finally {
           bindMvuPush(null)
           clearKeyHandlers()
+          resetFocus()
+          process.removeListener('SIGINT', onSignal)
+          process.removeListener('SIGTERM', onSignal)
           // Cleanup
           yield* _(this.cleanup(terminal))
         }
@@ -250,19 +287,15 @@ export class Runtime<Model, Msg> {
         while (true) {
           const msg = yield* _(Queue.take(this.messageQueue))
 
-          try {
-            yield* _(this.processMessage(msg, update))
-          } catch (error) {
-            if (this.config.onError) {
-              yield* _(this.config.onError(error))
-            } else {
-              yield* _(Effect.logError('Update error', error))
-            }
-            // Also invoke hooks.onError when present
-            if (this.hooks?.onError) {
-              yield* _(this.hooks.onError(error, 'update'))
-            }
-          }
+          // JS try/catch cannot observe Effect short-circuits: a failing
+          // processMessage must be caught on the Effect channel (and defects
+          // routed too), otherwise the fiber dies silently and the app hangs.
+          yield* _(
+            this.processMessage(msg, update).pipe(
+              Effect.catchAll(error => this.handleUpdateError(error)),
+              Effect.catchAllDefect(error => this.handleUpdateError(error))
+            )
+          )
 
           const state = yield* _(Ref.get(this.state))
           if (!state.isRunning) break
@@ -272,6 +305,24 @@ export class Runtime<Model, Msg> {
       Effect.catchAll(error =>
         Effect.fail(new RuntimeError('Update fiber failed', 'update', error))
       )
+    )
+  }
+
+  /**
+   * Report an update-phase error through config/hooks without killing the loop.
+   */
+  private handleUpdateError(error: unknown): Effect<void> {
+    return Effect.gen(
+      function* (_) {
+        if (this.config.onError) {
+          yield* _(this.config.onError(error))
+        } else {
+          yield* _(Effect.logError('Update error', error))
+        }
+        if (this.hooks?.onError) {
+          yield* _(this.hooks.onError(error, 'update'))
+        }
+      }.bind(this)
     )
   }
 
@@ -336,6 +387,10 @@ export class Runtime<Model, Msg> {
               if (this.hooks?.afterRender) {
                 yield* _(this.hooks.afterRender(viewResult, state.model))
               }
+
+              // Drop focus/overlay registrations from widgets that no longer
+              // rendered this frame (sweep keeps entries re-registered above).
+              sweepFocusables()
 
               this.consecutiveRenderErrors = 0
               const renderTime = Date.now() - startTime
@@ -481,12 +536,17 @@ export class Runtime<Model, Msg> {
             }
             // Notify registered handlers (HelpExplorer etc.) — they $set named
             // state which bindMvuPush turns into UserMsg SetMsg → model update.
+            // Case-preserving: unmodified single-char runes carry the typed
+            // character ('A'), while `key` is the lowercased key name.
+            const k = msg.key
             const keyName =
-              typeof (msg.key as { key?: string }).key === 'string'
-                ? (msg.key as { key: string }).key
-                : typeof (msg.key as { runes?: string }).runes === 'string'
-                  ? (msg.key as { runes: string }).runes
-                  : String((msg.key as { type?: string }).type ?? msg.key ?? '')
+              !k.ctrl && !k.alt && !k.meta && typeof k.runes === 'string' && k.runes.length === 1
+                ? k.runes
+                : typeof k.key === 'string'
+                  ? k.key
+                  : typeof k.runes === 'string'
+                    ? k.runes
+                    : String(k.type ?? k ?? '')
             emitKeyToHandlers(keyName)
             this.dirty = true
             break
@@ -494,6 +554,31 @@ export class Runtime<Model, Msg> {
 
           case 'WindowResize': {
             this.dirty = true
+            break
+          }
+
+          case 'MouseClick': {
+            if (process.env.TUIX_DEBUG_MOUSE) {
+              const dbgBounds = this.overlayBoundsEffect ? yield* _(this.overlayBoundsEffect) : null
+              console.error('[MouseClick]', msg.x, msg.y, 'bounds:', JSON.stringify(dbgBounds))
+            }
+            // A click that misses the painted overlay bounds is a backdrop
+            // click: modals with closeOnBackdrop dismiss here. Hits inside
+            // the overlay are not dispatched (per-widget click routing is
+            // future work).
+            if (this.overlayBoundsEffect) {
+              const bounds = yield* _(this.overlayBoundsEffect)
+              if (bounds) {
+                const inside =
+                  msg.x >= bounds.x &&
+                  msg.x < bounds.x + bounds.width &&
+                  msg.y >= bounds.y &&
+                  msg.y < bounds.y + bounds.height
+                if (!inside && dispatchBackdropClick()) {
+                  this.dirty = true
+                }
+              }
+            }
             break
           }
 

@@ -16,6 +16,7 @@ import { parseVisualCells } from '@tuix/ansi'
 import { attachOverlays, partitionOverlays } from '@tuix/core/types'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
+import { unwrapRendered } from '@tuix/view/primitives/view'
 import {
   type FlexboxProps,
   type FlexItem,
@@ -586,7 +587,7 @@ export const center = (view: View, options?: { width?: number; height?: number }
   return {
     render: () =>
       Effect.gen(function* (_) {
-        const content = yield* _(view.render())
+        const content = unwrapRendered(yield* _(view.render()))
         const lines = content.split('\n')
         const contentHeight = lines.length
         const contentWidth = Math.max(...lines.map(line => stringWidth(line)), 0)

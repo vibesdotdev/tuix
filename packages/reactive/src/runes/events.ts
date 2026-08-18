@@ -48,7 +48,7 @@ export interface StateEvent extends BaseReactivityEvent {
  * Effect execution events
  */
 export interface EffectEvent extends BaseReactivityEvent {
-  readonly type: 'effect-scheduled' | 'effect-executed' | 'effect-cleanup'
+  readonly type: 'effect-scheduled' | 'effect-executed' | 'effect-error' | 'effect-cleanup'
   readonly effectId: string
   readonly dependencies?: unknown[]
   readonly error?: Error

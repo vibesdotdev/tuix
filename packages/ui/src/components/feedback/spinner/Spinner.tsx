@@ -23,7 +23,7 @@
  */
 
 import { $state, $effect } from '@tuix/reactive/runes/runes'
-import { style, colors } from '@tuix/ansi'
+import { style, colors, parseColor } from '@tuix/ansi'
 import { useUITheme } from '../../../theme'
 
 // Types
@@ -53,9 +53,11 @@ const SPINNER_FRAMES = {
  * Spinner Component
  */
 export function Spinner(props: SpinnerProps): JSX.Element {
+  const { theme } = useUITheme()
+
   // Configuration
   const type = props.type || 'dots'
-  const spinnerColor = props.color || colors.blue
+  const spinnerColor = props.color || theme.colors.primary
   const size = props.size || 'medium'
   const speed = props.speed || 80
 
@@ -66,19 +68,19 @@ export function Spinner(props: SpinnerProps): JSX.Element {
   // Animation effect
   $effect(() => {
     const interval = setInterval(() => {
-      frameIndex.value = (frameIndex.value + 1) % frames.length
+      frameIndex.$set((frameIndex() + 1) % frames.length)
     }, speed)
 
     return () => clearInterval(interval)
   })
 
   // Terminal cells have no font size — size maps to glyph wrapping, never web px.
-  const glyph = frames[frameIndex.value]
+  const glyph = frames[frameIndex()]
   const frame = size === 'large' ? `[ ${glyph} ]` : glyph
 
   // Render
   const spinnerStyle = style({
-    foreground: spinnerColor,
+    foreground: parseColor(spinnerColor),
   })
 
   if (props.text) {

@@ -144,6 +144,59 @@ describe('Renderer Service Implementation', () => {
       expect(names.includes('tmp')).toBe(false)
       expect(names.includes('hud')).toBe(true)
     })
+
+    it('renderToLayer(name, view, x, y) paints the layer at x,y', async () => {
+      const snapshot = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          yield* renderer.createLayer('hud', 1)
+          yield* renderer.renderToLayer('hud', text('hi'), 2, 1)
+          return yield* renderer.getLayers
+        })
+      )
+      const hud = snapshot.find(layer => layer.name === 'hud')
+      const lines = (hud?.text ?? '').split('\n')
+      expect(lines[1]?.startsWith('  hi')).toBe(true)
+      expect(lines[0]?.trim()).toBe('')
+    })
+  })
+
+  describe('Positioned paints', () => {
+    it('renderBatch honors each item x and y', async () => {
+      const snapshot = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          yield* renderer.renderBatch([
+            { view: text('X'), x: 2, y: 1 },
+            { view: text('Y'), x: 4, y: 0 },
+          ])
+          return yield* renderer.getLayers
+        })
+      )
+      const main = snapshot.find(layer => layer.name === 'main')
+      const lines = (main?.text ?? '').split('\n')
+      expect(lines[1]?.startsWith('  X')).toBe(true)
+      expect(lines[0]?.startsWith('    Y')).toBe(true)
+    })
+
+    it('renderAt clips styled text without emitting truncated escapes', async () => {
+      const snapshot = await runRenderer(
+        Effect.gen(function* () {
+          const renderer = yield* RendererService
+          yield* renderer.setClipRegion({ x: 3, y: 0, width: 5, height: 1 })
+          yield* renderer.renderAt(text('\x1b[31mHello World\x1b[0m'), 0, 0)
+          yield* renderer.setClipRegion(null)
+          return yield* renderer.getLayers
+        })
+      )
+      const main = snapshot.find(layer => layer.name === 'main')
+      const row = (main?.text ?? '').split('\n')[0] ?? ''
+      // Columns 3..8 of the payload survive, styled — no shredded escape
+      // fragments (the old raw slice produced literal "1mHel").
+      expect(row.trimEnd()).toBe('lo Wo')
+      expect(row).not.toContain('1m')
+      expect(row).not.toContain('\x1b')
+    })
   })
 
   describe('Viewport rendering', () => {

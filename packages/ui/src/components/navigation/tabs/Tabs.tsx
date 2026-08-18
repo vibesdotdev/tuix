@@ -37,7 +37,7 @@
 import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
 import type { StateRune } from '@tuix/reactive/runes/runes'
 import { isStateRune } from '@tuix/reactive/runes/runes'
-import { style, colors, type Style } from '@tuix/ansi'
+import { style, colors, borderStyle, type Style } from '@tuix/ansi'
 
 // Types
 export interface TabProps {
@@ -72,7 +72,7 @@ export interface TabsProps {
  * Tab Component (used as child of Tabs)
  */
 export function Tab(props: TabProps): JSX.Element {
-  return <tab {...props} />
+  return <box {...props} />
 }
 
 /**
@@ -83,7 +83,7 @@ export function Tabs(props: TabsProps): JSX.Element {
   const tabs = $derived(() => {
     const children = Array.isArray(props.children) ? props.children : [props.children]
     return children
-      .filter(child => child && child.type === 'tab')
+      .filter(child => child && child.type === Tab)
       .map(child => child.props as TabProps)
   })
 
@@ -181,19 +181,19 @@ export function Tabs(props: TabsProps): JSX.Element {
   }
 
   function moveTabFocus(delta: number) {
-    const newIndex = focusedTabIndex() + delta
-    const maxIndex = tabs().length - 1
+    const count = tabs().length
+    if (count === 0) return
 
-    if (props.wrap) {
-      focusedTabIndex.$set((newIndex + tabs().length) % tabs().length)
-    } else {
-      focusedTabIndex.$set(Math.max(0, Math.min(maxIndex, newIndex)))
+    // Try at most `count` steps so an all-disabled tab set cannot recurse forever.
+    let candidate = focusedTabIndex()
+    for (let step = 0; step < count; step++) {
+      candidate = props.wrap
+        ? (candidate + delta + count) % count
+        : Math.max(0, Math.min(count - 1, candidate + delta))
+      if (!tabs()[candidate]?.disabled) break
     }
 
-    // Skip disabled tabs
-    if (tabs()[focusedTabIndex()]?.disabled) {
-      moveTabFocus(delta > 0 ? 1 : -1)
-    }
+    focusedTabIndex.$set(candidate)
   }
 
   // Render helpers
@@ -202,17 +202,14 @@ export function Tabs(props: TabsProps): JSX.Element {
     const isFocused = focused() && index === focusedTabIndex()
     const isDisabled = tab.disabled || false
 
-    const tabStyle =
+    const tabStyleOverride =
       typeof props.tabStyle === 'function'
         ? props.tabStyle(index, isActive, isFocused)
         : props.tabStyle
 
-    const baseStyle = style({
-      padding: { horizontal: 2, vertical: 0 },
-      cursor: isDisabled ? 'not-allowed' : 'pointer',
-      opacity: isDisabled ? 0.5 : 1,
-      ...tabStyle,
-    })
+    // Compose via Style.merge so Style instances flatten instead of nesting props.
+    let composedStyle = style({ padding: { horizontal: 2, vertical: 0 } })
+    if (tabStyleOverride) composedStyle = composedStyle.merge(tabStyleOverride)
 
     const activeStyle = isActive
       ? style({
@@ -221,7 +218,6 @@ export function Tabs(props: TabsProps): JSX.Element {
           bold: true,
         })
       : style({
-          background: 'transparent',
           foreground: colors.gray,
         })
 
@@ -231,7 +227,10 @@ export function Tabs(props: TabsProps): JSX.Element {
             background: colors.gray,
             foreground: colors.white,
           })
-        : {}
+        : undefined
+
+    composedStyle = composedStyle.merge(activeStyle)
+    if (focusStyle) composedStyle = composedStyle.merge(focusStyle)
 
     const content: JSX.Element[] = []
 
@@ -281,13 +280,7 @@ export function Tabs(props: TabsProps): JSX.Element {
           }
         }}
       >
-        <box
-          style={style({
-            ...baseStyle,
-            ...activeStyle,
-            ...focusStyle,
-          })}
-        >
+        <box style={composedStyle}>
           <hstack gap={1} align="middle">
             {content}
           </hstack>
@@ -299,14 +292,7 @@ export function Tabs(props: TabsProps): JSX.Element {
   function renderTabBar(): JSX.Element {
     const tabElements = tabs().map((tab, index) => renderTab(tab, index))
 
-    const barStyle = style({
-      ...props.tabBarStyle,
-      justifyContent: tabAlign === 'stretch' ? 'space-between' : tabAlign,
-      borderBottom: showBorder && tabPosition === 'top' ? 'single' : 'none',
-      borderTop: showBorder && tabPosition === 'bottom' ? 'single' : 'none',
-      borderRight: showBorder && tabPosition === 'left' ? 'single' : 'none',
-      borderLeft: showBorder && tabPosition === 'right' ? 'single' : 'none',
-    })
+    const barStyle = props.tabBarStyle ? style(props.tabBarStyle.toProps()) : style()
 
     if (orientation === 'horizontal') {
       return (
@@ -332,11 +318,8 @@ export function Tabs(props: TabsProps): JSX.Element {
 
   // Main render
   const containerStyle = $derived(() => {
-    const baseStyle = props.style || {}
-    return style({
-      ...baseStyle,
-      border: showBorder ? 'single' : 'none',
-    })
+    const baseStyle = props.style ?? style()
+    return showBorder ? baseStyle.border(borderStyle('thin')) : baseStyle
   })
 
   const layout = () => {

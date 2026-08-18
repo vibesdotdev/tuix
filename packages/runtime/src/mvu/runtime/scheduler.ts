@@ -174,51 +174,34 @@ export class CommandScheduler<Msg> {
           yield* _(Effect.sleep(Duration.millis(10)))
         }
 
-        const fiber = yield* _(
-          Effect.gen(
-            function* (_) {
-              try {
-                const result = yield* _(effect)
-
-                if (onComplete) {
-                  yield* _(
-                    Queue.offer(this.messageQueue, {
-                      _tag: 'UserMsg',
-                      msg: onComplete(result),
-                    })
-                  )
-                } else {
-                  yield* _(
-                    Queue.offer(this.messageQueue, {
-                      _tag: 'CommandComplete',
-                      id,
-                      result,
-                    })
-                  )
-                }
-              } catch (error) {
-                if (onError && error instanceof Error) {
-                  yield* _(
-                    Queue.offer(this.messageQueue, {
-                      _tag: 'UserMsg',
-                      msg: onError(error as E),
-                    })
-                  )
-                } else {
-                  yield* _(
-                    Queue.offer(this.messageQueue, {
-                      _tag: 'CommandError',
-                      id,
-                      error,
-                    })
-                  )
-                }
-              } finally {
-                this.activeCommands.delete(id)
-              }
-            }.bind(this)
-          ).pipe(Effect.fork)
+        // JS try/catch cannot observe Effect short-circuits, so failures are
+        // handled with Effect.match and the slot is released with Effect.ensuring
+        // (a failed command must never leak its concurrency slot).
+        const run = effect.pipe(
+          Effect.match({
+            onFailure: (error: E) =>
+              onError
+                ? { kind: 'msg' as const, msg: onError(error) }
+                : { kind: 'error' as const, id, error },
+            onSuccess: (result: A) =>
+              onComplete
+                ? { kind: 'msg' as const, msg: onComplete(result) }
+                : { kind: 'complete' as const, id, result },
+          }),
+          Effect.flatMap(outcome =>
+            Queue.offer(
+              this.messageQueue,
+              outcome.kind === 'msg'
+                ? { _tag: 'UserMsg', msg: outcome.msg }
+                : outcome.kind === 'error'
+                  ? { _tag: 'CommandError', id: outcome.id, error: outcome.error }
+                  : { _tag: 'CommandComplete', id: outcome.id, result: outcome.result }
+            )
+          ),
+          Effect.ensuring(Effect.sync(() => this.activeCommands.delete(id)))
         )
+
+        const fiber = yield* _(Effect.fork(run))
 
         this.activeCommands.set(id, fiber)
       }.bind(this)

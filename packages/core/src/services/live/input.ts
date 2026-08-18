@@ -17,6 +17,34 @@ const SORTED_SEQUENCES = Array.from(ANSI_SEQUENCES.entries()).sort(
 )
 
 /**
+ * True when the buffer starts an escape sequence that is not yet complete
+ * (a strict prefix of a possible sequence). The caller should wait for more
+ * stdin data — or force a flush after a timeout (lone ESC is genuinely
+ * ambiguous with the start of CSI/SS3 sequences).
+ */
+export const isIncompleteEscape = (buffer: string): boolean => {
+  if (!buffer.startsWith('\x1b')) return false
+  if (buffer.length === 1) return true
+  // Already a complete known sequence (the bare-ESC entry does not count —
+  // a longer buffer starting with ESC may still grow into one)
+  for (const [seq] of SORTED_SEQUENCES) {
+    if (seq !== '\x1b' && buffer.startsWith(seq)) return false
+  }
+  // X10 mouse: ESC [ M + 3 bytes
+  if (buffer.startsWith('\x1b[M') && buffer.length < 6) return true
+  // SGR mouse without final byte: ESC [ < b ; x ; y
+  if (/^\x1b\[<\d+;\d+;\d*$/.test(buffer)) return true
+  // CSI still accumulating: ESC [ <params without final byte
+  if (/^\x1b\[[0-9;:<>?]*$/.test(buffer)) return true
+  if (buffer === '\x1bO') return true
+  // Strict prefix of a longer known sequence
+  for (const [seq] of SORTED_SEQUENCES) {
+    if (seq.length > buffer.length && seq.startsWith(buffer)) return true
+  }
+  return false
+}
+
+/**
  * Platform abstraction for input operations
  */
 interface PlatformInput {
@@ -36,6 +64,12 @@ interface PlatformInput {
     removeListener: (event: string, listener: () => void) => void
   }
 }
+
+/**
+ * How long to wait for continuation bytes after a lone ESC before deciding it
+ * is a plain Escape keypress (BubbleTea uses a similar disambiguation window).
+ */
+const ESC_FLUSH_TIMEOUT_MS = 50
 
 /**
  * Get platform-specific input interface
@@ -100,11 +134,15 @@ const parseMouseEvent = (sequence: string): MouseEvent | null => {
     const motion = !!(info & 0x20)
     // X10 has no release event: button code 3 means "no button" (release).
     const release = (info & 0x03) === 3
+    const isWheel = !!(info & 0x40)
 
     let buttonName: MouseEvent['button']
     let eventType: MouseEvent['type']
 
-    if (motion) {
+    if (isWheel) {
+      buttonName = info & 0x01 ? 'wheel-down' : 'wheel-up'
+      eventType = 'wheel'
+    } else if (motion) {
       buttonName = 'none'
       eventType = 'motion'
     } else if (release) {
@@ -139,7 +177,9 @@ export const parseBuffer = (
   mousePubSub: PubSub.PubSub<MouseEvent>,
   pastePubSub?: PubSub.PubSub<string>,
   focusPubSub?: PubSub.PubSub<FocusEvent>,
-  onKeyPublished?: () => void
+  onKeyPublished?: () => void,
+  /** Force delivery of ambiguous pending input (lone ESC timeout). */
+  flushPending = false
 ): string => {
   while (buffer.length > 0) {
     // Focus in/out (CSI I / CSI O) — must run before generic ANSI key table
@@ -151,13 +191,17 @@ export const parseBuffer = (
         }
         buffer = drained.rest
         if (buffer.length === 0 || buffer === '\x1b' || buffer === '\x1b[') {
-          if (buffer === '\x1b' || buffer === '\x1b[') break
+          if (buffer === '\x1b' || buffer === '\x1b[') {
+            if (!flushPending) break
+          } else {
+            continue
+          }
+        } else {
           continue
         }
-        continue
       }
       if (buffer === '\x1b' || buffer === '\x1b[') {
-        break
+        if (!flushPending) break
       }
     }
 
@@ -200,10 +244,22 @@ export const parseBuffer = (
       continue
     }
 
+    // Possibly-incomplete escape sequence at a chunk boundary — wait for more
+    // data (the stdin handler flushes it after a timeout if nothing follows).
+    if (!flushPending && isIncompleteEscape(buffer)) {
+      break
+    }
+
     // Check for known ANSI sequences (longest first)
     let matched = false
     for (const [seq, partial] of SORTED_SEQUENCES) {
       if (buffer.startsWith(seq)) {
+        // A bare ESC entry must not swallow the start of a longer sequence:
+        // only match it when the buffer IS a lone ESC. Alt+key (ESC + char)
+        // and unknown CSI/SS3 sequences are handled below.
+        if (seq === '\x1b' && buffer.length > 1) {
+          continue
+        }
         const keyEvent: KeyEvent = {
           type: partial.type || KeyType.Runes,
           key: partial.key || '',
@@ -224,25 +280,41 @@ export const parseBuffer = (
 
     if (matched) continue
 
-    // Handle Alt+key sequences (ESC followed by a character)
-    if (buffer.startsWith('\x1b') && buffer.length > 1 && buffer[1] !== '[') {
-      const char = buffer[1]
+    // Handle Alt+key sequences (ESC followed by a character) — code-point aware
+    if (buffer.startsWith('\x1b') && buffer.length > 1 && buffer[1] !== '[' && buffer[1] !== 'O') {
+      const cp = buffer.codePointAt(1) ?? buffer.charCodeAt(1)
+      const char = String.fromCodePoint(cp)
+      const consumed = 1 + char.length
       const baseKey = parseChar(char)
       const keyEvent: KeyEvent = {
         ...baseKey,
         alt: true,
         key: `alt+${baseKey.runes || baseKey.key}`,
-        sequence: buffer.slice(0, 2),
+        sequence: buffer.slice(0, consumed),
       }
       Effect.runSync(PubSub.publish(keyPubSub, keyEvent))
       onKeyPublished?.()
-      buffer = buffer.slice(2)
+      buffer = buffer.slice(consumed)
       continue
     }
 
-    // Handle regular characters
+    // Unknown but complete CSI/SS3 sequence — consume it whole instead of
+    // shredding it into Escape + literal runes.
+    const unknownCsi = buffer.match(/^\x1b\[[0-9;:<>?]*[@-~]/)
+    if (unknownCsi) {
+      buffer = buffer.slice(unknownCsi[0].length)
+      continue
+    }
+    const unknownSs3 = buffer.match(/^\x1bO[@-~]/)
+    if (unknownSs3) {
+      buffer = buffer.slice(3)
+      continue
+    }
+
+    // Handle regular characters — one code point at a time (astral-plane safe)
     if (!buffer.startsWith('\x1b') || buffer.length === 1) {
-      const char = buffer[0]
+      const cp = buffer.codePointAt(0) ?? buffer.charCodeAt(0)
+      const char = String.fromCodePoint(cp)
       const keyEvent = parseChar(char)
       Effect.runSync(
         PubSub.publish(keyPubSub, {
@@ -251,13 +323,8 @@ export const parseBuffer = (
         })
       )
       onKeyPublished?.()
-      buffer = buffer.slice(1)
+      buffer = buffer.slice(char.length)
       continue
-    }
-
-    // Incomplete escape sequence - wait for more data
-    if (buffer.startsWith('\x1b') && buffer.length < 6) {
-      break
     }
 
     // Unknown sequence - skip the escape character and continue
@@ -300,16 +367,58 @@ export const InputServiceLive = Layer.scoped(
 
           // Setup input handling
           let buffer = ''
+          let escFlushTimer: ReturnType<typeof setTimeout> | null = null
+          const onKeyPublished = () => {
+            Effect.runSync(Ref.update(pendingKeys, n => n + 1))
+          }
           stdin.on('data', (chunk: string) => {
+            if (escFlushTimer) {
+              clearTimeout(escFlushTimer)
+              escFlushTimer = null
+            }
             buffer += chunk
-            buffer = parseBuffer(buffer, keyPubSub, mousePubSub, pastePubSub, focusPubSub, () => {
-              Effect.runSync(Ref.update(pendingKeys, n => n + 1))
-            })
+            buffer = parseBuffer(
+              buffer,
+              keyPubSub,
+              mousePubSub,
+              pastePubSub,
+              focusPubSub,
+              onKeyPublished
+            )
             Effect.runSync(Ref.set(pendingRaw, buffer.length))
+            // A pending lone ESC / partial sequence is ambiguous: wait briefly
+            // for continuation bytes, then force delivery (a lone ESC must
+            // eventually arrive as Escape instead of being merged into the
+            // next keypress).
+            if (buffer.length > 0 && isIncompleteEscape(buffer)) {
+              const pending = buffer
+              escFlushTimer = setTimeout(() => {
+                escFlushTimer = null
+                if (buffer === pending) {
+                  buffer = parseBuffer(
+                    buffer,
+                    keyPubSub,
+                    mousePubSub,
+                    pastePubSub,
+                    focusPubSub,
+                    onKeyPublished,
+                    true
+                  )
+                  Effect.runSync(Ref.set(pendingRaw, buffer.length))
+                }
+              }, ESC_FLUSH_TIMEOUT_MS)
+            }
           })
+          return () => {
+            if (escFlushTimer) {
+              clearTimeout(escFlushTimer)
+              escFlushTimer = null
+            }
+          }
         }),
-        () =>
+        clearEscFlush =>
           Effect.sync(() => {
+            clearEscFlush()
             stdin.removeAllListeners('data')
             if (stdin.isTTY && 'setRawMode' in stdin) {
               stdin.setRawMode(false)

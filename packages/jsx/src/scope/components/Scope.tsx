@@ -64,6 +64,7 @@ export function Scope(props: ScopeProps): JSX.Element {
   }
 
   // Register this scope FIRST (so it's in the registration order)
+  const previousScope = currentScopeStore.get()
   currentScopeStore.register(scopeDef)
 
   // Plugins: force child command registration during the walk. Plugin

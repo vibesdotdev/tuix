@@ -176,6 +176,30 @@ describe('Sub', () => {
       expect(array).toContain('c')
       expect(array).toContain('d')
     })
+
+    test('runs non-terminating subscriptions concurrently', async () => {
+      // mergeAll defaults to concurrency 1: the first stream never ends and
+      // the second never emits. batch must merge all streams unbounded.
+      const sub1 = Stream.repeatEffect(
+        Effect.sleep(Duration.millis(5)).pipe(Effect.map(() => 'a' as const))
+      )
+      const sub2 = Stream.repeatEffect(
+        Effect.sleep(Duration.millis(7)).pipe(Effect.map(() => 'b' as const))
+      )
+
+      const result = await Promise.race([
+        Effect.runPromise(Stream.runCollect(Stream.take(Sub.batch([sub1, sub2]), 6))).then(
+          chunk => ({ ok: true as const, items: Array.from(chunk) })
+        ),
+        new Promise<{ ok: false }>(resolve => setTimeout(() => resolve({ ok: false }), 2000)),
+      ])
+
+      expect(result.ok).toBe(true)
+      if (result.ok) {
+        expect(result.items.length).toBe(6)
+        expect(result.items).toContain('b')
+      }
+    })
   })
 
   describe('map', () => {

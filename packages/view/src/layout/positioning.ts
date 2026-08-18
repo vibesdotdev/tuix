@@ -8,6 +8,7 @@
 import { Effect } from 'effect'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
+import { unwrapRendered } from '@tuix/view/primitives/view'
 
 /**
  * Create a positioned layout with core positioning features
@@ -42,7 +43,7 @@ export const positionedLayout = (
   return {
     render: () =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(content.render())
+        const rendered = unwrapRendered(yield* _(content.render()))
         const lines = rendered.split('\n')
 
         // Apply padding
@@ -120,7 +121,7 @@ export const layered = (layers: View[], width: number, height: number): View => 
 
         // Render each layer into the buffer
         for (const layer of layers) {
-          const content = yield* _(layer.render())
+          const content = unwrapRendered(yield* _(layer.render()))
           const lines = content.split('\n')
 
           for (let y = 0; y < lines.length && y < height; y++) {

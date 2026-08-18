@@ -17,6 +17,35 @@ export type Cmd<Msg> = Effect.Effect<Msg | null>
 export type Sub<Msg> = Stream.Stream<Msg>
 
 /**
+ * Split a command string into argv, honoring single- and double-quoted segments.
+ */
+function splitCommandArgs(command: string): string[] {
+  const args: string[] = []
+  let current = ''
+  let quote: '"' | "'" | null = null
+  for (const ch of command) {
+    if (quote) {
+      if (ch === quote) {
+        quote = null
+      } else {
+        current += ch
+      }
+    } else if (ch === '"' || ch === "'") {
+      quote = ch
+    } else if (ch === ' ' || ch === '\t') {
+      if (current) {
+        args.push(current)
+        current = ''
+      }
+    } else {
+      current += ch
+    }
+  }
+  if (current) args.push(current)
+  return args
+}
+
+/**
  * Built-in command helpers
  */
 export const Cmd = {
@@ -135,7 +164,7 @@ export const Cmd = {
   ): Cmd<Msg> =>
     Effect.tryPromise({
       try: async () => {
-        const proc = Bun.spawn(command.split(' '), {
+        const proc = Bun.spawn(splitCommandArgs(command), {
           stdout: 'pipe',
           stderr: 'pipe',
         })
@@ -207,7 +236,8 @@ export const Sub = {
    * ])
    * ```
    */
-  batch: <Msg>(subs: Array<Sub<Msg>>): Sub<Msg> => Stream.mergeAll(subs),
+  batch: <Msg>(subs: Array<Sub<Msg>>): Sub<Msg> =>
+    Stream.mergeAll(subs, { concurrency: 'unbounded' }),
 
   /**
    * Map a subscription's messages

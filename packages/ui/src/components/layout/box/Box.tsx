@@ -32,7 +32,7 @@ import {
   type Style,
   type BorderStyle,
   style,
-  border,
+  borderStyle,
   colors,
   color,
   parseColor,
@@ -151,18 +151,18 @@ export function Box(props: BoxProps): JSX.Element {
 
     // Border
     if (props.border) {
-      const borderStyle =
+      const boxBorderStyle: BorderStyle | undefined =
         props.border === true
-          ? border.borderStyle('thin')
+          ? borderStyle('thin')
           : typeof props.border === 'string'
-            ? border.borderStyle(props.border)
+            ? borderStyle(toBorderType(props.border))
             : props.border
 
-      if (borderStyle) {
-        nextStyle = nextStyle.border(borderStyle)
+      if (boxBorderStyle) {
+        nextStyle = nextStyle.border(boxBorderStyle)
       }
     } else if (props.borderStyle) {
-      nextStyle = nextStyle.border(border.borderStyle(props.borderStyle))
+      nextStyle = nextStyle.border(borderStyle(toBorderType(props.borderStyle)))
     }
 
     const resolvedBorderColor = parseColor(props.borderColor)
@@ -207,16 +207,16 @@ export function Box(props: BoxProps): JSX.Element {
     }
 
     // State styling (lightweight defaults unless user provided overrides)
-    if (focused.get() && props.focusable) {
+    if (focused() && props.focusable) {
       if (!props.border && !props.borderStyle) {
-        nextStyle = nextStyle.border(border.borderStyle('double'))
+        nextStyle = nextStyle.border(borderStyle('double'))
       }
       if (!props.borderColor) {
         nextStyle = nextStyle.borderForeground(colors.blue)
       }
     }
 
-    if (hovering.get() && props.onClick && !resolvedBackground) {
+    if (hovering() && props.onClick && !resolvedBackground) {
       nextStyle = nextStyle.background(colors.gray)
     }
 
@@ -241,27 +241,27 @@ export function Box(props: BoxProps): JSX.Element {
         focusable={props.focusable}
         onClick={props.onClick}
         onFocus={() => {
-          focused.set(true)
+          focused.$set(true)
           props.onFocus?.()
         }}
         onBlur={() => {
-          focused.set(false)
+          focused.$set(false)
           props.onBlur?.()
         }}
         onMouseEnter={() => {
-          hovering.set(true)
+          hovering.$set(true)
         }}
         onMouseLeave={() => {
-          hovering.set(false)
+          hovering.$set(false)
         }}
         className={props.className}
       >
-        {renderContainer(boxStyle.get())}
+        {renderContainer(boxStyle())}
       </interactive>
     )
   }
 
-  return renderContainer(boxStyle.value, props.className)
+  return renderContainer(boxStyle(), props.className)
 }
 
 // Factory functions for common box patterns
@@ -299,6 +299,11 @@ export const centerBox = (props: BoxProps) => (
 export const scrollBox = (props: BoxProps) => (
   <Box scrollable border="single" borderColor={colors.gray} {...props} />
 )
+
+/** Map Box border names to the @tuix/ansi border factory types. */
+function toBorderType(value: string): BorderStyle['type'] {
+  return value === 'single' ? 'thin' : (value as BorderStyle['type'])
+}
 
 function resolveColor(value?: string | Color): Color | undefined {
   if (!value) return undefined

@@ -51,8 +51,14 @@ A short-lived React host (`dfe301b`) was added and then dropped
 
 ## Next edge
 
-- `Modal.closeOnBackdrop` needs overlay hit-testing before it can be
-  honest.
+- ~~`Modal.closeOnBackdrop` needs overlay hit-testing before it can be
+  honest.~~ (fixed 2026-08-17 late: renderer tracks painted overlay ink
+  bounds per frame (`getOverlayBounds`); runtime MouseClick dispatches a
+  backdrop click when it misses the overlay rect; vstack/hstack roots now
+  partition overlay-tagged children like the flex path, and Modal centers
+  itself when `width`/`height` are given. Proven live in a 80×24 PTY with
+  `apps/demo` `forms` command: bind:value write-back, Tab focus ring,
+  overlay-captured keys, backdrop dismissal.)
 - ~~Escape-aware line wrap~~ (fixed 2026-08-17 evening: `wrapLine` in
   `@tuix/ansi` tokenizes escapes, never splits them, re-emits SGR state
   on continuation rows; regression-tested and re-verified against live

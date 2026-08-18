@@ -63,11 +63,12 @@ export function Flex(props: FlexProps): JSX.Element {
     ...boxProps
   } = props
 
-  const finalDirection = reverse
-    ? direction === 'row'
-      ? 'row-reverse'
-      : 'column-reverse'
-    : direction
+  // hstack/vstack have no reverse mode, so reverse the child order instead.
+  const orderedChildren = reverse
+    ? Array.isArray(children)
+      ? [...children].reverse()
+      : children
+    : children
 
   if (direction === 'row') {
     return (
@@ -78,7 +79,7 @@ export function Flex(props: FlexProps): JSX.Element {
         justify={justify}
         {...boxProps}
       >
-        {children}
+        {orderedChildren}
       </hstack>
     )
   }
@@ -91,7 +92,7 @@ export function Flex(props: FlexProps): JSX.Element {
       justify={justify}
       {...boxProps}
     >
-      {children}
+      {orderedChildren}
     </vstack>
   )
 }

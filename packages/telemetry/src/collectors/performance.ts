@@ -24,6 +24,14 @@ export class PerformanceCollector {
     this.startFlushTimer()
   }
 
+  /**
+   * Explicit disposal for `using` / cleanup paths — stops the flush
+   * interval so collectors don't leak timers in tests and CLI exits.
+   */
+  [Symbol.dispose](): void {
+    this.stop()
+  }
+
   private generateSessionId(): string {
     return `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`
   }

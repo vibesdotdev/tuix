@@ -400,6 +400,19 @@ function generateKeyCode(char: string): string | undefined {
 export function parseChar(char: string, ctrl = false, alt = false, shift = false): KeyEvent {
   const code = char.charCodeAt(0)
 
+  // DEL (0x7f) is not a C0 control char but terminals send it as backspace.
+  if (code === 0x7f) {
+    return {
+      type: KeyType.Backspace,
+      key: 'backspace',
+      runes: undefined,
+      ctrl: false,
+      alt,
+      shift,
+      meta: false,
+    }
+  }
+
   // Control characters (0-31)
   if (code < 32) {
     const ctrlChar = String.fromCharCode(code + 96) // Convert to letter
@@ -420,9 +433,6 @@ export function parseChar(char: string, ctrl = false, alt = false, shift = false
         break
       case ' ':
         keyType = KeyType.Space
-        break
-      case '\x7f':
-        keyType = KeyType.Delete
         break
       case '\b':
         keyType = KeyType.Backspace
@@ -517,9 +527,13 @@ export const KeyUtils = {
   }),
 
   /**
-   * Check if a key event is a quit key (Ctrl+C, Ctrl+D, or 'q')
+   * Check if a key event is a quit key (Ctrl+C or Ctrl+D)
+   *
+   * The live parser bakes modifiers into `key` (`\x03` parses as
+   * `key: 'ctrl+c'`), so match both conventions.
    */
   isQuit: (event: KeyEvent): boolean => {
+    if (event.key === 'ctrl+c' || event.key === 'ctrl+d') return true
     return Boolean(event.ctrl && (event.key === 'c' || event.key === 'd'))
   },
 

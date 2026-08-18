@@ -101,7 +101,7 @@ export function Button(props: ButtonProps): JSX.Element {
     <button
       className={props.className}
       label={decorated}
-      focused={props.focused === true || variant === 'primary' || variant === 'default'}
+      focused={props.focused === true}
       disabled={disabled}
       fg={variantColor(variant)}
       onClick={disabled ? undefined : props.onClick}

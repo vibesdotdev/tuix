@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 
-import { renderStyled, renderStyledSync } from './index'
+import { renderStyled, renderStyledSync, wrapStyledLine } from './index'
 import { style } from '../style'
 import { colors, color } from '../color'
 import { ColorProfile } from '../color/profile'
@@ -44,6 +44,16 @@ describe('Render utilities', () => {
     expect(rows.length).toBeGreaterThan(1)
     for (const row of rows) {
       expect(row.startsWith('\x1b[1m')).toBe(true)
+    }
+    expect(rows[rows.length - 1].endsWith('\x1b[0m')).toBe(true)
+  })
+
+  test('wrap accumulates multiple SGR sequences on continuation rows', () => {
+    const rows = wrapStyledLine('\x1b[1m\x1b[31m' + 'word '.repeat(12) + '\x1b[0m', 30)
+    expect(rows.length).toBeGreaterThan(1)
+    for (const row of rows) {
+      expect(row).toContain('\x1b[1m')
+      expect(row).toContain('\x1b[31m')
     }
     expect(rows[rows.length - 1].endsWith('\x1b[0m')).toBe(true)
   })

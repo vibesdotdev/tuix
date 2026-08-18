@@ -17,6 +17,8 @@ export interface VisualCell {
 }
 
 const CSI = /\u001b\[[0-?]*[ -/]*[@-~]/y
+const OSC = /\u001b\][^\u0007\u001b]*(?:\u0007|\u001b\\)?/y
+const ESC_OTHER = /\u001b./y
 
 const ANSI16: Rgb[] = [
   { r: 0, g: 0, b: 0 },
@@ -91,7 +93,7 @@ function parseSgr(seq: string, fg?: Rgb, bg?: Rgb): { fg?: Rgb; bg?: Rgb; reset:
     }
     if ((code === 38 || code === 48) && parts[i + 1] === 5) {
       const idx = parts[i + 2] ?? 0
-      const rgb = idx < 16 ? ansi16(idx) : { r: idx, g: idx, b: idx }
+      const rgb = ansi256ToRgb(idx)
       if (code === 38) nextFg = rgb
       else nextBg = rgb
       i += 3
@@ -118,6 +120,21 @@ function clampByte(n: number): number {
   return Math.max(0, Math.min(255, Math.round(n)))
 }
 
+function ansi256ToRgb(index: number): Rgb {
+  if (index < 16) return ansi16(index)
+  // Grayscale ramp (232-255)
+  if (index >= 232) {
+    const gray = (index - 232) * 10 + 8
+    return { r: gray, g: gray, b: gray }
+  }
+  // 6x6x6 color cube (16-231)
+  const i = index - 16
+  const r = Math.floor(i / 36)
+  const g = Math.floor((i % 36) / 6)
+  const b = i % 6
+  return { r: r * 51, g: g * 51, b: b * 51 }
+}
+
 function prefixOf(fg?: Rgb, bg?: Rgb): string {
   let out = ''
   if (fg) out += `\x1b[38;2;${fg.r};${fg.g};${fg.b}m`
@@ -137,17 +154,33 @@ export function parseVisualCells(line: string): VisualCell[] {
       CSI.lastIndex = i
       const match = CSI.exec(line)
       if (match) {
-        const parsed = parseSgr(match[0]!, fg, bg)
-        if (parsed.reset) {
-          fg = undefined
-          bg = undefined
-          active = ''
-        } else {
-          fg = parsed.fg
-          bg = parsed.bg
-          active += match[0]
+        const seq = match[0]!
+        const isSgr = seq.endsWith('m')
+        if (isSgr) {
+          const parsed = parseSgr(seq, fg, bg)
+          if (parsed.reset) {
+            fg = undefined
+            bg = undefined
+            active = ''
+          } else {
+            fg = parsed.fg
+            bg = parsed.bg
+            active += seq
+          }
         }
         i = CSI.lastIndex
+        continue
+      }
+      // OSC and other escapes carry no cell styling; skip them entirely
+      // instead of leaking them into cell prefixes as literal text.
+      OSC.lastIndex = i
+      if (OSC.exec(line)) {
+        i = OSC.lastIndex
+        continue
+      }
+      ESC_OTHER.lastIndex = i
+      if (ESC_OTHER.exec(line)) {
+        i = ESC_OTHER.lastIndex
         continue
       }
     }

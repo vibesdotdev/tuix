@@ -55,11 +55,22 @@
 
 import { Effect } from 'effect'
 import { stringWidth } from '@tuix/view/string/width'
+import { attachOverlays, partitionOverlays } from '@tuix/core/types'
 import type { View, RenderError } from './types'
 import { style as createStyle, renderStyledSync, padVisual, type Style } from '@tuix/ansi'
 
 // Re-export types for convenience
 export type { View, RenderError } from './types'
+
+/**
+ * Normalize a view's render result to a plain string.
+ *
+ * View.render() may return either a string or `{ content, width, height }`
+ * (vstack/hstack/empty use the object form). Composing consumers must
+ * unwrap before splitting or interpolating.
+ */
+export const unwrapRendered = (result: string | { content: string }): string =>
+  typeof result === 'string' ? result : result.content
 
 /**
  * Create a simple text view
@@ -180,30 +191,35 @@ export const vstack = (...views: Array<View | View[]>): View => {
   const items =
     views.length === 1 && Array.isArray(views[0]) ? (views[0] as View[]) : (views as View[])
 
-  const width = items.length > 0 ? Math.max(...items.map(v => v.width || 0)) : 0
-  const height = items.reduce((sum, v) => sum + (v.height || 1), 0)
+  // Overlay-tagged children (e.g. <overlay>/<Modal>) lift out of flow so the
+  // renderer paints them on the transparent overlay layer — same contract as
+  // the flexbox path, so vstack-rooted apps get overlay compositing too.
+  const { flow, overlays } = partitionOverlays(items.map(view => ({ view })))
 
-  if (items.length === 0) {
-    return {
+  const width = flow.length > 0 ? Math.max(...flow.map(v => v.view.width || 0)) : 0
+  const height = flow.reduce((sum, v) => sum + (v.view.height || 1), 0)
+
+  if (flow.length === 0) {
+    const emptyView: View = {
       render: () => Effect.succeed(''),
       width: 0,
       height: 0,
     }
+    return overlays.length > 0 ? attachOverlays(emptyView, overlays) : emptyView
   }
 
-  return {
+  const stacked: View = {
     render: () =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(Effect.forEach(items, v => v.render()))
-        const contents = rendered.map(res =>
-          typeof res === 'string' ? res : (res as { content: string }).content
-        )
+        const rendered = yield* _(Effect.forEach(flow, v => v.view.render()))
+        const contents = rendered.map(unwrapRendered)
         const content = contents.join('\n')
         return { content, width, height }
       }),
     width,
     height,
   }
+  return overlays.length > 0 ? attachOverlays(stacked, overlays) : stacked
 }
 
 /**
@@ -234,28 +250,28 @@ export const hstack = (...views: Array<View | View[]>): View => {
   const items =
     views.length === 1 && Array.isArray(views[0]) ? (views[0] as View[]) : (views as View[])
 
-  const width = items.reduce((sum, v) => sum + (v.width || 0), 0)
-  const height = items.length > 0 ? Math.max(...items.map(v => v.height || 1)) : 0
+  // Overlay-tagged children lift out of flow (same contract as vstack/flex).
+  const { flow, overlays } = partitionOverlays(items.map(view => ({ view })))
 
-  return {
+  const width = flow.reduce((sum, v) => sum + (v.view.width || 0), 0)
+  const height = flow.length > 0 ? Math.max(...flow.map(v => v.view.height || 1)) : 0
+
+  const stacked: View = {
     render: () =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(Effect.forEach(items, v => v.render()))
-
-        const contents = rendered.map(res =>
-          typeof res === 'string' ? res : (res as { content: string }).content
-        )
+        const rendered = yield* _(Effect.forEach(flow, v => v.view.render()))
+        const contents = rendered.map(unwrapRendered)
 
         // Calculate actual height from rendered content, not from View metadata
         const actualHeight = Math.max(...contents.map(c => c.split('\n').length), 1)
 
         const lines = Array.from({ length: actualHeight }, (_, lineIndex) =>
-          items
-            .map((view, viewIndex) => {
+          flow
+            .map((item, viewIndex) => {
               const segments = contents[viewIndex]!.split('\n')
               const content = segments[lineIndex] || ''
-              const width = view.width || 0
-              return width > 0 ? padVisual(content, width) : content
+              const w = item.view.width || 0
+              return w > 0 ? padVisual(content, w) : content
             })
             .join('')
         )
@@ -265,6 +281,7 @@ export const hstack = (...views: Array<View | View[]>): View => {
     width,
     height,
   }
+  return overlays.length > 0 ? attachOverlays(stacked, overlays) : stacked
 }
 
 /**
@@ -295,10 +312,8 @@ export const box = (view: View): View => {
   return {
     render: () =>
       Effect.gen(function* (_) {
-        const content = yield* _(view.render())
-        const contentStr =
-          typeof content === 'string' ? content : (content as { content: string }).content
-        const lines = contentStr.split('\n')
+        const content = unwrapRendered(yield* _(view.render()))
+        const lines = content.split('\n')
 
         // Create box with rounded borders
         const boxWidth = width + 4 // +2 for padding, +2 for borders
@@ -307,7 +322,7 @@ export const box = (view: View): View => {
 
         const boxedLines = [top]
         for (const line of lines) {
-          const padded = ' ' + line.padEnd(width) + ' '
+          const padded = ' ' + padVisual(line, width) + ' '
           boxedLines.push('│' + padded + '│')
         }
         boxedLines.push(bottom)
@@ -340,7 +355,7 @@ export const box = (view: View): View => {
 export const center = (view: View, totalWidth: number): View => ({
   render: () =>
     Effect.gen(function* (_) {
-      const content = yield* _(view.render())
+      const content = unwrapRendered(yield* _(view.render()))
       const lines = content.split('\n')
 
       return lines
@@ -376,7 +391,7 @@ export const center = (view: View, totalWidth: number): View => ({
 export const styled = (view: View, style: string): View => ({
   render: () =>
     Effect.gen(function* (_) {
-      const content = yield* _(view.render())
+      const content = unwrapRendered(yield* _(view.render()))
       return `${style}${content}\x1b[0m`
     }),
   width: view.width,

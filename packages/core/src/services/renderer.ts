@@ -261,6 +261,22 @@ export class RendererService extends Context.Tag('RendererService')<
       never,
       never
     >
+
+    /**
+     * Bounds of the painted overlay layer from the last frame, or null when
+     * no overlay is visible. Backdrop hit-testing (e.g. Modal.closeOnBackdrop)
+     * compares mouse coordinates against this rect.
+     */
+    readonly getOverlayBounds: Effect.Effect<
+      {
+        readonly x: number
+        readonly y: number
+        readonly width: number
+        readonly height: number
+      } | null,
+      never,
+      never
+    >
   }
 >() {}
 

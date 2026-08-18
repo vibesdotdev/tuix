@@ -31,7 +31,7 @@
  */
 
 import { $effect } from '@tuix/reactive/runes/runes'
-import { style, colors, border, type Style } from '@tuix/ansi'
+import { style, colors, borderStyle as makeBorderStyle, type Style } from '@tuix/ansi'
 import { createViewportStore, type ViewportStore } from '../../../stores/viewportStore'
 
 // Types
@@ -93,7 +93,7 @@ export const Viewport = (props: ViewportProps) => {
   })
 
   // Update store settings for scrollbars
-  store.showScrollbars.value = showScrollbars
+  store.showScrollbars.$set(showScrollbars)
 
   // Convert children to content lines
   const processChildren = (children: JSX.Element | JSX.Element[]) => {
@@ -134,7 +134,7 @@ export const Viewport = (props: ViewportProps) => {
   $effect(() => {
     // When scroll position changes, call callbacks
     if (onScroll) {
-      onScroll(store.scrollX.value, store.scrollY.value)
+      onScroll(store.scrollX(), store.scrollY())
     }
   })
 
@@ -160,15 +160,15 @@ export const Viewport = (props: ViewportProps) => {
   }
 
   // Get visible content from store
-  const visibleLines = store.visibleLines.value
+  const visibleLines = store.visibleLines()
 
   // Render scrollbars
   const renderVerticalScrollbar = () => {
-    if (!showScrollbars || !store.hasVerticalScroll.value) return null
+    if (!showScrollbars || !store.hasVerticalScroll()) return null
 
     const viewportHeight = showScrollbars ? height - 1 : height
-    const thumbSize = store.verticalThumbSize.value
-    const thumbPosition = store.verticalThumbPosition.value
+    const thumbSize = store.verticalThumbSize()
+    const thumbPosition = store.verticalThumbPosition()
 
     const scrollbarLines = Array.from({ length: viewportHeight }, (_, i) => {
       if (i >= thumbPosition && i < thumbPosition + thumbSize) {
@@ -181,11 +181,11 @@ export const Viewport = (props: ViewportProps) => {
   }
 
   const renderHorizontalScrollbar = () => {
-    if (!showScrollbars || !store.hasHorizontalScroll.value) return null
+    if (!showScrollbars || !store.hasHorizontalScroll()) return null
 
     const viewportWidth = showScrollbars ? width - 1 : width
-    const thumbSize = store.horizontalThumbSize.value
-    const thumbPosition = store.horizontalThumbPosition.value
+    const thumbSize = store.horizontalThumbSize()
+    const thumbPosition = store.horizontalThumbPosition()
 
     let scrollbar = ''
     for (let i = 0; i < viewportWidth; i++) {
@@ -236,7 +236,10 @@ export const Viewport = (props: ViewportProps) => {
     }
   }
 
-  const borderStyleValue = borderStyle === 'none' ? undefined : border.borderStyle(borderStyle)
+  const borderStyleValue =
+    borderStyle === 'none'
+      ? undefined
+      : makeBorderStyle(borderStyle === 'single' ? 'thin' : borderStyle)
 
   const viewportStyle = (customStyle || style()).width(width).height(height)
 

@@ -6,8 +6,8 @@
 
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { Effect } from 'effect'
-import { text, styledText, vstack, hstack, empty, View } from './view'
-import { style, color, Colors } from '@tuix/ansi'
+import { text, styledText, vstack, hstack, empty, box, center, styled, View } from './view'
+import { style, color, Colors, stripAnsi } from '@tuix/ansi'
 
 describe('View Primitives', () => {
   describe('text', () => {
@@ -251,6 +251,49 @@ describe('View Primitives', () => {
       expect(result.content).toBe('L1R1\nL2R2')
       expect(result.width).toBe(4) // "L1R1" length
       expect(result.height).toBe(2)
+    })
+  })
+
+  describe('Object render results compose with string consumers', () => {
+    it('center unwraps a vstack render result', async () => {
+      const view = center(vstack(text('a'), text('b')), 20)
+
+      const result = await Effect.runPromise(view.render())
+      const lines = (typeof result === 'string' ? result : result.content).split('\n')
+
+      expect(lines).toHaveLength(2)
+      expect(lines[0]).toBe('         a          ')
+      expect(lines[1]).toBe('         b          ')
+    })
+
+    it('box unwraps a vstack render result', async () => {
+      const view = box(vstack(text('a'), text('b')))
+
+      const result = await Effect.runPromise(view.render())
+      const lines = (typeof result === 'string' ? result : result.content).split('\n')
+
+      expect(lines).toHaveLength(4)
+      expect(lines[0]).toBe('╭───╮')
+      expect(lines[1]).toBe('│ a │')
+      expect(lines[2]).toBe('│ b │')
+      expect(lines[3]).toBe('╰───╯')
+    })
+
+    it('styled unwraps an empty render result', async () => {
+      const view = styled(empty(), '\x1b[31m')
+
+      const result = await Effect.runPromise(view.render())
+
+      expect(result).toBe('\x1b[31m\x1b[0m')
+    })
+
+    it('box keeps the right border aligned for styled lines', async () => {
+      const view = box(text('\x1b[31mab\x1b[0m'))
+
+      const result = await Effect.runPromise(view.render())
+      const lines = (typeof result === 'string' ? result : result.content).split('\n')
+
+      expect(stripAnsi(lines[1]!)).toBe('│ ab │')
     })
   })
 

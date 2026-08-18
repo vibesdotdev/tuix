@@ -8,8 +8,9 @@
 import { Stream, Effect, pipe, Queue, Schedule } from 'effect'
 import type { Subprocess } from 'bun'
 import { jsx } from '@tuix/jsx/runtime'
+import { $state, $effect } from '@tuix/reactive'
 import type { ProcessManager } from '@tuix/process-manager/manager'
-
+import type { ProcessLog } from '@tuix/process-manager/types'
 // Spawn component props
 export interface SpawnProps {
   /** Command to execute */
@@ -283,7 +284,10 @@ export function ManagedSpawnComponent(props: ManagedSpawnProps): JSX.Element {
   const { processManager, processConfig, ...spawnProps } = props
 
   if (processManager && props.processName) {
-    // Add to process manager
+    // Spawn is async; hold logs in a rune so the view re-renders when
+    // they land instead of reading an empty snapshot mid-race.
+    const logs = $state<ProcessLog[]>([], `${props.processName}-logs`)
+
     Effect.runPromise(
       Effect.promise(async () => {
         await processManager.add({
@@ -298,14 +302,25 @@ export function ManagedSpawnComponent(props: ManagedSpawnProps): JSX.Element {
         })
 
         await processManager.start(props.processName)
+        logs.$set(processManager.getLogs(props.processName))
       })
-    )
+    ).catch(error => {
+      console.error(`[ManagedSpawn] failed to start ${props.processName}:`, error)
+    })
 
-    // Get logs from process manager
-    const logs = processManager.getLogs(props.processName)
-    const logStream = Stream.fromIterable(logs)
+    // Live tail: the manager exposes no log event bus yet, so poll the
+    // ring on an interval and stop when the view unmounts.
+    $effect(() => {
+      const timer = setInterval(() => {
+        const current = processManager.getLogs(props.processName)
+        if (current.length !== logs().length) {
+          logs.$set(current)
+        }
+      }, 500)
+      return () => clearInterval(timer)
+    })
 
-    // TODO: Create live log stream from process manager
+    const logStream = Stream.fromIterable(logs())
 
     return jsx('StreamBox', {
       title: `Process: ${props.processName}`,

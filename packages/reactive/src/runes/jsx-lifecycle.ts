@@ -20,7 +20,7 @@
  * like everything else in TUIX's JSX/runes system.
  */
 
-import { Effect, Queue, Deferred } from 'effect'
+import { Effect } from 'effect'
 import type { View } from '../core/types'
 import { runUntracked } from './tracking'
 
@@ -31,7 +31,6 @@ interface ComponentState {
   id: string
   mounted: boolean
   destroyed: boolean
-  updateQueue: Queue.Queue<() => void>
   effects: {
     pre: Array<() => void | (() => void)>
     post: Array<() => void | (() => void)>
@@ -47,7 +46,8 @@ interface ComponentState {
 // Global component registry
 const components = new Map<string, ComponentState>()
 const componentStack: ComponentState[] = []
-let updatePromise: Deferred.Deferred<void> | null = null
+let updatePromise: Promise<void> | null = null
+let updateResolve: (() => void) | null = null
 let flushingUpdates = false
 
 /**
@@ -74,7 +74,6 @@ export function initComponent(): ComponentState {
     id: createComponentId(),
     mounted: false,
     destroyed: false,
-    updateQueue: Queue.unbounded<() => void>(),
     effects: {
       pre: [],
       post: [],
@@ -300,9 +299,11 @@ export function afterUpdate(fn: () => void): void {
  * console.log('All updates flushed!')
  * ```
  */
-export async function tick(): Promise<void> {
+export function tick(): Promise<void> {
   if (!updatePromise) {
-    updatePromise = Deferred.make<void>()
+    updatePromise = new Promise<void>(resolve => {
+      updateResolve = resolve
+    })
 
     // Schedule flush on next tick
     queueMicrotask(() => {
@@ -310,7 +311,7 @@ export async function tick(): Promise<void> {
     })
   }
 
-  return Deferred.await(updatePromise)
+  return updatePromise
 }
 
 /**
@@ -407,8 +408,9 @@ function flushUpdates(): void {
     })
 
     // Resolve tick promise
-    if (updatePromise) {
-      Deferred.succeed(updatePromise, undefined)
+    if (updateResolve) {
+      updateResolve()
+      updateResolve = null
       updatePromise = null
     }
   } finally {

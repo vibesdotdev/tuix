@@ -259,4 +259,113 @@ describe('Input Service Implementation', () => {
       expect(k).toBeDefined()
     })
   })
+
+  describe('Escape disambiguation and chunk boundaries (shipped path)', () => {
+    const setup = async () => {
+      const keyPub = await Effect.runPromise(PubSub.unbounded<KeyEvent>())
+      const mousePub = await Effect.runPromise(PubSub.unbounded<MouseEvent>())
+      const keys: KeyEvent[] = []
+      const fiber = Effect.runFork(
+        Stream.fromPubSub(keyPub).pipe(Stream.runForEach(ev => Effect.sync(() => keys.push(ev))))
+      )
+      await Effect.runPromise(Effect.sleep('10 millis'))
+      /** Let the subscriber fiber drain published events. */
+      const drain = () => Effect.runPromise(Effect.sleep('10 millis'))
+      return { keyPub, mousePub, keys, fiber, drain }
+    }
+
+    it('holds a lone ESC when focus tracking is on, then delivers Escape on flush', async () => {
+      const focusPub = await Effect.runPromise(PubSub.unbounded<{ focused: boolean }>())
+      const { keyPub, mousePub, keys, fiber, drain } = await setup()
+      try {
+        const rest = parseBuffer('\x1b', keyPub, mousePub, undefined, focusPub)
+        expect(rest).toBe('\x1b')
+        await drain()
+        expect(keys).toHaveLength(0)
+
+        const rest2 = parseBuffer(rest, keyPub, mousePub, undefined, focusPub, undefined, true)
+        expect(rest2).toBe('')
+        await drain()
+        expect(keys.map(k => k.key)).toEqual(['escape'])
+      } finally {
+        await Effect.runPromise(Fiber.interrupt(fiber).pipe(Effect.ignore))
+      }
+    })
+
+    it('waits on a split CSI sequence and completes it across chunks', async () => {
+      const { keyPub, mousePub, keys, fiber, drain } = await setup()
+      try {
+        // Ctrl+Up arrives split across two stdin chunks
+        const rest = parseBuffer('\x1b[1;', keyPub, mousePub)
+        expect(rest).toBe('\x1b[1;')
+        await drain()
+        expect(keys).toHaveLength(0)
+
+        const rest2 = parseBuffer(`${rest}5A`, keyPub, mousePub)
+        expect(rest2).toBe('')
+        await drain()
+        expect(keys.map(k => k.key)).toEqual(['ctrl+up'])
+      } finally {
+        await Effect.runPromise(Fiber.interrupt(fiber).pipe(Effect.ignore))
+      }
+    })
+
+    it('parses ESC+char as alt+key instead of escape+runes', async () => {
+      const { keyPub, mousePub, keys, fiber, drain } = await setup()
+      try {
+        const rest = parseBuffer('\x1ba', keyPub, mousePub)
+        expect(rest).toBe('')
+        await drain()
+        expect(keys).toHaveLength(1)
+        expect(keys[0]?.alt).toBe(true)
+        expect(keys[0]?.key).toBe('alt+a')
+      } finally {
+        await Effect.runPromise(Fiber.interrupt(fiber).pipe(Effect.ignore))
+      }
+    })
+
+    it('consumes an unknown complete CSI sequence without emitting runes', async () => {
+      const { keyPub, mousePub, keys, fiber, drain } = await setup()
+      try {
+        const rest = parseBuffer('x\x1b[9999~y', keyPub, mousePub)
+        expect(rest).toBe('')
+        await drain()
+        expect(keys.map(k => k.key)).toEqual(['x', 'y'])
+      } finally {
+        await Effect.runPromise(Fiber.interrupt(fiber).pipe(Effect.ignore))
+      }
+    })
+
+    it('emits one KeyEvent per astral-plane code point', async () => {
+      const { keyPub, mousePub, keys, fiber, drain } = await setup()
+      try {
+        const rest = parseBuffer('\u{1F600}a', keyPub, mousePub)
+        expect(rest).toBe('')
+        await drain()
+        expect(keys).toHaveLength(2)
+        expect(keys[0]?.runes).toBe('\u{1F600}')
+        expect(keys[1]?.runes).toBe('a')
+      } finally {
+        await Effect.runPromise(Fiber.interrupt(fiber).pipe(Effect.ignore))
+      }
+    })
+
+    it('reports X10 wheel events as wheel, not left press', async () => {
+      const keyPub = await Effect.runPromise(PubSub.unbounded<KeyEvent>())
+      const mousePub = await Effect.runPromise(PubSub.unbounded<MouseEvent>())
+      const collecting = Effect.runPromise(
+        Stream.fromPubSub(mousePub).pipe(Stream.take(2), Stream.runCollect, Effect.scoped)
+      )
+      await new Promise(resolve => setTimeout(resolve, 5))
+
+      // X10 wheel up = 0x40, wheel down = 0x41
+      const up = `\x1b[M${String.fromCharCode(32 + 64)}${String.fromCharCode(32 + 1)}${String.fromCharCode(32 + 1)}`
+      const down = `\x1b[M${String.fromCharCode(32 + 65)}${String.fromCharCode(32 + 1)}${String.fromCharCode(32 + 1)}`
+      parseBuffer(up + down, keyPub, mousePub)
+
+      const events = await collecting.then(chunk => Array.from(chunk))
+      expect(events[0]).toMatchObject({ type: 'wheel', button: 'wheel-up' })
+      expect(events[1]).toMatchObject({ type: 'wheel', button: 'wheel-down' })
+    })
+  })
 })

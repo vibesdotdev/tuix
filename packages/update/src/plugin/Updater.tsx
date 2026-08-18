@@ -25,6 +25,8 @@ export interface UpdaterModel {
   checker: UpdateChecker
   checkResult: UpdateCheckResult | null
   checking: boolean
+  /** True once a check has run (success or failure) — stops auto retry loops. */
+  checkAttempted: boolean
   error: string | null
   config: UpdateNotificationConfig
   bannerDismissed: boolean
@@ -67,6 +69,7 @@ export const Updater: Component<UpdaterProps, UpdaterModel, UpdaterMsg> = {
       checker,
       checkResult: null,
       checking: false,
+      checkAttempted: false,
       error: null,
       config: notificationConfig,
       bannerDismissed: false,
@@ -95,6 +98,7 @@ export const Updater: Component<UpdaterProps, UpdaterModel, UpdaterMsg> = {
         return {
           ...model,
           checking: false,
+          checkAttempted: true,
           checkResult: msg.result,
         }
 
@@ -102,6 +106,7 @@ export const Updater: Component<UpdaterProps, UpdaterModel, UpdaterMsg> = {
         return {
           ...model,
           checking: false,
+          checkAttempted: true,
           error: msg.error,
         }
 
@@ -150,8 +155,9 @@ export const Updater: Component<UpdaterProps, UpdaterModel, UpdaterMsg> = {
   },
 
   subscriptions: model => {
-    // Auto-check on startup if enabled
-    if (model.config.autoCheck && !model.checkResult && !model.checking) {
+    // Auto-check once on startup. Gated on checkAttempted (not just
+    // checkResult) so a failing check does not re-dispatch forever.
+    if (model.config.autoCheck && !model.checkAttempted && !model.checking) {
       return [Effect.succeed({ _tag: 'CheckForUpdates' as const })]
     }
     return []

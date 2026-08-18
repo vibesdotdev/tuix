@@ -26,7 +26,12 @@ import { style, Style, color, border, type StyleProps } from '@tuix/ansi'
 import {
   isBindableRune,
   isStateRune,
+  isRune,
   getGlobalEventBus,
+  registerFocusable,
+  isFocused,
+  setFocusedId,
+  getFocusedId,
   type BindableRune,
   type StateRune,
 } from '@tuix/reactive'
@@ -1503,10 +1508,38 @@ function renderJSX(
     }
     case 'text-input':
     case 'input': {
-      const value = stringProp(safeProps.value ?? safeProps['bind:value'])
+      const bound = safeProps['bind:value']
+      const boundRune =
+        isRune(bound) && typeof (bound as StateRune<string>).$set === 'function'
+          ? (bound as StateRune<string>)
+          : null
+      const value = stringProp(safeProps.value ?? (boundRune ? String(boundRune() ?? '') : bound))
       const placeholder = stringProp(safeProps.placeholder)
+
+      // Two-way binding: a named bound rune registers a focusable whose
+      // scoped key handler writes typed characters back through $set →
+      // MVU set-msg → model → repaint. The name (not the closure, which is
+      // recreated each render) is the stable focus id.
+      let focused = safeProps.focused === true
+      if (boundRune && safeProps.disabled !== true) {
+        const focusId =
+          typeof safeProps.id === 'string' && safeProps.id.length > 0
+            ? `input:${safeProps.id}`
+            : typeof boundRune.$key === 'string'
+              ? `bind:${boundRune.$key}`
+              : null
+        if (focusId) {
+          registerFocusable(focusId, makeBoundKeyHandler(boundRune, safeProps))
+          if (safeProps.autoFocus === true && getFocusedId() === null) {
+            setFocusedId(focusId)
+          }
+          focused = isFocused(focusId)
+        } else {
+          warnUnnamedBind()
+        }
+      }
+
       const shown = value.length > 0 ? value : placeholder
-      const focused = safeProps.focused === true
       return paintCell(focused ? `▌${shown}▐` : `[${shown}]`, safeProps)
     }
     case 'textarea': {
@@ -1532,10 +1565,73 @@ function renderJSX(
       return views.length === 1 ? views[0]! : vstack(...views)
     }
 
-    default:
-      // For unknown types, try to create a text node
+    default: {
+      // Unknown intrinsics render as literal `[type]` text so the typo is
+      // visible on screen — but it is almost always a bug, so warn once
+      // per type (no spam on repeated renders).
+      warnUnknownIntrinsic(type)
       debug(`[RUNTIME] Unknown element type: ${type}, creating text node`)
       return text(`[${type}]`)
+    }
+  }
+}
+
+const warnedUnknownIntrinsics = new Set<string>()
+
+function warnUnknownIntrinsic(type: string): void {
+  if (warnedUnknownIntrinsics.has(type)) return
+  warnedUnknownIntrinsics.add(type)
+  if (process.env.TUIX_SILENT_UNKNOWN_INTRINSICS) return
+  console.warn(
+    `[tuix] Unknown JSX element <${type}> — rendering literal [${type}]. ` +
+      `Check the tag name; widgets come from @tuix/ui.`
+  )
+}
+
+let warnedUnnamedBind = false
+function warnUnnamedBind(): void {
+  if (warnedUnnamedBind) return
+  warnedUnnamedBind = true
+  console.warn(
+    '[tuix] bind:value on an input needs a named $state (e.g. $state("", "field") ' +
+      'or $states({...})) for focus + write-back; rendering display-only.'
+  )
+}
+
+/**
+ * Scoped key handler for an input bound to a rune. Returns true when the
+ * key was consumed (prevents broadcast to global handlers).
+ */
+function makeBoundKeyHandler(
+  rune: StateRune<string>,
+  props: Record<string, unknown>
+): (key: string) => boolean {
+  const current = () => String(rune() ?? '')
+  const limit = toNumber(props.charLimit)
+  const onChange = typeof props.onChange === 'function' ? props.onChange : undefined
+  const onSubmit = typeof props.onSubmit === 'function' ? props.onSubmit : undefined
+
+  return (key: string): boolean => {
+    // The legacy parser names Enter 'ctrl+m' (\r) / 'ctrl+j' (\n).
+    if (key === 'enter' || key === 'Enter' || key === 'ctrl+m' || key === 'ctrl+j') {
+      onSubmit?.(current())
+      return true
+    }
+    if (key === 'backspace' || key === 'Backspace' || key === '\x7f') {
+      const v = current()
+      if (v.length > 0) {
+        rune.$set(v.slice(0, -1))
+        onChange?.(rune())
+      }
+      return true
+    }
+    if (key.length === 1 && key >= ' ' && key !== '\x1b') {
+      if (limit != null && limit >= 0 && current().length >= limit) return true
+      rune.$set(current() + key)
+      onChange?.(rune())
+      return true
+    }
+    return false
   }
 }
 
@@ -1688,12 +1784,24 @@ export namespace JSX {
       placeholder?: string
       focused?: boolean
       'bind:value'?: unknown
+      id?: string
+      autoFocus?: boolean
+      charLimit?: number
+      disabled?: boolean
+      onChange?: (value: string) => void
+      onSubmit?: (value: string) => void
     }
     input: {
       value?: string
       placeholder?: string
       focused?: boolean
       'bind:value'?: unknown
+      id?: string
+      autoFocus?: boolean
+      charLimit?: number
+      disabled?: boolean
+      onChange?: (value: string) => void
+      onSubmit?: (value: string) => void
     }
     textarea: {
       value?: string

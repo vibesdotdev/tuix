@@ -316,7 +316,7 @@ export class ReactivityModule extends ModuleBase {
     dependencies?: unknown[]
   ): Effect<void, never> {
     return this.emitEvent<EffectEvent>(ReactivityEventChannels.EFFECT, {
-      type: 'effect-executed',
+      type: 'effect-error',
       effectId,
       dependencies,
       error,

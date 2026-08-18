@@ -7,6 +7,14 @@ import { getGlobalEventBus } from '@tuix/core/events'
 import { getGlobalRegistry } from '@tuix/core'
 import { ReactivityModule } from './module'
 import { trackRead, pushCollector, popCollector, runUntracked } from './tracking'
+import {
+  dispatchOverlayKey,
+  dispatchFocusedKey,
+  cycleFocus,
+  focusCount,
+  hasOverlayKeyHandlers,
+  getFocusedId,
+} from './focus'
 
 export { runUntracked }
 
@@ -106,15 +114,52 @@ export function registerKeyHandler(handler: (key: string) => void): () => void {
   }
 }
 
-/** Called by Runtime on each KeyPress (string form of the key). */
+/**
+ * Called by Runtime on each KeyPress (string form of the key).
+ *
+ * Routing order: overlay (modal) handlers first — a modal owns keys while
+ * open, nothing falls through — then Tab focus cycling (when focusables
+ * exist), then the focused widget's scoped handler, then global handlers.
+ * A scoped handler that returns `true` consumes the key.
+ */
 export function emitKeyToHandlers(key: string): void {
-  for (const h of keyHandlers) {
+  if (process.env.TUIX_DEBUG_KEYS) {
+    const consumed = debugRoute(key)
+    console.log('[emitKeyToHandlers]', JSON.stringify(key), {
+      overlay: hasOverlayKeyHandlers(),
+      focusables: focusCount(),
+      focused: getFocusedId(),
+      consumed,
+    })
+    return
+  }
+  debugRoute(key)
+}
+
+function debugRoute(key: string): boolean {
+  if (hasOverlayKeyHandlers()) {
+    dispatchOverlayKey(key)
+    return true
+  }
+  if (focusCount() > 0) {
+    if (key === 'tab' || key === 'Tab') {
+      cycleFocus(1)
+      return true
+    }
+    if (key === 'shift+tab' || key === 'Shift+Tab' || key === 'btab') {
+      cycleFocus(-1)
+      return true
+    }
+  }
+  if (dispatchFocusedKey(key)) return true
+  for (const h of [...keyHandlers]) {
     try {
       h(key)
     } catch {
       /* handler errors must not kill input */
     }
   }
+  return false
 }
 
 export function clearKeyHandlers(): void {
@@ -166,6 +211,7 @@ export interface BindableRune<T> extends StateRune<T> {
 
 export interface DerivedRune<T> extends Rune<T> {
   readonly $type: 'derived'
+  $subscribe(listener: (value: T) => void): () => void
 }
 
 export interface BindableOptions<T> {
@@ -209,7 +255,10 @@ export function $state<T>(initial: T, name?: string): StateRune<T> {
       if (module) {
         Effect.runSync(module.emitStateChange(runeId, newValue, 'user'))
       }
-      listeners.forEach(listener => listener(value))
+      // Snapshot: a listener may unsubscribe/resubscribe during notification
+      // (e.g. a $derived recompute), and Set.forEach would then visit the
+      // fresh listener too — re-entrant notification loops.
+      for (const listener of [...listeners]) listener(value)
       // Named state → MVU model (required for paint after next beginViewHydration)
       if (name && mvuPush) {
         mvuPush({ type: 'set', key: name, value: newValue })
@@ -285,7 +334,7 @@ export function $bindable<T>(initial: T, options: BindableOptions<T> = {}): Bind
       if (module) {
         Effect.runSync(module.emitStateChange(runeId, finalValue, 'user'))
       }
-      listeners.forEach(listener => listener(value))
+      for (const listener of [...listeners]) listener(value)
     }
   }
 
@@ -310,42 +359,73 @@ export function $bindable<T>(initial: T, options: BindableOptions<T> = {}): Bind
 export function $derived<T>(fn: () => T): DerivedRune<T> {
   let cached: T | undefined
   let hasCache = false
+  let computing = false
   const unsubs: Array<() => void> = []
+  const derivedListeners = new Set<(value: T) => void>()
+
+  // Assigned right after the rune is created; avoids referencing the binding
+  // inside its own initializer (TDZ hazard) while still letting reads of this
+  // derived register as a dependency of an enclosing derivation.
+  let self: { $subscribe: (l: (v: unknown) => void) => () => void } | null = null
 
   const recompute = () => {
-    for (const u of unsubs) u()
-    unsubs.length = 0
-
-    const deps = new Set<{ $subscribe: (l: (v: unknown) => void) => () => void }>()
-    pushCollector(deps as any)
+    if (computing) return
+    computing = true
     try {
-      cached = fn()
-      hasCache = true
-    } finally {
-      popCollector()
-    }
+      for (const u of unsubs) u()
+      unsubs.length = 0
 
-    // Subscribe without treating the immediate callback as invalidation
-    for (const dep of deps) {
-      let first = true
-      unsubs.push(
-        dep.$subscribe(() => {
-          if (first) {
-            first = false
-            return
-          }
-          hasCache = false
-        })
-      )
+      const deps = new Set<{ $subscribe: (l: (v: unknown) => void) => () => void }>()
+      pushCollector(deps as any)
+      try {
+        cached = fn()
+        hasCache = true
+      } finally {
+        popCollector()
+      }
+
+      // The immediate callback only primes the `first` flag; real changes
+      // arrive later. Notifications iterate a snapshot so a listener that
+      // resubscribes during invalidation cannot re-enter the loop.
+      for (const dep of deps) {
+        let first = true
+        unsubs.push(
+          dep.$subscribe(() => {
+            if (first) {
+              first = false
+              return
+            }
+            invalidate()
+          })
+        )
+      }
+    } finally {
+      computing = false
     }
   }
 
+  const invalidate = () => {
+    if (computing) return
+    hasCache = false
+    const value = rune()
+    for (const listener of [...derivedListeners]) listener(value)
+  }
+
   const rune = (() => {
+    if (self) trackRead(self)
     if (!hasCache) recompute()
     return cached as T
   }) as DerivedRune<T>
+  self = rune as unknown as { $subscribe: (l: (v: unknown) => void) => () => void }
 
   rune.$type = 'derived' as const
+  rune.$subscribe = (listener: (value: T) => void) => {
+    derivedListeners.add(listener)
+    listener(rune())
+    return () => {
+      derivedListeners.delete(listener)
+    }
+  }
   return rune
 }
 

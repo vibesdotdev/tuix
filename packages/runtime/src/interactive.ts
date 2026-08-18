@@ -5,7 +5,7 @@
  * using Effect.ts for proper scoping and lifecycle management
  */
 
-import { Effect, Context, Layer, Ref, FiberRef } from 'effect'
+import { Effect, Context, Layer, Ref, FiberRef, Fiber } from 'effect'
 import { runApp } from './mvu/runtime'
 import type { View } from '@tuix/view/primitives/view'
 
@@ -67,6 +67,7 @@ export const InteractiveContextLive = Layer.effect(
   Effect.gen(function* () {
     const config = yield* Ref.make(defaultConfig)
     const isActive = yield* Ref.make(false)
+    let timeoutFiber: Fiber.RuntimeFiber<void> | null = null
 
     return {
       config,
@@ -80,9 +81,14 @@ export const InteractiveContextLive = Layer.effect(
           yield* Ref.set(isActive, true)
           yield* FiberRef.set(InteractiveFiberRef, true)
 
-          // Set up timeout if configured
+          // Set up timeout if configured (replacing any previous one so
+          // repeated enter() calls don't leak sleep fibers)
+          if (timeoutFiber) {
+            yield* Fiber.interrupt(timeoutFiber).pipe(Effect.ignore)
+            timeoutFiber = null
+          }
           if (newConfig.timeout) {
-            yield* Effect.fork(
+            timeoutFiber = yield* Effect.fork(
               Effect.sleep(newConfig.timeout).pipe(
                 Effect.zipRight(Ref.set(isActive, false)),
                 Effect.zipRight(Effect.log('Interactive mode timed out'))
@@ -93,6 +99,10 @@ export const InteractiveContextLive = Layer.effect(
 
       exit: (code = 0) =>
         Effect.gen(function* () {
+          if (timeoutFiber) {
+            yield* Fiber.interrupt(timeoutFiber).pipe(Effect.ignore)
+            timeoutFiber = null
+          }
           yield* Ref.set(isActive, false)
           yield* FiberRef.set(InteractiveFiberRef, false)
           const cfg = yield* Ref.get(config)
