@@ -1,14 +1,13 @@
 /** @jsxImportSource @tuix/jsx */
 
 /**
- * Tasks — a real example app: board with filters, live add via bind:value,
- * toggle/complete with ✓, and a scrim confirm modal.
+ * Tasks — task board with filters, focus-ring input, and a scrim confirm.
  *
- * Keys: [tab] focus ring · [j/k] move · [space] toggle · [x] delete
- *       (confirm) · [1/2/3] filter · [esc] reset
+ * Keys: [tab] focus input · [j/k] move · [space] toggle · [x] delete ·
+ *       [1/2/3] filter · [esc] reset
  */
 
-import { $state, $states, $derived, registerKeyHandler, isFocused } from '@tuix/reactive'
+import { $state, $derived, registerKeyHandler, isFocused } from '@tuix/reactive'
 import { Input, KbdHint, Modal, useUITheme } from '@tuix/ui'
 
 type Filter = 'all' | 'active' | 'done'
@@ -28,20 +27,19 @@ const SEED: Task[] = [
   { id: 5, title: 'Gallery page on the site', tag: 'www', done: false },
 ]
 
+const LIST_W = 44
+
 let nextId = 6
 let keyCleanup: (() => void) | null = null
 
 export default function Tasks() {
   const { theme } = useUITheme()
-  const s = $states({
-    tasks: SEED as Task[],
-    cursor: 0,
-    filter: 'all' as Filter,
-    draft: '',
-    confirm: -1,
-    notice: '',
-  })
-  const { tasks, cursor, filter, draft, confirm, notice } = s
+  const tasks = $state(SEED as Task[], 'tasks')
+  const cursor = $state(0, 'cursor')
+  const filter = $state<Filter>('all', 'filter')
+  const draft = $state('', 'draft')
+  const confirm = $state(-1, 'confirm')
+  const notice = $state('', 'notice')
 
   const visible = $derived(() => {
     const all = tasks()
@@ -110,87 +108,96 @@ export default function Tasks() {
   ]
 
   return (
-    <vstack gap={0}>
-      {/* Header: title chip + stats (charm-style) */}
-      <hstack gap={1}>
-        <text bg={theme.colors.primary} fg={theme.colors.bg}>
-          {' Tuix Tasks '}
+    <box padding={1}>
+      <vstack gap={0}>
+        {/* Header: title chip + stats */}
+        <hstack gap={1}>
+          <text bg={theme.colors.primary} fg={theme.colors.bg}>
+            {' Tuix Tasks '}
+          </text>
+          <text fg={dim}>{`${open} open · ${done} done`}</text>
+        </hstack>
+        <text> </text>
+
+        {/* Filter row on the list grid */}
+        <hstack gap={1} width={LIST_W}>
+          {FILTERS.map(([f, label]) => {
+            const active = filter() === f
+            return (
+              <text key={f} fg={active ? theme.colors.primary : dim}>
+                {active ? `[ ${label} ]` : ` ${label} `}
+              </text>
+            )
+          })}
+          <text fg={dim}>{`· ${list.length}`}</text>
+        </hstack>
+        <text> </text>
+
+        {/* Task rows: cursor mark, state mark, title, tag on one grid */}
+        {list.length === 0 ? (
+          <text width={LIST_W} fg={dim}>
+            nothing here — tab to the input and add one
+          </text>
+        ) : (
+          list.map((t, i) => {
+            const at = i === cursor()
+            return (
+              <hstack key={t.id} gap={1} width={LIST_W}>
+                <text fg={at ? theme.colors.primary : dim}>{at ? '▸' : ' '}</text>
+                <text fg={t.done ? theme.colors.success : dim}>{t.done ? '✓' : '·'}</text>
+                <text fg={t.done ? dim : at ? bright : undefined}>{t.title}</text>
+                <text fg={dim}>{`· ${t.tag}`}</text>
+              </hstack>
+            )
+          })
+        )}
+        <text> </text>
+
+        {/* New task: focus-ring input on the same grid */}
+        <hstack gap={1}>
+          <text fg={dim}>{'new'}</text>
+          <Input
+            bind:value={draft}
+            placeholder="task title, enter to add"
+            width={LIST_W - 5}
+            onSubmit={add}
+          />
+        </hstack>
+
+        {/* Status line + hints */}
+        <text> </text>
+        <text fg={notice() ? theme.colors.success : dim} width={LIST_W}>
+          {notice() ? notice() : 'tab focuses the input'}
         </text>
-        <text fg={dim}>{`${open} open · ${done} done`}</text>
-      </hstack>
-      <text> </text>
+        <text> </text>
+        <hstack gap={2}>
+          <KbdHint keys="tab" label="focus" />
+          <KbdHint keys="j/k" label="move" />
+          <KbdHint keys="space" label="toggle" />
+          <KbdHint keys="x" label="delete" />
+          <KbdHint keys="1/2/3" label="filter" />
+        </hstack>
 
-      {/* Filter tabs */}
-      <hstack gap={1}>
-        {FILTERS.map(([f, label]) => {
-          const active = filter() === f
-          return (
-            <text key={f} fg={active ? theme.colors.primary : dim}>
-              {active ? `[ ${label} ]` : `  ${label}  `}
-            </text>
-          )
-        })}
-        <text fg={dim}>{`· ${list.length} shown`}</text>
-      </hstack>
-      <text> </text>
-
-      {/* Task rows: ✓ + dim for done, ▸ + accent for cursor */}
-      {list.length === 0 ? (
-        <text fg={dim}>nothing here — tab to the input and add one</text>
-      ) : (
-        list.map((t, i) => {
-          const at = i === cursor()
-          return (
-            <hstack key={t.id} gap={1}>
-              <text fg={at ? theme.colors.primary : dim}>{at ? '▸' : ' '}</text>
-              <text fg={t.done ? theme.colors.success : dim}>{t.done ? '✓' : '·'}</text>
-              <text fg={t.done ? dim : at ? bright : undefined}>{t.title}</text>
-              <text fg={dim}>{`· ${t.tag}`}</text>
-            </hstack>
-          )
-        })
-      )}
-      <text> </text>
-
-      {/* New task: focus-ring input (bind:value two-way) */}
-      <hstack gap={1}>
-        <text fg={dim}>{'new >'}</text>
-        <Input bind:value={draft} placeholder="task title, enter to add" onSubmit={add} />
-      </hstack>
-
-      {/* Status line + footer keys */}
-      <text> </text>
-      <text fg={notice() ? theme.colors.success : dim}>
-        {notice() ? notice() : `${tasks().length} total · tab focuses the input`}
-      </text>
-      <text> </text>
-      <hstack gap={1}>
-        <KbdHint keys="tab" label="focus input" />
-        <KbdHint keys="j/k" label="move" />
-        <KbdHint keys="space" label="toggle" />
-        <KbdHint keys="x" label="delete" />
-        <KbdHint keys="1/2/3" label="filter" />
-      </hstack>
-
-      <Modal
-        open={confirm() >= 0}
-        title="Delete task?"
-        width={40}
-        height={7}
-        scrim
-        closeOnBackdrop
-        onClose={() => confirm.$set(-1)}
-        onCancel={() => confirm.$set(-1)}
-        cancelLabel="Keep"
-        onConfirm={() => {
-          tasks.$set(tasks().filter(t => t.id !== confirm()))
-          confirm.$set(-1)
-          say('deleted')
-        }}
-        confirmLabel="Delete"
-      >
-        <text>{visible()[Math.max(0, cursor())]?.title ?? ''}</text>
-      </Modal>
-    </vstack>
+        <Modal
+          open={confirm() >= 0}
+          title="Delete task?"
+          width={44}
+          height={8}
+          scrim
+          closeOnBackdrop
+          onClose={() => confirm.$set(-1)}
+          onCancel={() => confirm.$set(-1)}
+          cancelLabel="Keep"
+          onConfirm={() => {
+            tasks.$set(tasks().filter(t => t.id !== confirm()))
+            confirm.$set(-1)
+            say('deleted')
+          }}
+          confirmLabel="Delete"
+        >
+          <text>{visible()[Math.max(0, cursor())]?.title ?? ''}</text>
+        </Modal>
+      </vstack>
+    </box>
   )
 }

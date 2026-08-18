@@ -29,9 +29,9 @@ export function formatKeys(keys: string): string {
       if (lower === 'down') return '↓'
       if (lower === 'left') return '←'
       if (lower === 'right') return '→'
-      if (lower.length === 1 && /\d/.test(lower)) return lower
-      if (lower.length === 1) return lower.toUpperCase()
-      return part.charAt(0).toUpperCase() + part.slice(1)
+      if (lower.length === 1) return lower
+      // Combos and words render as typed (j/k, ctrl+c, 1/2/3)
+      return part
     })
   return parts.join('')
 }

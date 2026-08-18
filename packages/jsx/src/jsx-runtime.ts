@@ -1540,8 +1540,15 @@ function renderJSX(
         }
       }
 
-      const shown = value.length > 0 ? value : placeholder
-      return paintCell(focused ? `▌${shown}▐` : `[${shown}]`, safeProps)
+      // Fixed-width interior keeps every field box the same size regardless
+      // of value length (form-grid alignment).
+      const widthHint = toNumber(safeProps.width)
+      let shown = value.length > 0 ? value : placeholder
+      if (widthHint && widthHint >= 4) {
+        const interior = widthHint - 4
+        shown = shown.slice(0, interior).padEnd(interior)
+      }
+      return paintCell(focused ? `▌ ${shown} ▐` : `[ ${shown} ]`, safeProps)
     }
     case 'textarea': {
       const fromChildren = toTextContent(validChildren)
@@ -1613,6 +1620,14 @@ function makeBoundKeyHandler(
   const onSubmit = typeof props.onSubmit === 'function' ? props.onSubmit : undefined
 
   return (key: string): boolean => {
+    // The parser names the space key 'space'; every other printable arrives
+    // as itself. Both must insert a character.
+    const ch =
+      key === 'space' || key === 'Space'
+        ? ' '
+        : key.length === 1 && key >= ' ' && key !== '\x1b'
+          ? key
+          : null
     // The legacy parser names Enter 'ctrl+m' (\r) / 'ctrl+j' (\n).
     if (key === 'enter' || key === 'Enter' || key === 'ctrl+m' || key === 'ctrl+j') {
       onSubmit?.(current())
@@ -1626,9 +1641,9 @@ function makeBoundKeyHandler(
       }
       return true
     }
-    if (key.length === 1 && key >= ' ' && key !== '\x1b') {
+    if (ch !== null) {
       if (limit != null && limit >= 0 && current().length >= limit) return true
-      rune.$set(current() + key)
+      rune.$set(current() + ch)
       onChange?.(rune())
       return true
     }

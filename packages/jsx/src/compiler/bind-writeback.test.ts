@@ -59,6 +59,16 @@ describe('bind:value write-back', () => {
     expect(draft()).toBe('a')
   })
 
+  test('space inserts a space character (not swallowed)', async () => {
+    const draft = $state('', 'draft-space')
+    await render(jsx('input', { 'bind:value': draft }))
+    cycleFocus(1)
+    emitKeyToHandlers('a')
+    emitKeyToHandlers('space')
+    emitKeyToHandlers('b')
+    expect(draft()).toBe('a b')
+  })
+
   test('enter fires onSubmit with the current value', async () => {
     const draft = $state('', 'draft3')
     let submitted = ''
@@ -99,11 +109,11 @@ describe('bind:value write-back', () => {
     const draft = $state('hi', 'draft6')
     await render(jsx('input', { 'bind:value': draft }))
     const unfocused = await render(jsx('input', { 'bind:value': draft }))
-    expect(unfocused).toContain('[hi]')
+    expect(unfocused).toContain('[ hi ]')
 
     cycleFocus(1)
     const focused = await render(jsx('input', { 'bind:value': draft }))
-    expect(focused).toContain('▌hi▐')
+    expect(focused).toContain('▌ hi ▐')
   })
 
   test('sweep drops focusables from widgets that stop rendering', async () => {

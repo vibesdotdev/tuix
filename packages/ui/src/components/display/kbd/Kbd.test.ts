@@ -5,21 +5,28 @@ import { skeletonLine } from '../../feedback/skeleton/Skeleton.tsx'
 import { sparklineBars } from '../../data/sparkline/Sparkline.tsx'
 
 describe('Kbd.formatKeys', () => {
-  it('uppercases single keys', () => {
+  it('renders single keys as typed (what the user presses)', () => {
     expect(formatKeys('/')).toBe('/')
-    expect(formatKeys('a')).toBe('A')
+    expect(formatKeys('a')).toBe('a')
+    expect(formatKeys('?')).toBe('?')
   })
 
   it('expands modifiers and named keys', () => {
-    expect(formatKeys('ctrl+s')).toBe('^S')
+    expect(formatKeys('ctrl+s')).toBe('^s')
     expect(formatKeys('alt+enter')).toBe('⌥Enter')
     expect(formatKeys('esc')).toBe('Esc')
     expect(formatKeys('space')).toBe('Space')
+    expect(formatKeys('tab')).toBe('Tab')
+  })
+
+  it('keeps combos as written', () => {
+    expect(formatKeys('j/k')).toBe('j/k')
+    expect(formatKeys('1/2/3')).toBe('1/2/3')
   })
 
   it('drops empty parts', () => {
-    expect(formatKeys('a++b')).toBe('AB')
-    expect(formatKeys('ctrl + x')).toBe('^X')
+    expect(formatKeys('a++b')).toBe('ab')
+    expect(formatKeys('ctrl + x')).toBe('^x')
   })
 })
 

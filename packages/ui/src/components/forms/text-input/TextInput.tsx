@@ -48,6 +48,7 @@ export function Input(props: InputProps): JSX.Element {
         className={props.className}
         value={displayed}
         placeholder={props.placeholder}
+        width={props.width}
         focused={props.focused}
         disabled={props.disabled}
         fg={props.focused ? theme.colors.primary : colors.white}
