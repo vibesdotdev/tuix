@@ -92,7 +92,7 @@ const next = $derived(data.next)
 
 	@media (min-width: 720px) {
 		.meta-grid {
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		}
 	}
 
@@ -148,7 +148,7 @@ const next = $derived(data.next)
 
 	.docs-pager {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		gap: 0.85rem;
 		margin-top: 2.75rem;
 		padding-top: 1.75rem;
@@ -194,7 +194,7 @@ const next = $derived(data.next)
 
 	@media (max-width: 560px) {
 		.docs-pager {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 		.pager-link.next {
 			text-align: left;

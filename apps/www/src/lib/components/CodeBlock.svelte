@@ -152,10 +152,19 @@ async function copy() {
     padding: 0.28rem 0.55rem;
     border-radius: 6px;
     cursor: pointer;
+    min-height: 1.6rem;
     transition:
       color 0.12s ease,
       border-color 0.12s ease,
       background 0.12s ease;
+  }
+
+  /* Comfortable touch target on phones */
+  @media (pointer: coarse) {
+    .copy-btn {
+      min-height: 2.2rem;
+      min-width: 3.4rem;
+    }
   }
 
   .copy-btn:hover {

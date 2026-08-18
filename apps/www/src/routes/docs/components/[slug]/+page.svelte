@@ -83,7 +83,7 @@ function pkgSlug(name: string) {
 <style>
 	.docs-pager {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		gap: 0.75rem;
 		margin-top: 2.5rem;
 		padding-top: 1.5rem;
@@ -127,7 +127,7 @@ function pkgSlug(name: string) {
 
 	@media (max-width: 560px) {
 		.docs-pager {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 		.pager-link.next {
 			text-align: left;

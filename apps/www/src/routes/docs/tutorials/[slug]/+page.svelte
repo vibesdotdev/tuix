@@ -132,7 +132,7 @@ function pkgSlug(name: string) {
 
 	@media (min-width: 720px) {
 		.meta-grid {
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		}
 		.meta-grid .meta-card:first-child {
 			grid-column: 1 / -1;
@@ -281,7 +281,7 @@ function pkgSlug(name: string) {
 
 	.docs-pager {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		gap: 0.85rem;
 		margin-top: 2.75rem;
 		padding-top: 1.75rem;
@@ -327,7 +327,7 @@ function pkgSlug(name: string) {
 
 	@media (max-width: 560px) {
 		.docs-pager {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 		.pager-link.next {
 			text-align: left;

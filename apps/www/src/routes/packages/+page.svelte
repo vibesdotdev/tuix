@@ -72,7 +72,7 @@ const layers = packagesByLayer()
 
 	@media (max-width: 560px) {
 		.pkg-grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 

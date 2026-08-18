@@ -90,7 +90,7 @@ await runApp(Hello, { interactive: false })`,
 <style>
 	.step-block {
 		display: grid;
-		grid-template-columns: auto 1fr;
+		grid-template-columns: auto minmax(0, 1fr);
 		gap: 1rem;
 		margin-bottom: 0.5rem;
 		align-items: start;
@@ -128,7 +128,7 @@ await runApp(Hello, { interactive: false })`,
 
 	@media (max-width: 560px) {
 		.step-block {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 		.step-num {
 			margin-bottom: 0.25rem;

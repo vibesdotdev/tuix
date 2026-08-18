@@ -245,7 +245,7 @@ $ bun test
 
 	@media (max-width: 860px) {
 		.evidence-grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 

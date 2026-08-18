@@ -90,7 +90,7 @@ const sampleFeatures = featureDocs.slice(0, 6)
 
 	@media (max-width: 640px) {
 		.doc-cards {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 

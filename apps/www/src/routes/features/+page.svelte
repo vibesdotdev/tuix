@@ -84,7 +84,7 @@ function pkgSlug(name: string) {
 
 	@media (max-width: 700px) {
 		.feat-grid {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 
