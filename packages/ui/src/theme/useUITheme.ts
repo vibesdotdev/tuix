@@ -5,7 +5,7 @@
  */
 
 import type { Theme, ThemeDepth } from '@tuix/themes'
-import { depthOf, vibesTheme } from '@tuix/themes'
+import { depthOf, vibesTheme, themeForColorScheme } from '@tuix/themes'
 import { $state } from '@tuix/reactive'
 import { colors } from '@tuix/ansi'
 
@@ -75,6 +75,16 @@ export function setUITheme(theme: Theme): void {
 /** Restore the default vibes theme. */
 export function resetUITheme(): void {
   globalTheme.$set(vibesTheme)
+}
+
+/**
+ * Apply the theme variant matching a detected terminal color scheme.
+ * Feed it the result of an OSC 11 background probe (or 'unknown' when the
+ * terminal never answered) — light terminals get the light theme, dark and
+ * unknown keep the vibes default.
+ */
+export function setUIThemeForScheme(scheme: 'light' | 'dark' | 'unknown'): void {
+  globalTheme.$set(themeForColorScheme(scheme))
 }
 
 /**

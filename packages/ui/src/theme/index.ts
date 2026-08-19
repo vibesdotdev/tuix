@@ -6,6 +6,7 @@ export {
   useUITheme,
   setUITheme,
   resetUITheme,
+  setUIThemeForScheme,
   getTextColor,
   getBackgroundColor,
 } from './useUITheme'

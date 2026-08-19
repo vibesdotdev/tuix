@@ -14,6 +14,23 @@ import { collectOverlays } from '../../types/overlay'
 import { RenderError } from '../../types/errors'
 import type { Viewport } from '../../../types/schemas'
 import { toAnsiStyleCode } from '@tuix/ansi'
+import { cursorTo } from '@tuix/ansi'
+
+/** DECSET 2026 — begin synchronized update (terminal buffers until ESU). */
+const SYNC_UPDATE_BEGIN = '\x1b[?2026h'
+/** DECSET 2026 — end synchronized update (terminal paints the frame). */
+const SYNC_UPDATE_END = '\x1b[?2026l'
+
+/** Visual width of a grapheme, memoized (width is a diff-loop hotspot). */
+const widthCache = new Map<string, number>()
+function graphemeWidth(char: string): number {
+  const cached = widthCache.get(char)
+  if (cached !== undefined) return cached
+  const width = Bun.stringWidth(char)
+  if (widthCache.size > 4096) widthCache.clear()
+  widthCache.set(char, width)
+  return width
+}
 
 function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): boolean {
   if (Option.isNone(a) && Option.isNone(b)) return true
@@ -221,9 +238,9 @@ class ScreenBuffer {
       const row = y + ly
       if (row < 0 || row >= this.height) continue
       const cells = parseVisualCells(lines[ly] ?? '')
+      let col = x
       for (let lx = 0; lx < cells.length; lx++) {
-        const col = x + lx
-        if (col < 0 || col >= this.width) continue
+        if (col < 0 || col >= this.width) break
         const cell = cells[lx]!
         const style =
           cell.fg || cell.bg
@@ -232,11 +249,10 @@ class ScreenBuffer {
                 ...(cell.bg ? { background: rgb(cell.bg.r, cell.bg.g, cell.bg.b) } : {}),
               })
             : Option.none<AnsiStyle>()
-        this.cells[row]![col] = {
-          char: cell.char || ' ',
-          style,
-          painted: true,
-        }
+        this.cells[row]![col] = { char: cell.char || ' ', style, painted: true }
+        // parseVisualCells already expands wide graphemes into trailing
+        // space cells, so one cell is one column — advance accordingly.
+        col += graphemeWidth(cell.char || ' ')
       }
     }
   }
@@ -279,6 +295,16 @@ class ScreenBuffer {
         if (a.char !== b.char || !stylesEqual(a.style, b.style)) {
           if (!run.length) runX = x
           run.push(b)
+          // Wide graphemes (especially emoji with VS16) leave residue in the
+          // trailing columns the old glyph occupied: some terminals do not
+          // clear them when a narrower glyph replaces a wide one. Extend the
+          // patch across the wider span so those columns are repainted
+          // explicitly even when the new cells match the previous buffer.
+          const span = Math.max(graphemeWidth(a.char), graphemeWidth(b.char))
+          for (let t = 1; t < span && x + t < w; t++) {
+            run.push(other.cells[y]![x + t]!)
+          }
+          x += span - 1
         } else {
           flush()
         }
@@ -722,15 +748,24 @@ export const RendererServiceLive = Layer.effect(
         let currentStyle: Option.Option<AnsiStyle> = Option.none()
         const caps = yield* _(terminal.getCapabilities)
 
+        // One write per frame: the whole diff is concatenated into a single
+        // payload so the terminal never presents a partial frame, and the
+        // payload is wrapped in DECSET 2026 synchronized output (BSU/ESU) so
+        // capable terminals hold rendering until the frame is complete.
+        // Emitted unconditionally: terminals that ignore 2026 paint as bytes
+        // arrive (no worse than before), and probing via DECRQM misreports
+        // under tmux ≥3.7.
+        let frame = SYNC_UPDATE_BEGIN
+
         for (const patch of patches) {
           // CUP is 1-based; the cell buffer is 0-based.
-          yield* _(terminal.moveCursor(patch.x + 1, patch.y + 1))
+          frame += cursorTo(patch.x + 1, patch.y + 1)
 
           let line = ''
           for (const cell of patch.cells) {
             if (!stylesEqual(cell.style, currentStyle)) {
               if (line.length > 0) {
-                yield* _(terminal.write(line))
+                frame += line
                 line = ''
               }
               const styleCode = pipe(
@@ -738,17 +773,19 @@ export const RendererServiceLive = Layer.effect(
                 Option.map(s => toAnsiStyleCode(s, caps.colorProfile)),
                 Option.getOrElse(() => toAnsiStyleCode({}, caps.colorProfile))
               )
-              yield* _(terminal.write(styleCode))
+              frame += styleCode
               currentStyle = cell.style
             }
             line += cell.char
           }
 
           if (line.length > 0) {
-            yield* _(terminal.write(line))
+            frame += line
           }
         }
-        yield* _(terminal.write('\x1b[0m'))
+
+        frame += `\x1b[0m${SYNC_UPDATE_END}`
+        yield* _(terminal.write(frame))
       }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'composite', cause }))))
 
     const setViewport = (viewport: Viewport) =>

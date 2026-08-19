@@ -9,6 +9,7 @@ import type { TerminalCapabilities } from '../../types/schemas'
 import { detectCapabilities as detectCapsFromEnv } from '../capabilities/detect'
 import { probeFromEnv, mergeProbeResults } from '../capabilities/da'
 import { parseCursorPositionReport, REQUEST_CURSOR_POSITION } from '../capabilities/cpr'
+import { parseOscColorReport, REQUEST_BG_COLOR } from '../capabilities/osc'
 import { encodeGraphics } from '../graphics'
 
 // ANSI Escape Sequences
@@ -300,6 +301,81 @@ export const TerminalServiceLive = Layer.effect(
         return position
       }),
 
+      queryBackgroundColor: Effect.gen(function* (_) {
+        const color = yield* _(
+          Effect.tryPromise({
+            try: () =>
+              new Promise<Rgb | null>(resolve => {
+                // Deterministic test override: an explicit probe color wins
+                // without touching the terminal.
+                const probeHex = platform.env.TUIX_PROBE_BG
+                if (typeof probeHex === 'string' && /^#?[0-9a-fA-F]{6}$/.test(probeHex)) {
+                  const v = probeHex.replace('#', '')
+                  resolve({
+                    r: Number.parseInt(v.slice(0, 2), 16),
+                    g: Number.parseInt(v.slice(2, 4), 16),
+                    b: Number.parseInt(v.slice(4, 6), 16),
+                  })
+                  return
+                }
+                const stdin = platform.stdin as NodeJS.ReadStream & {
+                  setRawMode?: (v: boolean) => void
+                  isRaw?: boolean
+                  isTTY?: boolean
+                }
+                if (!stdin.isTTY) {
+                  resolve(null)
+                  return
+                }
+                let buf = ''
+                let restored = false
+                const wasRaw = Boolean(stdin.isRaw)
+                const timeout = setTimeout(() => {
+                  cleanup()
+                  resolve(null)
+                }, 150)
+
+                const onData = (chunk: string | Buffer) => {
+                  buf += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
+                  const report = parseOscColorReport(buf)
+                  if (report) {
+                    cleanup()
+                    resolve(report.rgb)
+                  }
+                }
+
+                const cleanup = () => {
+                  if (restored) return
+                  restored = true
+                  clearTimeout(timeout)
+                  stdin.removeListener?.('data', onData)
+                  try {
+                    if (stdin.isTTY && stdin.setRawMode && !wasRaw) {
+                      stdin.setRawMode(false)
+                    }
+                  } catch {
+                    /* ignore */
+                  }
+                }
+
+                try {
+                  if (stdin.setRawMode) {
+                    stdin.setRawMode(true)
+                  }
+                  stdin.setEncoding?.('utf8')
+                  stdin.on?.('data', onData)
+                  platform.stdout.write(REQUEST_BG_COLOR)
+                } catch {
+                  cleanup()
+                  resolve(null)
+                }
+              }),
+            catch: () => new TerminalError({ operation: 'queryBackgroundColor' }),
+          }).pipe(Effect.catchAll(() => Effect.succeed<Rgb | null>(null)))
+        )
+        return color
+      }),
+
       setCursorShape: (shape: 'block' | 'underline' | 'bar') =>
         write(
           shape === 'block'
@@ -369,6 +445,7 @@ export const TerminalServiceTest = Layer.succeed(TerminalService, {
   setTitle: (_title: string) => Effect.void,
   bell: Effect.void,
   getCursorPosition: Effect.succeed({ x: 1, y: 1 }),
+  queryBackgroundColor: Effect.succeed(null),
   setCursorShape: (_shape: 'block' | 'underline' | 'bar') => Effect.void,
   setCursorBlink: (_enabled: boolean) => Effect.void,
   writeGraphics: _image => Effect.succeed({ protocol: 'none' as const, fallback: true }),

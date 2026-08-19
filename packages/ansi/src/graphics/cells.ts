@@ -142,6 +142,16 @@ function prefixOf(fg?: Rgb, bg?: Rgb): string {
   return out
 }
 
+const widthMemo = new Map<string, number>()
+function cellWidth(char: string): number {
+  const cached = widthMemo.get(char)
+  if (cached !== undefined) return cached
+  const width = Math.max(1, Bun.stringWidth(char))
+  if (widthMemo.size > 4096) widthMemo.clear()
+  widthMemo.set(char, width)
+  return width
+}
+
 export function parseVisualCells(line: string): VisualCell[] {
   const cells: VisualCell[] = []
   let i = 0
@@ -191,6 +201,13 @@ export function parseVisualCells(line: string): VisualCell[] {
     i += char.length
     if (char === '\n' || char === '\r') continue
     cells.push({ char, prefix: active || prefixOf(fg, bg), fg, bg })
+    // Wide graphemes occupy extra terminal columns. Emit trailing space
+    // cells so one cell === one column everywhere (layout, slicing, and
+    // buffer writes stay in agreement with stringWidth math).
+    const span = cellWidth(char)
+    for (let t = 1; t < span; t++) {
+      cells.push({ char: ' ', prefix: active || prefixOf(fg, bg), fg, bg })
+    }
   }
 
   return cells

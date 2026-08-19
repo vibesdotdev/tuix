@@ -156,3 +156,116 @@ export const renderBox = (options: BoxOptions): string => {
 
   return lines.join('\n')
 }
+
+// =============================================================================
+// Gradient Box Rendering
+// =============================================================================
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  const value = hex.replace('#', '')
+  const full =
+    value.length === 3
+      ? value
+          .split('')
+          .map(c => c + c)
+          .join('')
+      : value
+  return {
+    r: Number.parseInt(full.slice(0, 2), 16) || 0,
+    g: Number.parseInt(full.slice(2, 4), 16) || 0,
+    b: Number.parseInt(full.slice(4, 6), 16) || 0,
+  }
+}
+
+function lerpColor(
+  from: { r: number; g: number; b: number },
+  to: { r: number; g: number; b: number },
+  t: number
+): { r: number; g: number; b: number } {
+  return {
+    r: Math.round(from.r + (to.r - from.r) * t),
+    g: Math.round(from.g + (to.g - from.g) * t),
+    b: Math.round(from.b + (to.b - from.b) * t),
+  }
+}
+
+function fgSequence(color: { r: number; g: number; b: number }): string {
+  return `\x1b[38;2;${color.r};${color.g};${color.b}m`
+}
+
+/**
+ * Options for rendering a box whose border color blends between two colors.
+ */
+export interface GradientBoxOptions extends BoxOptions {
+  /** Perimeter color blend endpoints (hex). Each side interpolates from → to. */
+  readonly gradient: { from: string; to: string }
+}
+
+/**
+ * Render a box with a gradient border: each side's color interpolates from
+ * `gradient.from` to `gradient.to` along that side, Lipgloss
+ * `BorderForegroundBlend`-style. Emits truecolor SGR per border cell; content
+ * rows keep their own styling. Sides default to all; partial sides blend
+ * across their own extent.
+ */
+export const renderGradientBox = (options: GradientBoxOptions): string => {
+  const { width, height, border, sides = BSide.All, content = [], padding = 0 } = options
+  const from = hexToRgb(options.gradient.from)
+  const to = hexToRgb(options.gradient.to)
+  const lines: string[] = []
+
+  const innerWidth = width - 2
+  const paddedWidth = innerWidth - padding * 2
+
+  if (hasSide(sides, BSide.Top)) {
+    const left = hasSide(sides, BSide.Left) ? border.topLeft : ''
+    const right = hasSide(sides, BSide.Right) ? border.topRight : ''
+    const middle = innerWidth
+    let line = ''
+    let index = 0
+    const total = Math.max(1, innerWidth + left.length + right.length - 1)
+    for (const glyph of [left, border.horizontal.repeat(middle), right].join('')) {
+      const color = lerpColor(from, to, index / total)
+      line += fgSequence(color) + glyph
+      index++
+    }
+    lines.push(line + '\x1b[0m')
+  }
+
+  const contentHeight = height - 2
+  for (let i = 0; i < contentHeight; i++) {
+    const t = contentHeight > 1 ? i / (contentHeight - 1) : 0
+    const left = hasSide(sides, BSide.Left)
+      ? fgSequence(lerpColor(from, to, t)) + border.vertical
+      : ''
+    const right = hasSide(sides, BSide.Right)
+      ? fgSequence(lerpColor(from, to, t)) + border.vertical
+      : ''
+
+    let line = content[i] ?? ''
+    if (padding > 0) {
+      const paddingStr = ' '.repeat(padding)
+      line = paddingStr + padToWidth(line, paddedWidth) + paddingStr
+    } else {
+      line = padToWidth(line, innerWidth)
+    }
+
+    lines.push(left + line + (right ? right + '\x1b[0m' : ''))
+  }
+
+  if (hasSide(sides, BSide.Bottom)) {
+    const left = hasSide(sides, BSide.Left) ? border.bottomLeft : ''
+    const right = hasSide(sides, BSide.Right) ? border.bottomRight : ''
+    let line = ''
+    let index = 0
+    const total = Math.max(1, innerWidth + left.length + right.length - 1)
+    for (const glyph of [left, border.horizontal.repeat(innerWidth), right].join('')) {
+      const color = lerpColor(from, to, index / total)
+      line += fgSequence(color) + glyph
+      index++
+    }
+    lines.push(line + '\x1b[0m')
+  }
+
+  return lines.join('\n')
+}

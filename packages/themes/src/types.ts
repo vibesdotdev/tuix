@@ -37,6 +37,11 @@ export interface ThemeColors {
   // Text variations (derived)
   textDim?: string
   textBright?: string
+  /**
+   * Deepest text tier — hints, keymap descriptions, param values. The fourth
+   * rung of the text hierarchy: bright > fg > textDim > textFaint.
+   */
+  textFaint?: string
 }
 
 /**

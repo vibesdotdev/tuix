@@ -12,6 +12,7 @@ import { nordTheme } from './themes/nord'
 import { draculaTheme } from './themes/dracula'
 import { gruvboxTheme } from './themes/gruvbox'
 import { vibesTheme } from './themes/vibes'
+import { flatTheme } from './themes/flat'
 
 /**
  * Theme context service
@@ -63,6 +64,7 @@ class ThemeContextImpl implements ThemeContext {
     this.themes.set('dracula', draculaTheme)
     this.themes.set('gruvbox', gruvboxTheme)
     this.themes.set('vibes', vibesTheme)
+    this.themes.set('flat', flatTheme)
 
     // Register custom themes
     if (customThemes) {

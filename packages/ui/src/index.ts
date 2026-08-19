@@ -54,7 +54,7 @@ export { Accordion } from './components/display/accordion/index.js'
 export { Breadcrumbs } from './components/navigation/breadcrumbs/index.js'
 export { Skeleton, SkeletonText } from './components/feedback/skeleton/index.js'
 export { Alert } from './components/feedback/alert/index.js'
-export { Sparkline, sparklineBars } from './components/data/sparkline/index.js'
+export { Sparkline, sparklineBars, sparklineBraille } from './components/data/sparkline/index.js'
 export { ToastViewport, createToastStore } from './components/feedback/toast/index.js'
 
 // Layout patterns
@@ -62,6 +62,7 @@ export { StaticLayout } from './components/layout/static-layout/StaticLayout.js'
 export { InteractiveLayout } from './components/layout/interactive-layout/InteractiveLayout.js'
 export { Help } from './components/navigation/help/index.js'
 export { LargeText } from './components/display/large-text/index.js'
+export { Wordmark, wordmark, wordmarkRows } from './components/display/wordmark/index.js'
 export { Viewport } from './components/layout/viewport/index.js'
 
 // Theme utilities

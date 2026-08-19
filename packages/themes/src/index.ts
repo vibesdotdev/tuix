@@ -56,3 +56,18 @@ export { nordTheme } from './themes/nord'
 export { draculaTheme } from './themes/dracula'
 export { gruvboxTheme } from './themes/gruvbox'
 export { vibesTheme } from './themes/vibes'
+export { flatTheme } from './themes/flat'
+
+import { lightTheme as light } from './themes/light'
+import { vibesTheme as vibes } from './themes/vibes'
+
+/**
+ * Pick the default theme variant for a detected terminal color scheme.
+ * Light terminals get the light theme; dark and unknown keep the vibes
+ * default (never guess light on failure — a dark app on a light terminal
+ * is unreadable, while the reverse merely looks dim).
+ */
+export function themeForColorScheme(scheme: 'light' | 'dark' | 'unknown'): Theme {
+  if (scheme === 'light') return light
+  return vibes
+}

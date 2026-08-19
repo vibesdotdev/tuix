@@ -3,6 +3,13 @@ import CodeBlock from '$lib/components/CodeBlock.svelte'
 
 const demos = [
   {
+    id: 'brand',
+    title: 'Brand — wordmark, braille, gradient borders',
+    blurb:
+      'Half-block wordmark with per-glyph gradient, 2×4 braille sparklines, and Lipgloss-style gradient border boxes — all pure ANSI, no graphics protocol required.',
+    file: 'brand.png',
+  },
+  {
     id: 'kit',
     title: 'Kit — agent workbench',
     blurb:
@@ -87,17 +94,19 @@ export default function Tasks() {
 					/>
 					<div class="shot-meta">
 						<span>100×30 · PTY capture</span>
-						<span class="keys">{demo.keys.join(' · ')}</span>
+						{#if demo.keys}<span class="keys">{demo.keys.join(' · ')}</span>{/if}
 					</div>
 				</div>
 				<div class="desc">
 					<h2>{demo.title}</h2>
 					<p>{demo.blurb}</p>
-					<div class="key-chips">
-						{#each demo.keys as k (k)}
-							<kbd>{k}</kbd>
-						{/each}
-					</div>
+					{#if demo.keys}
+						<div class="key-chips">
+							{#each demo.keys as k (k)}
+								<kbd>{k}</kbd>
+							{/each}
+						</div>
+					{/if}
 					{#if demo.id === 'tasks'}
 						<div class="snippet">
 							<CodeBlock code={heroCode} lang="tsx" filename="tasks.tsx" terminal={false} />

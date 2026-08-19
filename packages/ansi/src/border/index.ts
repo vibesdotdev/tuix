@@ -17,7 +17,9 @@ export {
   removeSide,
   fromPattern,
   renderBox,
+  renderGradientBox,
   type BoxOptions,
+  type GradientBoxOptions,
 } from './utils'
 
 export type { Border, BorderStyle } from './types'

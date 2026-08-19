@@ -8,6 +8,12 @@
 const ESC = '\u001b['
 
 /**
+ * CUP — cursor position (1-based row/col), for building frame payloads that
+ * must be emitted as one write.
+ */
+export const cursorTo = (x: number, y: number): string => `\u001b[${y};${x}H`
+
+/**
  * ANSI SGR Codes
  *
  * Standard ANSI escape sequences for terminal text formatting.

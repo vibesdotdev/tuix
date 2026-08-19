@@ -3,6 +3,7 @@ import FooPlugin from './plugin/foo'
 import HelloCommand from './commands/hello-test'
 import StudioHome from './commands/studio-home'
 import Kit from './commands/kit'
+import Brand from './commands/brand'
 import Forms from './commands/forms'
 import Tasks from './commands/tasks'
 import Dash from './commands/dash'
@@ -26,6 +27,11 @@ export default function App() {
         component={StudioHome}
       />
       <Command name="kit" description="KISS kit primitives" component={Kit} />
+      <Command
+        name="brand"
+        description="Wordmark banner, braille sparkline, gradient border"
+        component={Brand}
+      />
       <Command
         name="forms"
         description="bind:value + focus ring + modal backdrop (live proof)"

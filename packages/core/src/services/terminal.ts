@@ -7,8 +7,10 @@
 
 import { Effect, Context } from 'effect'
 import type { TerminalError, WindowSize, TerminalCapabilities } from '../types'
+import type { Rgb } from '@tuix/ansi'
 
 export type { TerminalError, WindowSize, TerminalCapabilities }
+export type { Rgb }
 
 /**
  * The TerminalService interface defines all low-level terminal operations.
@@ -174,6 +176,13 @@ export class TerminalService extends Context.Tag('TerminalService')<
      * Returns the current cursor position as reported by the terminal.
      */
     readonly getCursorPosition: Effect.Effect<{ x: number; y: number }, TerminalError, never>
+
+    /**
+     * Query the terminal's background color via OSC 11 (dynamic colors).
+     * Returns null when the terminal does not answer (non-TTY, unsupported,
+     * or timeout) — callers should treat null as "unknown scheme".
+     */
+    readonly queryBackgroundColor: Effect.Effect<Rgb | null, TerminalError, never>
 
     /**
      * Set cursor shape/style.

@@ -23,3 +23,11 @@ export {
   probeFromEnv,
   mergeProbeResults,
 } from './da'
+export {
+  REQUEST_FG_COLOR,
+  REQUEST_BG_COLOR,
+  parseOscColorReport,
+  luminance,
+  colorSchemeFromBackground,
+  type OscColorReport,
+} from './osc'
