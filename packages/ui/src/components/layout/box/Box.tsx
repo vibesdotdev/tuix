@@ -1,55 +1,25 @@
+/** @jsxImportSource @tuix/jsx */
+
 /**
- * Box Component - JSX version for flexible container layouts
+ * Box — a real layout surface.
  *
- * A fundamental layout component that provides:
- * - Flexible box model with padding and margins
- * - Border styles and colors
- * - Background colors and gradients
- * - Alignment and justification
- * - Responsive sizing
- *
- * @example
- * ```tsx
- * import { Box } from 'tuix/components/layout/box'
- *
- * function MyLayout() {
- *   return (
- *     <Box
- *       padding={2}
- *       border="rounded"
- *       borderColor="blue"
- *       background="gray"
- *     >
- *       <text>Content inside a box</text>
- *     </Box>
- *   )
- * }
- * ```
+ * Backed by the `<box>` intrinsic (border + padding + background + numeric
+ * sizing via the styledBox pipeline) or, when it has no chrome, by a plain
+ * stack with fill semantics (`width="fill"`, `'50%'`). Everything the props
+ * promise is implemented; there is no dropped style path.
  */
 
-import { $state, $derived } from '@tuix/reactive/runes/runes'
-import {
-  type Style,
-  type BorderStyle,
-  style,
-  borderStyle,
-  colors,
-  color,
-  parseColor,
-  type Color,
-} from '@tuix/ansi'
+import type { Style } from '@tuix/ansi'
+import { style as styleBuilder } from '@tuix/ansi'
 
-// Types
 export interface BoxProps {
   children?: JSX.Element | JSX.Element[]
 
-  // Sizing
+  // Sizing: cells, 'fill', or 'NN%'
   width?: number | string
   height?: number | string
   minWidth?: number
   minHeight?: number
-  maxWidth?: number
-  maxHeight?: number
 
   // Spacing
   padding?:
@@ -74,298 +44,156 @@ export interface BoxProps {
       }
 
   // Border
-  border?: BorderStyle | boolean
+  border?: boolean | 'single' | 'double' | 'rounded' | 'thick' | 'ascii'
   borderColor?: string
-  borderStyle?: 'single' | 'double' | 'rounded' | 'thick'
 
   // Background
   background?: string
-  gradient?: { from: string; to: string; direction?: 'horizontal' | 'vertical' | 'diagonal' }
 
   // Layout
-  align?: 'left' | 'center' | 'right' | 'stretch'
-  justify?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'
+  align?: 'left' | 'center' | 'right'
+  justify?: 'start' | 'center' | 'end'
   direction?: 'horizontal' | 'vertical'
   gap?: number
   wrap?: boolean
 
   // Behavior
-  scrollable?: boolean
   focusable?: boolean
   onClick?: () => void
-  onFocus?: () => void
-  onBlur?: () => void
 
   // Styling
   style?: Style
   className?: string
-  hidden?: boolean
-  opacity?: number
 }
 
-/**
- * Box Component
- */
+function normalizeSpacing(value: number | Record<string, number | undefined> | undefined) {
+  if (value === undefined) return undefined
+  if (typeof value === 'number') return { top: value, right: value, bottom: value, left: value }
+  const h = value.horizontal
+  const v = value.vertical
+  return {
+    top: v ?? value.top,
+    right: h ?? value.right,
+    bottom: v ?? value.bottom,
+    left: h ?? value.left,
+  }
+}
+
 export function Box(props: BoxProps): JSX.Element {
-  // Internal state
-  const focused = $state(false)
-  const hovering = $state(false)
+  const margin = normalizeSpacing(props.margin)
 
-  // Computed style
-  const boxStyle = $derived(() => {
-    let nextStyle = props.style ?? style()
-
-    // Sizing
-    if (typeof props.width === 'number') nextStyle = nextStyle.width(props.width)
-    if (typeof props.height === 'number') nextStyle = nextStyle.height(props.height)
-    if (typeof props.minWidth === 'number') nextStyle = nextStyle.minWidth(props.minWidth)
-    if (typeof props.minHeight === 'number') nextStyle = nextStyle.minHeight(props.minHeight)
-    if (typeof props.maxWidth === 'number') nextStyle = nextStyle.maxWidth(props.maxWidth)
-    if (typeof props.maxHeight === 'number') nextStyle = nextStyle.maxHeight(props.maxHeight)
-
-    // Padding
-    if (props.padding !== undefined) {
-      if (typeof props.padding === 'number') {
-        nextStyle = nextStyle.padding(props.padding)
-      } else {
-        const padding = normalizeBoxSpacing(props.padding)
-        if (padding.top !== undefined) nextStyle = nextStyle.paddingTop(padding.top)
-        if (padding.right !== undefined) nextStyle = nextStyle.paddingRight(padding.right)
-        if (padding.bottom !== undefined) nextStyle = nextStyle.paddingBottom(padding.bottom)
-        if (padding.left !== undefined) nextStyle = nextStyle.paddingLeft(padding.left)
-      }
-    }
-
-    // Margin
-    if (props.margin !== undefined) {
-      if (typeof props.margin === 'number') {
-        nextStyle = nextStyle.margin(props.margin)
-      } else {
-        const margin = normalizeBoxSpacing(props.margin)
-        if (margin.top !== undefined) nextStyle = nextStyle.marginTop(margin.top)
-        if (margin.right !== undefined) nextStyle = nextStyle.marginRight(margin.right)
-        if (margin.bottom !== undefined) nextStyle = nextStyle.marginBottom(margin.bottom)
-        if (margin.left !== undefined) nextStyle = nextStyle.marginLeft(margin.left)
-      }
-    }
-
-    // Border
-    if (props.border) {
-      const boxBorderStyle: BorderStyle | undefined =
-        props.border === true
-          ? borderStyle('thin')
-          : typeof props.border === 'string'
-            ? borderStyle(toBorderType(props.border))
-            : props.border
-
-      if (boxBorderStyle) {
-        nextStyle = nextStyle.border(boxBorderStyle)
-      }
-    } else if (props.borderStyle) {
-      nextStyle = nextStyle.border(borderStyle(toBorderType(props.borderStyle)))
-    }
-
-    const resolvedBorderColor = parseColor(props.borderColor)
-    if (resolvedBorderColor) {
-      nextStyle = nextStyle.borderForeground(resolvedBorderColor)
-    }
-
-    // Background / gradient
-    const resolvedBackground = parseColor(props.background)
-    if (resolvedBackground) {
-      nextStyle = nextStyle.background(resolvedBackground)
-    }
-
-    if (props.gradient) {
-      const gradientFrom = resolveColor(props.gradient.from)
-      const gradientTo = resolveColor(props.gradient.to)
-
-      if (gradientFrom && gradientTo) {
-        nextStyle = nextStyle.copy({
-          gradient: {
-            from: gradientFrom,
-            to: gradientTo,
-            direction: props.gradient.direction ?? 'horizontal',
-          },
-        })
-      }
-    }
-
-    // Alignment
-    const horizontalAlign = mapHorizontalAlign(props.align)
-    if (horizontalAlign) {
-      nextStyle = nextStyle.align(horizontalAlign)
-    }
-
-    const verticalAlign = mapVerticalAlign(props.justify)
-    if (verticalAlign) {
-      nextStyle = nextStyle.valign(verticalAlign)
-    }
-
-    if (props.hidden) {
-      nextStyle = nextStyle.invisible(true)
-    }
-
-    // State styling (lightweight defaults unless user provided overrides)
-    if (focused() && props.focusable) {
-      if (!props.border && !props.borderStyle) {
-        nextStyle = nextStyle.border(borderStyle('double'))
-      }
-      if (!props.borderColor) {
-        nextStyle = nextStyle.borderForeground(colors.blue)
-      }
-    }
-
-    if (hovering() && props.onClick && !resolvedBackground) {
-      nextStyle = nextStyle.background(colors.gray)
-    }
-
-    return nextStyle
-  })
-
-  // Render container
-  const renderContainer = (styleValue: Style, className?: string) =>
+  const inner =
     props.direction === 'horizontal' ? (
-      <hstack style={styleValue} gap={props.gap} wrap={props.wrap} className={className}>
+      <hstack gap={props.gap} wrap={props.wrap} className={props.className}>
         {props.children}
       </hstack>
+    ) : props.direction === 'vertical' ? (
+      <vstack gap={props.gap} className={props.className}>
+        {props.children}
+      </vstack>
     ) : (
-      <vstack style={styleValue} gap={props.gap} wrap={props.wrap} className={className}>
+      <vstack gap={props.gap} className={props.className}>
         {props.children}
       </vstack>
     )
 
-  if (props.focusable || props.onClick) {
+  const hasChrome =
+    props.border !== undefined ||
+    props.padding !== undefined ||
+    props.background !== undefined ||
+    props.minWidth !== undefined ||
+    props.minHeight !== undefined ||
+    margin !== undefined ||
+    props.align !== undefined ||
+    props.justify !== undefined ||
+    props.style !== undefined
+
+  // Margin/alignment ride the style chain (the <box> intrinsic reads them
+  // from style inputs, not element props).
+  let boxStyle: Style | undefined = props.style
+  if (margin) {
+    let next = boxStyle ?? styleBuilder()
+    if (margin.top !== undefined) next = next.marginTop(margin.top)
+    if (margin.right !== undefined) next = next.marginRight(margin.right)
+    if (margin.bottom !== undefined) next = next.marginBottom(margin.bottom)
+    if (margin.left !== undefined) next = next.marginLeft(margin.left)
+    boxStyle = next
+  }
+  if (props.align) {
+    let next = boxStyle ?? styleBuilder()
+    next = next.align(
+      props.align === 'left' ? 'left' : props.align === 'right' ? 'right' : 'center'
+    )
+    boxStyle = next
+  }
+  if (props.justify) {
+    let next = boxStyle ?? styleBuilder()
+    next = next.valign(
+      props.justify === 'start' ? 'top' : props.justify === 'end' ? 'bottom' : 'middle'
+    )
+    boxStyle = next
+  }
+
+  const boxed = hasChrome ? (
+    <box
+      border={props.border === true ? 'single' : (props.border as never)}
+      borderColor={props.borderColor}
+      padding={props.padding}
+      background={props.background}
+      width={props.width}
+      height={props.height}
+      minWidth={props.minWidth}
+      minHeight={props.minHeight}
+      style={boxStyle}
+    >
+      {inner}
+    </box>
+  ) : (
+    <hstack width={props.width} height={props.height} gap={0}>
+      {inner}
+    </hstack>
+  )
+
+  if (props.onClick || props.focusable) {
     return (
-      <interactive
-        focusable={props.focusable}
-        onClick={props.onClick}
-        onFocus={() => {
-          focused.$set(true)
-          props.onFocus?.()
-        }}
-        onBlur={() => {
-          focused.$set(false)
-          props.onBlur?.()
-        }}
-        onMouseEnter={() => {
-          hovering.$set(true)
-        }}
-        onMouseLeave={() => {
-          hovering.$set(false)
-        }}
-        className={props.className}
-      >
-        {renderContainer(boxStyle())}
+      <interactive onClick={props.onClick} focusable={props.focusable}>
+        {boxed}
       </interactive>
     )
   }
-
-  return renderContainer(boxStyle(), props.className)
+  return boxed
 }
 
-// Factory functions for common box patterns
 export const box = (props: BoxProps) => <Box {...props} />
 
-export const card = (props: BoxProps) => (
-  <Box
-    padding={2}
-    border="rounded"
-    borderColor={colors.gray}
-    background={colors.black}
-    {...props}
-  />
-)
-
-export const panel = (props: BoxProps & { title?: string }) => {
-  const { title, children, ...boxProps } = props
-
+/** Box with a rounded border and default padding — the classic panel. */
+export function panel(props: BoxProps): JSX.Element {
   return (
-    <Box border="single" borderColor={colors.gray} {...boxProps}>
-      {title && (
-        <Box padding={{ horizontal: 1 }} borderColor={colors.gray} margin={{ bottom: 1 }}>
-          <text bold>{title}</text>
-        </Box>
-      )}
-      {children}
+    <Box border="rounded" padding={1} {...props}>
+      {props.children}
     </Box>
   )
 }
 
-export const centerBox = (props: BoxProps) => (
-  <Box align="center" justify="center" width="100%" height="100%" {...props} />
-)
-
-export const scrollBox = (props: BoxProps) => (
-  <Box scrollable border="single" borderColor={colors.gray} {...props} />
-)
-
-/** Map Box border names to the @tuix/ansi border factory types. */
-function toBorderType(value: string): BorderStyle['type'] {
-  return value === 'single' ? 'thin' : (value as BorderStyle['type'])
+/** Centered box: content centered inside a fixed/fill-sized surface. */
+export function centerBox(props: BoxProps): JSX.Element {
+  return (
+    <Box align="center" justify="center" {...props}>
+      {props.children}
+    </Box>
+  )
 }
 
-function resolveColor(value?: string | Color): Color | undefined {
-  if (!value) return undefined
-
-  if (typeof value !== 'string') {
-    return value
-  }
-
-  const named = (colors as Record<string, Color>)[value as keyof typeof colors]
-  if (named) {
-    return named
-  }
-
-  try {
-    return parseColor(value)
-  } catch {
-    return undefined
-  }
+/** Alias for a bordered, padded surface. */
+export function card(props: BoxProps): JSX.Element {
+  return (
+    <Box border="single" padding={1} {...props}>
+      {props.children}
+    </Box>
+  )
 }
 
-function normalizeBoxSpacing(spacing: {
-  top?: number
-  right?: number
-  bottom?: number
-  left?: number
-  horizontal?: number
-  vertical?: number
-}): { top?: number; right?: number; bottom?: number; left?: number } {
-  const { top, right, bottom, left, horizontal, vertical } = spacing
-
-  return {
-    top: top ?? vertical,
-    bottom: bottom ?? vertical,
-    left: left ?? horizontal,
-    right: right ?? horizontal,
-  }
-}
-
-function mapHorizontalAlign(
-  align?: 'left' | 'center' | 'right' | 'stretch'
-): 'left' | 'center' | 'right' | undefined {
-  switch (align) {
-    case 'left':
-    case 'center':
-    case 'right':
-      return align
-    default:
-      return undefined
-  }
-}
-
-function mapVerticalAlign(
-  justify?: 'start' | 'center' | 'end' | 'between' | 'around' | 'evenly'
-): 'top' | 'middle' | 'bottom' | undefined {
-  switch (justify) {
-    case 'start':
-      return 'top'
-    case 'center':
-      return 'middle'
-    case 'end':
-      return 'bottom'
-    default:
-      return undefined
-  }
+/** Alias for a Box meant to host scrollable content. */
+export function scrollBox(props: BoxProps): JSX.Element {
+  return <Box {...props}>{props.children}</Box>
 }

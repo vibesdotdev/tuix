@@ -185,17 +185,6 @@ export interface LayoutRect {
 }
 
 /**
- * Size constraints for layout calculations.
- * Defines minimum and maximum bounds for width and height.
- */
-export interface SizeConstraints {
-  readonly minWidth?: number
-  readonly maxWidth?: number
-  readonly minHeight?: number
-  readonly maxHeight?: number
-}
-
-/**
  * Layout calculation result containing computed positions for container and children.
  * Output of the layout engine after processing constraints and properties.
  */

@@ -20,6 +20,9 @@ import {
   pad as padToWidth,
 } from '@tuix/ansi'
 import { joinVertical, Center } from './join'
+import { flexbox } from './flexbox'
+import { FlexDirection } from '../layout/types'
+import { resolveSize } from '../primitives/types'
 
 /**
  * Box properties
@@ -119,19 +122,72 @@ export const styledBox = (content: View | View[], props: BoxProps = {}): View =>
   // Calculate padding with helper
   const padding = normalizePadding(props.padding)
 
+  // Height style may be numeric (distribute now) or 'fill'/'NN%' (resolve
+  // against the render context). When set, the inner region becomes a
+  // column flexbox sized to the content box: growing children (spacers,
+  // flex items) distribute the vertical space INSIDE the border instead of
+  // the box hugging its content.
+  const styleHeight = props.style?.props?.height
+  const numericHeight =
+    typeof styleHeight === 'number' && styleHeight > 0
+      ? Math.max(1, styleHeight - padding.top - padding.bottom - (props.border ? 2 : 0))
+      : undefined
+  let distributed: View | null = null
+  let distributedHeight = -1
+  const laidOutFor = (innerHeight: number): View => {
+    if (innerHeight < 1 || contents.length === 0) return innerView
+    if (!distributed || distributedHeight !== innerHeight) {
+      distributed = flexbox(contents as never, {
+        direction: FlexDirection.Column,
+        height: innerHeight,
+      })
+      distributedHeight = innerHeight
+    }
+    return distributed
+  }
+  const contextHeight = (context?: { width: number; height: number }): number | undefined => {
+    if (styleHeight === undefined) return undefined
+    if (numericHeight !== undefined) return numericHeight
+    const resolved = resolveSize(
+      styleHeight as never,
+      'height',
+      context,
+      (innerView.height || 0) + padding.top + padding.bottom + (props.border ? 2 : 0)
+    )
+    return Math.max(1, resolved - padding.top - padding.bottom - (props.border ? 2 : 0))
+  }
+  const laidOut: View = {
+    render: context => laidOutFor(contextHeight(context) ?? 0).render(context),
+    get width() {
+      return innerView.width
+    },
+    get height() {
+      return numericHeight ?? innerView.height
+    },
+  }
+
   return {
-    render: () =>
+    render: context =>
       Effect.gen(function* (_) {
-        // First render the inner content
-        const innerContent = yield* _(innerView.render())
+        // First render the inner content (context flows so 'fill' heights
+        // resolve and the inner flexbox distributes)
+        const innerContent = yield* _(laidOut.render(context))
         let contentStr =
           typeof innerContent === 'string'
             ? innerContent
             : (innerContent as { content: string }).content
 
-        // Apply style to content if provided
+        // Apply style to content if provided. String size units
+        // ('fill'/'NN%') are layout directives resolved by the distribution
+        // pass above — strip them so renderStyled's numeric padding math
+        // never sees them.
         if (props.style) {
-          contentStr = renderStyledSync(contentStr, props.style)
+          const styleProps =
+            props.style.props ?? (props.style as unknown as Record<string, unknown>)
+          const clean = { ...(styleProps as Record<string, unknown>) }
+          if (typeof clean.height === 'string') delete clean.height
+          if (typeof clean.width === 'string') delete clean.width
+          contentStr = renderStyledSync(contentStr, clean as never)
         }
 
         const innerLines = contentStr.split('\n')
@@ -176,7 +232,10 @@ export const styledBox = (content: View | View[], props: BoxProps = {}): View =>
       (props.minWidth || 0) + (props.border ? 2 : 0)
     ),
     height: Math.max(
-      (innerView.height || 0) + padding.top + padding.bottom + (props.border ? 2 : 0),
+      (laidOut.height || innerView.height || 0) +
+        padding.top +
+        padding.bottom +
+        (props.border ? 2 : 0),
       (props.minHeight || 0) + (props.border ? 2 : 0)
     ),
   }

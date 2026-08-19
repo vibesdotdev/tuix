@@ -1,37 +1,16 @@
+/** @jsxImportSource @tuix/jsx */
+
 /**
- * Flex Component - JSX version for flexible layouts
+ * Flex — real flexbox layout.
  *
- * Provides flexbox-like layouts for terminal UIs:
- * - Row and column layouts
- * - Alignment and justification
- * - Gap spacing
- * - Wrapping support
- * - Flex grow/shrink
- *
- * @example
- * ```tsx
- * import { Flex, Row, Column } from 'tuix/components/layout/flex'
- *
- * function MyLayout() {
- *   return (
- *     <Column gap={2}>
- *       <Row justify="between">
- *         <text>Left</text>
- *         <text>Right</text>
- *       </Row>
- *
- *       <Flex direction="row" wrap gap={1}>
- *         {items.map(item => <Box key={item}>{item}</Box>)}
- *       </Flex>
- *     </Column>
- *   )
- * }
- * ```
+ * Delegates to the vstack/hstack intrinsics, which route alignment and
+ * fill/percent sizing through the flexbox engine. Child flex metadata
+ * (`grow`, `flex`, `shrink`, `basis`) is read directly off child elements —
+ * put it on <FlexItem> or any child.
  */
 
 import { Box, type BoxProps } from '../box'
 
-// Types
 export interface FlexProps extends Omit<BoxProps, 'direction'> {
   direction?: 'row' | 'column'
   reverse?: boolean
@@ -44,79 +23,52 @@ export interface FlexProps extends Omit<BoxProps, 'direction'> {
 export interface FlexItemProps extends BoxProps {
   grow?: number
   shrink?: number
-  basis?: number | string
+  basis?: number | 'auto'
   alignSelf?: 'auto' | 'start' | 'center' | 'end' | 'stretch' | 'baseline'
 }
 
-/**
- * Flex Component
- */
 export function Flex(props: FlexProps): JSX.Element {
   const {
     direction = 'row',
     reverse = false,
-    wrap = false,
     gap,
     align,
     justify,
+    width,
+    height,
+    background,
     children,
-    ...boxProps
   } = props
 
-  // hstack/vstack have no reverse mode, so reverse the child order instead.
   const orderedChildren = reverse
     ? Array.isArray(children)
       ? [...children].reverse()
       : children
     : children
 
-  if (direction === 'row') {
-    return (
-      <hstack
-        gap={gap}
-        wrap={wrap === true ? true : wrap === 'reverse' ? 'reverse' : false}
-        align={align}
-        justify={justify}
-        {...boxProps}
-      >
-        {orderedChildren}
-      </hstack>
-    )
+  const stackProps = {
+    gap,
+    align: align as string | undefined,
+    justify: justify as string | undefined,
+    width,
+    height,
+    bg: background,
   }
 
-  return (
-    <vstack
-      gap={gap}
-      wrap={wrap === true ? true : wrap === 'reverse' ? 'reverse' : false}
-      align={align}
-      justify={justify}
-      {...boxProps}
-    >
-      {orderedChildren}
-    </vstack>
+  return direction === 'row' ? (
+    <hstack {...stackProps}>{orderedChildren}</hstack>
+  ) : (
+    <vstack {...stackProps}>{orderedChildren}</vstack>
   )
 }
 
 /**
- * FlexItem Component - Child of Flex with grow/shrink properties
+ * FlexItem — passthrough that attaches flex metadata to its child.
+ * `grow`/`flex`/`shrink`/`basis` are consumed by the parent flex layout
+ * from this element's props; the children render unchanged.
  */
-export function FlexItem(props: FlexItemProps): JSX.Element {
-  const { grow, shrink, basis, alignSelf, children, ...boxProps } = props
-
-  const style: any = {
-    ...boxProps.style,
-  }
-
-  if (grow !== undefined) style.flexGrow = grow
-  if (shrink !== undefined) style.flexShrink = shrink
-  if (basis !== undefined) style.flexBasis = basis
-  if (alignSelf) style.alignSelf = alignSelf
-
-  return (
-    <Box {...boxProps} style={style}>
-      {children}
-    </Box>
-  )
+export function FlexItem(props: FlexItemProps): JSX.Element | JSX.Element[] {
+  return props.children as JSX.Element | JSX.Element[]
 }
 
 // Convenience components
@@ -128,43 +80,33 @@ export function Column(props: Omit<FlexProps, 'direction'>): JSX.Element {
   return <Flex {...props} direction="column" />
 }
 
-// Common flex patterns
-export function SpaceBetween(props: Omit<FlexProps, 'justify'>): JSX.Element {
-  return <Row {...props} justify="between" />
+export function SpaceBetween(props: Omit<FlexProps, 'direction' | 'justify'>): JSX.Element {
+  return <Flex {...props} direction="row" justify="between" />
 }
 
-export function Center(props: FlexProps): JSX.Element {
-  return <Flex {...props} align="center" justify="center" />
+export function Center(props: Omit<FlexProps, 'direction' | 'align' | 'justify'>): JSX.Element {
+  return <Flex {...props} direction="row" align="center" justify="center" />
 }
 
-export function Stack(props: Omit<FlexProps, 'direction'> & { spacing?: number }): JSX.Element {
-  const { spacing, ...flexProps } = props
-  return <Column {...flexProps} gap={spacing} />
+export function Stack(props: Omit<FlexProps, 'direction'>): JSX.Element {
+  return <Flex {...props} direction="column" />
 }
 
-// Grid-like layout using flex
-export function Grid(
-  props: {
-    columns?: number
-    gap?: number
-    children: JSX.Element[]
-  } & BoxProps
-): JSX.Element {
-  const { columns = 2, gap = 1, children, ...boxProps } = props
-
-  // Group children into rows
+/** Simple uniform grid: children re-flowed into rows of `columns` cells. */
+export function Grid(props: Omit<FlexProps, 'direction'> & { columns?: number }): JSX.Element {
+  const columns = Math.max(1, props.columns ?? 2)
+  const children = Array.isArray(props.children) ? props.children : [props.children]
   const rows: JSX.Element[][] = []
   for (let i = 0; i < children.length; i += columns) {
-    rows.push(children.slice(i, i + columns))
+    rows.push(children.slice(i, i + columns) as JSX.Element[])
   }
-
   return (
-    <Column gap={gap} {...boxProps}>
+    <Column gap={props.gap}>
       {rows.map((row, i) => (
-        <Row key={i} gap={gap}>
-          {row.map((child, j) => (
-            <FlexItem key={j} grow={1} basis={0}>
-              {child}
+        <Row key={`grid-row-${i}`} gap={props.gap}>
+          {row.map((cell, j) => (
+            <FlexItem key={`grid-cell-${i}-${j}`} grow={1}>
+              {cell}
             </FlexItem>
           ))}
         </Row>
@@ -173,55 +115,35 @@ export function Grid(
   )
 }
 
-// Spacer component for flex layouts
+/** Flexible gap: grows to fill remaining space in its parent flex. */
 export function Spacer({ size = 1 }: { size?: number }): JSX.Element {
-  return <FlexItem grow={size} />
+  return <spacer flex={size} />
 }
 
-// Common layout patterns
+/** Classic app frame: fixed sidebar + a growing main region. */
 export function Sidebar(
-  props: {
-    sidebar: JSX.Element
-    sidebarWidth?: number
-    content: JSX.Element
-    gap?: number
-  } & BoxProps
+  props: Omit<FlexProps, 'direction'> & { sidebarWidth?: number }
 ): JSX.Element {
-  const { sidebar, sidebarWidth = 20, content, gap = 2, ...boxProps } = props
-
+  const { sidebarWidth = 24, children, ...rest } = props
+  const list = Array.isArray(children) ? children : [children]
+  const [sidebar, ...main] = list
   return (
-    <Row gap={gap} {...boxProps}>
-      <Box width={sidebarWidth}>{sidebar}</Box>
-      <FlexItem grow={1}>{content}</FlexItem>
+    <Row {...rest}>
+      <vstack width={sidebarWidth}>{sidebar}</vstack>
+      <FlexItem grow={1}>
+        <vstack width="fill">{main}</vstack>
+      </FlexItem>
     </Row>
   )
 }
 
-export function Header(
-  props: {
-    header: JSX.Element
-    content: JSX.Element
-    footer?: JSX.Element
-    headerHeight?: number
-    footerHeight?: number
-    gap?: number
-  } & BoxProps
-): JSX.Element {
-  const {
-    header,
-    content,
-    footer,
-    headerHeight = 3,
-    footerHeight = 3,
-    gap = 0,
-    ...boxProps
-  } = props
-
+/** Title bar: a row with bold title text. */
+export function Header(props: Omit<FlexProps, 'direction'> & { title?: string }): JSX.Element {
+  const { title, children, ...rest } = props
   return (
-    <Column gap={gap} height="100%" {...boxProps}>
-      <Box height={headerHeight}>{header}</Box>
-      <FlexItem grow={1}>{content}</FlexItem>
-      {footer && <Box height={footerHeight}>{footer}</Box>}
-    </Column>
+    <Row {...rest}>
+      {title !== undefined ? <text bold>{title}</text> : null}
+      {children}
+    </Row>
   )
 }

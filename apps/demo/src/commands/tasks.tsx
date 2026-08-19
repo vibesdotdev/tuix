@@ -109,7 +109,7 @@ export default function Tasks() {
   ]
 
   return (
-    <box padding={1} border="rounded" borderColor={dim2}>
+    <box padding={1} border="rounded" borderColor={dim2} height="fill">
       {/* Header */}
       <hstack gap={1}>
         <text bg="#3d2e1e" fg="#fcd34d">
@@ -170,9 +170,8 @@ export default function Tasks() {
       <text> </text>
       <text> </text>
 
-      {Array.from({ length: Math.max(0, (process.stdout.rows ?? 24) - 18) }, (_, i) => (
-        <text key={`f-${i}`}> </text>
-      ))}
+      {/* flexible filler pushes hints to the bottom */}
+      <spacer flex={1} />
 
       {/* Hints */}
       <text fg={notice() ? theme.colors.success : dim2} width={LIST_W}>

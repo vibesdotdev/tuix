@@ -34,6 +34,7 @@ export {
   emitKeyToHandlers,
   clearKeyHandlers,
 } from './runes/runes'
+export { useViewport, setViewportSize, type ViewportSize } from './runes/viewport'
 export type {
   StateRune,
   DerivedRune,

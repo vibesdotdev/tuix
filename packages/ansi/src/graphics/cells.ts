@@ -9,11 +9,23 @@ export interface Rgb {
   b: number
 }
 
+/** SGR decoration state tracked per cell (bold, italic, …). */
+export interface SgrDecorations {
+  bold?: true
+  faint?: true
+  italic?: true
+  underline?: true
+  blink?: true
+  reverse?: true
+  strikethrough?: true
+}
+
 export interface VisualCell {
   char: string
   prefix: string
   fg?: Rgb
   bg?: Rgb
+  decorations?: SgrDecorations
 }
 
 const CSI = /\u001b\[[0-?]*[ -/]*[@-~]/y
@@ -43,9 +55,16 @@ function ansi16(index: number): Rgb {
   return ANSI16[Math.max(0, Math.min(15, index))] ?? ANSI16[7]!
 }
 
-function parseSgr(seq: string, fg?: Rgb, bg?: Rgb): { fg?: Rgb; bg?: Rgb; reset: boolean } {
+function parseSgr(
+  seq: string,
+  fg?: Rgb,
+  bg?: Rgb,
+  decorations?: SgrDecorations
+): { fg?: Rgb; bg?: Rgb; decorations?: SgrDecorations; reset: boolean } {
   if (seq === '\u001b[0m' || seq === '\u001b[m') return { reset: true }
-  if (!seq.startsWith('\u001b[') || !seq.endsWith('m')) return { fg, bg, reset: false }
+  if (!seq.startsWith('\u001b[') || !seq.endsWith('m')) {
+    return { fg, bg, decorations, reset: false }
+  }
   const parts = seq
     .slice(2, -1)
     .split(';')
@@ -53,11 +72,44 @@ function parseSgr(seq: string, fg?: Rgb, bg?: Rgb): { fg?: Rgb; bg?: Rgb; reset:
   let i = 0
   let nextFg = fg
   let nextBg = bg
+  let nextDec = decorations ? { ...decorations } : undefined
+  const DEC_ON: Record<number, keyof SgrDecorations> = {
+    1: 'bold',
+    2: 'faint',
+    3: 'italic',
+    4: 'underline',
+    5: 'blink',
+    7: 'reverse',
+    9: 'strikethrough',
+  }
+  const DEC_OFF: Record<number, Array<keyof SgrDecorations>> = {
+    22: ['bold', 'faint'],
+    23: ['italic'],
+    24: ['underline'],
+    25: ['blink'],
+    27: ['reverse'],
+    29: ['strikethrough'],
+  }
   while (i < parts.length) {
     const code = parts[i] ?? 0
     if (code === 0) {
       nextFg = undefined
       nextBg = undefined
+      nextDec = undefined
+      i += 1
+      continue
+    }
+    const decOn = DEC_ON[code]
+    if (decOn) {
+      nextDec = nextDec ?? {}
+      nextDec[decOn] = true
+      i += 1
+      continue
+    }
+    const decOff = DEC_OFF[code]
+    if (decOff && nextDec) {
+      for (const key of decOff) delete nextDec[key]
+      if (Object.keys(nextDec).length === 0) nextDec = undefined
       i += 1
       continue
     }
@@ -112,7 +164,7 @@ function parseSgr(seq: string, fg?: Rgb, bg?: Rgb): { fg?: Rgb; bg?: Rgb; reset:
     }
     i += 1
   }
-  return { fg: nextFg, bg: nextBg, reset: false }
+  return { fg: nextFg, bg: nextBg, decorations: nextDec, reset: false }
 }
 
 function clampByte(n: number): number {
@@ -157,6 +209,7 @@ export function parseVisualCells(line: string): VisualCell[] {
   let i = 0
   let fg: Rgb | undefined
   let bg: Rgb | undefined
+  let decorations: SgrDecorations | undefined
   let active = ''
 
   while (i < line.length) {
@@ -167,14 +220,16 @@ export function parseVisualCells(line: string): VisualCell[] {
         const seq = match[0]!
         const isSgr = seq.endsWith('m')
         if (isSgr) {
-          const parsed = parseSgr(seq, fg, bg)
+          const parsed = parseSgr(seq, fg, bg, decorations)
           if (parsed.reset) {
             fg = undefined
             bg = undefined
+            decorations = undefined
             active = ''
           } else {
             fg = parsed.fg
             bg = parsed.bg
+            decorations = parsed.decorations
             active += seq
           }
         }
@@ -200,13 +255,13 @@ export function parseVisualCells(line: string): VisualCell[] {
     const char = String.fromCodePoint(code)
     i += char.length
     if (char === '\n' || char === '\r') continue
-    cells.push({ char, prefix: active || prefixOf(fg, bg), fg, bg })
+    cells.push({ char, prefix: active || prefixOf(fg, bg), fg, bg, decorations })
     // Wide graphemes occupy extra terminal columns. Emit trailing space
     // cells so one cell === one column everywhere (layout, slicing, and
     // buffer writes stay in agreement with stringWidth math).
     const span = cellWidth(char)
     for (let t = 1; t < span; t++) {
-      cells.push({ char: ' ', prefix: active || prefixOf(fg, bg), fg, bg })
+      cells.push({ char: ' ', prefix: active || prefixOf(fg, bg), fg, bg, decorations })
     }
   }
 

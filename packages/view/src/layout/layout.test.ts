@@ -27,8 +27,9 @@ describe('grid', () => {
     const out = lines(await render(view))
     expect(out[0]?.startsWith('aa')).toBe(true)
     expect(out[0]).toContain('bb')
-    // Default cell height is 3, so the second row of cells starts at line 3.
-    expect(out[3]?.startsWith('cc')).toBe(true)
+    // Rows are content-sized (height 1 for single-line items), so the
+    // second cell row starts on the next line.
+    expect(out[1]?.startsWith('cc')).toBe(true)
   })
 
   it('honors the gap between cells', async () => {

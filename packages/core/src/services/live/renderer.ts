@@ -52,11 +52,23 @@ function graphemeWidth(char: string): number {
 function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): boolean {
   if (Option.isNone(a) && Option.isNone(b)) return true
   if (Option.isNone(a) || Option.isNone(b)) return false
+  // Full style comparison: foreground, background, AND decorations. The old
+  // fg/bg-only check never repainted cells whose only change was bold,
+  // italic, underline, faint, blink, or reverse — silently stale rendering.
   const left = a.value
   const right = b.value
+  const dec = (s: AnsiStyle): number =>
+    (s.bold ? 1 : 0) |
+    (s.faint ? 2 : 0) |
+    (s.italic ? 4 : 0) |
+    (s.underline ? 8 : 0) |
+    (s.blink ? 16 : 0) |
+    (s.reverse ? 32 : 0) |
+    (s.strikethrough ? 64 : 0)
   return (
     JSON.stringify(left.foreground ?? null) === JSON.stringify(right.foreground ?? null) &&
-    JSON.stringify(left.background ?? null) === JSON.stringify(right.background ?? null)
+    JSON.stringify(left.background ?? null) === JSON.stringify(right.background ?? null) &&
+    dec(left) === dec(right)
   )
 }
 
@@ -259,11 +271,19 @@ class ScreenBuffer {
       for (let lx = 0; lx < cells.length; lx++) {
         if (col < 0 || col >= this.width) break
         const cell = cells[lx]!
+        const dec = cell.decorations
         const style =
-          cell.fg || cell.bg
+          cell.fg || cell.bg || dec
             ? Option.some({
                 ...(cell.fg ? { foreground: rgb(cell.fg.r, cell.fg.g, cell.fg.b) } : {}),
                 ...(cell.bg ? { background: rgb(cell.bg.r, cell.bg.g, cell.bg.b) } : {}),
+                ...(dec?.bold ? { bold: true } : {}),
+                ...(dec?.faint ? { faint: true } : {}),
+                ...(dec?.italic ? { italic: true } : {}),
+                ...(dec?.underline ? { underline: true } : {}),
+                ...(dec?.blink ? { blink: true } : {}),
+                ...(dec?.reverse ? { reverse: true } : {}),
+                ...(dec?.strikethrough ? { strikethrough: true } : {}),
               })
             : Option.none<AnsiStyle>()
         this.cells[row]![col] = { char: cell.char || ' ', style, painted: true }

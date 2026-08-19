@@ -251,7 +251,7 @@ describe('Terminal Service Implementation', () => {
         }).pipe(Effect.provide(TerminalServiceLive))
       )
 
-      expect(writes).toContain('\x1b[?47h')
+      expect(writes).toContain('\x1b[?1049h')
     })
 
     it('should disable alternate screen', async () => {
@@ -264,7 +264,7 @@ describe('Terminal Service Implementation', () => {
         }).pipe(Effect.provide(TerminalServiceLive))
       )
 
-      expect(writes).toContain('\x1b[?47l')
+      expect(writes).toContain('\x1b[?1049l')
     })
   })
 

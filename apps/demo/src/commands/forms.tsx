@@ -32,7 +32,7 @@ export default function Forms() {
   const bright = theme.colors.textBright ?? theme.colors.fg
 
   return (
-    <box padding={1} border="rounded" borderColor={dim2}>
+    <box padding={1} border="rounded" borderColor={dim2} height="fill">
       {/* Header */}
       <hstack gap={1}>
         <text bg="#1e3a5f" fg="#93c5fd">
@@ -81,9 +81,8 @@ export default function Forms() {
       <text> </text>
       <text> </text>
 
-      {Array.from({ length: Math.max(0, (process.stdout.rows ?? 24) - 14) }, (_, i) => (
-        <text key={`f-${i}`}> </text>
-      ))}
+      {/* flexible filler pushes hints to the bottom */}
+      <spacer flex={1} />
 
       {/* Hints */}
       <hstack gap={2}>

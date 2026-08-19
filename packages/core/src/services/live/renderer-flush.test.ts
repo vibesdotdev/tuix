@@ -125,6 +125,18 @@ describe('frame flush', () => {
     // zero terminal bytes.
     expect(writes.length).toBe(1)
   })
+
+  it('decoration-only change (same fg/bg) still repaints', async () => {
+    const writes: string[] = []
+    // Identical text and colors; only the SGR decoration differs. The old
+    // fg/bg-only style comparison never emitted a patch for this.
+    await runFrames(writes, [
+      [{ content: '\x1b[38;2;255;255;255mplain\x1b[0m' }],
+      [{ content: '\x1b[1m\x1b[38;2;255;255;255mbold\x1b[0m' }],
+    ])
+    expect(writes.length).toBe(2)
+    expect(writes[1]).toContain('\x1b[1m')
+  })
 })
 
 describe('wide grapheme handling', () => {

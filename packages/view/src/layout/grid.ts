@@ -45,21 +45,48 @@ const calculateAutoSize = (
 }
 
 /**
- * Calculate minimum content size for a track
+ * Measure per-track content sizes from the items placed in them.
+ *
+ * A monospace grid has min-content == max-content: the widest (columns) or
+ * tallest (rows) natural size of the items occupying the track. Items
+ * spanning multiple tracks are excluded — their content belongs to the span,
+ * not one track. Views without size metadata count as 1.
  */
-const calculateMinContentSize = (): number => {
-  // In a real implementation, this would measure content
-  // For now, use a reasonable minimum
-  return 5
-}
-
-/**
- * Calculate maximum content size for a track
- */
-const calculateMaxContentSize = (availableSize: number): number => {
-  // In a real implementation, this would measure content
-  // For now, use a fraction of available space
-  return Math.floor(availableSize * 0.3)
+const measureTrackContent = (
+  items: ReadonlyArray<GridItem>,
+  trackCount: number,
+  axis: 'width' | 'height'
+): number[] => {
+  const sizes = new Array<number>(trackCount).fill(1)
+  for (let i = 0; i < items.length; i++) {
+    const placement = items[i]!.placement
+      ? getCellBounds(items[i]!.placement, i, trackCount)
+      : getCellBounds(undefined, i, trackCount)
+    const spanCols = placement.colEnd - placement.colStart
+    const spanRows = placement.rowEnd - placement.rowStart
+    const natural = axis === 'width' ? (items[i]!.view.width ?? 1) : (items[i]!.view.height ?? 1)
+    if (axis === 'width' && spanCols === 1) {
+      const track = placement.colStart
+      if (track >= 0 && track < trackCount) {
+        sizes[track] = Math.max(sizes[track]!, Math.max(1, natural))
+      }
+    } else if (axis === 'height' && spanRows === 1) {
+      const track = placement.rowStart
+      if (track >= 0 && track < trackCount) {
+        sizes[track] = Math.max(sizes[track]!, Math.max(1, natural))
+      }
+    } else {
+      // Spanning items contribute their share to every track they cross,
+      // so the span's content fits without inflating any single track.
+      const spanCount = axis === 'width' ? spanCols : spanRows
+      const start = axis === 'width' ? placement.colStart : placement.rowStart
+      const share = Math.max(1, Math.ceil(Math.max(1, natural) / Math.max(1, spanCount)))
+      for (let t = start; t < start + spanCount && t < trackCount; t++) {
+        if (t >= 0) sizes[t] = Math.max(sizes[t]!, share)
+      }
+    }
+  }
+  return sizes
 }
 
 /**
@@ -73,20 +100,24 @@ const generateAutoRows = (rowCount: number, availableHeight: number): GridTrack[
 }
 
 /**
- * Calculate default cell sizes based on content
+ * Intrinsic container size from real content measurement: each track
+ * contributes its natural size (fixed sizes as-is, content for the rest).
  */
-const calculateDefaultCellSizes = (
-  items: ReadonlyArray<{ view: View }>,
-  template: GridTemplate
-): { cellWidth: number; cellHeight: number } => {
-  // In a real implementation, this would measure actual content
-  // For now, use reasonable defaults based on grid structure
-  const columnCount = template.columns.length
-  const hasFixedColumns = template.columns.some(col => col.type === 'fixed')
-
+const calculateIntrinsicSize = (
+  items: ReadonlyArray<GridItem>,
+  template: GridTemplate,
+  rowCount: number
+): { width: number; height: number } => {
+  const columnContent = measureTrackContent(items, template.columns.length, 'width')
+  const rowContent = measureTrackContent(items, rowCount, 'height')
+  const intrinsic = (tracks: ReadonlyArray<GridTrack>, content: number[]): number =>
+    tracks.reduce(
+      (sum, track, i) => sum + (track.type === 'fixed' ? track.size : Math.max(1, content[i] ?? 1)),
+      0
+    )
   return {
-    cellWidth: hasFixedColumns ? 15 : 20,
-    cellHeight: 3,
+    width: intrinsic(template.columns, columnContent),
+    height: intrinsic(template.rows, rowContent),
   }
 }
 
@@ -166,19 +197,22 @@ const parseTrackSize = (
   track: GridTrack,
   availableSize: number,
   totalFractions: number,
-  fractionSize: number
+  fractionSize: number,
+  contentSize: number
 ): number => {
+  void availableSize
+  void totalFractions
   switch (track.type) {
     case 'fixed':
       return track.size
     case 'fraction':
       return Math.floor(track.fraction * fractionSize)
     case 'auto':
-      return calculateAutoSize(availableSize, totalFractions, fractionSize)
+      // At least the content, at least the 1fr share of free space.
+      return Math.max(contentSize, Math.max(1, Math.floor(fractionSize)))
     case 'min-content':
-      return calculateMinContentSize()
     case 'max-content':
-      return calculateMaxContentSize(availableSize)
+      return contentSize
   }
 }
 
@@ -199,7 +233,8 @@ const parseTrackSize = (
 const calculateTrackSizes = (
   tracks: ReadonlyArray<GridTrack>,
   availableSize: number,
-  gap: number
+  gap: number,
+  contentSizes?: number[]
 ): number[] => {
   const totalGap = Math.max(0, (tracks.length - 1) * gap)
   const availableForTracks = availableSize - totalGap
@@ -223,7 +258,15 @@ const calculateTrackSizes = (
   const fractionSize = totalFractions > 0 ? remainingSize / totalFractions : 0
 
   // Calculate final track sizes
-  return tracks.map(track => parseTrackSize(track, availableSize, totalFractions, fractionSize))
+  return tracks.map((track, index) =>
+    parseTrackSize(
+      track,
+      availableSize,
+      totalFractions,
+      fractionSize,
+      Math.max(1, contentSizes?.[index] ?? 1)
+    )
+  )
 }
 
 /**
@@ -351,8 +394,14 @@ const calculateGridLayout = (
   const availableWidth = containerWidth - (padding.left ?? 0) - (padding.right ?? 0)
   const availableHeight = containerHeight - (padding.top ?? 0) - (padding.bottom ?? 0)
 
-  // Calculate column sizes and positions
-  const columnSizes = calculateTrackSizes(template.columns, availableWidth, columnGap)
+  // Calculate column sizes and positions (content-measured)
+  const columnContent = measureTrackContent(items, template.columns.length, 'width')
+  const columnSizes = calculateTrackSizes(
+    template.columns,
+    availableWidth,
+    columnGap,
+    columnContent
+  )
   const columnPositions = calculateTrackPositions(columnSizes, columnGap)
 
   // Calculate row sizing based on template or auto-generate.
@@ -366,7 +415,8 @@ const calculateGridLayout = (
   }
   const rows = templateRows
 
-  const rowSizes = calculateTrackSizes(rows, availableHeight, rowGap)
+  const rowContent = measureTrackContent(items, rows.length, 'height')
+  const rowSizes = calculateTrackSizes(rows, availableHeight, rowGap, rowContent)
   const rowPositions = calculateTrackPositions(rowSizes, rowGap)
 
   // Place items in grid
@@ -448,16 +498,21 @@ export const grid = (items: ReadonlyArray<GridItem | View>, props: GridProps = {
   const paddingH = (padding.left ?? 0) + (padding.right ?? 0)
   const paddingV = (padding.top ?? 0) + (padding.bottom ?? 0)
 
-  // Simple size calculation for now
+  // Content-measured container size: widest/tallest natural track sizes,
+  // plus inter-track gaps. (Rows extended to hold every item.)
   const columnCount = template.columns.length
   const rowCount = Math.ceil(gridItems.length / columnCount)
+  const templateRows = template.rows.length > 0 ? [...template.rows] : []
+  while (templateRows.length < rowCount) templateRows.push({ type: 'auto' })
+  const effectiveTemplate: GridTemplate = { columns: template.columns, rows: templateRows }
 
-  // Calculate cell sizes based on content or defaults
-  const { cellWidth, cellHeight } = calculateDefaultCellSizes(gridItems, template)
   const gap = props.gap ?? 0
+  const columnGap = props.columnGap ?? gap
+  const rowGap = props.rowGap ?? gap
+  const intrinsic = calculateIntrinsicSize(gridItems, effectiveTemplate, rowCount)
 
-  const totalWidth = paddingH + cellWidth * columnCount + gap * (columnCount - 1)
-  const totalHeight = paddingV + cellHeight * rowCount + gap * (rowCount - 1)
+  const totalWidth = paddingH + intrinsic.width + columnGap * Math.max(0, columnCount - 1)
+  const totalHeight = paddingV + intrinsic.height + rowGap * Math.max(0, rowCount - 1)
 
   return {
     render: () =>

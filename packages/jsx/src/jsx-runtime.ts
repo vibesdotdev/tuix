@@ -924,15 +924,23 @@ function collectFlexChildren(children: unknown[]): Array<View | FlexItem> {
     const grow = toNumber(flexProps.grow)
     const shrink = toNumber(flexProps.shrink)
     const basis = toNumber(flexProps.basis)
+    const alignSelf = mapAlignItems(flexProps.alignSelf)
     const rendered = renderChild(child)
     if (!rendered) continue
-    if (flex !== undefined || grow !== undefined || shrink !== undefined || basis !== undefined) {
+    if (
+      flex !== undefined ||
+      grow !== undefined ||
+      shrink !== undefined ||
+      basis !== undefined ||
+      alignSelf !== undefined
+    ) {
       out.push({
         view: rendered,
         flex: flex ?? grow,
         grow: grow ?? flex,
         shrink,
         basis: basis !== undefined ? basis : undefined,
+        ...(alignSelf ? { alignSelf } : {}),
       })
     } else {
       out.push(rendered)
@@ -1375,32 +1383,28 @@ function renderJSX(
           borderBackground: (safeProps as Record<string, unknown>).borderBackground as any,
         })
       }
-      const width = toNumber(safeProps.width)
-      if (typeof width === 'number') {
-        styleInputs.push({ width })
+      // 'fill'/'NN%' heights route through styledBox, which resolves them
+      // against the render context and distributes inner children (spacers,
+      // flex items) inside the chrome. Numeric sizes and string widths keep
+      // the style path; string widths pad via fillView afterwards.
+      const widthSize = toSizeValue(safeProps.width)
+      const heightSize = toSizeValue(safeProps.height)
+      if (typeof widthSize === 'number') styleInputs.push({ width: widthSize })
+      if (typeof heightSize === 'number') styleInputs.push({ height: heightSize })
+      const sizeInputs: Partial<StyleProps> = {}
+      if (heightSize !== undefined) {
+        ;(sizeInputs as Record<string, unknown>).height = heightSize
       }
-      const height = toNumber(safeProps.height)
-      if (typeof height === 'number') {
-        styleInputs.push({ height })
-      }
-      const styleForBox = mergeStyleProps(...styleInputs)
+      const mergedForBox = mergeStyleProps(...styleInputs, sizeInputs)
       let boxView = styledBox(childrenViews, {
         border: resolveBorderPreset(safeProps.border ?? safeProps.borderStyle ?? safeProps.variant),
         padding,
         minWidth: toNumber(safeProps.minWidth),
         minHeight: toNumber(safeProps.minHeight),
-        style: styleForBox ? buildStyle(styleForBox) : undefined,
+        style: mergedForBox ? buildStyle(mergedForBox) : undefined,
       })
-      // 'fill'/'NN%' sizing resolves against the render context, which the
-      // construction-time style path cannot see — route those through
-      // fillView instead of the numeric style props.
-      const widthSize = toSizeValue(safeProps.width)
-      const heightSize = toSizeValue(safeProps.height)
-      if (typeof widthSize === 'string' || typeof heightSize === 'string') {
-        boxView = fillView(boxView, {
-          width: typeof widthSize === 'string' ? widthSize : undefined,
-          height: typeof heightSize === 'string' ? heightSize : undefined,
-        })
+      if (typeof widthSize === 'string') {
+        boxView = fillView(boxView, { width: widthSize })
       }
       return boxView
     }
@@ -1445,6 +1449,26 @@ function renderJSX(
     case 'vstack': {
       const childrenViews = ensureViewArray(validChildren)
       const gap = toNumber(safeProps.gap) ?? 0
+      const align = mapAlignItems(safeProps.align ?? safeProps.alignItems)
+      const justify = mapJustifyContent(safeProps.justify ?? safeProps.justifyContent)
+      const width = toSizeValue(safeProps.width)
+      const height = toSizeValue(safeProps.height)
+      const bg = safeProps.bg ?? safeProps.background
+      // Alignment/justification need a sized container: route through the
+      // flexbox engine (which also resolves fill/% sizing). Plain stacks
+      // stay on the fast content-sized path.
+      if (align || justify || typeof width === 'string' || typeof height === 'string') {
+        const flexProps: FlexboxProps = {
+          direction: FlexDirection.Column,
+          alignItems: align ?? undefined,
+          justifyContent: justify ?? undefined,
+          gap,
+          width,
+          height,
+        }
+        if (typeof bg === 'string') flexProps.background = bg
+        return flexbox(childrenViews, flexProps)
+      }
       let stacked: View
       if (gap > 0 && childrenViews.length > 1) {
         const spaced: View[] = []
@@ -1464,6 +1488,23 @@ function renderJSX(
     case 'hstack': {
       const childrenViews = ensureViewArray(validChildren)
       const gap = toNumber(safeProps.gap) ?? 0
+      const align = mapAlignItems(safeProps.align ?? safeProps.alignItems)
+      const justify = mapJustifyContent(safeProps.justify ?? safeProps.justifyContent)
+      const width = toSizeValue(safeProps.width)
+      const height = toSizeValue(safeProps.height)
+      const bg = safeProps.bg ?? safeProps.background
+      if (align || justify || typeof width === 'string' || typeof height === 'string') {
+        const flexProps: FlexboxProps = {
+          direction: FlexDirection.Row,
+          alignItems: align ?? undefined,
+          justifyContent: justify ?? undefined,
+          gap,
+          width,
+          height,
+        }
+        if (typeof bg === 'string') flexProps.background = bg
+        return flexbox(childrenViews, flexProps)
+      }
       const joined = gap > 0 ? joinViews(childrenViews, gap) : hstack(...childrenViews)
       return applyFillProps(joined, safeProps)
     }

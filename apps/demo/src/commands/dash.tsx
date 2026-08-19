@@ -91,7 +91,7 @@ export default function Dash() {
   const gate: Status = errRate() > 4 ? 'error' : errRate() > 1.5 ? 'warning' : 'active'
 
   return (
-    <box padding={1} border="rounded" borderColor={dim2}>
+    <box padding={1} border="rounded" borderColor={dim2} height="fill">
       {/* Header */}
       <hstack gap={1}>
         <text bg="#2d1f3d" fg="#c4b5fd">
@@ -149,9 +149,8 @@ export default function Dash() {
       <text> </text>
       <text> </text>
 
-      {Array.from({ length: Math.max(0, (process.stdout.rows ?? 24) - 18) }, (_, i) => (
-        <text key={`f-${i}`}> </text>
-      ))}
+      {/* flexible filler pushes hints to the bottom */}
+      <spacer flex={1} />
 
       {/* Hints */}
       <hstack gap={2}>

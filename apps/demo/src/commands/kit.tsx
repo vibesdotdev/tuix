@@ -1,6 +1,6 @@
 /** @jsxImportSource @tuix/jsx */
 
-import { $state, registerKeyHandler } from '@tuix/reactive'
+import { $state, registerKeyHandler, useViewport } from '@tuix/reactive'
 import { Avatar, CommandPalette, KbdHint, Modal, StatusBar, useUITheme } from '@tuix/ui'
 
 type Focus = 'sessions' | 'files' | 'composer'
@@ -51,12 +51,6 @@ const FOCUSES: Focus[] = ['sessions', 'files', 'composer']
 
 let keyCleanup: (() => void) | null = null
 
-function viewport() {
-  return {
-    cols: Math.max(60, process.stdout.columns ?? 80),
-  }
-}
-
 function wrap(text: string, width: number): string[] {
   const max = Math.max(16, width)
   const words = text.split(/\s+/)
@@ -83,7 +77,8 @@ function Kit() {
   const extra = $state<Turn[]>([], 'extra')
   const query = $state('', 'query')
 
-  const { cols } = viewport()
+  const vp = useViewport()
+  const cols = vp().cols
   const compact = cols < 90
   const wrapWidth = compact ? Math.max(16, cols - 30) : 60
 

@@ -15,6 +15,7 @@ import {
   sweepFocusables,
   resetFocus,
   dispatchBackdropClick,
+  setViewportSize,
 } from '@tuix/reactive'
 import type { RuntimeConfig, RuntimeState, SystemMsg, RuntimeMetrics } from './types'
 import { RuntimeError } from './types'
@@ -553,6 +554,9 @@ export class Runtime<Model, Msg> {
           }
 
           case 'WindowResize': {
+            // Hydrate the reactive viewport so useViewport() consumers
+            // re-render; the renderer already resized its own buffers.
+            setViewportSize(msg.width, msg.height)
             this.dirty = true
             break
           }

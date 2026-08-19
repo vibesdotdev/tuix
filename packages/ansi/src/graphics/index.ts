@@ -14,4 +14,5 @@ export {
   visualCellCount,
   type VisualCell,
   type Rgb,
+  type SgrDecorations,
 } from './cells'

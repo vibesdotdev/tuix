@@ -42,9 +42,11 @@ const ANSI = {
   scrollUp: (n: number) => `${CSI}${n}S`,
   scrollDown: (n: number) => `${CSI}${n}T`,
 
-  // Modes
-  alternateScreenEnable: `${CSI}?47h`,
-  alternateScreenDisable: `${CSI}?47l`,
+  // Modes — ?1049 is the modern alt-screen switch: save cursor, switch to
+  // the alternate buffer, and clear it. Legacy ?47 left the cursor
+  // un-restored and didn't guarantee a cleared buffer.
+  alternateScreenEnable: `${CSI}?1049h`,
+  alternateScreenDisable: `${CSI}?1049l`,
   mouseTrackingEnable: `${CSI}?1000h`,
   mouseTrackingDisable: `${CSI}?1000l`,
 

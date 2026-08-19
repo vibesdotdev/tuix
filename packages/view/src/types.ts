@@ -18,7 +18,6 @@ export type {
   GridItem,
   GridProps,
   LayoutRect,
-  SizeConstraints,
   LayoutResult,
   SpacerProps,
   DividerOrientation,

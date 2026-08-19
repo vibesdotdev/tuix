@@ -67,3 +67,4 @@ export { Viewport } from './components/layout/viewport/index.js'
 
 // Theme utilities
 export * from './theme/index.js'
+export { useViewport, setViewportSize, type ViewportSize } from '@tuix/reactive'
