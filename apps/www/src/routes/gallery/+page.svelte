@@ -74,9 +74,9 @@ export default function Tasks() {
 	<p class="eyebrow">Evidence</p>
 	<h1>Gallery</h1>
 	<p>
-		Every screenshot below is a real PTY capture at 100×30 — decoded from the terminal itself, not
-		reconstructed from views. Casts (keyboard input included) live in
-		<code>docs/evidence/casts/</code> in the repo.
+		Every screenshot below is a real GPU-rendered capture from a Ghostty window at the labeled grid
+		size — truecolor, real fonts, real terminal compositing via the <code>@tuix/ghostty</code>
+		capture package.
 	</p>
 </div>
 
@@ -93,7 +93,7 @@ export default function Tasks() {
 						height={1188}
 					/>
 					<div class="shot-meta">
-						<span>100×30 · PTY capture</span>
+						<span>{demo.file === 'kit-120x40.png' ? '120×40' : demo.file === 'kit-80x24-palette.png' ? '80×24' : '100×30'} · Ghostty capture</span>
 						{#if demo.keys}<span class="keys">{demo.keys.join(' · ')}</span>{/if}
 					</div>
 				</div>

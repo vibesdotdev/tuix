@@ -20,7 +20,10 @@ import {
   JustifyContent,
   AlignItems,
   FlexWrap,
+  fillView,
   type FlexboxProps,
+  type FlexItem,
+  type SizeValue,
 } from '@tuix/view'
 import { style, Style, color, border, type StyleProps } from '@tuix/ansi'
 import {
@@ -876,6 +879,68 @@ function ensureViewArray(children: unknown[]): View[] {
   return views
 }
 
+/** Coerce a width/height prop to a SizeValue: numbers pass through, 'fill'
+ * and 'NN%' strings pass through as terminal sizing units, everything else
+ * (including booleans/objects) is dropped. */
+function toSizeValue(value: unknown): SizeValue | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string') {
+    if (value === 'fill') return 'fill'
+    if (/^\d+(?:\.\d+)?%$/.test(value)) return value as `${number}%`
+    const numeric = Number(value)
+    if (Number.isFinite(numeric) && value.trim() !== '') return numeric
+  }
+  return undefined
+}
+
+/** Extract rect-filling props (width/height sizes + background) shared by
+ * text/vstack/hstack: returns null when none are present. */
+function extractFillProps(
+  props: Record<string, unknown>
+): { width?: SizeValue; height?: SizeValue; background?: string } | null {
+  const width = toSizeValue(props.width)
+  const height = toSizeValue(props.height)
+  const bg = props.bg ?? props.background
+  const background = typeof bg === 'string' ? bg : undefined
+  if (width === undefined && height === undefined && background === undefined) return null
+  return { width, height, background }
+}
+
+/** Wrap a view with fill semantics when fill props are present. */
+function applyFillProps(view: View, props: Record<string, unknown>): View {
+  const fill = extractFillProps(props)
+  return fill ? fillView(view, fill) : view
+}
+
+/** Render flex children, lifting flex/grow/shrink/basis from element props
+ * onto FlexItems — the JSX path into the flexbox grow/shrink algorithm. */
+function collectFlexChildren(children: unknown[]): Array<View | FlexItem> {
+  const out: Array<View | FlexItem> = []
+  for (const child of children) {
+    const flexProps = isJSXElement(child)
+      ? ((child.props ?? {}) as Record<string, unknown>)
+      : (child as Record<string, unknown>)
+    const flex = toNumber(flexProps.flex)
+    const grow = toNumber(flexProps.grow)
+    const shrink = toNumber(flexProps.shrink)
+    const basis = toNumber(flexProps.basis)
+    const rendered = renderChild(child)
+    if (!rendered) continue
+    if (flex !== undefined || grow !== undefined || shrink !== undefined || basis !== undefined) {
+      out.push({
+        view: rendered,
+        flex: flex ?? grow,
+        grow: grow ?? flex,
+        shrink,
+        basis: basis !== undefined ? basis : undefined,
+      })
+    } else {
+      out.push(rendered)
+    }
+  }
+  return out
+}
+
 const joinViews = (views: View[], gap: number = 1): View => {
   if (views.length === 0) return text('')
   if (views.length === 1) return views[0]
@@ -1249,10 +1314,11 @@ function renderJSX(
     case 'text': {
       const textContent = toTextContent(validChildren)
       if (textContent !== null) {
-        return paintCell(textContent, safeProps)
+        return applyFillProps(paintCell(textContent, safeProps), safeProps)
       }
       const views = ensureViewArray(validChildren)
-      return views.length === 1 ? views[0] : vstack(...views)
+      const stacked = views.length === 1 ? views[0]! : vstack(...views)
+      return applyFillProps(stacked, safeProps)
     }
 
     case 'styled-text':
@@ -1318,13 +1384,24 @@ function renderJSX(
         styleInputs.push({ height })
       }
       const styleForBox = mergeStyleProps(...styleInputs)
-      const boxView = styledBox(childrenViews, {
+      let boxView = styledBox(childrenViews, {
         border: resolveBorderPreset(safeProps.border ?? safeProps.borderStyle ?? safeProps.variant),
         padding,
         minWidth: toNumber(safeProps.minWidth),
         minHeight: toNumber(safeProps.minHeight),
         style: styleForBox ? buildStyle(styleForBox) : undefined,
       })
+      // 'fill'/'NN%' sizing resolves against the render context, which the
+      // construction-time style path cannot see — route those through
+      // fillView instead of the numeric style props.
+      const widthSize = toSizeValue(safeProps.width)
+      const heightSize = toSizeValue(safeProps.height)
+      if (typeof widthSize === 'string' || typeof heightSize === 'string') {
+        boxView = fillView(boxView, {
+          width: typeof widthSize === 'string' ? widthSize : undefined,
+          height: typeof heightSize === 'string' ? heightSize : undefined,
+        })
+      }
       return boxView
     }
 
@@ -1368,6 +1445,7 @@ function renderJSX(
     case 'vstack': {
       const childrenViews = ensureViewArray(validChildren)
       const gap = toNumber(safeProps.gap) ?? 0
+      let stacked: View
       if (gap > 0 && childrenViews.length > 1) {
         const spaced: View[] = []
         childrenViews.forEach((view, index) => {
@@ -1376,19 +1454,22 @@ function renderJSX(
           }
           spaced.push(view)
         })
-        return vstack(...spaced)
+        stacked = vstack(...spaced)
+      } else {
+        stacked = vstack(...childrenViews)
       }
-      return vstack(...childrenViews)
+      return applyFillProps(stacked, safeProps)
     }
 
     case 'hstack': {
       const childrenViews = ensureViewArray(validChildren)
       const gap = toNumber(safeProps.gap) ?? 0
-      return gap > 0 ? joinViews(childrenViews, gap) : hstack(...childrenViews)
+      const joined = gap > 0 ? joinViews(childrenViews, gap) : hstack(...childrenViews)
+      return applyFillProps(joined, safeProps)
     }
 
     case 'flex': {
-      const childrenViews = ensureViewArray(validChildren)
+      const childrenViews = collectFlexChildren(validChildren)
       const flexProps: FlexboxProps = {}
       const direction = mapFlexDirection(safeProps.direction)
       if (direction) flexProps.direction = direction
@@ -1406,10 +1487,12 @@ function renderJSX(
       if (typeof columnGap === 'number') flexProps.columnGap = columnGap
       const padding = normalizePadding(safeProps.padding)
       if (padding) flexProps.padding = padding
-      const width = toNumber(safeProps.width)
-      if (typeof width === 'number') flexProps.width = width
-      const height = toNumber(safeProps.height)
-      if (typeof height === 'number') flexProps.height = height
+      const width = toSizeValue(safeProps.width)
+      if (width !== undefined) flexProps.width = width
+      const height = toSizeValue(safeProps.height)
+      if (height !== undefined) flexProps.height = height
+      const bg = safeProps.bg ?? safeProps.background
+      if (typeof bg === 'string') flexProps.background = bg
       return flexbox(childrenViews, flexProps)
     }
 

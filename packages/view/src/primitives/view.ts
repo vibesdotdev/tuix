@@ -56,7 +56,8 @@
 import { Effect } from 'effect'
 import { stringWidth } from '@tuix/view/string/width'
 import { attachOverlays, partitionOverlays } from '@tuix/core/types'
-import type { View, RenderError } from './types'
+import type { View, RenderError, SizeValue, FillViewOptions } from './types'
+import { resolveSize } from './types'
 import { style as createStyle, renderStyledSync, padVisual, type Style } from '@tuix/ansi'
 
 // Re-export types for convenience
@@ -164,6 +165,66 @@ export const measureView = (view: View) =>
  */
 export const renderView = (view: View) => view.render()
 
+export { type FillViewOptions } from './types'
+
+function hexToRgbText(hex: string): string {
+  const v = hex.trim().replace('#', '')
+  const r = Number.parseInt(v.slice(0, 2), 16)
+  const g = Number.parseInt(v.slice(2, 4), 16)
+  const b = Number.parseInt(v.slice(4, 6), 16)
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return '0;0;0'
+  return `${r};${g};${b}`
+}
+
+/**
+ * Wrap a view so it occupies an exact rect: lines padded to `width`, rows
+ * padded to `height`, and every cell (including padding) painted with the
+ * given background. This is the semantic primitive behind "backgrounds fill
+ * where there is no text": the rect, not the ink, is the surface.
+ *
+ * `width`/`height` resolve at render time against the containing rect, so
+ * `'fill'` and `'50%'` work anywhere a context flows (the renderer supplies
+ * terminal size at the root; layouts pass children their allocated rect).
+ */
+export const fillView = (view: View, options: FillViewOptions = {}): View => {
+  const naturalWidth = view.width ?? 0
+  const naturalHeight = view.height ?? 0
+  return {
+    render: context =>
+      Effect.gen(function* (_) {
+        const width = resolveSize(options.width, 'width', context, naturalWidth)
+        const height = resolveSize(options.height, 'height', context, naturalHeight)
+        const rendered = yield* _(view.render(context))
+        const content = typeof rendered === 'string' ? rendered : rendered.content
+        const lines = content.split('\n')
+        while (lines.length < height) lines.push('')
+        const padded = lines.slice(0, Math.max(height, 1)).map(line => padVisual(line, width))
+        const sgr =
+          options.background || options.foreground
+            ? `${options.foreground ? `\x1b[38;2;${hexToRgbText(options.foreground)}m` : ''}` +
+              `${options.background ? `\x1b[48;2;${hexToRgbText(options.background)}m` : ''}`
+            : ''
+        const body = padded.join('\n')
+        if (!sgr) return { content: body, width, height }
+        return {
+          content: body
+            .split('\n')
+            .map(l => sgr + l + '\x1b[0m')
+            .join('\n'),
+          width,
+          height,
+        }
+      }),
+    get width() {
+      return typeof options.width === 'number' ? options.width : naturalWidth
+    },
+    get height() {
+      return typeof options.height === 'number' ? options.height : naturalHeight
+    },
+    background: options.background ?? view.background,
+  }
+}
+
 /**
  * Combine multiple views vertically
  *
@@ -209,9 +270,9 @@ export const vstack = (...views: Array<View | View[]>): View => {
   }
 
   const stacked: View = {
-    render: () =>
+    render: context =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(Effect.forEach(flow, v => v.view.render()))
+        const rendered = yield* _(Effect.forEach(flow, v => v.view.render(context)))
         const contents = rendered.map(unwrapRendered)
         const content = contents.join('\n')
         return { content, width, height }
@@ -257,9 +318,9 @@ export const hstack = (...views: Array<View | View[]>): View => {
   const height = flow.length > 0 ? Math.max(...flow.map(v => v.view.height || 1)) : 0
 
   const stacked: View = {
-    render: () =>
+    render: context =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(Effect.forEach(flow, v => v.view.render()))
+        const rendered = yield* _(Effect.forEach(flow, v => v.view.render(context)))
         const contents = rendered.map(unwrapRendered)
 
         // Calculate actual height from rendered content, not from View metadata

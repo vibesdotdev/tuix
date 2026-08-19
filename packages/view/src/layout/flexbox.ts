@@ -17,6 +17,7 @@ import { attachOverlays, partitionOverlays } from '@tuix/core/types'
 import { stringWidth } from '@tuix/view/string/width'
 import type { View } from '@tuix/view/types'
 import { unwrapRendered } from '@tuix/view/primitives/view'
+import { resolveSize } from '@tuix/view/primitives/types'
 import {
   type FlexboxProps,
   type FlexItem,
@@ -420,11 +421,14 @@ const calculateFlexLayout = (
  */
 const calculateContainerDimensions = (
   flexItems: FlexItem[],
-  props: FlexboxProps
+  props: FlexboxProps,
+  resolved?: { width?: number; height?: number }
 ): { width: number; height: number } => {
-  // If explicit width/height provided, use those
-  if (props.width !== undefined && props.height !== undefined) {
-    return { width: props.width, height: props.height }
+  // If explicit (resolved) width/height provided, use those
+  const width = resolved?.width ?? (typeof props.width === 'number' ? props.width : undefined)
+  const height = resolved?.height ?? (typeof props.height === 'number' ? props.height : undefined)
+  if (width !== undefined && height !== undefined) {
+    return { width, height }
   }
 
   const padding = props.padding ?? {}
@@ -444,8 +448,8 @@ const calculateContainerDimensions = (
     const contentHeight = Math.max(...flexItems.map(item => getViewSize(item.view).height), 0)
 
     return {
-      width: props.width ?? paddingH + contentWidth + totalGap,
-      height: props.height ?? paddingV + contentHeight,
+      width: width ?? paddingH + contentWidth + totalGap,
+      height: height ?? paddingV + contentHeight,
     }
   } else {
     // Column layout - use flex basis if specified, otherwise natural size
@@ -458,8 +462,8 @@ const calculateContainerDimensions = (
     const contentWidth = Math.max(...flexItems.map(item => getViewSize(item.view).width), 0)
 
     return {
-      width: props.width ?? paddingH + contentWidth,
-      height: props.height ?? paddingV + contentHeight + totalGap,
+      width: width ?? paddingH + contentWidth,
+      height: height ?? paddingV + contentHeight + totalGap,
     }
   }
 }
@@ -498,41 +502,93 @@ const renderChildToBuffer = (
   }
 }
 
+/** Lift flex metadata (grow/shrink/basis/flex) off a bare View, e.g. the
+ * FlexView produced by spacer({flex}). The old normalization dropped it,
+ * making flex spacers inert. */
+const normalizeFlexItem = (item: FlexItem | View): FlexItem => {
+  if ('view' in item) return item
+  const view = item as View & { flex?: number; grow?: number; shrink?: number; basis?: number }
+  if (
+    view.flex === undefined &&
+    view.grow === undefined &&
+    view.shrink === undefined &&
+    view.basis === undefined
+  ) {
+    return { view }
+  }
+  return {
+    view,
+    flex: view.flex,
+    grow: view.grow ?? view.flex,
+    shrink: view.shrink,
+    basis: view.basis,
+  }
+}
+
+const backgroundPrefix = (hex: string): string => {
+  const v = hex.trim().replace('#', '')
+  const r = Number.parseInt(v.slice(0, 2), 16)
+  const g = Number.parseInt(v.slice(2, 4), 16)
+  const b = Number.parseInt(v.slice(4, 6), 16)
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return ''
+  return `\x1b[48;2;${r};${g};${b}m`
+}
+
 export const flexbox = (items: ReadonlyArray<FlexItem | View>, props: FlexboxProps = {}): View => {
   // Normalize items to FlexItem and lift overlay-tagged views out of flow.
-  const flexItems = items.map(item => ('view' in item ? item : { view: item }))
+  const flexItems = items.map(normalizeFlexItem)
   const { flow, overlays } = partitionOverlays(flexItems)
 
-  // Calculate container dimensions
-  const { width: totalWidth, height: totalHeight } = calculateContainerDimensions(flow, props)
+  // Content-sized fallback, used when no context is available (nested inside
+  // content-sized parents) and for measurement metadata.
+  const fallback = calculateContainerDimensions(flow, props)
+  // Construction-time layout for height metadata (wrapping grows rows).
+  const metaLayout = calculateFlexLayout(flow, fallback.width, fallback.height, props)
 
-  // Track if dimensions are explicit (for padding behavior)
-  const hasExplicitWidth = props.width !== undefined
-
-  // Pre-calculate layout to get actual height (for wrapping)
-  const preLayout = calculateFlexLayout(flow, totalWidth, totalHeight, props)
-  const actualHeight = preLayout.bounds.height
+  // Track if dimensions are explicit (for padding behavior). A container
+  // background also implies fixed-size semantics — trailing styled spaces
+  // are the surface and must not be trimmed.
+  const hasExplicitWidth = props.width !== undefined || props.background !== undefined
 
   const view: View = {
-    render: () =>
+    render: context =>
       Effect.gen(function* (_) {
-        // Use pre-calculated layout
-        const layout = preLayout
+        // Resolve 'fill'/'NN%' against the containing rect; without a
+        // context (content-sized parent) fall back to content dimensions.
+        const totalWidth = resolveSize(props.width, 'width', context, fallback.width)
+        const totalHeight = resolveSize(props.height, 'height', context, fallback.height)
+
+        const layout = calculateFlexLayout(flow, totalWidth, totalHeight, props)
+        const actualHeight = layout.bounds.height
 
         // Create a 2D buffer for rendering (use actual height from layout).
         // Cells carry their SGR prefix so the join can run-length encode
         // styling instead of emitting the escape before every character.
+        const containerBg = props.background ? backgroundPrefix(props.background) : ''
+        if (actualHeight <= 0 || totalWidth <= 0) return ''
         const buffer: Array<Array<{ char: string; prefix: string }>> = Array(actualHeight)
           .fill(null)
-          .map(() => Array(totalWidth).fill({ char: ' ', prefix: '' }))
+          .map(() => Array(totalWidth).fill({ char: ' ', prefix: containerBg }))
 
-        // Render each child into the buffer
+        // Render each child into the buffer. The child's allocated rect is
+        // its render context so nested 'fill'/'%' sizing resolves against
+        // the space it actually got, and a declared background pre-fills the
+        // rect so color covers the whole child, not just its ink.
         for (const child of layout.children) {
-          const content = yield* _(child.view.render())
+          const bg = child.view.background ? backgroundPrefix(child.view.background) : ''
+          if (bg) {
+            for (let y = child.bounds.y; y < child.bounds.y + child.bounds.height; y++) {
+              for (let x = child.bounds.x; x < child.bounds.x + child.bounds.width; x++) {
+                if (buffer[y] && buffer[y]![x]) buffer[y]![x] = { char: ' ', prefix: bg }
+              }
+            }
+          }
+          const content = yield* _(
+            child.view.render({ width: child.bounds.width, height: child.bounds.height })
+          )
           const contentStr = typeof content === 'string' ? content : (content as any).content
           renderChildToBuffer(buffer, contentStr, child.bounds, totalWidth, actualHeight)
         }
-
         // Convert buffer to string with run-length encoded SGR via
         // joinVisualCells (a prefix is emitted once per style run).
         // If no explicit width, trim trailing spaces ONLY on lines with content
@@ -550,8 +606,9 @@ export const flexbox = (items: ReadonlyArray<FlexItem | View>, props: FlexboxPro
             .join('\n')
         }
       }),
-    width: totalWidth,
-    height: actualHeight, // Actual height after wrapping
+    width: typeof props.width === 'number' ? props.width : fallback.width,
+    height: typeof props.height === 'number' ? props.height : metaLayout.bounds.height,
+    background: props.background,
   }
   return attachOverlays(view, overlays)
 }

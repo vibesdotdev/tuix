@@ -19,7 +19,8 @@ export interface StatusHint {
 export interface StatusBarProps {
   facts?: StatusFact[]
   hints?: StatusHint[]
-  width?: number
+  /** Fixed width in cells, or 'fill' for the full terminal width. */
+  width?: number | 'fill'
 }
 
 export interface StatusSegment {
@@ -82,18 +83,24 @@ export function clipStatusBarSegments(segments: StatusSegment[], width: number):
 
 export function formatStatusBar(props: StatusBarProps): string {
   const segments = formatStatusBarSegments(props)
-  const width = props.width
+  const resolved =
+    props.width === 'fill'
+      ? (process.stdout.columns ?? 80)
+      : typeof props.width === 'number'
+        ? props.width
+        : undefined
   const clipped =
-    typeof width === 'number' && width > 0 ? clipStatusBarSegments(segments, width) : segments
+    resolved !== undefined && resolved > 0 ? clipStatusBarSegments(segments, resolved) : segments
   return clipped.map(segment => segment.text).join('')
 }
 
 export function StatusBar(props: StatusBarProps): JSX.Element {
   const { theme } = useUITheme()
-  const segments = clipStatusBarSegments(
-    formatStatusBarSegments(props),
-    props.width ?? Number.POSITIVE_INFINITY
-  )
+  const resolvedWidth =
+    props.width === 'fill'
+      ? (process.stdout.columns ?? 80)
+      : (props.width ?? Number.POSITIVE_INFINITY)
+  const segments = clipStatusBarSegments(formatStatusBarSegments(props), resolvedWidth)
 
   function colorOf(tone: StatusSegment['tone']): string {
     switch (tone) {

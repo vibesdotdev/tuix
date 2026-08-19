@@ -171,8 +171,8 @@ $ bun test
 		<div class="section-head">
 			<h2>Photographed in a real terminal</h2>
 			<p>
-				These are live xterm screenshots of the demo workbench in a real PTY — not HTML mockups.
-				Overlays composite over the workbench; the footer matches the keys.
+				These are GPU-rendered screenshots of the demo workbench running in a real Ghostty window —
+				captured from the live terminal surface with truecolor, not mockups.
 			</p>
 		</div>
 		<div class="evidence-grid">

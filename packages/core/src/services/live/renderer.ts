@@ -21,6 +21,23 @@ const SYNC_UPDATE_BEGIN = '\x1b[?2026h'
 /** DECSET 2026 — end synchronized update (terminal paints the frame). */
 const SYNC_UPDATE_END = '\x1b[?2026l'
 
+/**
+ * Opaque background mode: when TUIX_PAINT_BG holds a #rrggbb hex, unstyled
+ * cells paint that background instead of leaving the terminal default. Used
+ * for screenshots (and terminals whose default background differs from the
+ * app theme) so the app grid reads as a solid surface.
+ */
+const PAINT_BG: AnsiStyle['background'] | undefined = (() => {
+  const hex = process.env.TUIX_PAINT_BG
+  if (!hex || !/^#?[0-9a-fA-F]{6}$/.test(hex)) return undefined
+  const v = hex.replace('#', '')
+  return rgb(
+    Number.parseInt(v.slice(0, 2), 16),
+    Number.parseInt(v.slice(2, 4), 16),
+    Number.parseInt(v.slice(4, 6), 16)
+  )
+})()
+
 /** Visual width of a grapheme, memoized (width is a diff-loop hotspot). */
 const widthCache = new Map<string, number>()
 function graphemeWidth(char: string): number {
@@ -588,10 +605,11 @@ export const RendererServiceLive = Layer.effect(
       layer: RenderLayer,
       view: View,
       x: number,
-      y: number
+      y: number,
+      context?: { width: number; height: number }
     ): Effect.Effect<void, RenderError, never> =>
       Effect.gen(function* (_) {
-        const rendered = yield* _(view.render())
+        const rendered = yield* _(view.render(context))
         const content =
           typeof rendered === 'string'
             ? rendered
@@ -606,7 +624,9 @@ export const RendererServiceLive = Layer.effect(
         const height = size.height && size.height > 0 ? size.height : 24
         const mainLayer = yield* _(ensureLayer('main', 0, width, height))
         mainLayer.buffer.clear()
-        yield* _(paintViewToLayer(mainLayer, view, 0, 0))
+        // The terminal size is the root render context: 'fill' and
+        // percentage sizing inside the app resolve against the real grid.
+        yield* _(paintViewToLayer(mainLayer, view, 0, 0, { width, height }))
 
         const overlays = collectOverlays(view)
         const overlayLayer = yield* _(ensureLayer('overlay', 1, width, height))
@@ -763,18 +783,22 @@ export const RendererServiceLive = Layer.effect(
 
           let line = ''
           for (const cell of patch.cells) {
-            if (!stylesEqual(cell.style, currentStyle)) {
+            const paint =
+              !PAINT_BG || Option.isSome(cell.style)
+                ? cell.style
+                : Option.some({ background: PAINT_BG } as AnsiStyle)
+            if (!stylesEqual(paint, currentStyle)) {
               if (line.length > 0) {
                 frame += line
                 line = ''
               }
               const styleCode = pipe(
-                cell.style,
+                paint,
                 Option.map(s => toAnsiStyleCode(s, caps.colorProfile)),
                 Option.getOrElse(() => toAnsiStyleCode({}, caps.colorProfile))
               )
               frame += styleCode
-              currentStyle = cell.style
+              currentStyle = paint
             }
             line += cell.char
           }

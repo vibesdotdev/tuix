@@ -5,6 +5,7 @@
     "": {
       "name": "tuix",
       "dependencies": {
+        "@tuix/ghostty": "workspace:*",
         "node-pty": "^1.0.0",
       },
       "devDependencies": {
@@ -194,6 +195,10 @@
         "@types/bun": "latest",
         "typescript": "^5.3.0",
       },
+    },
+    "packages/ghostty": {
+      "name": "@tuix/ghostty",
+      "version": "0.1.0",
     },
     "packages/input": {
       "name": "@tuix/input",
@@ -675,6 +680,8 @@
     "@tuix/debug": ["@tuix/debug@workspace:packages/debug"],
 
     "@tuix/docs": ["@tuix/docs@workspace:packages/docs"],
+
+    "@tuix/ghostty": ["@tuix/ghostty@workspace:packages/ghostty"],
 
     "@tuix/input": ["@tuix/input@workspace:packages/input"],
 

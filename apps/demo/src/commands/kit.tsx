@@ -54,7 +54,6 @@ let keyCleanup: (() => void) | null = null
 function viewport() {
   return {
     cols: Math.max(60, process.stdout.columns ?? 80),
-    rows: Math.max(18, process.stdout.rows ?? 24),
   }
 }
 
@@ -84,12 +83,9 @@ function Kit() {
   const extra = $state<Turn[]>([], 'extra')
   const query = $state('', 'query')
 
-  const { cols, rows } = viewport()
+  const { cols } = viewport()
   const compact = cols < 90
-  const chrome = 3
-  const bodyH = Math.max(4, rows - chrome)
-  const sideW = compact ? cols : Math.min(24, Math.max(18, Math.floor(cols * 0.28)))
-  const mainW = compact ? cols : Math.max(20, cols - sideW)
+  const wrapWidth = compact ? Math.max(16, cols - 30) : 60
 
   if (keyCleanup) keyCleanup()
   keyCleanup = registerKeyHandler(key => {
@@ -173,10 +169,10 @@ function Kit() {
 
   const session = SESSIONS[selected()] ?? SESSIONS[0]!
   const thread = [...(THREADS[session.id] ?? []), ...extra()]
-  const threadBudget = Math.max(3, bodyH - (compact ? 6 : 2))
+  const threadBudget = compact ? 6 : 14
   const threadLines = thread.flatMap(turn => {
     const prefix = turn.role === 'you' ? 'you  ' : 'grok '
-    return wrap(turn.text, Math.max(16, mainW - prefix.length - 1)).map((line, i) =>
+    return wrap(turn.text, Math.max(16, wrapWidth - prefix.length - 1)).map((line, i) =>
       i === 0 ? `${prefix}${line}` : `     ${line}`
     )
   })
@@ -206,22 +202,24 @@ function Kit() {
   ))
 
   const body = compact ? (
-    <flex direction="column" width={cols} height={bodyH}>
+    <flex direction="column" width="fill" flex={1}>
       <text fg={dim}>sessions</text>
       {sessionLines}
       <text> </text>
-      {convo}
+      <flex direction="column" width="fill" flex={1}>
+        {convo}
+      </flex>
     </flex>
   ) : (
-    <flex direction="row" width={cols} height={bodyH}>
-      <flex direction="column" width={sideW} height={bodyH}>
+    <flex direction="row" width="fill" flex={1}>
+      <flex direction="column" width="28%">
         <text fg={dim}>sessions</text>
         {sessionLines}
         <text> </text>
         <text fg={dim}>files</text>
         {fileLines}
       </flex>
-      <flex direction="column" width={mainW} height={bodyH}>
+      <flex direction="column" width="fill" flex={1}>
         <text fg={dim}>{session.title}</text>
         {convo}
       </flex>
@@ -258,7 +256,7 @@ function Kit() {
     ) : null
 
   return (
-    <flex direction="column" width={cols} height={rows}>
+    <flex direction="column" width="fill" height="fill">
       <hstack gap={1}>
         <text bg="#0d3d2d" fg="#5eead4">
           {' ◈ vibes '}
@@ -271,7 +269,7 @@ function Kit() {
       {helpOverlay}
       <text fg={focus() === 'composer' ? hi : dim}>{`▸ ${draft() || 'say something…'}`}</text>
       <StatusBar
-        width={cols}
+        width="fill"
         facts={
           compact
             ? [

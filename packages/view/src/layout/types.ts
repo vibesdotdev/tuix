@@ -6,6 +6,7 @@
  */
 
 import type { View } from '../../types'
+import type { SizeValue } from '../../primitives/types'
 
 // =============================================================================
 // Flexbox Types
@@ -83,8 +84,12 @@ export interface FlexboxProps {
   readonly gap?: number
   readonly rowGap?: number
   readonly columnGap?: number
-  readonly width?: number
-  readonly height?: number
+  /** Container width: cells, `'fill'` (containing rect), or `'NN%'`. */
+  readonly width?: SizeValue
+  /** Container height: cells, `'fill'` (containing rect), or `'NN%'`. */
+  readonly height?: SizeValue
+  /** Container background painted across the full container rect (hex). */
+  readonly background?: string
   readonly padding?: {
     top?: number
     right?: number
