@@ -166,6 +166,27 @@ export const styledBox = (content: View | View[], props: BoxProps = {}): View =>
     },
   }
 
+  // Width style may be numeric or 'fill'/'NN%'. When it's a string,
+  // resolve it against the render context so the border STRETCHES to
+  // the target width (not content width with trailing spaces).
+  const styleWidth = props.style?.props?.width
+  const numericWidth =
+    typeof styleWidth === 'number' && styleWidth > 0
+      ? Math.max(1, styleWidth - padding.left - padding.right - (props.border ? 2 : 0))
+      : undefined
+  const contextWidth = (context?: { width: number; height: number }): number | undefined => {
+    if (styleWidth === undefined) return undefined
+    if (numericWidth !== undefined) return numericWidth
+    if (!context) return undefined
+    const resolved = resolveSize(
+      styleWidth as never,
+      'width',
+      context,
+      (innerView.width || 0) + padding.left + padding.right + (props.border ? 2 : 0)
+    )
+    return Math.max(1, resolved - padding.left - padding.right - (props.border ? 2 : 0))
+  }
+
   return {
     render: context =>
       Effect.gen(function* (_) {
@@ -195,14 +216,22 @@ export const styledBox = (content: View | View[], props: BoxProps = {}): View =>
         // Calculate inner dimensions using helper
         const { width: innerWidth } = getContentDimensions(innerLines)
 
+        // Resolve context-driven width (fill/NN%) so the border stretches
+        // to the target width instead of rendering at content width.
+        const targetWidth = contextWidth(context)
+        const minWidth = props.minWidth || 0
+
         // Apply border if specified
         if (props.border) {
           // Apply padding manually before passing to renderBox
           const paddedLines = createPaddedLines(innerLines, innerWidth, padding)
           const paddedWidth = innerWidth + padding.left + padding.right
 
-          // Apply minWidth after padding
-          const finalWidth = Math.max(paddedWidth, props.minWidth || 0)
+          // Apply minWidth and context width after padding. When a target
+          // width is set (numeric or context-resolved fill/NN%), the box
+          // caps to that width — content is truncated/padded to fit.
+          const cappedWidth = targetWidth ?? numericWidth ?? null
+          const finalWidth = cappedWidth !== null ? cappedWidth : Math.max(paddedWidth, minWidth)
           const adjustedLines = adjustToFinalWidth(paddedLines, paddedWidth, finalWidth)
 
           // renderBox expects width/height to include borders, and content to be pre-padded
@@ -223,12 +252,14 @@ export const styledBox = (content: View | View[], props: BoxProps = {}): View =>
         // For non-bordered boxes, apply padding manually
         const paddedLines = createPaddedLines(innerLines, innerWidth, padding)
         const paddedWidth = innerWidth + padding.left + padding.right
-        const finalWidth = Math.max(paddedWidth, props.minWidth || 0)
+        const cappedWidth2 = targetWidth ?? numericWidth ?? null
+        const finalWidth = cappedWidth2 !== null ? cappedWidth2 : Math.max(paddedWidth, minWidth)
         const adjustedLines = adjustToFinalWidth(paddedLines, paddedWidth, finalWidth)
         return adjustedLines.join('\n')
       }),
     width: Math.max(
-      (innerView.width || 0) + padding.left + padding.right + (props.border ? 2 : 0),
+      numericWidth ??
+        (innerView.width || 0) + padding.left + padding.right + (props.border ? 2 : 0),
       (props.minWidth || 0) + (props.border ? 2 : 0)
     ),
     height: Math.max(

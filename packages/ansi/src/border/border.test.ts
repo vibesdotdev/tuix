@@ -233,7 +233,8 @@ describe('Border Utilities', () => {
         sides: BorderSide.Top | BorderSide.Bottom,
       })
 
-      const expected = ['---', '   ', '---'].join('\n')
+      // No side borders → inner width = width (not width - 2).
+      const expected = ['-----', '     ', '-----'].join('\n')
 
       expect(result).toBe(expected)
     })

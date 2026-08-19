@@ -17,6 +17,7 @@ export type SystemMsg<Msg> =
   | { readonly _tag: 'KeyPress'; readonly key: KeyEvent }
   | { readonly _tag: 'MouseMove'; readonly x: number; readonly y: number }
   | { readonly _tag: 'MouseClick'; readonly x: number; readonly y: number; readonly button: number }
+  | { readonly _tag: 'Paste'; readonly content: string }
   | { readonly _tag: 'WindowResize'; readonly width: number; readonly height: number }
   | { readonly _tag: 'Quit' }
   | { readonly _tag: 'UserMsg'; readonly msg: Msg }

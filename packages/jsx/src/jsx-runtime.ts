@@ -24,6 +24,7 @@ import {
   type FlexboxProps,
   type FlexItem,
   type SizeValue,
+  clipView,
 } from '@tuix/view'
 import { style, Style, color, border, type StyleProps } from '@tuix/ansi'
 import {
@@ -1042,8 +1043,8 @@ const wrapInteractiveView = (child: View, props: Record<string, unknown>): View 
     const onKeyPress = events['onKeyPress']
     if (typeof onKeyPress === 'function') {
       registerFocusable(focusId, key => {
-        onKeyPress(normalizeKeyName(key))
-        return true
+        const result = onKeyPress(normalizeKeyName(key))
+        return result !== false
       })
     } else {
       registerFocusable(focusId)
@@ -1441,16 +1442,19 @@ function renderJSX(
           borderBackground: (safeProps as Record<string, unknown>).borderBackground as any,
         })
       }
-      // 'fill'/'NN%' heights route through styledBox, which resolves them
-      // against the render context and distributes inner children (spacers,
-      // flex items) inside the chrome. Numeric sizes and string widths keep
-      // the style path; string widths pad via fillView afterwards.
+      // 'fill'/'NN%' sizes route through styledBox, which resolves them
+      // against the render context: heights distribute inner children
+      // (spacers, flex items) inside the chrome, and widths stretch the
+      // border to the target width. Numeric sizes go through the style.
       const widthSize = toSizeValue(safeProps.width)
       const heightSize = toSizeValue(safeProps.height)
       if (typeof widthSize === 'number') styleInputs.push({ width: widthSize })
       if (typeof heightSize === 'number') styleInputs.push({ height: heightSize })
       const sizeInputs: Partial<StyleProps> = {}
-      if (heightSize !== undefined) {
+      if (widthSize !== undefined && typeof widthSize !== 'number') {
+        ;(sizeInputs as Record<string, unknown>).width = widthSize
+      }
+      if (heightSize !== undefined && typeof heightSize !== 'number') {
         ;(sizeInputs as Record<string, unknown>).height = heightSize
       }
       const mergedForBox = mergeStyleProps(...styleInputs, sizeInputs)
@@ -1461,9 +1465,10 @@ function renderJSX(
         minHeight: toNumber(safeProps.minHeight),
         style: mergedForBox ? buildStyle(mergedForBox) : undefined,
       })
-      if (typeof widthSize === 'string') {
-        boxView = fillView(boxView, { width: widthSize })
-      }
+      // String widths that aren't handled by styledBox (no context) fall
+      // back to fillView padding. When a context IS available, styledBox
+      // resolves the width and stretches the border — fillView is only
+      // reached for the no-context case.
       return boxView
     }
 
@@ -1693,7 +1698,33 @@ function renderJSX(
       const kids = toTextContent(validChildren)
       const label = kids && kids.length > 0 ? kids : String(safeProps.label ?? 'OK')
       const focused = safeProps.focused === true
-      return paintCell(focused ? `[ ${label} ]` : `( ${label} )`, safeProps)
+      const disabled = safeProps.disabled === true
+      const onClick = typeof safeProps.onClick === 'function' ? safeProps.onClick : undefined
+      const buttonId =
+        typeof safeProps.id === 'string' && safeProps.id.length > 0
+          ? safeProps.id
+          : typeof safeProps.className === 'string' && safeProps.className.length > 0
+            ? safeProps.className
+            : `button:${label.slice(0, 12)}`
+      // The button is a real interactive: it registers as focusable (Tab
+      // cycles to it), normalizes keys before dispatch, and fires onClick
+      // on Enter/Space. The visual is [ label ] (focused) or ( label ).
+      const cell = paintCell(focused ? `[ ${label} ]` : `( ${label} )`, safeProps)
+      const handler = (key: string): boolean => {
+        if (disabled) return false
+        if (key === 'enter' || key === 'space' || key === 'return') {
+          if (onClick) onClick()
+          return true
+        }
+        return false
+      }
+      return wrapInteractiveView(cell, {
+        ...safeProps,
+        focusable: !disabled,
+        id: buttonId,
+        onKeyPress: onClick ? handler : undefined,
+        onClick: disabled ? undefined : onClick,
+      })
     }
     case 'text-input':
     case 'input': {
@@ -1758,7 +1789,12 @@ function renderJSX(
     case 'scrollview':
     case 'viewport': {
       const views = ensureViewArray(validChildren)
-      return views.length === 1 ? views[0]! : vstack(...views)
+      const inner = views.length === 1 ? views[0]! : vstack(...views)
+      const width = toSizeValue(safeProps.width) ?? 'fill'
+      const height = toSizeValue(safeProps.height) ?? 'fill'
+      const scrollX = toNumber(safeProps.scrollX) ?? 0
+      const scrollY = toNumber(safeProps.scrollY) ?? 0
+      return clipView(inner, { width, height, scrollX, scrollY })
     }
 
     default: {
@@ -1820,6 +1856,19 @@ function makeBoundKeyHandler(
     if (key === 'enter' || key === 'Enter' || key === 'ctrl+m' || key === 'ctrl+j') {
       onSubmit?.(current())
       return true
+    }
+    if (key === 'escape' || key === 'Escape' || key === 'esc') {
+      const onEscape = typeof props.onEscape === 'function' ? props.onEscape : undefined
+      const onCancel = typeof props.onCancel === 'function' ? props.onCancel : undefined
+      if (typeof onEscape === 'function') {
+        onEscape()
+        return true
+      }
+      if (typeof onCancel === 'function') {
+        onCancel()
+        return true
+      }
+      return false
     }
     if (key === 'backspace' || key === 'Backspace' || key === '\x7f') {
       const v = current()

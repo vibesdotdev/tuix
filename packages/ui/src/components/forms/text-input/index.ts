@@ -16,5 +16,4 @@ export {
   type InputProps,
   type TextInputProps,
   type EchoMode,
-  type CursorStyle,
 } from './TextInput'

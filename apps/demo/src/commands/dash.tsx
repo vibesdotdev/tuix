@@ -1,8 +1,9 @@
 /** @jsxImportSource @tuix/jsx */
 
 /**
- * Dash — live service dashboard on an interval clock. Metric cards share one
- * width so the screen sits on a grid; statuses run as a compact strip.
+ * Dash — live service dashboard. Compact, content-sized card with real
+ * metrics, sparklines, progress bars, and a service health strip. Not
+ * forced full-height — the card hugs its content.
  *
  * Keys: [p] pause/resume · [r] reset history · [t] inject a spike
  */
@@ -10,8 +11,8 @@
 import { $state, $derived, registerKeyHandler } from '@tuix/reactive'
 import { KbdHint, ProgressBar, Sparkline, StatusIndicator, useUITheme } from '@tuix/ui'
 
-const HISTORY = 40
-const CARD_W = 30
+const HISTORY = 32
+const CARD_W = 28
 
 function push(arr: number[], v: number): number[] {
   const next = [...arr, v]
@@ -58,6 +59,7 @@ export default function Dash() {
     if (paused()) return
     const drift = (Math.random() - 0.5) * 90
     const burst = spike() ? 420 : 0
+
     rps.$set(clamp(Math.round(rps() + drift + burst), 320, 1900))
     p95.$set(clamp(Math.round(p95() + (Math.random() - 0.5) * 14 + (burst ? 38 : 0)), 62, 380))
     errRate.$set(
@@ -88,11 +90,13 @@ export default function Dash() {
 
   const dim = theme.colors.textDim ?? '#7d8ca3'
   const dim2 = theme.colors.textDim
+  const fg = theme.colors.fg
+  const bright = theme.colors.textBright ?? fg
   const gate: Status = errRate() > 4 ? 'error' : errRate() > 1.5 ? 'warning' : 'active'
 
   return (
-    <box padding={1} border="rounded" borderColor={dim2} height="fill">
-      {/* Header */}
+    <vstack gap={0}>
+      {/* Header bar */}
       <hstack gap={1}>
         <text bg="#2d1f3d" fg="#c4b5fd">
           {' ◎ Tuix Dash '}
@@ -104,42 +108,64 @@ export default function Dash() {
       </hstack>
       <text> </text>
 
-      {/* Metric cards */}
+      {/* Metric cards — side by side, content-sized */}
       <hstack gap={2}>
-        <vstack gap={0} width={CARD_W}>
-          <text fg={dim2}>{'req/s'}</text>
-          <text fg={theme.colors.fg}>{String(rps())}</text>
-          <text fg={dim2}>{`avg ${avg()}`}</text>
-          <text> </text>
-          <Sparkline values={history()} width={CARD_W} variant="bar" />
-        </vstack>
-        <vstack gap={0} width={CARD_W}>
-          <text fg={dim2}>{'errors %'}</text>
-          <text fg={theme.colors.fg}>{errRate().toFixed(2)}</text>
-          <text fg={errRate() > 1.5 ? theme.colors.warning : dim2}>
-            {errRate() > 1.5 ? 'elevated' : 'nominal'}
-          </text>
-          <text> </text>
-          <Sparkline values={errHistory()} width={CARD_W} variant="bar" />
-        </vstack>
+        {/* req/s card */}
+        <box border="single" borderColor={dim2} padding={1}>
+          <vstack gap={0}>
+            <text fg={dim2}>{'req/s'}</text>
+            <text fg={bright} bold>
+              {String(rps())}
+            </text>
+            <text fg={dim2}>{`avg ${avg()}`}</text>
+            <text> </text>
+            <Sparkline values={history()} width={CARD_W} variant="bar" />
+          </vstack>
+        </box>
+        {/* errors card */}
+        <box border="single" borderColor={dim2} padding={1}>
+          <vstack gap={0}>
+            <text fg={dim2}>{'errors %'}</text>
+            <text fg={errRate() > 1.5 ? theme.colors.warning : bright} bold>
+              {errRate().toFixed(2)}
+            </text>
+            <text fg={errRate() > 1.5 ? theme.colors.warning : dim2}>
+              {errRate() > 1.5 ? 'elevated' : 'nominal'}
+            </text>
+            <text> </text>
+            <Sparkline values={errHistory()} width={CARD_W} variant="bar" />
+          </vstack>
+        </box>
       </hstack>
       <text> </text>
 
-      {/* Saturation bars */}
-      <vstack gap={0} width={CARD_W * 2 + 2}>
-        <ProgressBar value={mem()} label={`memory ${mem()}%`} />
+      {/* Saturation bars — full width of the card grid */}
+      <vstack gap={0} width={CARD_W * 2 + 4}>
+        <text fg={dim2}>{'saturation'}</text>
+        <text> </text>
+        <ProgressBar value={mem()} label={`memory  ${mem()}%`} />
         <text> </text>
         <ProgressBar
           value={conns()}
           total={240}
-          label={`connections ${conns()}/240`}
+          label={`conns   ${conns()}/240`}
           variant={conns() > 200 ? 'warning' : 'secondary'}
         />
       </vstack>
       <text> </text>
 
+      {/* p95 latency */}
+      <hstack gap={1}>
+        <text fg={dim2}>{'p95'}</text>
+        <text fg={p95() > 220 ? theme.colors.warning : bright} bold>
+          {`${p95()}ms`}
+        </text>
+      </hstack>
+      <text> </text>
+
       {/* Services strip */}
       <text fg={dim2}>{'services'}</text>
+      <text> </text>
       <hstack gap={3}>
         <StatusIndicator status={gate} label="edge" />
         <StatusIndicator status={p95() > 220 ? 'warning' : 'active'} label="api" />
@@ -147,10 +173,6 @@ export default function Dash() {
         <StatusIndicator status="active" label="postgres" />
       </hstack>
       <text> </text>
-      <text> </text>
-
-      {/* flexible filler pushes hints to the bottom */}
-      <spacer flex={1} />
 
       {/* Hints */}
       <hstack gap={2}>
@@ -159,6 +181,6 @@ export default function Dash() {
         <KbdHint keys="t" label="inject spike" />
         <KbdHint keys="ctrl+c" label="quit" />
       </hstack>
-    </box>
+    </vstack>
   )
 }

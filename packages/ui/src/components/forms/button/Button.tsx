@@ -1,9 +1,6 @@
 /** @jsxImportSource @tuix/jsx */
 
-import { colors } from '@tuix/ansi'
-import type { Theme } from '@tuix/themes'
 import { labelOf } from '../../../bind'
-import { useUITheme, getTextColor, type ThemeVariant } from '../../../theme'
 
 export type ButtonVariant =
   | 'primary'
@@ -25,6 +22,7 @@ export interface ButtonProps {
   disabled?: boolean
   loading?: boolean
   focused?: boolean
+  id?: string
   className?: string
   type?: 'button' | 'submit' | 'cancel'
 }
@@ -55,19 +53,14 @@ function decorate(label: string, variant: ButtonVariant, size: ButtonSize): stri
   }
 }
 
-function variantColor(variant: ButtonVariant, theme: Theme): string {
-  if (variant === 'ghost') {
-    return theme.colors.textDim ?? colors.gray
-  }
-  if (variant === 'secondary') {
-    return theme.colors.secondary
-  }
-  const tv = (variant === 'danger' ? 'error' : variant) as ThemeVariant
-  return getTextColor(tv, theme)
-}
-
 /**
  * Action trigger. Composes the `<button>` intrinsic.
+ *
+ * The `<button>` intrinsic registers as focusable (Tab cycles to it),
+ * normalizes keys, and fires `onClick` on Enter/Space. Theme colors are
+ * resolved through the `variant` prop (read by `paintCell` via
+ * `themeColor`), so this layer no longer needs `useUITheme` /
+ * `variantColor` boilerplate.
  *
  * @example
  * ```tsx
@@ -75,18 +68,16 @@ function variantColor(variant: ButtonVariant, theme: Theme): string {
  * ```
  */
 export function Button(props: ButtonProps): JSX.Element {
-  const { theme } = useUITheme()
-  const variant = props.variant ?? 'secondary'
+  const variant = props.variant ?? 'default'
   const size = props.size ?? 'default'
   const raw = labelOf(props.children, props.label ?? '')
   const label = props.loading ? `… ${raw}` : raw
   const disabled = Boolean(props.disabled || props.loading)
   const decorated = decorate(label, variant, size)
-  const color = variantColor(variant, theme)
 
   if (variant === 'ghost') {
     return (
-      <text className={props.className} fg={color}>
+      <text className={props.className} variant="dim">
         {decorated}
       </text>
     )
@@ -94,11 +85,12 @@ export function Button(props: ButtonProps): JSX.Element {
 
   return (
     <button
+      id={props.id}
       className={props.className}
       label={decorated}
       focused={props.focused === true}
       disabled={disabled}
-      fg={color}
+      variant={variant}
       onClick={disabled ? undefined : props.onClick}
     />
   )

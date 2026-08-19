@@ -11,6 +11,7 @@
 import { Effect } from 'effect'
 import type { View, AppServices } from '@tuix/view/types'
 import { View as ViewCore, unwrapRendered } from '@tuix/view/primitives/view'
+import { resolveSize } from '@tuix/view/primitives/types'
 
 // =============================================================================
 // Types
@@ -313,9 +314,9 @@ export const scrollableView = (
   scrollOffset: number = 0
 ): View => {
   return {
-    render: () =>
+    render: context =>
       Effect.gen(function* (_) {
-        const rendered = unwrapRendered(yield* _(content.render()))
+        const rendered = unwrapRendered(yield* _(content.render(context)))
         const lines = rendered.split('\n')
 
         // Extract viewport
@@ -330,6 +331,53 @@ export const scrollableView = (
       }),
     width: content.width,
     height: viewportHeight,
+  }
+}
+
+/**
+ * Clip a view to a rect (width × height), scrolling to show a window of
+ * the content. This is the primitive behind `<viewport>`/`<scrollview>`:
+ * content renders at its natural size, then we slice the visible window
+ * and pad to the rect. Horizontal scroll offsets content left; vertical
+ * scroll offsets it up.
+ */
+export const clipView = (
+  content: View,
+  opts: {
+    width: number | 'fill' | `${number}%`
+    height: number | 'fill' | `${number}%`
+    scrollX?: number
+    scrollY?: number
+  }
+): View => {
+  return {
+    render: context =>
+      Effect.gen(function* (_) {
+        const resolvedWidth = resolveSize(opts.width, 'width', context, content.width ?? 1)
+        const resolvedHeight = resolveSize(opts.height, 'height', context, content.height ?? 1)
+        const sx = Math.max(0, opts.scrollX ?? 0)
+        const sy = Math.max(0, opts.scrollY ?? 0)
+        const rendered = unwrapRendered(yield* _(content.render(context)))
+        const lines = rendered.split('\n')
+
+        // Vertical: slice [sy, sy + resolvedHeight)
+        let visible = lines.slice(sy, sy + resolvedHeight)
+        while (visible.length < resolvedHeight) visible.push('')
+
+        // Horizontal: slice each line [sx, sx + resolvedWidth)
+        visible = visible.map(line => {
+          if (line.length === 0) return ' '.repeat(resolvedWidth)
+          const sliced = line.slice(sx, sx + resolvedWidth)
+          if (sliced.length < resolvedWidth) {
+            return sliced + ' '.repeat(resolvedWidth - sliced.length)
+          }
+          return sliced
+        })
+
+        return visible.join('\n')
+      }),
+    width: resolveSize(opts.width, 'width', undefined, content.width ?? 1),
+    height: resolveSize(opts.height, 'height', undefined, content.height ?? 1),
   }
 }
 

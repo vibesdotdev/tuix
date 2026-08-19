@@ -6,7 +6,13 @@
 import type { Border, BorderSide, BorderStyle, Color } from '../types'
 import { BorderSide as BSide } from '../types'
 import { border } from './presets'
-import { pad as padToWidth, visualWidth } from '../core/width'
+import { pad as padToWidth, truncate, visualWidth } from '../core/width'
+
+/** Truncate a string to a visual width (no suffix). */
+const truncateToWidth = (input: string, maxWidth: number): string => {
+  if (maxWidth <= 0) return ''
+  return truncate(input, maxWidth, '')
+}
 
 // =============================================================================
 // Border Utilities
@@ -35,8 +41,10 @@ export const getBorderFromStyle = (style: BorderStyle): Border => {
     case 'thin':
       return border.thin
     case 'thick':
+    case 'solid':
       return border.thick
     case 'double':
+    case 'double-dashed':
       return border.double
     case 'rounded':
       return border.rounded
@@ -44,6 +52,8 @@ export const getBorderFromStyle = (style: BorderStyle): Border => {
       return border.ascii
     case 'dotted':
       return border.dotted
+    case 'dashed':
+      return border.dashed ?? border.thin
     default:
       return border.thin
   }
@@ -118,29 +128,37 @@ export const renderBox = (options: BoxOptions): string => {
   const { width, height, border, sides = BSide.All, content = [], padding = 0 } = options
   const lines: string[] = []
 
-  const innerWidth = width - 2
-  const paddedWidth = innerWidth - padding * 2
+  // Inner width accounts for side borders only when they're present.
+  const hasLeft = hasSide(sides, BSide.Left)
+  const hasRight = hasSide(sides, BSide.Right)
+  const sideBorderWidth = (hasLeft ? 1 : 0) + (hasRight ? 1 : 0)
+  const innerWidth = Math.max(0, width - sideBorderWidth)
+  const paddedWidth = Math.max(0, innerWidth - padding * 2)
 
   // Top border
   if (hasSide(sides, BSide.Top)) {
-    const left = hasSide(sides, BSide.Left) ? border.topLeft : ''
-    const right = hasSide(sides, BSide.Right) ? border.topRight : ''
+    const left = hasLeft ? border.topLeft : ''
+    const right = hasRight ? border.topRight : ''
     const middle = border.horizontal.repeat(innerWidth)
     lines.push(left + middle + right)
   }
 
-  // Content lines with side borders
-  const contentHeight = height - 2
+  // Content lines with side borders. Truncate content wider than the
+  // inner width so it can't overflow past the right border — pad() only
+  // pads, so we truncate first.
+  const contentHeight =
+    height - (hasSide(sides, BSide.Top) ? 1 : 0) - (hasSide(sides, BSide.Bottom) ? 1 : 0)
   for (let i = 0; i < contentHeight; i++) {
-    const left = hasSide(sides, BSide.Left) ? border.vertical : ''
-    const right = hasSide(sides, BSide.Right) ? border.vertical : ''
+    const left = hasLeft ? border.vertical : ''
+    const right = hasRight ? border.vertical : ''
 
     let line = content[i] ?? ''
     if (padding > 0) {
       const paddingStr = ' '.repeat(padding)
+      line = truncateToWidth(line, paddedWidth)
       line = paddingStr + padToWidth(line, paddedWidth) + paddingStr
     } else {
-      line = padToWidth(line, innerWidth)
+      line = padToWidth(truncateToWidth(line, innerWidth), innerWidth)
     }
 
     lines.push(left + line + right)
@@ -148,8 +166,8 @@ export const renderBox = (options: BoxOptions): string => {
 
   // Bottom border
   if (hasSide(sides, BSide.Bottom)) {
-    const left = hasSide(sides, BSide.Left) ? border.bottomLeft : ''
-    const right = hasSide(sides, BSide.Right) ? border.bottomRight : ''
+    const left = hasLeft ? border.bottomLeft : ''
+    const right = hasRight ? border.bottomRight : ''
     const middle = border.horizontal.repeat(innerWidth)
     lines.push(left + middle + right)
   }

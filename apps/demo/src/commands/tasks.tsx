@@ -1,106 +1,94 @@
 /** @jsxImportSource @tuix/jsx */
 
 /**
- * Tasks — task board with filters, focus-ring input, and a scrim confirm.
+ * Tasks — kanban-style task list with filters, inline add, and delete
+ * confirmation. Content-sized card (not forced full-height).
  *
- * Keys: [tab] focus input · [j/k] move · [space] toggle · [x] delete ·
- *       [1/2/3] filter · [esc] reset
+ * Keys: [tab] focus · [j/k] move · [space] toggle · [x] delete · [1/2/3] filter
  */
 
-import { $state, $derived, registerKeyHandler, isFocused } from '@tuix/reactive'
-import { Input, KbdHint, Modal, useUITheme } from '@tuix/ui'
+import { $state, registerKeyHandler } from '@tuix/reactive'
+import { Input, Modal, KbdHint, useUITheme } from '@tuix/ui'
+
+interface Task {
+  id: string
+  title: string
+  done: boolean
+  tag: string
+}
 
 type Filter = 'all' | 'active' | 'done'
 
-interface Task {
-  id: number
-  title: string
-  tag: string
-  done: boolean
-}
-
-const SEED: Task[] = [
-  { id: 1, title: 'Ship overlay scrim', tag: 'modal', done: true },
-  { id: 2, title: 'Center command palette', tag: 'kit', done: true },
-  { id: 3, title: 'Record demo videos', tag: 'docs', done: false },
-  { id: 4, title: 'Fix footer key chips', tag: 'kit', done: false },
-  { id: 5, title: 'Gallery page on the site', tag: 'www', done: false },
-]
-
-const LIST_W = 44
-
-let nextId = 6
 let keyCleanup: (() => void) | null = null
+
+const INITIAL: Task[] = [
+  { id: '1', title: 'Ship overlay scrim modal', done: true, tag: 'kit' },
+  { id: '2', title: 'Center command palette', done: true, tag: 'kit' },
+  { id: '3', title: 'Record demo videos', done: false, tag: 'docs' },
+  { id: '4', title: 'Fix footer key chips', done: false, tag: 'kit' },
+  { id: '5', title: 'Gallery page on the site', done: false, tag: 'www' },
+]
 
 export default function Tasks() {
   const { theme } = useUITheme()
-  const tasks = $state(SEED as Task[], 'tasks')
+  const tasks = $state<Task[]>(INITIAL, 'tasks')
   const cursor = $state(0, 'cursor')
   const filter = $state<Filter>('all', 'filter')
   const draft = $state('', 'draft')
   const confirm = $state(-1, 'confirm')
-  const notice = $state('', 'notice')
 
-  const visible = $derived(() => {
-    const all = tasks()
-    const f = filter()
-    return f === 'all' ? all : all.filter(t => (f === 'done') === t.done)
+  const dim = theme.colors.textDim ?? '#7d8ca3'
+  const dim2 = theme.colors.textDim
+  const bright = theme.colors.textBright ?? theme.colors.fg
+  const fg = theme.colors.fg
+  const accent = theme.colors.primary
+  const ok = theme.colors.success
+  const warn = theme.colors.warning
+
+  const list = tasks().filter(t => {
+    if (filter() === 'active') return !t.done
+    if (filter() === 'done') return t.done
+    return true
   })
-
-  function say(text: string) {
-    notice.$set(text)
-    setTimeout(() => {
-      if (notice() === text) notice.$set('')
-    }, 1800)
-  }
-
-  function move(delta: number) {
-    const n = visible().length
-    if (n === 0) return
-    cursor.$set((cursor() + delta + n) % n)
-  }
-
-  function add() {
-    const title = draft().trim()
-    if (!title) return
-    tasks.$set([{ id: nextId++, title, tag: 'new', done: false }, ...tasks()])
-    draft.$set('')
-    cursor.$set(0)
-    say('added ✓')
-  }
-
-  function toggleCurrent() {
-    const t = visible()[cursor()]
-    if (!t) return
-    tasks.$set(tasks().map(x => (x.id === t.id ? { ...x, done: !x.done } : x)))
-    say(t.done ? 'reopened' : 'done ✓')
-  }
+  const open = list.filter(t => !t.done).length
+  const done = tasks().length - list.filter(t => !t.done).length
 
   if (keyCleanup) keyCleanup()
   keyCleanup = registerKeyHandler(key => {
-    if (confirm() >= 0) return
-    if (isFocused('bind:draft')) return
-    if (key === 'j' || key === 'down') move(1)
-    else if (key === 'k' || key === 'up') move(-1)
-    else if (key === ' ' || key === 'space') toggleCurrent()
-    else if (key === '1') filter.$set('all')
-    else if (key === '2') filter.$set('active')
-    else if (key === '3') filter.$set('done')
-    else if (key === 'x' || key === 'X') {
-      const t = visible()[cursor()]
-      if (t) confirm.$set(t.id)
-    } else if (key === 'escape' || key === 'Escape') {
+    if (confirm() >= 0) {
+      if (key === 'escape' || key === 'esc') confirm.$set(-1)
+      return
+    }
+    if (key === 'j' || key === 'down') {
+      if (cursor() < list.length - 1) cursor.$set(cursor() + 1)
+    } else if (key === 'k' || key === 'up') {
+      if (cursor() > 0) cursor.$set(cursor() - 1)
+    } else if (key === 'space' || key === ' ') {
+      const t = list[cursor()]
+      if (t) {
+        tasks.$set(tasks().map(x => (x.id === t.id ? { ...x, done: !x.done } : x)))
+      }
+    } else if (key === 'x') {
+      const t = list[cursor()]
+      if (t) confirm.$set(t.id as unknown as number)
+    } else if (key === '1') {
       filter.$set('all')
+      cursor.$set(0)
+    } else if (key === '2') {
+      filter.$set('active')
+      cursor.$set(0)
+    } else if (key === '3') {
+      filter.$set('done')
       cursor.$set(0)
     }
   })
 
-  const list = visible()
-  const open = tasks().filter(t => !t.done).length
-  const done = tasks().length - open
-  const dim = theme.colors.textDim ?? '#7d8ca3'
-  const dim2 = theme.colors.textDim
-  const bright = theme.colors.textBright ?? theme.colors.fg
+  function add() {
+    const text = draft().trim()
+    if (!text) return
+    tasks.$set([...tasks(), { id: String(Date.now()), title: text, done: false, tag: 'new' }])
+    draft.$set('')
+  }
 
   const FILTERS: Array<[Filter, string]> = [
     ['all', 'all'],
@@ -109,8 +97,8 @@ export default function Tasks() {
   ]
 
   return (
-    <box padding={1} border="rounded" borderColor={dim2} height="fill">
-      {/* Header */}
+    <vstack gap={0}>
+      {/* Header bar */}
       <hstack gap={1}>
         <text bg="#3d2e1e" fg="#fcd34d">
           {' ▣ Tuix Tasks '}
@@ -120,11 +108,11 @@ export default function Tasks() {
       <text> </text>
 
       {/* Filters */}
-      <hstack gap={1} width={LIST_W}>
+      <hstack gap={1}>
         {FILTERS.map(([f, label]) => {
           const active = filter() === f
           return (
-            <text key={f} fg={active ? theme.colors.primary : dim}>
+            <text key={f} fg={active ? accent : dim} bold={active}>
               {active ? `[ ${label} ]` : ` ${label} `}
             </text>
           )
@@ -133,51 +121,47 @@ export default function Tasks() {
       </hstack>
       <text> </text>
 
-      {/* List */}
-      {list.length === 0 ? (
-        <text width={LIST_W} fg={dim2}>
-          nothing here — tab to add one
-        </text>
-      ) : (
-        list.map((t, i) => {
-          const at = i === cursor()
-          return (
-            <hstack key={t.id} gap={1} width={LIST_W}>
-              <text fg={at ? theme.colors.primary : dim2} width={1}>
-                {at ? '>' : ' '}
-              </text>
-              <text fg={t.done ? theme.colors.success : dim2} width={1}>
-                {t.done ? 'x' : '·'}
-              </text>
-              <text fg={t.done ? dim2 : at ? bright : theme.colors.fg}>{t.title}</text>
-              <text fg={dim2}>{` ${t.tag}`}</text>
-            </hstack>
-          )
-        })
-      )}
+      {/* Task list */}
+      <box border="single" borderColor={dim2} padding={1}>
+        <vstack gap={0}>
+          {list.length === 0 ? (
+            <text fg={dim2}>nothing here — type below to add one</text>
+          ) : (
+            list.map((t, i) => {
+              const at = i === cursor()
+              return (
+                <hstack key={t.id} gap={1}>
+                  <text fg={at ? accent : dim2} width={1}>
+                    {at ? '>' : ' '}
+                  </text>
+                  <text fg={t.done ? ok : dim2} width={1}>
+                    {t.done ? '✓' : '○'}
+                  </text>
+                  <text fg={t.done ? dim2 : at ? bright : fg} bold={at}>
+                    {t.done ? t.title : t.title}
+                  </text>
+                  <text fg={dim2}>{` ${t.tag}`}</text>
+                </hstack>
+              )
+            })
+          )}
+        </vstack>
+      </box>
       <text> </text>
 
-      {/* Input */}
+      {/* Add input */}
       <hstack gap={1}>
-        <text fg={dim2}>{'new'}</text>
+        <text fg={dim2}>{'add'}</text>
         <Input
           bind:value={draft}
           placeholder="task title, enter to add"
-          width={LIST_W - 5}
+          width={36}
           onSubmit={add}
         />
       </hstack>
       <text> </text>
-      <text> </text>
-
-      {/* flexible filler pushes hints to the bottom */}
-      <spacer flex={1} />
 
       {/* Hints */}
-      <text fg={notice() ? theme.colors.success : dim2} width={LIST_W}>
-        {notice() || ' '}
-      </text>
-      <text> </text>
       <hstack gap={2}>
         <KbdHint keys="tab" label="focus" />
         <KbdHint keys="j/k" label="move" />
@@ -197,14 +181,13 @@ export default function Tasks() {
         onCancel={() => confirm.$set(-1)}
         cancelLabel="Keep"
         onConfirm={() => {
-          tasks.$set(tasks().filter(t => t.id !== confirm()))
+          tasks.$set(tasks().filter(t => t.id !== String(confirm())))
           confirm.$set(-1)
-          say('deleted')
+          if (cursor() >= list.length - 1) cursor.$set(Math.max(0, list.length - 2))
         }}
-        confirmLabel="Delete"
       >
-        <text>{visible()[Math.max(0, cursor())]?.title ?? ''}</text>
+        <text fg={warn}>{list.find(t => t.id === String(confirm()))?.title}</text>
       </Modal>
-    </box>
+    </vstack>
   )
 }

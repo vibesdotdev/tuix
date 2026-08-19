@@ -114,38 +114,54 @@ export function createViewportStore(options: ViewportStoreOptions): ViewportStor
   const isScrolling = $state(false)
   const showScrollbars = $state(true)
 
+  // Whether each scrollbar will actually be shown — based on raw content
+  // dimensions vs raw viewport dimensions (no circular dependency).
+  const willShowVScroll = $derived(
+    () => showScrollbars() && dimensions().contentHeight > dimensions().height
+  )
+  const willShowHScroll = $derived(
+    () => showScrollbars() && dimensions().contentWidth > dimensions().width
+  )
+
+  // Effective content area after reserving space for the scrollbars that
+  // are actually present.
+  const effectiveWidth = $derived(() =>
+    willShowVScroll() ? dimensions().width - 1 : dimensions().width
+  )
+  const effectiveHeight = $derived(() =>
+    willShowHScroll() ? dimensions().height - 1 : dimensions().height
+  )
+
   // Derived state
   const maxScrollX = $derived(() => {
-    const viewportWidth = showScrollbars() ? dimensions().width - 1 : dimensions().width
-    return Math.max(0, dimensions().contentWidth - viewportWidth)
+    return Math.max(0, dimensions().contentWidth - effectiveWidth())
   })
 
   const maxScrollY = $derived(() => {
-    const viewportHeight = showScrollbars() ? dimensions().height - 1 : dimensions().height
-    return Math.max(0, dimensions().contentHeight - viewportHeight)
+    return Math.max(0, dimensions().contentHeight - effectiveHeight())
   })
 
   const visibleLines = $derived(() => {
-    const viewportWidth = showScrollbars() ? dimensions().width - 1 : dimensions().width
-    const viewportHeight = showScrollbars() ? dimensions().height - 1 : dimensions().height
+    const vw = effectiveWidth()
+    const vh = effectiveHeight()
 
     // Get the visible portion of content
     const visibleContent = contentLines()
-      .slice(scrollY(), scrollY() + viewportHeight)
+      .slice(scrollY(), scrollY() + vh)
       .map(line => {
         if (wrapContent) {
           // Handle line wrapping
-          return wrapLine(line, viewportWidth, scrollX())
+          return wrapLine(line, vw, scrollX())
         } else {
           // Simple horizontal scrolling
-          const visiblePart = line.slice(scrollX(), scrollX() + viewportWidth)
-          return visiblePart.padEnd(viewportWidth)
+          const visiblePart = line.slice(scrollX(), scrollX() + vw)
+          return visiblePart.padEnd(vw)
         }
       })
 
     // Pad with empty lines if needed
-    while (visibleContent.length < viewportHeight) {
-      visibleContent.push(' '.repeat(viewportWidth))
+    while (visibleContent.length < vh) {
+      visibleContent.push(' '.repeat(vw))
     }
 
     return visibleContent
@@ -169,27 +185,27 @@ export function createViewportStore(options: ViewportStoreOptions): ViewportStor
 
   const verticalThumbSize = $derived(() => {
     if (!hasVerticalScroll()) return 0
-    const viewportHeight = showScrollbars() ? dimensions().height - 1 : dimensions().height
-    return Math.max(1, Math.floor((viewportHeight / dimensions().contentHeight) * viewportHeight))
+    const vh = effectiveHeight()
+    return Math.max(1, Math.floor((vh / dimensions().contentHeight) * vh))
   })
 
   const verticalThumbPosition = $derived(() => {
     if (!hasVerticalScroll()) return 0
-    const viewportHeight = showScrollbars() ? dimensions().height - 1 : dimensions().height
-    const availableSpace = viewportHeight - verticalThumbSize()
+    const vh = effectiveHeight()
+    const availableSpace = vh - verticalThumbSize()
     return Math.floor((scrollY() / maxScrollY()) * availableSpace)
   })
 
   const horizontalThumbSize = $derived(() => {
     if (!hasHorizontalScroll()) return 0
-    const viewportWidth = showScrollbars() ? dimensions().width - 1 : dimensions().width
-    return Math.max(1, Math.floor((viewportWidth / dimensions().contentWidth) * viewportWidth))
+    const vw = effectiveWidth()
+    return Math.max(1, Math.floor((vw / dimensions().contentWidth) * vw))
   })
 
   const horizontalThumbPosition = $derived(() => {
     if (!hasHorizontalScroll()) return 0
-    const viewportWidth = showScrollbars() ? dimensions().width - 1 : dimensions().width
-    const availableSpace = viewportWidth - horizontalThumbSize()
+    const vw = effectiveWidth()
+    const availableSpace = vw - horizontalThumbSize()
     return Math.floor((scrollX() / maxScrollX()) * availableSpace)
   })
 
@@ -298,21 +314,21 @@ export function createViewportStore(options: ViewportStoreOptions): ViewportStor
   }
 
   const ensureVisible = (line: number, column = 0) => {
-    const viewportHeight = showScrollbars() ? dimensions().height - 1 : dimensions().height
-    const viewportWidth = showScrollbars() ? dimensions().width - 1 : dimensions().width
+    const vh = effectiveHeight()
+    const vw = effectiveWidth()
 
     // Ensure line is visible vertically
     if (line < scrollY()) {
       scrollY.$set(line)
-    } else if (line >= scrollY() + viewportHeight) {
-      scrollY.$set(line - viewportHeight + 1)
+    } else if (line >= scrollY() + vh) {
+      scrollY.$set(line - vh + 1)
     }
 
     // Ensure column is visible horizontally
     if (column < scrollX()) {
       scrollX.$set(column)
-    } else if (column >= scrollX() + viewportWidth) {
-      scrollX.$set(column - viewportWidth + 1)
+    } else if (column >= scrollX() + vw) {
+      scrollX.$set(column - vw + 1)
     }
   }
 

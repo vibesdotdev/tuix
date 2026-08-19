@@ -7,7 +7,6 @@ import { useUITheme } from '../../../theme'
 import { email } from '../../../validation'
 
 export type EchoMode = 'normal' | 'password' | 'none'
-export type CursorStyle = 'block' | 'underline' | 'bar' | 'blink'
 
 export interface InputProps {
   value?: string
@@ -16,7 +15,6 @@ export interface InputProps {
   width?: number
   echoMode?: EchoMode
   charLimit?: number
-  cursorStyle?: CursorStyle
   onSubmit?: (value: string) => void
   onChange?: (value: string) => void
   onFocus?: () => void

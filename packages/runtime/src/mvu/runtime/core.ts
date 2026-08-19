@@ -273,8 +273,12 @@ export class Runtime<Model, Msg> {
             })
           : Effect.void
 
+        const runPaste = Stream.runForEach(input.pasteEvents, content =>
+          Queue.offer(this.messageQueue, { _tag: 'Paste' as const, content })
+        )
+
         // Run until fibers interrupted on shutdown
-        yield* _(Effect.all([runKeys, runResize, runMouse], { concurrency: 'unbounded' }))
+        yield* _(Effect.all([runKeys, runResize, runMouse, runPaste], { concurrency: 'unbounded' }))
       }.bind(this)
     ).pipe(
       Effect.catchAll(error => {
@@ -605,10 +609,21 @@ export class Runtime<Model, Msg> {
               const dbgBounds = this.overlayBoundsEffect ? yield* _(this.overlayBoundsEffect) : null
               console.error('[MouseClick]', msg.x, msg.y, 'bounds:', JSON.stringify(dbgBounds))
             }
-            // A click that misses the painted overlay bounds is a backdrop
-            // click: modals with closeOnBackdrop dismiss here. Hits inside
-            // the overlay are not dispatched (per-widget click routing is
-            // future work).
+            // Per-widget click routing requires the renderer to expose per-view
+            // painted bounds (a layout-pass position map). The HitTestService
+            // and MouseRouterService in @tuix/input/mouse provide the registry
+            // API but the renderer currently only tracks the overlay layer's
+            // bounds (getOverlayBounds). To wire per-widget clicks, the
+            // renderer needs a getInteractiveBounds() or similar that records
+            // each interactive view's (x, y, width, height) during the paint
+            // pass; then the runtime can hit-test (msg.x, msg.y) against that
+            // map and dispatch to the matching view's onClick (stored in the
+            // view's INTERACTIVE_METADATA via wrapInteractiveView).
+            //
+            // For now: a click that misses the painted overlay bounds is a
+            // backdrop click — modals with closeOnBackdrop dismiss here. Hits
+            // inside the overlay are not dispatched (per-widget click routing
+            // is future work).
             if (this.overlayBoundsEffect) {
               const bounds = yield* _(this.overlayBoundsEffect)
               if (bounds) {
@@ -622,6 +637,11 @@ export class Runtime<Model, Msg> {
                 }
               }
             }
+            break
+          }
+
+          case 'Paste': {
+            this.dirty = true
             break
           }
 

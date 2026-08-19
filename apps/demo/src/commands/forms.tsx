@@ -1,8 +1,11 @@
 /** @jsxImportSource @tuix/jsx */
 
 /**
- * Forms — bind:value two-way + focus ring + modal backdrop, laid out on a
- * real form grid: label column, uniform field width, hints at the bottom.
+ * Forms — bind:value two-way + focus ring + modal backdrop.
+ *
+ * Content-sized form card (not forced full-height — the form has a natural
+ * size and the terminal shows it as a compact dialog). The modal overlay
+ * demonstrates scrim + backdrop click + Escape to close.
  *
  * Keys: [tab] cycle fields · Enter in Email submits · Esc closes modal ·
  *       click outside dismisses
@@ -12,7 +15,7 @@ import { $state, $derived } from '@tuix/reactive'
 import { Input, Modal, Kbd, KbdHint, useUITheme } from '@tuix/ui'
 
 const LABEL_W = 8
-const FIELD_W = 28
+const FIELD_W = 32
 
 export default function Forms() {
   const { theme } = useUITheme()
@@ -30,10 +33,11 @@ export default function Forms() {
   const dim = theme.colors.textDim ?? '#7d8ca3'
   const dim2 = theme.colors.textDim
   const bright = theme.colors.textBright ?? theme.colors.fg
+  const accent = theme.colors.primary
 
   return (
-    <box padding={1} border="rounded" borderColor={dim2} height="fill">
-      {/* Header */}
+    <vstack gap={0}>
+      {/* Header bar */}
       <hstack gap={1}>
         <text bg="#1e3a5f" fg="#93c5fd">
           {' ◆ Tuix Forms '}
@@ -42,47 +46,48 @@ export default function Forms() {
       </hstack>
       <text> </text>
 
-      {/* Form grid */}
-      <hstack gap={1}>
-        <text width={LABEL_W} fg={dim2}>
-          {'Name'}
-        </text>
-        <Input bind:value={name} placeholder="your name" width={FIELD_W} />
-      </hstack>
+      {/* Form card — content-sized, bordered */}
+      <box border="rounded" borderColor={dim2} padding={1}>
+        <hstack gap={1}>
+          <text width={LABEL_W} fg={dim2}>
+            {'Name'}
+          </text>
+          <Input bind:value={name} placeholder="your name" width={FIELD_W} />
+        </hstack>
+        <text> </text>
+        <hstack gap={1}>
+          <text width={LABEL_W} fg={dim2}>
+            {'Email'}
+          </text>
+          <Input
+            bind:value={email}
+            placeholder="you@example.com"
+            width={FIELD_W}
+            onSubmit={submit}
+          />
+        </hstack>
+        <text> </text>
+        <text fg={dim2}>{'─'.repeat(LABEL_W + FIELD_W + 1)}</text>
+        <text> </text>
+        <hstack gap={1}>
+          <text width={LABEL_W} fg={dim2}>
+            {'Preview'}
+          </text>
+          <text fg={name() || email() ? bright : dim}>{preview()}</text>
+        </hstack>
+        {sent() ? (
+          <vstack gap={0}>
+            <text> </text>
+            <hstack gap={1}>
+              <text width={LABEL_W} fg={theme.colors.success}>
+                {'Sent ✓'}
+              </text>
+              <text fg={theme.colors.success}>{sent()}</text>
+            </hstack>
+          </vstack>
+        ) : null}
+      </box>
       <text> </text>
-      <hstack gap={1}>
-        <text width={LABEL_W} fg={dim2}>
-          {'Email'}
-        </text>
-        <Input bind:value={email} placeholder="you@example.com" width={FIELD_W} onSubmit={submit} />
-      </hstack>
-      <text> </text>
-
-      {/* Preview */}
-      <hstack gap={1}>
-        <text width={LABEL_W} fg={dim2}>
-          {'Preview'}
-        </text>
-        <text fg={bright}>{preview()}</text>
-      </hstack>
-
-      {sent() ? (
-        <>
-          <text> </text>
-          <hstack gap={1}>
-            <text width={LABEL_W} fg={dim2}>
-              {'Sent'}
-            </text>
-            <text fg={theme.colors.success}>{sent()}</text>
-          </hstack>
-        </>
-      ) : null}
-
-      <text> </text>
-      <text> </text>
-
-      {/* flexible filler pushes hints to the bottom */}
-      <spacer flex={1} />
 
       {/* Hints */}
       <hstack gap={2}>
@@ -103,9 +108,9 @@ export default function Forms() {
           confirm.$set(false)
         }}
       >
-        <text>{preview()}</text>
+        <text fg={bright}>{preview()}</text>
       </Modal>
-    </box>
+    </vstack>
   )
 }
 
