@@ -109,6 +109,7 @@ function Kit() {
         return
       }
       if (k === 'space' || k === 'Space') query.$set(`${query()} `)
+      else if (k === 'space' || k === 'Space') query.$set(`${query()} `)
       else if (k.length === 1 && k >= ' ') query.$set(`${query()}${k}`)
       return
     }
@@ -165,6 +166,7 @@ function Kit() {
         return
       }
       if (k === 'space' || k === 'Space') draft.$set(`${draft()} `)
+      else if (k === 'space' || k === 'Space') draft.$set(`${draft()} `)
       else if (k.length === 1 && k >= ' ') draft.$set(`${draft()}${k}`)
     }
   })

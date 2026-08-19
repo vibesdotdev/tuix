@@ -78,8 +78,8 @@ export default function Tasks() {
 
   if (keyCleanup) keyCleanup()
   keyCleanup = registerKeyHandler(key => {
-    if (confirm() >= 0) return // modal owns keys via overlay capture
-    if (isFocused('bind:draft')) return // focus ring owns typing
+    if (confirm() >= 0) return
+    if (isFocused('bind:draft')) return
     if (key === 'j' || key === 'down') move(1)
     else if (key === 'k' || key === 'up') move(-1)
     else if (key === ' ' || key === 'space') toggleCurrent()
@@ -99,6 +99,7 @@ export default function Tasks() {
   const open = tasks().filter(t => !t.done).length
   const done = tasks().length - open
   const dim = theme.colors.textDim ?? '#7d8ca3'
+  const dim2 = theme.colors.textDim
   const bright = theme.colors.textBright ?? theme.colors.fg
 
   const FILTERS: Array<[Filter, string]> = [
@@ -108,96 +109,105 @@ export default function Tasks() {
   ]
 
   return (
-    <box padding={1}>
-      <vstack gap={0}>
-        {/* Header: title chip + stats */}
-        <hstack gap={1}>
-          <text bg={theme.colors.primary} fg={theme.colors.bg}>
-            {' Tuix Tasks '}
-          </text>
-          <text fg={dim}>{`${open} open · ${done} done`}</text>
-        </hstack>
-        <text> </text>
-
-        {/* Filter row on the list grid */}
-        <hstack gap={1} width={LIST_W}>
-          {FILTERS.map(([f, label]) => {
-            const active = filter() === f
-            return (
-              <text key={f} fg={active ? theme.colors.primary : dim}>
-                {active ? `[ ${label} ]` : ` ${label} `}
-              </text>
-            )
-          })}
-          <text fg={dim}>{`· ${list.length}`}</text>
-        </hstack>
-        <text> </text>
-
-        {/* Task rows: cursor mark, state mark, title, tag on one grid */}
-        {list.length === 0 ? (
-          <text width={LIST_W} fg={dim}>
-            nothing here — tab to the input and add one
-          </text>
-        ) : (
-          list.map((t, i) => {
-            const at = i === cursor()
-            return (
-              <hstack key={t.id} gap={1} width={LIST_W}>
-                <text fg={at ? theme.colors.primary : dim}>{at ? '▸' : ' '}</text>
-                <text fg={t.done ? theme.colors.success : dim}>{t.done ? '✓' : '·'}</text>
-                <text fg={t.done ? dim : at ? bright : undefined}>{t.title}</text>
-                <text fg={dim}>{`· ${t.tag}`}</text>
-              </hstack>
-            )
-          })
-        )}
-        <text> </text>
-
-        {/* New task: focus-ring input on the same grid */}
-        <hstack gap={1}>
-          <text fg={dim}>{'new'}</text>
-          <Input
-            bind:value={draft}
-            placeholder="task title, enter to add"
-            width={LIST_W - 5}
-            onSubmit={add}
-          />
-        </hstack>
-
-        {/* Status line + hints */}
-        <text> </text>
-        <text fg={notice() ? theme.colors.success : dim} width={LIST_W}>
-          {notice() ? notice() : 'tab focuses the input'}
+    <box padding={1} border="rounded" borderColor={dim2}>
+      {/* Header */}
+      <hstack gap={1}>
+        <text bg={theme.colors.primary} fg={theme.colors.bg}>
+          {' Tuix Tasks '}
         </text>
-        <text> </text>
-        <hstack gap={2}>
-          <KbdHint keys="tab" label="focus" />
-          <KbdHint keys="j/k" label="move" />
-          <KbdHint keys="space" label="toggle" />
-          <KbdHint keys="x" label="delete" />
-          <KbdHint keys="1/2/3" label="filter" />
-        </hstack>
+        <text fg={dim}>{`${open} open · ${done} done`}</text>
+      </hstack>
+      <text> </text>
 
-        <Modal
-          open={confirm() >= 0}
-          title="Delete task?"
-          width={44}
-          height={8}
-          scrim
-          closeOnBackdrop
-          onClose={() => confirm.$set(-1)}
-          onCancel={() => confirm.$set(-1)}
-          cancelLabel="Keep"
-          onConfirm={() => {
-            tasks.$set(tasks().filter(t => t.id !== confirm()))
-            confirm.$set(-1)
-            say('deleted')
-          }}
-          confirmLabel="Delete"
-        >
-          <text>{visible()[Math.max(0, cursor())]?.title ?? ''}</text>
-        </Modal>
-      </vstack>
+      {/* Filters */}
+      <hstack gap={1} width={LIST_W}>
+        {FILTERS.map(([f, label]) => {
+          const active = filter() === f
+          return (
+            <text key={f} fg={active ? theme.colors.primary : dim}>
+              {active ? `[ ${label} ]` : ` ${label} `}
+            </text>
+          )
+        })}
+        <text fg={dim2}>{`· ${list.length}`}</text>
+      </hstack>
+      <text> </text>
+
+      {/* List */}
+      {list.length === 0 ? (
+        <text width={LIST_W} fg={dim2}>
+          nothing here — tab to add one
+        </text>
+      ) : (
+        list.map((t, i) => {
+          const at = i === cursor()
+          return (
+            <hstack key={t.id} gap={1} width={LIST_W}>
+              <text fg={at ? theme.colors.primary : dim2} width={1}>
+                {at ? '>' : ' '}
+              </text>
+              <text fg={t.done ? theme.colors.success : dim2} width={1}>
+                {t.done ? 'x' : '·'}
+              </text>
+              <text fg={t.done ? dim2 : at ? bright : theme.colors.fg}>
+                {t.title}
+              </text>
+              <text fg={dim2}>{` ${t.tag}`}</text>
+            </hstack>
+          )
+        })
+      )}
+      <text> </text>
+
+      {/* Input */}
+      <hstack gap={1}>
+        <text fg={dim2}>{'new'}</text>
+        <Input
+          bind:value={draft}
+          placeholder="task title, enter to add"
+          width={LIST_W - 5}
+          onSubmit={add}
+        />
+      </hstack>
+      <text> </text>
+      <text> </text>
+
+      {Array.from({ length: Math.max(0, (process.stdout.rows ?? 24) - 18) }, (_, i) => (
+        <text key={`f-${i}`}> </text>
+      ))}
+
+      {/* Hints */}
+      <text fg={notice() ? theme.colors.success : dim2} width={LIST_W}>
+        {notice() || ' '}
+      </text>
+      <text> </text>
+      <hstack gap={2}>
+        <KbdHint keys="tab" label="focus" />
+        <KbdHint keys="j/k" label="move" />
+        <KbdHint keys="space" label="toggle" />
+        <KbdHint keys="x" label="delete" />
+        <KbdHint keys="1/2/3" label="filter" />
+      </hstack>
+
+      <Modal
+        open={confirm() >= 0}
+        title="Delete task?"
+        width={44}
+        height={8}
+        scrim
+        closeOnBackdrop
+        onClose={() => confirm.$set(-1)}
+        onCancel={() => confirm.$set(-1)}
+        cancelLabel="Keep"
+        onConfirm={() => {
+          tasks.$set(tasks().filter(t => t.id !== confirm()))
+          confirm.$set(-1)
+          say('deleted')
+        }}
+        confirmLabel="Delete"
+      >
+        <text>{visible()[Math.max(0, cursor())]?.title ?? ''}</text>
+      </Modal>
     </box>
   )
 }

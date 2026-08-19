@@ -43,7 +43,7 @@ export function Input(props: InputProps): JSX.Element {
   const displayed = echo === 'password' ? '•'.repeat(raw.length) : echo === 'none' ? '' : raw
 
   return (
-    <box background={depth.inset} border="thin" borderColor={depth.outset} padding={0}>
+    <box border="thin" borderColor={props.focused ? theme.colors.primary : depth.outset} padding={0}>
       <input
         className={props.className}
         value={displayed}

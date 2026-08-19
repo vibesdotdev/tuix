@@ -356,5 +356,11 @@ export const toAnsiStyleCode = (
   // Add decoration sequences
   sequence += buildDecorationSequence(props)
 
+  // Empty props = explicit reset (clears any inherited background from the
+  // previous cell in a diff-patch run).  Without this, a cell with no style
+  // leaves the terminal's current bg untouched → header-chip green bleeds
+  // into every following cell.
+  if (!sequence) return '\x1b[0m'
+
   return sequence
 }

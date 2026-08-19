@@ -65,8 +65,11 @@ def main():
         os.environ['TERM'] = 'xterm-256color'
         os.environ.pop('TUIX_DEBUG_KEYS', None)
         os.environ.pop('TUIX_DEBUG_MOUSE', None)
-        os.chdir(os.path.join(os.path.dirname(__file__), '..', 'apps', 'demo'))
-        os.execvp('bun', ['bun', 'src/index.ts', command])
+        # Run from repo root so workspace tsconfig.json (jsxImportSource) is found
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        os.chdir(repo_root)
+        demo = os.path.join('apps', 'demo')
+        os.execvp('bun', ['bun', os.path.join(demo, 'src', 'index.ts'), command])
 
     fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack('HHHH', ROWS, COLS, 0, 0))
 
