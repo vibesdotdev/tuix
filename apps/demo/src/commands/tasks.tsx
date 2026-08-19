@@ -2,7 +2,7 @@
 
 /**
  * Tasks — kanban-style task list with filters, inline add, and delete
- * confirmation. Content-sized card (not forced full-height).
+ * confirmation.
  *
  * Keys: [tab] focus · [j/k] move · [space] toggle · [x] delete · [1/2/3] filter
  */
@@ -98,7 +98,7 @@ export default function Tasks() {
 
   return (
     <vstack gap={0}>
-      {/* Header bar */}
+      {/* Header */}
       <hstack gap={1}>
         <text bg="#3d2e1e" fg="#fcd34d">
           {' ▣ Tuix Tasks '}
@@ -121,8 +121,8 @@ export default function Tasks() {
       </hstack>
       <text> </text>
 
-      {/* Task list */}
-      <box border="single" borderColor={dim2} padding={1}>
+      {/* Task list — tight padding */}
+      <box border="single" borderColor={dim2} padding={{ top: 0, right: 1, bottom: 0, left: 1 }}>
         <vstack gap={0}>
           {list.length === 0 ? (
             <text fg={dim2}>nothing here — type below to add one</text>
@@ -138,7 +138,7 @@ export default function Tasks() {
                     {t.done ? '✓' : '○'}
                   </text>
                   <text fg={t.done ? dim2 : at ? bright : fg} bold={at}>
-                    {t.done ? t.title : t.title}
+                    {t.title}
                   </text>
                   <text fg={dim2}>{` ${t.tag}`}</text>
                 </hstack>

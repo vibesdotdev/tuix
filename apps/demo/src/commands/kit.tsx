@@ -8,7 +8,7 @@
  */
 
 import { $state, registerKeyHandler, useViewport } from '@tuix/reactive'
-import { Avatar, CommandPalette, KbdHint, Modal, StatusBar, useUITheme } from '@tuix/ui'
+import { CommandPalette, KbdHint, Modal, StatusBar, useUITheme } from '@tuix/ui'
 
 type Focus = 'sessions' | 'files' | 'composer'
 type Overlay = 'none' | 'command' | 'help'
@@ -74,6 +74,10 @@ function wrap(text: string, width: number): string[] {
   return lines
 }
 
+function trunc(text: string, width: number): string {
+  return text.length > width ? `${text.slice(0, width - 1)}…` : text
+}
+
 function Kit() {
   const { theme } = useUITheme()
   const focus = $state<Focus>('composer', 'focus')
@@ -86,8 +90,8 @@ function Kit() {
 
   const vp = useViewport()
   const cols = vp().cols
-  const compact = cols < 90
-  const wrapWidth = compact ? Math.max(20, cols - 30) : 52
+  const sidebarW = 22
+  const convoW = Math.max(20, cols - sidebarW - 3)
 
   if (keyCleanup) keyCleanup()
   keyCleanup = registerKeyHandler(key => {
@@ -153,62 +157,36 @@ function Kit() {
 
   const threadLines = thread.flatMap(turn => {
     const prefix = turn.role === 'you' ? 'you  ' : 'grok '
-    return wrap(turn.text, Math.max(16, wrapWidth - prefix.length - 1)).map((line, i) =>
+    return wrap(turn.text, Math.max(16, convoW - prefix.length - 1)).map((line, i) =>
       i === 0 ? `${prefix}${line}` : `     ${line}`
     )
   })
-  const visible = threadLines.slice(-12)
+  const visible = threadLines.slice(-14)
 
-  const sessionItems = SESSIONS.map((item, i) => (
-    <hstack key={item.id} gap={1}>
-      <text fg={i === selected() && focus() === 'sessions' ? hi : dim}>
-        {i === selected() ? '▸' : ' '}
+  const sessionItems = SESSIONS.map((item, i) => {
+    const isSel = i === selected()
+    const isFocus = focus() === 'sessions'
+    return (
+      <text key={item.id} fg={isSel && isFocus ? hi : isSel ? bright : fg} bold={isSel}>
+        {`${isSel ? '▸ ' : '  '}${trunc(item.title, sidebarW - 2)}`}
       </text>
-      <Avatar glyph={item.id === 'auth' ? '⚡' : item.id === 'flower' ? '✿' : '📦'} size="small" />
-      <text fg={i === selected() && focus() === 'sessions' ? hi : fg}>{item.title}</text>
-    </hstack>
-  ))
+    )
+  })
 
-  const fileItems = FILES.map((name, i) => (
-    <text key={name} fg={i === fileIx() && focus() === 'files' ? hi : fg}>
-      {`${i === fileIx() ? '▸ ' : '  '}${name}`}
-    </text>
-  ))
+  const fileItems = FILES.map((name, i) => {
+    const at = i === fileIx() && focus() === 'files'
+    return (
+      <text key={name} fg={at ? hi : dim}>
+        {`${at ? '▸ ' : '  '}${trunc(name, sidebarW - 2)}`}
+      </text>
+    )
+  })
 
   const convo = visible.map((line, i) => (
     <text key={`l${i}`} fg={line.startsWith('you') ? dim : bright}>
-      {line}
+      {`│ ${line}`}
     </text>
   ))
-
-  const sidebarWidth = compact ? 18 : 26
-
-  const body = (
-    <flex direction="row" width="fill" gap={1}>
-      {/* Sidebar: sessions + files */}
-      <vstack gap={0} width={sidebarWidth}>
-        <text fg={dim} bold>
-          sessions
-        </text>
-        {sessionItems}
-        <text> </text>
-        <text fg={dim} bold>
-          files
-        </text>
-        {fileItems}
-      </vstack>
-      {/* Vertical separator */}
-      <text fg={dim}>{'│'}</text>
-      {/* Main: conversation — grows to fill remaining width */}
-      <flex direction="column" width="fill" flex={1}>
-        <text fg={dim} bold>
-          {session.title}
-        </text>
-        <text> </text>
-        {convo}
-      </flex>
-    </flex>
-  )
 
   const commandOverlay =
     overlay() === 'command' ? (
@@ -241,7 +219,7 @@ function Kit() {
 
   return (
     <vstack gap={0} width="fill" height="fill">
-      {/* Header bar */}
+      {/* Header */}
       <hstack gap={1}>
         <text bg="#0d3d2d" fg="#5eead4">
           {' ◈ vibes '}
@@ -252,12 +230,34 @@ function Kit() {
         <text fg={dim}>{`${SESSIONS.length} sessions`}</text>
       </hstack>
       <text> </text>
-      {/* Body */}
-      {body}
+
+      {/* Body: sidebar + conversation */}
+      <hstack gap={1} width="fill">
+        {/* Sidebar */}
+        <vstack gap={0} width={sidebarW}>
+          <text fg={dim} bold>
+            {'sessions'}
+          </text>
+          {sessionItems}
+          <text> </text>
+          <text fg={dim} bold>
+            {'files'}
+          </text>
+          {fileItems}
+        </vstack>
+        {/* Conversation — separator prefix on each line */}
+        <vstack gap={0} flex={1}>
+          <text fg={dim} bold>{`│ ${session.title}`}</text>
+          <text> </text>
+          {convo}
+        </vstack>
+      </hstack>
       <text> </text>
+
       {/* Composer */}
       <text fg={focus() === 'composer' ? hi : dim}>{`▸ ${draft() || 'say something…'}`}</text>
       <text> </text>
+
       {/* Status bar */}
       <StatusBar
         width="fill"
