@@ -57,6 +57,7 @@ export { draculaTheme } from './themes/dracula'
 export { gruvboxTheme } from './themes/gruvbox'
 export { vibesTheme } from './themes/vibes'
 export { flatTheme } from './themes/flat'
+export { getTheme, setGlobalTheme, resetGlobalTheme, themeColor } from './store'
 
 import { lightTheme as light } from './themes/light'
 import { vibesTheme as vibes } from './themes/vibes'

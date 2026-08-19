@@ -53,38 +53,18 @@ export interface UITheme {
 }
 
 /**
- * Global theme state - defaults to vibes theme
+ * Global theme state — delegated to the @tuix/themes store so the JSX
+ * runtime (<text variant>, <interactive focusRing>) and the UI layer read
+ * through the same reactive source. setUITheme/resetUITheme/
+ * setUIThemeForScheme are thin wrappers over the store.
  */
-const globalTheme = $state<Theme>(vibesTheme)
+export { setGlobalTheme as setUITheme, resetGlobalTheme as resetUITheme } from '@tuix/themes'
 
-/**
- * Switch the theme every `useUITheme` consumer renders with.
- *
- * @example
- * ```tsx
- * import { setUITheme } from '@tuix/ui'
- * import { nordTheme } from '@tuix/themes'
- *
- * setUITheme(nordTheme)
- * ```
- */
-export function setUITheme(theme: Theme): void {
-  globalTheme.$set(theme)
-}
+import { getTheme, setGlobalTheme } from '@tuix/themes'
+import { themeForColorScheme } from '@tuix/themes'
 
-/** Restore the default vibes theme. */
-export function resetUITheme(): void {
-  globalTheme.$set(vibesTheme)
-}
-
-/**
- * Apply the theme variant matching a detected terminal color scheme.
- * Feed it the result of an OSC 11 background probe (or 'unknown' when the
- * terminal never answered) — light terminals get the light theme, dark and
- * unknown keep the vibes default.
- */
 export function setUIThemeForScheme(scheme: 'light' | 'dark' | 'unknown'): void {
-  globalTheme.$set(themeForColorScheme(scheme))
+  setGlobalTheme(themeForColorScheme(scheme))
 }
 
 /**
@@ -105,7 +85,7 @@ export function setUIThemeForScheme(scheme: 'light' | 'dark' | 'unknown'): void 
  * ```
  */
 export function useUITheme(): UITheme {
-  const currentTheme = globalTheme()
+  const currentTheme = getTheme()
 
   /**
    * Map variant to theme color

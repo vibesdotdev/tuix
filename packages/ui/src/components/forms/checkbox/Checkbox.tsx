@@ -19,9 +19,11 @@
  */
 
 import { $state, $effect } from '@tuix/reactive/runes/runes'
+import { isFocused } from '@tuix/reactive'
 import type { StateRune, BindableRune } from '@tuix/reactive/runes/runes'
 import { isBindableRune, isStateRune } from '@tuix/reactive/runes/runes'
 import { style, colors } from '@tuix/ansi'
+import { useUITheme } from '../../../theme'
 
 export interface CheckboxProps {
   checked?: boolean
@@ -38,11 +40,18 @@ export interface CheckboxProps {
  * Checkbox Component
  */
 export function Checkbox(props: CheckboxProps): JSX.Element {
+  const { theme } = useUITheme()
   const boundChecked = props['bind:checked']
   const localChecked = $state(props.checked ?? false)
-  const isFocused = $state(false)
 
-  // Get current checked state (bound or local)
+  const boundRune = boundChecked as (StateRune<boolean> & { $key?: string }) | undefined
+  const focusId = boundRune?.$key
+    ? `bind:${boundRune.$key}`
+    : props.className
+      ? `interactive:${props.className}`
+      : undefined
+  const isFieldFocused = focusId ? isFocused(focusId) : false
+
   const isChecked = () => {
     if (boundChecked && (isBindableRune(boundChecked) || isStateRune(boundChecked))) {
       return boundChecked()
@@ -50,7 +59,6 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     return localChecked()
   }
 
-  // Sync bound value
   $effect(() => {
     if (boundChecked && (isBindableRune(boundChecked) || isStateRune(boundChecked))) {
       if (boundChecked() !== localChecked()) {
@@ -59,11 +67,11 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
     }
   })
 
-  // Event handlers
   function handleKeyPress(key: string) {
     if (props.disabled) return
 
-    if (key === 'Enter' || key === ' ') {
+    const k = key
+    if (k === 'enter' || k === 'space') {
       toggleChecked()
     }
   }
@@ -79,17 +87,19 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
 
   // Render
   const checkboxChar = isChecked() ? '☑' : '☐'
-  const checkboxColor = props.disabled ? colors.gray : isFocused() ? colors.blue : colors.white
+  const checkboxColor = props.disabled
+    ? (theme.colors.textDim ?? colors.gray)
+    : isFieldFocused
+      ? theme.colors.primary
+      : (theme.colors.textBright ?? theme.colors.fg ?? colors.white)
 
   return (
     <interactive
       onKeyPress={handleKeyPress}
       onFocus={() => {
-        isFocused.$set(true)
         props.onFocus?.()
       }}
       onBlur={() => {
-        isFocused.$set(false)
         props.onBlur?.()
       }}
       onClick={() => {
@@ -98,12 +108,21 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
         }
       }}
       focusable={!props.disabled}
+      focusId={focusId}
       className={props.className}
     >
       <hstack gap={1} align="middle">
         <text style={style().foreground(checkboxColor)}>{checkboxChar}</text>
         {props.label && (
-          <text style={props.disabled ? style().foreground(colors.gray) : undefined}>
+          <text
+            style={
+              props.disabled
+                ? style().foreground(theme.colors.textDim ?? colors.gray)
+                : isFieldFocused
+                  ? style().foreground(theme.colors.primary)
+                  : undefined
+            }
+          >
             {props.label}
           </text>
         )}

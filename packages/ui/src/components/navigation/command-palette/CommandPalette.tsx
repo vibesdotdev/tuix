@@ -116,7 +116,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element | null {
                 focusable
                 onClick={() => props.onPick(item)}
                 onKeyPress={key => {
-                  if (key === 'Enter') {
+                  if (key === 'enter') {
                     props.onPick(item)
                     return
                   }

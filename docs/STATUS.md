@@ -438,8 +438,8 @@
       - ？ **docs/**
       - ？ lifecycle-manager.ts
       - ✓ README.md
-    - ？ **performance/**
-      - ？ optimized-renderer.ts
+    - ✗ **performance/**
+      - ✗ optimized-renderer.ts (deleted)
     - ⚠ **primitives/**
       - ⚠ view.test.ts
       - ？ view.ts
@@ -447,7 +447,7 @@
     - ？ **viewport/**
     - ？ index.ts
     - ✓ README.md
-    - ？ view-cache.ts
+    - ✗ view-cache.ts (deleted)
   - ？ constants.ts
   - ？ errors.ts
   - ？ index.ts

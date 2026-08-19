@@ -19,9 +19,11 @@
  */
 
 import { $state, $effect } from '@tuix/reactive/runes/runes'
+import { isFocused } from '@tuix/reactive'
 import type { StateRune, BindableRune } from '@tuix/reactive/runes/runes'
 import { isBindableRune, isStateRune } from '@tuix/reactive/runes/runes'
 import { style, colors, Borders } from '@tuix/ansi'
+import { useUITheme } from '../../../theme'
 
 export interface ToggleProps {
   on?: boolean
@@ -43,13 +45,20 @@ export interface ToggleProps {
  * Toggle Component
  */
 export function Toggle(props: ToggleProps): JSX.Element {
+  const { theme } = useUITheme()
   const boundValue = props['bind:checked'] || props['bind:value']
   const localOn = $state(
     props.on ?? props.checked ?? props.defaultOn ?? props.defaultChecked ?? false
   )
-  const isFocused = $state(false)
 
-  // Get current on state (bound or local)
+  const boundRune = boundValue as (StateRune<boolean> & { $key?: string }) | undefined
+  const focusId = boundRune?.$key
+    ? `bind:${boundRune.$key}`
+    : props.className
+      ? `interactive:${props.className}`
+      : undefined
+  const isFieldFocused = focusId ? isFocused(focusId) : false
+
   const isOn = () => {
     if (boundValue && (isBindableRune(boundValue) || isStateRune(boundValue))) {
       return boundValue()
@@ -57,7 +66,6 @@ export function Toggle(props: ToggleProps): JSX.Element {
     return localOn()
   }
 
-  // Sync bound value
   $effect(() => {
     if (boundValue && (isBindableRune(boundValue) || isStateRune(boundValue))) {
       if (boundValue() !== localOn()) {
@@ -66,11 +74,11 @@ export function Toggle(props: ToggleProps): JSX.Element {
     }
   })
 
-  // Event handlers
   function handleKeyPress(key: string) {
     if (props.disabled) return
 
-    if (key === 'Enter' || key === ' ') {
+    const k = key
+    if (k === 'enter' || k === 'space') {
       toggleOn()
     }
   }
@@ -87,24 +95,27 @@ export function Toggle(props: ToggleProps): JSX.Element {
 
   // Render
   const on = isOn()
-  const toggleColor = props.disabled ? colors.gray : on ? colors.green : colors.gray
+  const dimColor = theme.colors.textDim ?? colors.gray
+  const toggleColor = props.disabled
+    ? dimColor
+    : on
+      ? (theme.colors.success ?? colors.green)
+      : dimColor
   const borderColor = props.disabled
-    ? colors.gray
-    : isFocused()
-      ? colors.blue
+    ? dimColor
+    : isFieldFocused
+      ? theme.colors.primary
       : on
-        ? colors.green
-        : colors.gray
+        ? (theme.colors.success ?? colors.green)
+        : dimColor
 
   return (
     <interactive
       onKeyPress={handleKeyPress}
       onFocus={() => {
-        isFocused.$set(true)
         props.onFocus?.()
       }}
       onBlur={() => {
-        isFocused.$set(false)
         props.onBlur?.()
       }}
       onClick={() => {
@@ -113,6 +124,7 @@ export function Toggle(props: ToggleProps): JSX.Element {
         }
       }}
       focusable={!props.disabled}
+      focusId={focusId}
       className={props.className}
     >
       <hstack gap={1} align="middle">
@@ -124,7 +136,7 @@ export function Toggle(props: ToggleProps): JSX.Element {
           <text style={style().foreground(toggleColor)}>{on ? ' ON ' : ' OFF '}</text>
         </box>
         {props.label && (
-          <text style={props.disabled ? style().foreground(colors.gray) : undefined}>
+          <text style={props.disabled ? style().foreground(dimColor) : undefined}>
             {props.label}
           </text>
         )}

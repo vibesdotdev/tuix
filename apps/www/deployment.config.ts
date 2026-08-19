@@ -16,13 +16,15 @@ const deployment = createAppDeployment({
   provider: 'cloudflare-workers',
   runtime: 'edge',
   build: {
-    // Runner chdirs into the app dir before build; commands must be
-    // relative to apps/www. Install still runs at the repo root
-    // (workspaceRootDir below) where the bun lockfile lives.
+    // The deploy runner executes buildCommand with cwd=workspaceRoot
+    // (the tuix repo root), NOT the app dir. The root `bun run build`
+    // invokes scripts/build.ts (package builder) and never runs vite
+    // build for this app, so .svelte-kit/cloudflare/ goes stale. Use
+    // --cwd to target apps/www explicitly.
     workspaceRootDir: '../..',
     appDir: 'apps/www',
     installCommand: 'bun install --frozen-lockfile',
-    buildCommand: 'bun run build',
+    buildCommand: 'bun run --cwd apps/www build',
     outputDir: 'apps/www/.svelte-kit/cloudflare',
   },
   origins: [

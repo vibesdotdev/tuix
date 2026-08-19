@@ -1,7 +1,9 @@
 /** @jsxImportSource @tuix/jsx */
 
 import { colors } from '@tuix/ansi'
+import type { Theme } from '@tuix/themes'
 import { labelOf } from '../../../bind'
+import { useUITheme, getTextColor, type ThemeVariant } from '../../../theme'
 
 export type ButtonVariant =
   | 'primary'
@@ -53,24 +55,15 @@ function decorate(label: string, variant: ButtonVariant, size: ButtonSize): stri
   }
 }
 
-function variantColor(variant: ButtonVariant) {
-  switch (variant) {
-    case 'primary':
-    case 'default':
-      return colors.cyan
-    case 'danger':
-      return colors.red
-    case 'success':
-      return colors.green
-    case 'warning':
-      return colors.yellow
-    case 'info':
-      return colors.blue
-    case 'ghost':
-      return colors.gray
-    default:
-      return colors.white
+function variantColor(variant: ButtonVariant, theme: Theme): string {
+  if (variant === 'ghost') {
+    return theme.colors.textDim ?? colors.gray
   }
+  if (variant === 'secondary') {
+    return theme.colors.secondary
+  }
+  const tv = (variant === 'danger' ? 'error' : variant) as ThemeVariant
+  return getTextColor(tv, theme)
 }
 
 /**
@@ -82,16 +75,18 @@ function variantColor(variant: ButtonVariant) {
  * ```
  */
 export function Button(props: ButtonProps): JSX.Element {
+  const { theme } = useUITheme()
   const variant = props.variant ?? 'secondary'
   const size = props.size ?? 'default'
   const raw = labelOf(props.children, props.label ?? '')
   const label = props.loading ? `… ${raw}` : raw
   const disabled = Boolean(props.disabled || props.loading)
   const decorated = decorate(label, variant, size)
+  const color = variantColor(variant, theme)
 
   if (variant === 'ghost') {
     return (
-      <text className={props.className} fg={variantColor(variant)}>
+      <text className={props.className} fg={color}>
         {decorated}
       </text>
     )
@@ -103,7 +98,7 @@ export function Button(props: ButtonProps): JSX.Element {
       label={decorated}
       focused={props.focused === true}
       disabled={disabled}
-      fg={variantColor(variant)}
+      fg={color}
       onClick={disabled ? undefined : props.onClick}
     />
   )

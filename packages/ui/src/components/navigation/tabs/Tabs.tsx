@@ -35,6 +35,7 @@
  */
 
 import { $state, $derived, $effect } from '@tuix/reactive/runes/runes'
+import { isFocused } from '@tuix/reactive'
 import type { StateRune } from '@tuix/reactive/runes/runes'
 import { isStateRune } from '@tuix/reactive/runes/runes'
 import { style, colors, borderStyle, type Style } from '@tuix/ansi'
@@ -88,7 +89,8 @@ export function Tabs(props: TabsProps): JSX.Element {
   })
 
   // Internal state
-  const focused = $state(props.autoFocus || false)
+  const focusId = props.className ? `interactive:${props.className}` : undefined
+  const focused = () => (focusId ? isFocused(focusId) : props.autoFocus || false)
   const hovering = $state(false)
   const internalActiveIndex = $state(0)
   const focusedTabIndex = $state(0)
@@ -147,32 +149,30 @@ export function Tabs(props: TabsProps): JSX.Element {
     if (!focused() || !focusable) return
 
     const isHorizontal = orientation === 'horizontal'
-    const nextKey = isHorizontal ? 'ArrowRight' : 'ArrowDown'
-    const prevKey = isHorizontal ? 'ArrowLeft' : 'ArrowUp'
+    const nextKey = isHorizontal ? 'right' : 'down'
+    const prevKey = isHorizontal ? 'left' : 'up'
 
     switch (key) {
       case nextKey:
       case 'l':
-      case 'Tab':
         moveTabFocus(1)
         break
       case prevKey:
       case 'h':
-      case 'Shift+Tab':
         moveTabFocus(-1)
         break
-      case 'Home':
+      case 'home':
         focusedTabIndex.$set(0)
         break
-      case 'End':
+      case 'end':
         focusedTabIndex.$set(tabs().length - 1)
         break
-      case 'Enter':
-      case ' ':
+      case 'enter':
+      case 'space':
         setActiveIndex(focusedTabIndex())
         break
-      case 'Delete':
-      case 'Backspace':
+      case 'delete':
+      case 'backspace':
         if (tabs()[focusedTabIndex()]?.closeable) {
           closeTab(focusedTabIndex())
         }
@@ -346,12 +346,6 @@ export function Tabs(props: TabsProps): JSX.Element {
   return (
     <interactive
       onKeyPress={handleKeyPress}
-      onFocus={() => {
-        focused.$set(true)
-      }}
-      onBlur={() => {
-        focused.$set(false)
-      }}
       onMouseEnter={() => {
         hovering.$set(true)
       }}
@@ -359,6 +353,7 @@ export function Tabs(props: TabsProps): JSX.Element {
         hovering.$set(false)
       }}
       focusable={focusable}
+      focusId={focusId}
       className={props.className}
     >
       <vstack style={containerStyle()}>{layout()}</vstack>

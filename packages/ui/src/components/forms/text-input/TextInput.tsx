@@ -1,7 +1,7 @@
 /** @jsxImportSource @tuix/jsx */
 
 import { colors } from '@tuix/ansi'
-import type { BindableRune, StateRune } from '@tuix/reactive'
+import { isFocused, type BindableRune, type StateRune } from '@tuix/reactive'
 import { readBound } from '../../../bind'
 import { useUITheme } from '../../../theme'
 import { email } from '../../../validation'
@@ -42,10 +42,15 @@ export function Input(props: InputProps): JSX.Element {
   const echo = props.echoMode ?? 'normal'
   const displayed = echo === 'password' ? '•'.repeat(raw.length) : echo === 'none' ? '' : raw
 
+  const bound = props['bind:value'] as (StateRune<string> & { $key?: string }) | undefined
+  const focusKey = bound?.$key
+  const focusId = focusKey ? `bind:${focusKey}` : props.id ? `input:${props.id}` : undefined
+  const isFieldFocused = focusId ? isFocused(focusId) : Boolean(props.focused)
+
   return (
     <box
       border="thin"
-      borderColor={props.focused ? theme.colors.primary : depth.outset}
+      borderColor={isFieldFocused ? theme.colors.primary : depth.outset}
       padding={0}
     >
       <input
@@ -53,9 +58,13 @@ export function Input(props: InputProps): JSX.Element {
         value={displayed}
         placeholder={props.placeholder}
         width={props.width}
-        focused={props.focused}
+        focused={isFieldFocused}
         disabled={props.disabled}
-        fg={props.focused ? theme.colors.primary : colors.white}
+        fg={
+          isFieldFocused
+            ? theme.colors.primary
+            : (theme.colors.textBright ?? theme.colors.fg ?? colors.white)
+        }
         bind:value={echo === 'normal' ? props['bind:value'] : undefined}
         onChange={props.disabled ? undefined : props.onChange}
         onSubmit={props.disabled ? undefined : props.onSubmit}

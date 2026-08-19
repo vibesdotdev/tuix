@@ -13,6 +13,7 @@ export async function GET() {
   const paths: string[] = [
     '/',
     '/features',
+    '/gallery',
     '/get-started',
     '/packages',
     '/docs',

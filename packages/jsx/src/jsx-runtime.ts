@@ -38,6 +38,7 @@ import {
   type BindableRune,
   type StateRune,
 } from '@tuix/reactive'
+import { getTheme, themeColor } from '@tuix/themes'
 import { scopeManager } from './scope/manager'
 import { Scope, ScopeContent, ScopeFallback } from './scope/components'
 import type { ScopeContext, ScopeDef } from './scope/types'
@@ -782,13 +783,40 @@ const buildStyle = (...inputs: Array<Partial<StyleProps> | undefined>): StyleIns
 const paintCell = (content: string, props: Record<string, unknown>) => {
   const fg = props.fg ?? props.color ?? props.foreground
   const bg = props.bg ?? props.background
+  const variant = props.variant as string | undefined
+  const themeFg = variant ? themeColor(variant as never) : undefined
+  const resolvedFg = fg ?? themeFg
   const merged = mergeStyleProps(
     extractStyleProps(props.style),
-    fg ? { foreground: fg as never } : undefined,
+    resolvedFg ? { foreground: resolvedFg as never } : undefined,
     bg ? { background: bg as never } : undefined
   )
-  if (!merged || Object.keys(merged).length === 0) return text(content)
+  if (!merged || Object.keys(merged).length === 0) {
+    return resolvedFg ? styledText(content, style().foreground(resolvedFg as never)) : text(content)
+  }
   return styledText(content, buildStyle(merged))
+}
+
+/** Normalize a key string to consistent lowercase form. The keyboard parser
+ *  already produces lowercase names, but some upstream callers send DOM-style
+ *  names ('ArrowUp', 'Enter'). This bridges both so <interactive> handlers
+ *  always receive clean 'up'/'down'/'enter'/'escape'/'tab'/'space'. */
+function normalizeKeyName(key: string): string {
+  const lower = key.toLowerCase()
+  switch (lower) {
+    case 'arrowup':
+      return 'up'
+    case 'arrowdown':
+      return 'down'
+    case 'arrowleft':
+      return 'left'
+    case 'arrowright':
+      return 'right'
+    case ' ':
+      return 'space'
+    default:
+      return lower
+  }
 }
 
 const unwrapProp = (value: unknown): unknown => {
@@ -995,9 +1023,39 @@ const wrapInteractiveView = (child: View, props: Record<string, unknown>): View 
 
   const disabled = props.disabled === true || props.disabled === 'true'
   const focusable = disabled ? false : props.focusable !== false
+
+  // Focus system integration: when a focusable interactive element has a
+  // stable focusId (from props.focusId, props.id, or props.className), register
+  // it with the global focus registry so Tab cycles between elements and
+  // dispatchFocusedKey routes key events to the focused element's handler.
+  let focused = false
+  const focusId =
+    typeof props.focusId === 'string' && props.focusId.length > 0
+      ? props.focusId
+      : typeof props.id === 'string' && props.id.length > 0
+        ? `interactive:${props.id}`
+        : typeof props.className === 'string' && props.className.length > 0
+          ? `interactive:${props.className}`
+          : null
+
+  if (focusable && focusId) {
+    const onKeyPress = events['onKeyPress']
+    if (typeof onKeyPress === 'function') {
+      registerFocusable(focusId, key => {
+        onKeyPress(normalizeKeyName(key))
+        return true
+      })
+    } else {
+      registerFocusable(focusId)
+    }
+    focused = isFocused(focusId)
+  }
+
   const metadata: Record<string, unknown> = {
     focusable,
     events,
+    focused,
+    focusId,
     className: props.className,
     role: props.role,
     tooltip: props.tooltip,
@@ -1575,6 +1633,12 @@ function renderJSX(
 
       if (safeProps.className !== undefined) {
         interactiveProps.className = safeProps.className
+      }
+      if (safeProps.id !== undefined) {
+        interactiveProps.id = safeProps.id
+      }
+      if (safeProps.focusId !== undefined) {
+        interactiveProps.focusId = safeProps.focusId
       }
       if (safeProps.role !== undefined) {
         interactiveProps.role = safeProps.role

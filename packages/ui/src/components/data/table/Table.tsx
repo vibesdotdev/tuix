@@ -37,7 +37,7 @@
  * ```
  */
 
-import { $state, $derived, $effect, type StateRune, isStateRune } from '@tuix/reactive'
+import { $state, $derived, $effect, type StateRune, isStateRune, isFocused } from '@tuix/reactive'
 import { style, colors, type Style } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view'
 
@@ -100,7 +100,8 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
   const focusable = props.focusable !== false
 
   // Internal state
-  const focused = $state(props.autoFocus || false)
+  const focusId = props.className ? `interactive:${props.className}` : undefined
+  const focused = () => (focusId ? isFocused(focusId) : props.autoFocus || false)
   const hovering = $state(false)
   const filterValue = $state('')
   const scrollOffset = $state(0)
@@ -243,36 +244,36 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
     if (!focused() || !focusable) return
 
     switch (key) {
-      case 'ArrowUp':
+      case 'up':
       case 'k':
         moveSelection(-1)
         break
-      case 'ArrowDown':
+      case 'down':
       case 'j':
         moveSelection(1)
         break
-      case 'ArrowLeft':
+      case 'left':
       case 'h':
         // Horizontal scrolling if needed
         break
-      case 'ArrowRight':
+      case 'right':
       case 'l':
         // Horizontal scrolling if needed
         break
-      case 'Home':
+      case 'home':
         selectIndex(0)
         break
-      case 'End':
+      case 'end':
         selectIndex(sortedData().length - 1)
         break
-      case 'PageUp':
+      case 'pageup':
         moveSelection(-(props.height || 10))
         break
-      case 'PageDown':
+      case 'pagedown':
         moveSelection(props.height || 10)
         break
-      case 'Enter':
-      case ' ':
+      case 'enter':
+      case 'space':
         if (selectionMode === 'multi') {
           toggleMultiSelect(selectedIndex())
         } else if (selectionMode === 'single') {
@@ -542,12 +543,6 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
   return (
     <interactive
       onKeyPress={handleKeyPress}
-      onFocus={() => {
-        focused.$set(true)
-      }}
-      onBlur={() => {
-        focused.$set(false)
-      }}
       onMouseEnter={() => {
         hovering.$set(true)
       }}
@@ -555,6 +550,7 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
         hovering.$set(false)
       }}
       focusable={focusable}
+      focusId={focusId}
       className={props.className}
     >
       <vstack style={tableStyle()}>

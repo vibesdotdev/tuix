@@ -35,6 +35,7 @@ export {
   clearKeyHandlers,
 } from './runes/runes'
 export { useViewport, setViewportSize, type ViewportSize } from './runes/viewport'
+export { useFocus, type UseFocusResult } from './runes/use-focus'
 export type {
   StateRune,
   DerivedRune,

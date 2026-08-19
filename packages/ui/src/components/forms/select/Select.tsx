@@ -125,7 +125,7 @@ export function Select<T = string>(props: SelectProps<T>): JSX.Element {
                 focusable={!option.disabled}
                 onClick={() => pick(option)}
                 onKeyPress={key => {
-                  if (key === 'Enter') {
+                  if (key === 'enter') {
                     pick(option)
                     return
                   }

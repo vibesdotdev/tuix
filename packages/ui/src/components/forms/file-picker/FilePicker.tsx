@@ -22,6 +22,7 @@ import { Text } from '../../display/text/Text'
 import { Flex } from '../../layout/flex/Flex'
 import { List, type ListItem } from '../../data/list/List'
 import { Spinner } from '../../feedback/spinner/Spinner'
+import { useUITheme } from '../../../theme'
 
 // =============================================================================
 // Types
@@ -313,6 +314,7 @@ const createDefaultFileSystemService = (): FileSystemService => ({
 // =============================================================================
 
 const Breadcrumbs = ({ path, width }: { path: string; width: number }) => {
+  const { theme } = useUITheme()
   const normalizedPath = PathUtils.normalize(path)
   const parts = normalizedPath === '/' ? [] : normalizedPath.split('/').filter(Boolean)
   let breadcrumb = '/'
@@ -327,7 +329,15 @@ const Breadcrumbs = ({ path, width }: { path: string; width: number }) => {
     }
   }
 
-  return <Text style={style().foreground(colors.blue).bold()}>📍 {breadcrumb}</Text>
+  return (
+    <Text
+      style={style()
+        .foreground(theme.colors.info ?? colors.blue)
+        .bold()}
+    >
+      📍 {breadcrumb}
+    </Text>
+  )
 }
 
 const FileItemRenderer = ({
@@ -341,10 +351,12 @@ const FileItemRenderer = ({
   focused: boolean
   showFileInfo: boolean
 }) => {
+  const { theme } = useUITheme()
   const icon = getFileIcon(item)
   const name = item.name
   const size = showFileInfo && !item.isDirectory ? formatFileSize(item.size) : ''
   const date = showFileInfo ? formatDate(item.lastModified) : ''
+  const metaColor = theme.colors.textDim ?? colors.gray
 
   return (
     <Flex direction="row" gap={2}>
@@ -353,23 +365,28 @@ const FileItemRenderer = ({
       {showFileInfo && (
         <>
           <Flex flex={1} />
-          <Text style={style().foreground(colors.gray)}>{size}</Text>
-          <Text style={style().foreground(colors.gray)}>{date}</Text>
+          <Text style={style().foreground(metaColor)}>{size}</Text>
+          <Text style={style().foreground(metaColor)}>{date}</Text>
         </>
       )}
     </Flex>
   )
 }
 
-const ErrorMessage = ({ error }: { error: string }) => (
-  <Box
-    border={border.borderStyle('rounded')}
-    padding={{ vertical: 1, horizontal: 2 }}
-    style={style().background(colors.red).foreground(colors.white)}
-  >
-    <Text>⚠️ Error: {error}</Text>
-  </Box>
-)
+const ErrorMessage = ({ error }: { error: string }) => {
+  const { theme } = useUITheme()
+  return (
+    <Box
+      border={border.borderStyle('rounded')}
+      padding={{ vertical: 1, horizontal: 2 }}
+      style={style()
+        .background(theme.colors.danger ?? colors.red)
+        .foreground(theme.colors.textBright ?? theme.colors.fg ?? colors.white)}
+    >
+      <Text>⚠️ Error: {error}</Text>
+    </Box>
+  )
+}
 
 const LoadingIndicator = () => (
   <Flex direction="row" gap={1} justify="center" align="center">
@@ -546,6 +563,7 @@ export const FilePicker = (props: FilePickerProps = {}) => {
     },
 
     view(model: FilePickerModel): View {
+      const { theme } = useUITheme()
       const lines: View[] = []
 
       // Path breadcrumbs
@@ -591,9 +609,13 @@ export const FilePicker = (props: FilePickerProps = {}) => {
 
       // Hidden files toggle hint
       const hiddenHint = model.showHidden ? (
-        <Text style={style().foreground(colors.gray)}>Press H to hide hidden files</Text>
+        <Text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
+          Press H to hide hidden files
+        </Text>
       ) : (
-        <Text style={style().foreground(colors.gray)}>Press H to show hidden files</Text>
+        <Text style={style().foreground(theme.colors.textDim ?? colors.gray)}>
+          Press H to show hidden files
+        </Text>
       )
 
       return (

@@ -121,7 +121,8 @@ export function SpinnerWithMessage(
     messageColor?: string
   }
 ): JSX.Element {
-  const { message, messageColor = colors.gray, ...spinnerProps } = props
+  const { theme } = useUITheme()
+  const { message, messageColor = theme.colors.textDim ?? colors.gray, ...spinnerProps } = props
 
   return (
     <vstack align="center" gap={1}>

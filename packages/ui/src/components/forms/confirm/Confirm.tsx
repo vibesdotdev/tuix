@@ -19,7 +19,9 @@
  */
 
 import { $state } from '@tuix/reactive/runes/runes'
+import { isFocused } from '@tuix/reactive'
 import { style, colors } from '@tuix/ansi'
+import { useUITheme } from '../../../theme'
 
 export interface ConfirmProps {
   message: string
@@ -37,34 +39,33 @@ export interface ConfirmProps {
  * Confirm Component
  */
 export function Confirm(props: ConfirmProps): JSX.Element {
+  const { theme } = useUITheme()
   const yesLabel = props.yesLabel || 'Yes'
   const noLabel = props.noLabel || 'No'
   const selectedChoice = $state<'yes' | 'no'>(props.defaultChoice || 'no')
-  const isFocused = $state(false)
 
-  // Event handlers
+  const focusId = props.className ? `interactive:${props.className}` : 'tuix-confirm'
+  const isFieldFocused = isFocused(focusId)
+
   function handleKeyPress(key: string) {
     switch (key) {
-      case 'ArrowLeft':
-      case 'ArrowRight':
-      case 'Tab':
+      case 'left':
+      case 'right':
         toggleChoice()
         break
 
       case 'y':
-      case 'Y':
         selectedChoice.$set('yes')
         confirm()
         break
 
       case 'n':
-      case 'N':
         selectedChoice.$set('no')
         cancel()
         break
 
-      case 'Enter':
-      case ' ':
+      case 'enter':
+      case 'space':
         if (selectedChoice() === 'yes') {
           confirm()
         } else {
@@ -72,7 +73,7 @@ export function Confirm(props: ConfirmProps): JSX.Element {
         }
         break
 
-      case 'Escape':
+      case 'escape':
         cancel()
         break
     }
@@ -93,45 +94,55 @@ export function Confirm(props: ConfirmProps): JSX.Element {
   // Render
   const yesStyle = style().padding(0, 2)
   const noStyle = style().padding(0, 2)
+  const dimColor = theme.colors.textDim ?? colors.gray
+  const brightColor = theme.colors.textBright ?? theme.colors.fg ?? colors.white
 
   if (selectedChoice() === 'yes') {
-    yesStyle.bg(colors.blue).fg(colors.white).bold()
+    yesStyle.background(theme.colors.primary).foreground(brightColor).bold()
   } else {
-    yesStyle.fg(colors.gray)
+    yesStyle.foreground(dimColor)
   }
 
   if (selectedChoice() === 'no') {
-    noStyle.bg(colors.red).fg(colors.white).bold()
+    noStyle
+      .background(theme.colors.danger ?? colors.red)
+      .foreground(brightColor)
+      .bold()
   } else {
-    noStyle.fg(colors.gray)
+    noStyle.foreground(dimColor)
   }
 
   return (
     <interactive
       onKeyPress={handleKeyPress}
       onFocus={() => {
-        isFocused.$set(true)
         props.onFocus?.()
       }}
       onBlur={() => {
-        isFocused.$set(false)
         props.onBlur?.()
       }}
       focusable
+      focusId={focusId}
       className={props.className}
     >
-      <vstack gap={1}>
-        <text>{props.message}</text>
+      <box
+        border={isFieldFocused ? 'rounded' : undefined}
+        borderColor={isFieldFocused ? theme.colors.primary : undefined}
+        padding={isFieldFocused ? 1 : 0}
+      >
+        <vstack gap={1}>
+          <text>{props.message}</text>
 
-        <hstack gap={2}>
-          <text style={yesStyle}>{yesLabel}</text>
-          <text style={noStyle}>{noLabel}</text>
-        </hstack>
+          <hstack gap={2}>
+            <text style={yesStyle}>{yesLabel}</text>
+            <text style={noStyle}>{noLabel}</text>
+          </hstack>
 
-        <text style={style().foreground(colors.gray).italic()}>
-          ← → to select, Enter to confirm, Esc to cancel
-        </text>
-      </vstack>
+          <text style={style().foreground(dimColor).italic()}>
+            ← → to select, Enter to confirm, Esc to cancel
+          </text>
+        </vstack>
+      </box>
     </interactive>
   )
 }

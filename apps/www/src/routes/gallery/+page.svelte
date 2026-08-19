@@ -7,6 +7,7 @@ const demos = [
     title: 'Brand — wordmark, braille, gradient borders',
     blurb:
       'Half-block wordmark with per-glyph gradient, 2×4 braille sparklines, and Lipgloss-style gradient border boxes — all pure ANSI, no graphics protocol required.',
+    grid: '100×30',
     file: 'brand.png',
   },
   {
@@ -14,14 +15,34 @@ const demos = [
     title: 'Kit — agent workbench',
     blurb:
       'Session list, transcript, composer, and file pane. Tab focus, / command palette, ? help overlay — all on the overlay layer with scrim.',
+    grid: '100×30',
     keys: ['tab', '/', '?', 'esc'],
     file: 'kit.png',
+  },
+  {
+    id: 'kit-120x40',
+    title: 'Kit — wide layout (120×40)',
+    blurb:
+      'The same workbench at 120 columns: sidebar, file list, composer, and status footer stretch into the wider grid with the overlay layer still active.',
+    grid: '120×40',
+    keys: ['tab', '/', '?', 'esc'],
+    file: 'kit-120x40.png',
+  },
+  {
+    id: 'kit-80x24-palette',
+    title: 'Kit — command palette (80×24)',
+    blurb:
+      'The / command palette rendered as an overlay above the 80×24 workbench. Scrim dims the background; fuzzy filter narrows commands in real time.',
+    grid: '80×24',
+    keys: ['/'],
+    file: 'kit-80x24-palette.png',
   },
   {
     id: 'tasks',
     title: 'Tasks — focus ring + confirm',
     blurb:
       'bind:value two-way input in the focus ring, j/k cursor, space toggles, x opens a scrim confirm modal, 1/2/3 filters.',
+    grid: '100×30',
     keys: ['tab', 'j/k', 'space', 'x', '1/2/3'],
     file: 'tasks.png',
   },
@@ -30,6 +51,7 @@ const demos = [
     title: 'Dash — live metrics',
     blurb:
       'Interval-driven state through the MVU loop: sparklines trace history, bars track saturation, service statuses react to error rate.',
+    grid: '100×30',
     keys: ['p', 'r', 't'],
     file: 'dash.png',
   },
@@ -38,6 +60,7 @@ const demos = [
     title: 'Forms — bind:value proof',
     blurb:
       'Two-way binding end to end: typed characters write through the bound rune, the focused field shows its cursor, and derived preview stays live.',
+    grid: '100×30',
     keys: ['tab', 'enter', 'esc'],
     file: 'forms.png',
   },
@@ -45,9 +68,10 @@ const demos = [
 
 const heroCode = `/** @jsxImportSource @tuix/jsx */
 import { $state } from '@tuix/reactive'
-import { Modal, KbdHint } from '@tuix/ui'
+import { Modal, KbdHint, useUITheme } from '@tuix/ui'
 
 export default function Tasks() {
+  const { theme } = useUITheme()
   const confirm = $state(false, 'confirm')
 
   return (
@@ -57,6 +81,7 @@ export default function Tasks() {
       <Modal open={confirm()} scrim title="Delete task?">
         <text>Are you sure?</text>
       </Modal>
+      <KbdHint keys="x" label="delete" />
     </vstack>
   )
 }`
@@ -93,7 +118,7 @@ export default function Tasks() {
 						height={1188}
 					/>
 					<div class="shot-meta">
-						<span>{demo.file === 'kit-120x40.png' ? '120×40' : demo.file === 'kit-80x24-palette.png' ? '80×24' : '100×30'} · Ghostty capture</span>
+						<span>{demo.grid} · Ghostty capture</span>
 						{#if demo.keys}<span class="keys">{demo.keys.join(' · ')}</span>{/if}
 					</div>
 				</div>

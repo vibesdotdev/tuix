@@ -75,7 +75,8 @@
     "@tuix/ansi": "workspace:*",
     "@tuix/core": "workspace:*",
     "@tuix/reactive": "workspace:*",
-    "@tuix/runtime": "workspace:*"
+    "@tuix/runtime": "workspace:*",
+    "@tuix/themes": "workspace:*"
   },
   "devDependencies": {
     "@types/bun": "latest",

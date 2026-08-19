@@ -44,7 +44,7 @@ function walk(
         key={node.id}
         focusable
         onClick={handle}
-        onKeyPress={key => key === 'Enter' && handle()}
+        onKeyPress={key => key === 'enter' && handle()}
       >
         <text>{line}</text>
       </interactive>

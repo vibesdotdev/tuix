@@ -1,5 +1,6 @@
 /** @jsxImportSource @tuix/jsx */
 
+import { isFocused } from '@tuix/reactive'
 import { useUITheme } from '../../../theme'
 
 export interface SliderProps {
@@ -60,6 +61,9 @@ export function Slider(props: SliderProps): JSX.Element {
   const track = sliderTrack(value, width, props.steps)
   const disabled = Boolean(props.disabled)
 
+  const focusId = props.className ? `interactive:${props.className}` : 'tuix-slider'
+  const isFieldFocused = isFocused(focusId)
+
   function stepBy(delta: number) {
     if (disabled || !props.onChange) return
     const granularity = props.steps && props.steps >= 2 ? 1 / (props.steps - 1) : 0.05
@@ -67,20 +71,20 @@ export function Slider(props: SliderProps): JSX.Element {
   }
 
   function handleKeys(key: string): boolean {
-    const lower = key.toLowerCase()
-    if (lower === 'left' || lower === 'h') {
+    const k = key
+    if (k === 'left' || k === 'h') {
       stepBy(-1)
       return true
     }
-    if (lower === 'right' || lower === 'l') {
+    if (k === 'right' || k === 'l') {
       stepBy(1)
       return true
     }
-    if (lower === 'home') {
+    if (k === 'home') {
       if (!disabled) props.onChange?.(0)
       return true
     }
-    if (lower === 'end') {
+    if (k === 'end') {
       if (!disabled) props.onChange?.(1)
       return true
     }
@@ -88,12 +92,22 @@ export function Slider(props: SliderProps): JSX.Element {
   }
 
   const valueText = props.showValue ? `${Math.round(position * 100)}%` : undefined
+  const trackColor = disabled
+    ? theme.colors.textDim
+    : isFieldFocused
+      ? theme.colors.primary
+      : theme.colors.primary
 
   return (
-    <interactive className={props.className} focusable={!disabled} onKeyPress={handleKeys}>
+    <interactive
+      className={props.className}
+      focusable={!disabled}
+      focusId={focusId}
+      onKeyPress={handleKeys}
+    >
       <hstack gap={1}>
         {props.label ? <text fg={theme.colors.textDim}>{props.label}</text> : null}
-        <text fg={disabled ? theme.colors.textDim : theme.colors.primary}>{track}</text>
+        <text fg={trackColor}>{track}</text>
         {valueText ? <text fg={theme.colors.textDim}>{valueText}</text> : null}
       </hstack>
     </interactive>

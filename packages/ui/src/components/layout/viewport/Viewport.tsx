@@ -33,6 +33,7 @@
 import { $effect } from '@tuix/reactive/runes/runes'
 import { style, colors, borderStyle as makeBorderStyle, type Style } from '@tuix/ansi'
 import { createViewportStore, type ViewportStore } from '../../../stores/viewportStore'
+import { useUITheme } from '../../../theme'
 
 // Types
 export interface ViewportProps {
@@ -64,6 +65,7 @@ export interface ViewportProps {
 // ViewportState type is now managed by the store
 
 export const Viewport = (props: ViewportProps) => {
+  const { theme } = useUITheme()
   const {
     children,
     width,
@@ -247,7 +249,9 @@ export const Viewport = (props: ViewportProps) => {
     <vstack
       style={
         borderStyleValue
-          ? viewportStyle.border(borderStyleValue).borderForeground(colors.gray)
+          ? viewportStyle
+              .border(borderStyleValue)
+              .borderForeground(theme.colors.border ?? colors.gray)
           : viewportStyle
       }
     >
@@ -259,32 +263,32 @@ export const Viewport = (props: ViewportProps) => {
   // In a real implementation, this would integrate with the input system
   const handleKeyPress = (key: string) => {
     switch (key) {
-      case 'ArrowUp':
+      case 'up':
       case 'k':
         scrollUp()
         break
-      case 'ArrowDown':
+      case 'down':
       case 'j':
         scrollDown()
         break
-      case 'ArrowLeft':
+      case 'left':
       case 'h':
         scrollLeft()
         break
-      case 'ArrowRight':
+      case 'right':
       case 'l':
         scrollRight()
         break
-      case 'PageUp':
+      case 'pageup':
         store.pageUp()
         break
-      case 'PageDown':
+      case 'pagedown':
         store.pageDown()
         break
-      case 'Home':
+      case 'home':
         store.scrollToTop()
         break
-      case 'End':
+      case 'end':
         store.scrollToBottom()
         break
     }
