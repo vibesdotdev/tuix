@@ -27,6 +27,7 @@
     "@types/bun": "^1.2.23",
     "@vibesdotdev/infra-cloudflare": "^0.0.2",
     "@vibesdotdev/infra-core": "^0.0.2",
+    "playwright": "^1.62.1",
     "typescript": "^5.6.2"
   },
   "peerDependencies": {

@@ -94,8 +94,8 @@ export default function Dash() {
     <box padding={1} border="rounded" borderColor={dim2}>
       {/* Header */}
       <hstack gap={1}>
-        <text bg={theme.colors.primary} fg={theme.colors.bg}>
-          {' Tuix Dash '}
+        <text bg="#2d1f3d" fg="#c4b5fd">
+          {' ◎ Tuix Dash '}
         </text>
         <text fg={paused() ? theme.colors.warning : theme.colors.success}>
           {paused() ? '‖ paused' : '● live'}

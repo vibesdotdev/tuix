@@ -112,8 +112,8 @@ export default function Tasks() {
     <box padding={1} border="rounded" borderColor={dim2}>
       {/* Header */}
       <hstack gap={1}>
-        <text bg={theme.colors.primary} fg={theme.colors.bg}>
-          {' Tuix Tasks '}
+        <text bg="#3d2e1e" fg="#fcd34d">
+          {' ▣ Tuix Tasks '}
         </text>
         <text fg={dim}>{`${open} open · ${done} done`}</text>
       </hstack>
@@ -149,9 +149,7 @@ export default function Tasks() {
               <text fg={t.done ? theme.colors.success : dim2} width={1}>
                 {t.done ? 'x' : '·'}
               </text>
-              <text fg={t.done ? dim2 : at ? bright : theme.colors.fg}>
-                {t.title}
-              </text>
+              <text fg={t.done ? dim2 : at ? bright : theme.colors.fg}>{t.title}</text>
               <text fg={dim2}>{` ${t.tag}`}</text>
             </hstack>
           )

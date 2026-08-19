@@ -35,8 +35,8 @@ export default function Forms() {
     <box padding={1} border="rounded" borderColor={dim2}>
       {/* Header */}
       <hstack gap={1}>
-        <text bg={theme.colors.primary} fg={theme.colors.bg}>
-          {' Tuix Forms '}
+        <text bg="#1e3a5f" fg="#93c5fd">
+          {' ◆ Tuix Forms '}
         </text>
         <text fg={dim}>two-way binding, live preview</text>
       </hstack>
@@ -44,24 +44,25 @@ export default function Forms() {
 
       {/* Form grid */}
       <hstack gap={1}>
-        <text width={LABEL_W} fg={dim2}>{'Name'}</text>
+        <text width={LABEL_W} fg={dim2}>
+          {'Name'}
+        </text>
         <Input bind:value={name} placeholder="your name" width={FIELD_W} />
       </hstack>
       <text> </text>
       <hstack gap={1}>
-        <text width={LABEL_W} fg={dim2}>{'Email'}</text>
-        <Input
-          bind:value={email}
-          placeholder="you@example.com"
-          width={FIELD_W}
-          onSubmit={submit}
-        />
+        <text width={LABEL_W} fg={dim2}>
+          {'Email'}
+        </text>
+        <Input bind:value={email} placeholder="you@example.com" width={FIELD_W} onSubmit={submit} />
       </hstack>
       <text> </text>
 
       {/* Preview */}
       <hstack gap={1}>
-        <text width={LABEL_W} fg={dim2}>{'Preview'}</text>
+        <text width={LABEL_W} fg={dim2}>
+          {'Preview'}
+        </text>
         <text fg={bright}>{preview()}</text>
       </hstack>
 
@@ -69,7 +70,9 @@ export default function Forms() {
         <>
           <text> </text>
           <hstack gap={1}>
-            <text width={LABEL_W} fg={dim2}>{'Sent'}</text>
+            <text width={LABEL_W} fg={dim2}>
+              {'Sent'}
+            </text>
             <text fg={theme.colors.success}>{sent()}</text>
           </hstack>
         </>

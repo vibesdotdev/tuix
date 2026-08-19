@@ -271,7 +271,10 @@ const applyColors = (line: string, props: StyleProps, profile: ColorProfile): st
 
   sequence += buildDecorationSequence(props)
 
-  if (!sequence) return line
+  if (!sequence) {
+    const hasLeadingSgr = /^\x1b\[[0-9;]*m/.test(line)
+    return hasLeadingSgr ? line : RESET + line + RESET
+  }
   return sequence + line + RESET
 }
 

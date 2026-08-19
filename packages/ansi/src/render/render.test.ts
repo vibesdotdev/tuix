@@ -6,8 +6,24 @@ import { colors, color } from '../color'
 import { ColorProfile } from '../color/profile'
 
 describe('Render utilities', () => {
-  test('renderStyled returns plain text when no styles applied', () => {
-    expect(renderStyled('Hello', style())).toBe('Hello')
+  test('renderStyled wraps unstyled text with reset to prevent bg bleed', () => {
+    const result = renderStyled('Hello', style())
+    expect(result).toContain('Hello')
+    expect(result).toMatch(/^\x1b\[0m.*\x1b\[0m$/)
+  })
+
+  test('bg color does not bleed into following unstyled cells', () => {
+    const greenBg = style().bg('#22c55e')
+    const noStyle = style()
+    const cellA = renderStyled('vibes', greenBg)
+    const cellB = renderStyled(' next', noStyle)
+    const combined = cellA + cellB
+    expect(cellA).toContain('\x1b[48;2;34;197;94m')
+    expect(cellB).toMatch(/^\x1b\[0m/)
+    expect(combined).toContain('\x1b[0m')
+    const lastResetIndex = combined.lastIndexOf('\x1b[0m')
+    const afterReset = combined.slice(lastResetIndex + 4)
+    expect(afterReset).not.toContain('\x1b[')
   })
 
   test('hex string foreground does not paint literal undefined', () => {

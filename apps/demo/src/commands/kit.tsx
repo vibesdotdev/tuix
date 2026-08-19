@@ -260,8 +260,8 @@ function Kit() {
   return (
     <flex direction="column" width={cols} height={rows}>
       <hstack gap={1}>
-        <text bg={theme.colors.primary} fg={theme.colors.bg}>
-          {' vibes '}
+        <text bg="#0d3d2d" fg="#5eead4">
+          {' ◈ vibes '}
         </text>
         <text fg={theme.colors.textBright}>{session.title}</text>
         <text fg={dim}>{`${SESSIONS.length} sessions`}</text>
