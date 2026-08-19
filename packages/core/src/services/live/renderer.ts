@@ -1,7 +1,7 @@
 /**
  * @since 1.0.0
  */
-import { Effect, Layer, Option, Ref, pipe } from 'effect'
+import { Effect, Layer, Option, Ref } from 'effect'
 
 import type { StyleProps as AnsiStyle } from '@tuix/ansi'
 import { visualWidth, parseVisualCells, joinVisualCells, rgb } from '@tuix/ansi'
@@ -49,15 +49,45 @@ function graphemeWidth(char: string): number {
   return width
 }
 
-function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): boolean {
-  if (Option.isNone(a) && Option.isNone(b)) return true
-  if (Option.isNone(a) || Option.isNone(b)) return false
-  // Full style comparison: foreground, background, AND decorations. The old
-  // fg/bg-only check never repainted cells whose only change was bold,
-  // italic, underline, faint, blink, or reverse — silently stale rendering.
-  const left = a.value
-  const right = b.value
-  const dec = (s: AnsiStyle): number =>
+/**
+ * Pack a Color (discriminated union) into a single 32-bit integer for O(1)
+ * comparison. Layout: [type:3][r/code:8][g:8][b:8] — 27 bits used.
+ * Returns 0 for undefined/null/none colors (distinct from any real color
+ * because type=0 is reserved for "absent").
+ */
+function packColor(c: AnsiStyle['foreground'] | undefined | null): number {
+  if (!c) return 0
+  const obj = c as { type?: string; r?: number; g?: number; b?: number; code?: number; value?: string }
+  switch (obj.type) {
+    case 'rgb':
+      // type=1, r, g, b packed
+      return (1 << 24) | ((obj.r! & 0xff) << 16) | ((obj.g! & 0xff) << 8) | (obj.b! & 0xff)
+    case 'ansi':
+      // type=2, code in low byte
+      return (2 << 24) | (obj.code! & 0xff)
+    case 'ansi256':
+      // type=3, code in low byte
+      return (3 << 24) | (obj.code! & 0xff)
+    case 'hex':
+      // type=4, parse hex to rgb for comparison
+      if (obj.value) {
+        const v = obj.value.replace('#', '')
+        const r = Number.parseInt(v.slice(0, 2), 16)
+        const g = Number.parseInt(v.slice(2, 4), 16)
+        const b = Number.parseInt(v.slice(4, 6), 16)
+        return (4 << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff)
+      }
+      return 0
+    case 'none':
+      return 0
+    default:
+      return 0
+  }
+}
+
+/** Pack decoration bits into a 7-bit bitmask. */
+function packDecorations(s: AnsiStyle): number {
+  return (
     (s.bold ? 1 : 0) |
     (s.faint ? 2 : 0) |
     (s.italic ? 4 : 0) |
@@ -65,10 +95,19 @@ function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): 
     (s.blink ? 16 : 0) |
     (s.reverse ? 32 : 0) |
     (s.strikethrough ? 64 : 0)
+  )
+}
+
+function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): boolean {
+  if (Option.isNone(a) && Option.isNone(b)) return true
+  if (Option.isNone(a) || Option.isNone(b)) return false
+  const left = a.value
+  const right = b.value
+  // Numeric comparison — zero allocations, no JSON.stringify.
   return (
-    JSON.stringify(left.foreground ?? null) === JSON.stringify(right.foreground ?? null) &&
-    JSON.stringify(left.background ?? null) === JSON.stringify(right.background ?? null) &&
-    dec(left) === dec(right)
+    packColor(left.foreground) === packColor(right.foreground) &&
+    packColor(left.background) === packColor(right.background) &&
+    packDecorations(left) === packDecorations(right)
   )
 }
 
@@ -101,6 +140,108 @@ function dimCell(cell: Cell): Cell {
     }),
     painted: true,
   }
+}
+
+/**
+ * Compute the minimal SGR escape to transition from one style to another.
+ * Instead of always emitting a full reset + new style, this emits only the
+ * codes that actually change between the two states. For example, if only
+ * boldness changes, it emits just SGR 1 (bold on) or SGR 22 (bold off).
+ *
+ * SGR limitations: there is no individual "off" for italic/underline/blink
+ * on some terminals, so we use the specific off codes (SGR 23, 24, 25)
+ * which are widely supported in modern terminals.
+ */
+function computeStyleTransition(
+  from: Option.Option<AnsiStyle>,
+  to: Option.Option<AnsiStyle>,
+  colorProfile: number | undefined
+): string {
+  // Transition to "no style" → full reset.
+  if (Option.isNone(to)) return '\x1b[0m'
+
+  const target = to.value
+  const source = Option.isSome(from) ? from.value : undefined
+
+  // If transitioning from no style, just emit the full target style.
+  if (!source) {
+    return toAnsiStyleCode(target, colorProfile)
+  }
+
+  // Check if we need a reset. A reset is required when we need to turn OFF
+  // a decoration and the terminal doesn't have a reliable individual "off"
+  // code, or when both colors and decorations change substantially.
+  const sourceDec = packDecorations(source)
+  const targetDec = packDecorations(target)
+  const removedDecs = sourceDec & ~targetDec
+
+  // Build incremental codes.
+  const codes: string[] = []
+
+  // Check if colors changed.
+  const fgChanged = packColor(source.foreground) !== packColor(target.foreground)
+  const bgChanged = packColor(source.background) !== packColor(target.background)
+
+  // If decorations are being removed AND colors change, a full reset + apply
+  // is often shorter than individual off codes + new colors. Use reset path.
+  if (removedDecs && (fgChanged || bgChanged)) {
+    return '\x1b[0m' + toAnsiStyleCode(target, colorProfile)
+  }
+
+  // Handle decoration removals with individual off codes.
+  if (removedDecs & 1) codes.push('22')  // bold off (SGR 22)
+  if (removedDecs & 2) codes.push('22')  // faint off (SGR 22 — same as bold off)
+  if (removedDecs & 4) codes.push('23')  // italic off (SGR 23)
+  if (removedDecs & 8) codes.push('24')  // underline off (SGR 24)
+  if (removedDecs & 16) codes.push('25') // blink off (SGR 25)
+  if (removedDecs & 32) codes.push('27') // reverse off (SGR 27)
+  if (removedDecs & 64) codes.push('29') // strikethrough off (SGR 29)
+
+  // Handle decoration additions.
+  const addedDecs = targetDec & ~sourceDec
+  if (addedDecs & 1) codes.push('1')   // bold
+  if (addedDecs & 2) codes.push('2')   // faint
+  if (addedDecs & 4) codes.push('3')   // italic
+  if (addedDecs & 8) codes.push('4')   // underline
+  if (addedDecs & 16) codes.push('5')  // blink
+  if (addedDecs & 32) codes.push('7')  // reverse
+  if (addedDecs & 64) codes.push('9')  // strikethrough
+
+  // Handle color changes incrementally.
+  if (fgChanged) {
+    if (!target.foreground) {
+      codes.push('39') // default fg
+    } else {
+      const c = target.foreground as { type?: string; r?: number; g?: number; b?: number; code?: number }
+      if (c.type === 'rgb') {
+        codes.push(`38;2;${c.r};${c.g};${c.b}`)
+      } else if (c.type === 'ansi256') {
+        codes.push(`38;5;${c.code}`)
+      } else if (c.type === 'ansi') {
+        codes.push(c.code! < 8 ? `${30 + c.code!}` : `${90 + c.code! - 8}`)
+      }
+    }
+  }
+
+  if (bgChanged) {
+    if (!target.background) {
+      codes.push('49') // default bg
+    } else {
+      const c = target.background as { type?: string; r?: number; g?: number; b?: number; code?: number }
+      if (c.type === 'rgb') {
+        codes.push(`48;2;${c.r};${c.g};${c.b}`)
+      } else if (c.type === 'ansi256') {
+        codes.push(`48;5;${c.code}`)
+      } else if (c.type === 'ansi') {
+        codes.push(c.code! < 8 ? `${40 + c.code!}` : `${100 + c.code! - 8}`)
+      }
+    }
+  }
+
+  // If nothing changed at all (shouldn't happen, but defensive).
+  if (codes.length === 0) return ''
+
+  return `\x1b[${codes.join(';')}m`
 }
 
 // -----------------------------------------------------------------------------
@@ -169,6 +310,10 @@ interface RenderStats {
   dirtyRegionCount: number
   bufferSwitches: number
   forcedRedraws: number
+  /** Per-frame timing history (ring buffer, up to 120 entries). Only populated when profiling is enabled. */
+  frameTimeHistory: readonly number[]
+  /** Percentage of rows skipped by the dirty-row bitmap (0-100). */
+  dirtyRowSkipRate: number
 }
 
 /**
@@ -190,6 +335,8 @@ class ScreenBuffer {
   readonly width: number
   readonly height: number
   private cells: Cell[][]
+  /** Dirty-row bitmap: true means this row was written during the current frame. */
+  private dirtyRows: Uint8Array
 
   constructor(width: number, height: number) {
     this.width = Math.max(0, width | 0)
@@ -201,6 +348,7 @@ class ScreenBuffer {
         painted: false,
       }))
     )
+    this.dirtyRows = new Uint8Array(this.height)
   }
 
   clear(): void {
@@ -209,6 +357,23 @@ class ScreenBuffer {
         this.cells[y]![x] = { char: ' ', style: Option.none(), painted: false }
       }
     }
+    // All rows dirty after clear (entire content changed)
+    this.dirtyRows.fill(1)
+  }
+
+  /** Mark a specific row as dirty (written to). */
+  markRowDirty(y: number): void {
+    if (y >= 0 && y < this.height) this.dirtyRows[y] = 1
+  }
+
+  /** Check if a row is dirty. */
+  isRowDirty(y: number): boolean {
+    return y >= 0 && y < this.height && this.dirtyRows[y] === 1
+  }
+
+  /** Reset all dirty-row flags (after diff consumes them). */
+  clearDirtyFlags(): void {
+    this.dirtyRows.fill(0)
   }
 
   /**
@@ -225,6 +390,7 @@ class ScreenBuffer {
           scrim: true,
         }
       }
+      this.dirtyRows[y] = 1
     }
   }
 
@@ -268,6 +434,7 @@ class ScreenBuffer {
       if (row < 0 || row >= this.height) continue
       const cells = parseVisualCells(lines[ly] ?? '')
       let col = x
+      let rowTouched = false
       for (let lx = 0; lx < cells.length; lx++) {
         if (col < 0 || col >= this.width) break
         const cell = cells[lx]!
@@ -287,10 +454,12 @@ class ScreenBuffer {
               })
             : Option.none<AnsiStyle>()
         this.cells[row]![col] = { char: cell.char || ' ', style, painted: true }
+        rowTouched = true
         // parseVisualCells already expands wide graphemes into trailing
         // space cells, so one cell is one column — advance accordingly.
         col += graphemeWidth(cell.char || ' ')
       }
+      if (rowTouched) this.dirtyRows[row] = 1
     }
   }
 
@@ -298,6 +467,7 @@ class ScreenBuffer {
     for (let y = 0; y < other.height; y++) {
       const ty = oy + y
       if (ty < 0 || ty >= this.height) continue
+      let rowTouched = false
       for (let x = 0; x < other.width; x++) {
         const tx = ox + x
         if (tx < 0 || tx >= this.width) continue
@@ -308,16 +478,28 @@ class ScreenBuffer {
           } else {
             this.cells[ty]![tx] = { ...cell }
           }
+          rowTouched = true
         }
       }
+      if (rowTouched) this.dirtyRows[ty] = 1
     }
   }
 
+  /**
+   * Diff this buffer (front/previous) against `other` (back/current).
+   * Uses the dirty-row bitmap on `other` to skip rows that were never
+   * written — O(dirty_rows × width) instead of O(height × width).
+   */
   diff(other: ScreenBuffer): DiffPatch[] {
     const patches: DiffPatch[] = []
     const h = Math.min(this.height, other.height)
     const w = Math.min(this.width, other.width)
     for (let y = 0; y < h; y++) {
+      // Skip rows that were never touched in the back buffer this frame.
+      // Soundness: dirty tracking may over-report (a cleared row is dirty
+      // even if its content matches the front buffer) but never under-reports.
+      if (!other.isRowDirty(y)) continue
+
       let run: Cell[] = []
       let runX = 0
       const flush = () => {
@@ -436,6 +618,8 @@ export const RendererServiceLive = Layer.effect(
         dirtyRegionCount: 0,
         bufferSwitches: 0,
         forcedRedraws: 0,
+        frameTimeHistory: [],
+        dirtyRowSkipRate: 0,
       },
     }
     const state = yield* _(Ref.make(initialState))
@@ -550,8 +734,16 @@ export const RendererServiceLive = Layer.effect(
         )
       }
 
-      // Diff front and back buffers
+      // Diff front and back buffers (dirty-row bitmap accelerated).
       const diff = front.diff(back)
+
+      // Track dirty-row skip rate for diagnostics.
+      let totalRows = back.height
+      let dirtyRowCount = 0
+      for (let y = 0; y < back.height; y++) {
+        if (back.isRowDirty(y)) dirtyRowCount++
+      }
+      const skipRate = totalRows > 0 ? ((totalRows - dirtyRowCount) / totalRows) * 100 : 0
 
       if (diff.length > 0) {
         yield* _(applyPatches(diff))
@@ -561,12 +753,13 @@ export const RendererServiceLive = Layer.effect(
             stats: {
               ...s.stats,
               dirtyRegionCount: s.stats.dirtyRegionCount + 1,
+              dirtyRowSkipRate: skipRate,
             },
           }))
         )
       }
 
-      // Swap buffers
+      // Swap buffers (the old front becomes the new back for next frame).
       yield* _(Ref.set(frontBuffer, back))
       yield* _(Ref.set(backBuffer, front))
 
@@ -679,7 +872,10 @@ export const RendererServiceLive = Layer.effect(
     }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'paint', cause }))))
 
     const getStats: Effect.Effect<RenderStats, never, never> = Ref.get(state).pipe(
-      Effect.map(s => s.stats)
+      Effect.map(s => ({
+        ...s.stats,
+        frameTimeHistory: [...frameTimeHistory],
+      }))
     )
 
     const getViewports: Effect.Effect<ReadonlyArray<Viewport>, never, never> = Ref.get(state).pipe(
@@ -787,6 +983,17 @@ export const RendererServiceLive = Layer.effect(
       Effect.gen(function* (_) {
         let currentStyle: Option.Option<AnsiStyle> = Option.none()
         const caps = yield* _(terminal.getCapabilities)
+        // Resolve the color profile from capabilities.colors field.
+        const colorProfile =
+          caps.colors === 'truecolor'
+            ? undefined // default (TrueColor) in toAnsiStyleCode
+            : caps.colors === '256'
+              ? 2 // ColorProfile.ANSI256
+              : caps.colors === 'basic'
+                ? 1 // ColorProfile.ANSI
+                : caps.colors === 'none'
+                  ? 0 // ColorProfile.NoColor
+                  : undefined
 
         // One write per frame: the whole diff is concatenated into a single
         // payload so the terminal never presents a partial frame, and the
@@ -797,11 +1004,51 @@ export const RendererServiceLive = Layer.effect(
         // under tmux ≥3.7.
         let frame = SYNC_UPDATE_BEGIN
 
+        // Track cursor position for cost-model cursor movement.
+        let curRow = -1
+        let curCol = -1
+
         for (const patch of patches) {
-          // CUP is 1-based; the cell buffer is 0-based.
-          frame += cursorTo(patch.x + 1, patch.y + 1)
+          // Cost-model cursor positioning:
+          // CUP (CSI y;x H) is always correct but costs 5-8 bytes.
+          // CHA (CSI x G) costs 3-5 bytes when already on the correct row.
+          // CUF (CSI n C) costs 3-5 bytes for short forward moves.
+          // Simple overwrite (no move) costs 0 bytes when already at position.
+          const targetRow = patch.y + 1 // 1-based
+          const targetCol = patch.x + 1 // 1-based
+
+          if (curRow === targetRow && curCol === targetCol) {
+            // Already at position — no cursor move needed.
+          } else if (curRow === targetRow) {
+            // Same row: choose between CHA and relative move.
+            const delta = targetCol - curCol
+            if (delta > 0 && delta <= 4) {
+              // Short forward move: CSI n C (CUF)
+              frame += delta === 1 ? '\x1b[C' : `\x1b[${delta}C`
+            } else if (delta < 0 && delta >= -4) {
+              // Short backward move: CSI n D (CUB)
+              const back = -delta
+              frame += back === 1 ? '\x1b[D' : `\x1b[${back}D`
+            } else {
+              // Longer same-row jump: CHA (CSI col G) saves the row byte.
+              frame += `\x1b[${targetCol}G`
+            }
+          } else if (curCol === targetCol && Math.abs(targetRow - curRow) <= 3) {
+            // Same column, short vertical move.
+            const delta = targetRow - curRow
+            if (delta > 0) {
+              frame += delta === 1 ? '\x1b[B' : `\x1b[${delta}B`
+            } else {
+              const up = -delta
+              frame += up === 1 ? '\x1b[A' : `\x1b[${up}A`
+            }
+          } else {
+            // Full CUP for arbitrary positioning.
+            frame += cursorTo(targetCol, targetRow)
+          }
 
           let line = ''
+          let cellsWritten = 0
           for (const cell of patch.cells) {
             const paint =
               !PAINT_BG || Option.isSome(cell.style)
@@ -812,20 +1059,21 @@ export const RendererServiceLive = Layer.effect(
                 frame += line
                 line = ''
               }
-              const styleCode = pipe(
-                paint,
-                Option.map(s => toAnsiStyleCode(s, caps.colorProfile)),
-                Option.getOrElse(() => toAnsiStyleCode({}, caps.colorProfile))
-              )
-              frame += styleCode
+              // Incremental SGR: compute minimal transition between styles.
+              frame += computeStyleTransition(currentStyle, paint, colorProfile)
               currentStyle = paint
             }
             line += cell.char
+            cellsWritten += graphemeWidth(cell.char)
           }
 
           if (line.length > 0) {
             frame += line
           }
+
+          // Update cursor position tracking (cursor advances after write).
+          curRow = targetRow
+          curCol = targetCol + cellsWritten
         }
 
         frame += `\x1b[0m${SYNC_UPDATE_END}`
@@ -888,6 +1136,8 @@ export const RendererServiceLive = Layer.effect(
           dirtyRegionCount: 0,
           bufferSwitches: 0,
           forcedRedraws: 0,
+          frameTimeHistory: [],
+          dirtyRowSkipRate: 0,
         },
       })),
       setProfilingEnabled: enabled =>

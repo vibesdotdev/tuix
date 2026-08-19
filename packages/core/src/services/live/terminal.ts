@@ -424,6 +424,7 @@ export const TerminalServiceTest = Layer.succeed(TerminalService, {
   restoreCursor: Effect.void,
   getCapabilities: Effect.succeed({
     colors: 'truecolor',
+    colorProfile: 3,
     unicode: true,
     mouse: true,
     clipboard: false,

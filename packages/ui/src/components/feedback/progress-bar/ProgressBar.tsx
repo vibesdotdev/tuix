@@ -1,12 +1,14 @@
 /**
  * @tuix/ui - ProgressBar component
  *
- * Progress indicator with filled/unfilled sections and percentage display.
+ * Progress indicator with sub-cell precision using fractional block characters,
+ * filled/unfilled sections, and percentage display.
  */
 
 import { style, colors } from '@tuix/ansi'
 import { Box } from '../../layout/box'
 import { useUITheme, type ThemeVariant } from '../../../theme'
+import { FRACTIONAL_BLOCKS } from '../../../glyphs'
 
 /**
  * ProgressBar props
@@ -41,12 +43,20 @@ export interface ProgressBarProps {
    * Bar width in characters
    */
   width?: number
+
+  /**
+   * Use sub-cell precision with fractional block characters (default: true).
+   * When true, the last partial cell uses ▏▎▍▌▋▊▉ for 8-level sub-cell fill.
+   * When false, uses whole-character fill (█/░) only.
+   */
+  subcell?: boolean
 }
 
 /**
  * ProgressBar component
  *
- * Visual progress indicator with optional label and percentage.
+ * Visual progress indicator with optional label, percentage, and sub-cell
+ * precision for smooth fill rendering.
  *
  * @example
  * ```tsx
@@ -62,16 +72,31 @@ export function ProgressBar(props: ProgressBarProps): JSX.Element {
   const total = props.total || 100
   const percentage = Math.min(100, Math.max(0, (props.value / total) * 100))
   const width = props.width || 40
+  const useSubcell = props.subcell !== false // default true
 
   const filledColor = getColor(variant) ?? colors.green
   const emptyColor = theme.colors.border ?? colors.gray
 
-  // Calculate filled and empty sections
-  const filledChars = Math.round((percentage / 100) * width)
-  const emptyChars = width - filledChars
+  // Calculate fill with sub-cell precision (8 levels per cell).
+  const fillExact = (percentage / 100) * width
+  const filledChars = Math.floor(fillExact)
+  const fractionalLevel = Math.round((fillExact - filledChars) * 8)
+  const emptyChars = width - filledChars - (fractionalLevel > 0 ? 1 : 0)
 
-  const filled = '█'.repeat(filledChars)
-  const empty = '░'.repeat(emptyChars)
+  let barContent: string
+  if (useSubcell && fractionalLevel > 0 && fractionalLevel < 8) {
+    // Sub-cell: full blocks + fractional block + empty
+    const filled = '█'.repeat(filledChars)
+    const partial = FRACTIONAL_BLOCKS[fractionalLevel]!
+    const empty = '░'.repeat(Math.max(0, emptyChars))
+    barContent = filled + partial + empty
+  } else {
+    // Whole-cell fallback
+    const adjustedFilled = filledChars + (fractionalLevel >= 4 ? 1 : 0)
+    const filled = '█'.repeat(Math.min(adjustedFilled, width))
+    const empty = '░'.repeat(Math.max(0, width - adjustedFilled))
+    barContent = filled + empty
+  }
 
   // Format percentage text
   const percentageText = props.showPercentage ? ` ${percentage.toFixed(0)}%` : ''
@@ -88,8 +113,7 @@ export function ProgressBar(props: ProgressBarProps): JSX.Element {
       )}
 
       <Box direction="horizontal" gap={0}>
-        {filled && <text style={style().foreground(filledColor)}>{filled}</text>}
-        {empty && <text style={style().foreground(emptyColor)}>{empty}</text>}
+        <text style={style().foreground(filledColor)}>{barContent}</text>
       </Box>
     </Box>
   )

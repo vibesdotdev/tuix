@@ -33,6 +33,7 @@ function captureLayer(writes: string[]) {
     restoreCursor: Effect.void,
     getCapabilities: Effect.succeed({
       colors: 'truecolor',
+      colorProfile: 3,
       unicode: true,
       mouse: true,
       clipboard: false,

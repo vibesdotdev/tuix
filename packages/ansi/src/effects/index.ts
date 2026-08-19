@@ -14,8 +14,8 @@
  */
 
 // Export shadow effects
-export type { ShadowConfig } from './shadow'
-export { createDropShadow, createInnerShadow } from './shadow'
+export type { ShadowConfig, ShadowStyle, ShadowCell, ShadowRGB, ShadowConfigBuilder, LegacyShadowConfig } from './shadow'
+export { ShadowEdges, renderShadow, createShadowConfig, createDropShadow, createInnerShadow } from './shadow'
 
 // Export glow effects
 export type { GlowConfig } from './glow'
@@ -58,3 +58,7 @@ export { createMatrixEffect } from './matrix'
 
 // Export hologram effects
 export { createHologramEffect } from './hologram'
+
+// Export sub-cell rendering primitives
+export type { SubCell, BrailleCanvas } from './subcell'
+export { halfBlockRow, brailleCanvas, progressFill, verticalBar, densityFill } from './subcell'

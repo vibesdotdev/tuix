@@ -295,6 +295,8 @@ export const TerminalCapabilitiesSchema = z.object({
     z.literal('256'),
     z.literal('truecolor'),
   ]),
+  /** Numeric color profile for the ANSI rendering path (0=NoColor, 1=ANSI, 2=ANSI256, 3=TrueColor). */
+  colorProfile: z.number().min(0).max(3).optional(),
   unicode: z.boolean(),
   mouse: z.boolean(),
   clipboard: z.boolean(),

@@ -113,6 +113,11 @@ export function detectCapabilities(input: DetectCapabilitiesInput): TerminalCapa
 
   return {
     colors,
+    colorProfile:
+      colors === 'truecolor' ? 3
+        : colors === '256' ? 2
+        : colors === 'basic' ? 1
+        : 0,
     unicode,
     mouse,
     clipboard: false,

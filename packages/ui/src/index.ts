@@ -69,3 +69,20 @@ export { Viewport } from './components/layout/viewport/index.js'
 export * from './theme/index.js'
 export { useViewport, setViewportSize, type ViewportSize } from '@tuix/reactive'
 export { useFocus, type UseFocusResult } from '@tuix/reactive'
+
+// Glyph vocabulary (standardized status, navigation, scroll, progress glyphs)
+export {
+  StatusGlyph,
+  NavGlyph,
+  ScrollGlyph,
+  FractionalBlock,
+  FRACTIONAL_BLOCKS,
+  ShadeBlock,
+  BorderAccent,
+  KeyHintGlyph,
+} from './glyphs.js'
+export type { StatusGlyphKey } from './glyphs.js'
+
+// Focus ring utilities
+export { computeFocusRing, focusBorderColor } from './focus-ring.js'
+export type { FocusRingConfig, FocusRingResult } from './focus-ring.js'
