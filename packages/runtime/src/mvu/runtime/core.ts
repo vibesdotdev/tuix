@@ -8,6 +8,8 @@ import { Effect, Queue, Fiber, Ref, FiberRef, Layer, Context, Duration, Stream }
 import type { Component, View, Update, Command } from '@tuix/core/types'
 import { TerminalService, InputService, RendererService } from '@tuix/core/services'
 import { KeyUtils } from '@tuix/input/keyboard'
+import { formatError } from './format-error'
+import { buildCrashOverlay } from './crash-overlay'
 import {
   bindMvuPush,
   emitKeyToHandlers,
@@ -275,7 +277,15 @@ export class Runtime<Model, Msg> {
         yield* _(Effect.all([runKeys, runResize, runMouse], { concurrency: 'unbounded' }))
       }.bind(this)
     ).pipe(
-      Effect.catchAll(error => Effect.fail(new RuntimeError('Input fiber failed', 'input', error)))
+      Effect.catchAll(error => {
+        // The fiber is forked and never joined, so a bare Effect.fail would
+        // die silently. Log the real error before re-throwing so the failure
+        // surfaces in the console instead of vanishing.
+        return Effect.logError('Input fiber failed: ' + formatError(error)).pipe(
+          Effect.catchAll(() => Effect.void),
+          Effect.flatMap(() => Effect.fail(new RuntimeError('Input fiber failed', 'input', error)))
+        )
+      })
     )
   }
 
@@ -304,7 +314,12 @@ export class Runtime<Model, Msg> {
       }.bind(this)
     ).pipe(
       Effect.catchAll(error =>
-        Effect.fail(new RuntimeError('Update fiber failed', 'update', error))
+        Effect.logError('Update fiber failed: ' + formatError(error)).pipe(
+          Effect.catchAll(() => Effect.void),
+          Effect.flatMap(() =>
+            Effect.fail(new RuntimeError('Update fiber failed', 'update', error))
+          )
+        )
       )
     )
   }
@@ -318,7 +333,7 @@ export class Runtime<Model, Msg> {
         if (this.config.onError) {
           yield* _(this.config.onError(error))
         } else {
-          yield* _(Effect.logError('Update error', error))
+          yield* _(Effect.logError('Update error: ' + formatError(error)))
         }
         if (this.hooks?.onError) {
           yield* _(this.hooks.onError(error, 'update'))
@@ -394,6 +409,7 @@ export class Runtime<Model, Msg> {
               sweepFocusables()
 
               this.consecutiveRenderErrors = 0
+              this.lastOverlayMessage = ''
               const renderTime = Date.now() - startTime
               yield* _(
                 Ref.update(this.state, s => ({
@@ -439,14 +455,37 @@ export class Runtime<Model, Msg> {
     )
   }
 
+  private lastOverlayMessage = ''
+
   private handleRenderFailure(error: unknown): Effect.Effect<void> {
     return Effect.gen(
       function* (_) {
         this.consecutiveRenderErrors++
-        yield* _(Effect.logError('Render error', error))
+        const formatted = formatError(error)
+        yield* _(Effect.logError('Render error: ' + formatted))
 
         if (this.hooks?.onError) {
           yield* _(this.hooks.onError(error, 'render'))
+        }
+
+        // Paint a visible crash overlay straight to the terminal, bypassing
+        // the renderer whose frame just failed. Dedupe by message so a
+        // repeated identical failure doesn't flicker; the next successful
+        // frame clears + repaints and the overlay is gone. The terminal write
+        // is best-effort: if the service itself is unavailable the log above
+        // still carries the full message.
+        if (formatted !== this.lastOverlayMessage) {
+          this.lastOverlayMessage = formatted
+          yield* _(
+            Effect.gen(function* () {
+              const terminal = yield* _(TerminalService)
+              const size = yield* _(terminal.getSize)
+              yield* _(terminal.write(buildCrashOverlay(formatted, size.width)))
+            } as never).pipe(
+              Effect.catchAll(() => Effect.void),
+              Effect.catchAllDefect(() => Effect.void)
+            )
+          )
         }
 
         if (this.consecutiveRenderErrors >= this.maxRenderErrors || this.config.exitAfterRender) {
