@@ -98,6 +98,44 @@ function packDecorations(s: AnsiStyle): number {
   )
 }
 
+/**
+ * Unpack a 32-bit packed color back to a Color object.
+ * Inverse of packColor(). Returns undefined for packed value 0 (no color).
+ */
+function unpackColor(packed: number): AnsiStyle['foreground'] | undefined {
+  if (packed === 0) return undefined
+  const type = (packed >>> 24) & 0x7
+  switch (type) {
+    case 1: // rgb
+      return rgb((packed >>> 16) & 0xff, (packed >>> 8) & 0xff, packed & 0xff)
+    case 2: // ansi (16-color)
+      return { type: 'ansi', code: packed & 0xff } as unknown as AnsiStyle['foreground']
+    case 3: // ansi256
+      return { type: 'ansi256', code: packed & 0xff } as unknown as AnsiStyle['foreground']
+    case 4: // hex (stored as rgb values)
+      return rgb((packed >>> 16) & 0xff, (packed >>> 8) & 0xff, packed & 0xff)
+    default:
+      return undefined
+  }
+}
+
+/**
+ * Unpack a decoration bitmask back to style props.
+ * Inverse of packDecorations().
+ */
+function unpackDecorations(dec: number): Partial<AnsiStyle> {
+  if (dec === 0) return {}
+  const result: Partial<AnsiStyle> = {}
+  if (dec & 1) result.bold = true
+  if (dec & 2) result.faint = true
+  if (dec & 4) result.italic = true
+  if (dec & 8) result.underline = true
+  if (dec & 16) result.blink = true
+  if (dec & 32) result.reverse = true
+  if (dec & 64) result.strikethrough = true
+  return result
+}
+
 function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): boolean {
   if (Option.isNone(a) && Option.isNone(b)) return true
   if (Option.isNone(a) || Option.isNone(b)) return false

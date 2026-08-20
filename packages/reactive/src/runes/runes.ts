@@ -7,6 +7,7 @@ import { getGlobalEventBus } from '@tuix/core/events'
 import { getGlobalRegistry } from '@tuix/core'
 import { ReactivityModule } from './module'
 import { trackRead, pushCollector, popCollector, runUntracked } from './tracking'
+import { beginMemoFrame, endMemoFrame } from './memo'
 import {
   dispatchOverlayKey,
   dispatchFocusedKey,
@@ -62,9 +63,11 @@ let viewHydrationModel: Record<string, unknown> | null = null
 
 export function beginViewHydration(model: Record<string, unknown>): void {
   viewHydrationModel = model
+  beginMemoFrame()
 }
 
 export function endViewHydration(): void {
+  endMemoFrame()
   viewHydrationModel = null
 }
 

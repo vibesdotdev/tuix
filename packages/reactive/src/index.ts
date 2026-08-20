@@ -66,6 +66,14 @@ export {
   dispatchBackdropClick,
 } from './runes/focus'
 export type { ScopedKeyHandler } from './runes/focus'
+export {
+  memo,
+  beginMemoFrame,
+  endMemoFrame,
+  resetMemoSlots,
+  getMemoStats,
+  isMemoActive,
+} from './runes/memo'
 export * from './runes/events'
 export * from './runes/module'
 export * from './runes/jsx-lifecycle'
