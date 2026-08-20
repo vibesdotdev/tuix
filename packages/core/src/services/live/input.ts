@@ -226,7 +226,9 @@ export const parseBuffer = (
       buffer = buffer.slice(mouseSeq.length)
 
       const mouseEvent = parseMouseEvent(mouseSeq)
-      if (mouseEvent) {
+      // Shift-bypass: when Shift is held, don't consume the mouse event.
+      // This allows native terminal text selection to work.
+      if (mouseEvent && !mouseEvent.shift) {
         Effect.runSync(PubSub.publish(mousePubSub, mouseEvent))
       }
       continue
@@ -238,7 +240,9 @@ export const parseBuffer = (
       buffer = buffer.slice(6)
 
       const mouseEvent = parseMouseEvent(mouseSeq)
-      if (mouseEvent) {
+      // Shift-bypass: when Shift is held, don't consume the mouse event.
+      // This allows native terminal text selection to work.
+      if (mouseEvent && !mouseEvent.shift) {
         Effect.runSync(PubSub.publish(mousePubSub, mouseEvent))
       }
       continue

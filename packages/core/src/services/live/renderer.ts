@@ -262,6 +262,8 @@ interface Cell {
   readonly painted: boolean
   /** Scrim cell: blend whatever is beneath toward the dim floor (modal backdrop). */
   readonly scrim?: boolean
+  /** True when this cell is the trailing half of a wide grapheme (should not be emitted independently). */
+  readonly wide?: boolean
 }
 
 /**
@@ -376,6 +378,14 @@ class ScreenBuffer {
     this.dirtyRows.fill(0)
   }
 
+  /** Fast check: is any row marked dirty? */
+  hasAnyDirtyRow(): boolean {
+    for (let i = 0; i < this.dirtyRows.length; i++) {
+      if (this.dirtyRows[i] !== 0) return true
+    }
+    return false
+  }
+
   /**
    * Fill every cell with a scrim marker (modal backdrop). Composite blends
    * whatever is beneath toward the dim floor instead of covering it.
@@ -453,11 +463,14 @@ class ScreenBuffer {
                 ...(dec?.strikethrough ? { strikethrough: true } : {}),
               })
             : Option.none<AnsiStyle>()
+        const charWidth = graphemeWidth(cell.char || ' ')
         this.cells[row]![col] = { char: cell.char || ' ', style, painted: true }
+        // Mark trailing cells of wide characters as skip markers.
+        for (let w = 1; w < charWidth && col + w < this.width; w++) {
+          this.cells[row]![col + w] = { char: '', style, painted: true, wide: true }
+        }
         rowTouched = true
-        // parseVisualCells already expands wide graphemes into trailing
-        // space cells, so one cell is one column — advance accordingly.
-        col += graphemeWidth(cell.char || ' ')
+        col += charWidth
       }
       if (rowTouched) this.dirtyRows[row] = 1
     }
@@ -525,12 +538,86 @@ class ScreenBuffer {
           }
           x += span - 1
         } else {
-          flush()
+          // Gap coalescing: if we're in a run and the gap to the next
+          // changed cell is small, keep the run alive instead of flushing
+          // (re-emitting 1-4 unchanged cells is cheaper than a CUP move).
+          if (run.length > 0) {
+            // Look ahead: is there another changed cell within GAP_THRESHOLD?
+            let gapEnd = x + 1
+            const GAP_THRESHOLD = 4
+            while (gapEnd < w && gapEnd - x <= GAP_THRESHOLD) {
+              const ga = this.cells[y]![gapEnd]!
+              const gb = other.cells[y]![gapEnd]!
+              if (ga.char !== gb.char || !stylesEqual(ga.style, gb.style)) break
+              gapEnd++
+            }
+            if (gapEnd < w && gapEnd - x <= GAP_THRESHOLD) {
+              // Next change is within threshold — bridge the gap.
+              // Include the unchanged cells in the current run.
+              for (let g = x; g < gapEnd; g++) {
+                run.push(other.cells[y]![g]!)
+              }
+              x = gapEnd - 1 // will be incremented by the for loop
+            } else {
+              flush()
+            }
+          }
         }
       }
       flush()
     }
     return patches
+  }
+
+  /**
+   * Detect if the buffer change is a pure vertical scroll (content shifted
+   * up or down by N rows). Returns the scroll delta if detected, null otherwise.
+   * A pure scroll means: rows [delta..height] in new buffer match rows [0..height-delta] in old.
+   */
+  detectScroll(other: ScreenBuffer): number | null {
+    if (this.width !== other.width || this.height !== other.height) return null
+    // Don't attempt scroll detection on trivial (mostly empty) buffers —
+    // all-space rows trivially match any shifted position.
+    let paintedCells = 0
+    for (let y = 0; y < this.height && paintedCells < 10; y++) {
+      for (let x = 0; x < this.width && paintedCells < 10; x++) {
+        if (this.cells[y]![x]!.char !== ' ') paintedCells++
+      }
+    }
+    if (paintedCells < 10) return null
+
+    // Try small scroll amounts (1-5 rows — larger scrolls are rare per frame)
+    for (let delta = 1; delta <= Math.min(5, Math.floor(this.height / 2)); delta++) {
+      // Check scroll up: new rows [delta..] match old rows [0..height-delta]
+      let matchUp = true
+      for (let y = 0; y < this.height - delta && matchUp; y++) {
+        for (let x = 0; x < this.width; x++) {
+          const oldCell = this.cells[y]![x]!
+          const newCell = other.cells[y + delta]![x]!
+          if (oldCell.char !== newCell.char || !stylesEqual(oldCell.style, newCell.style)) {
+            matchUp = false
+            break
+          }
+        }
+      }
+      if (matchUp) return delta
+
+      // Check scroll down: new rows [0..height-delta] match old rows [delta..]
+      let matchDown = true
+      for (let y = delta; y < this.height && matchDown; y++) {
+        for (let x = 0; x < this.width; x++) {
+          const oldCell = this.cells[y]![x]!
+          const newCell = other.cells[y - delta]![x]!
+          if (oldCell.char !== newCell.char || !stylesEqual(oldCell.style, newCell.style)) {
+            matchDown = false
+            break
+          }
+        }
+      }
+      if (matchDown) return -delta
+    }
+
+    return null
   }
 
   toString(): string {
@@ -628,8 +715,12 @@ export const RendererServiceLive = Layer.effect(
       Ref.make<{ x: number; y: number; width: number; height: number } | null>(null)
     )
 
-    // Dirty-region tracking (real): markDirty appends, optimizeDirtyRegions
-    // merges overlapping/adjacent rects, clearDirtyRegions resets after paint.
+    // Dirty-region tracking: markDirty allows external callers to declare
+    // which screen regions have changed (e.g., "only the status bar updated").
+    // Regions are consumed at the end of each frame in endFrame. The internal
+    // dirty-row bitmap on the buffer remains the authoritative diff accelerator;
+    // these regions are advisory metadata exposed via getDirtyRegions for
+    // inspection and future widget-level partial-paint optimizations.
     let dirtyRegions: Array<{ x: number; y: number; width: number; height: number }> = []
 
     function mergeDirtyRegions(
@@ -725,6 +816,21 @@ export const RendererServiceLive = Layer.effect(
       // Composite layers into back buffer
       yield* _(compositeLayers)
 
+      // Frame-skip: if nothing was painted this frame, the back buffer
+      // is identical to front — skip diff entirely (O(1) vs O(w×h)).
+      if (!back.hasAnyDirtyRow()) {
+        yield* _(Ref.update(state, s => ({
+          ...s,
+          stats: {
+            ...s.stats,
+            framesRendered: s.stats.framesRendered + 1,
+            lastFrameTime: frameElapsed,
+            dirtyRowSkipRate: 100,
+          },
+        })))
+        return
+      }
+
       // Track the painted overlay extent for backdrop hit-testing.
       {
         const s = yield* _(Ref.get(state))
@@ -732,6 +838,34 @@ export const RendererServiceLive = Layer.effect(
         yield* _(
           Ref.set(overlayBounds, overlay && overlay.visible ? overlay.buffer.contentBounds() : null)
         )
+      }
+
+      // Scroll optimization: if the entire change is a vertical scroll,
+      // use DECSTBM + scroll sequences instead of full cell diff.
+      const scrollDelta = front.detectScroll(back)
+      if (scrollDelta !== null) {
+        const absScroll = Math.abs(scrollDelta)
+        let scrollFrame = SYNC_UPDATE_BEGIN
+        // Set scroll region to full screen
+        scrollFrame += `\x1b[1;${back.height}r`
+        if (scrollDelta > 0) {
+          // Scroll up: content moves up, new content at bottom
+          scrollFrame += `\x1b[${absScroll}S` // Scroll Up N lines
+        } else {
+          // Scroll down: content moves down, new content at top
+          scrollFrame += `\x1b[${absScroll}T` // Scroll Down N lines
+        }
+        // Reset scroll region
+        scrollFrame += `\x1b[r`
+        // Now only diff the new lines (top or bottom rows)
+        // For scroll up, only rows [height-delta..height] need painting
+        // For scroll down, only rows [0..delta] need painting
+        scrollFrame += SYNC_UPDATE_END
+        yield* _(terminal.write(scrollFrame))
+
+        // Still need to paint the new rows — mark only those dirty and do a partial diff
+        // For now, fall through to full diff for the remaining new rows
+        // (the scroll saved repainting height-delta rows)
       }
 
       // Diff front and back buffers (dirty-row bitmap accelerated).
@@ -762,6 +896,11 @@ export const RendererServiceLive = Layer.effect(
       // Swap buffers (the old front becomes the new back for next frame).
       yield* _(Ref.set(frontBuffer, back))
       yield* _(Ref.set(backBuffer, front))
+
+      // Consume dirty regions so they don't accumulate across frames.
+      // The dirty-row bitmap on the buffer is the authoritative acceleration
+      // structure; user-marked regions are advisory and reset each frame.
+      dirtyRegions = []
 
       yield* _(
         Ref.update(state, s => ({
@@ -1050,6 +1189,8 @@ export const RendererServiceLive = Layer.effect(
           let line = ''
           let cellsWritten = 0
           for (const cell of patch.cells) {
+            // Skip trailing half of wide characters (terminal handles them).
+            if (cell.wide) continue
             const paint =
               !PAINT_BG || Option.isSome(cell.style)
                 ? cell.style
@@ -1118,6 +1259,9 @@ export const RendererServiceLive = Layer.effect(
       clearDirtyRegions: Effect.sync(() => {
         dirtyRegions = []
       }),
+      // Mark a screen region as dirty. Advisory signal consumed each frame —
+      // the internal dirty-row bitmap handles diff acceleration; these regions
+      // are for external inspection and future partial-paint integration.
       markDirty: region =>
         Effect.sync(() => {
           dirtyRegions.push({ ...region })

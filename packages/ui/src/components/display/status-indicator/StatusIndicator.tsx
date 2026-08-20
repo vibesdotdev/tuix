@@ -8,6 +8,7 @@ import { style, colors } from '@tuix/ansi'
 import { Box } from '../../layout/box'
 import { useUITheme } from '../../../theme'
 import { $state, $effect } from '@tuix/reactive'
+import { StatusGlyph } from '../../../glyphs'
 
 /**
  * Status types
@@ -79,7 +80,26 @@ export function StatusIndicator(props: StatusIndicatorProps): JSX.Element {
     })
   }
 
-  const indicator = pulseState() ? '◉' : '●'
+  // Map status to glyph
+  const indicator = (() => {
+    if (props.status === 'active' && props.pulse) {
+      return pulseState() ? StatusGlyph.selected : StatusGlyph.active
+    }
+    switch (props.status) {
+      case 'active':
+        return StatusGlyph.active
+      case 'inactive':
+        return StatusGlyph.inactive
+      case 'error':
+        return StatusGlyph.error
+      case 'warning':
+        return StatusGlyph.warning
+      case 'info':
+        return StatusGlyph.info
+      default:
+        return StatusGlyph.active
+    }
+  })()
 
   return (
     <Box direction="horizontal" align="center" gap={1} style={style().inline(true)}>

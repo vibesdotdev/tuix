@@ -73,10 +73,13 @@ export interface PanelProps {
  * ```
  */
 export function Panel(props: PanelProps): JSX.Element {
-  const { getColor, spacing, theme } = useUITheme()
+  const { getColor, spacing, theme, depth } = useUITheme()
 
   const variant = props.variant || 'default'
-  const borderColor = getColor(variant) ?? theme.colors.border ?? colors.gray
+  const borderColor =
+    variant === 'default'
+      ? (depth.outset ?? theme.colors.border ?? colors.gray)
+      : (getColor(variant) ?? theme.colors.border ?? colors.gray)
   const borderPreset =
     props.rounded !== false ? 'rounded' : (theme.typography.borderStyle ?? 'thin')
 

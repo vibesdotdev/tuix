@@ -3,6 +3,7 @@
 import { $state } from '@tuix/reactive'
 import type { BindableRune, StateRune } from '@tuix/reactive'
 import { readBound } from '../../../bind'
+import { computeFocusRing } from '../../../focus-ring'
 import { useUITheme } from '../../../theme'
 import { Input } from '../text-input/TextInput'
 
@@ -101,6 +102,12 @@ export function Select<T = string>(props: SelectProps<T>): JSX.Element {
     return legacy >= 0 ? legacy : -1
   })()
 
+  const ring = computeFocusRing({
+    focused: Boolean(props.open),
+    colors: theme.colors,
+    variant: 'border',
+  })
+
   return (
     <vstack className={props.className}>
       <button
@@ -132,7 +139,7 @@ export function Select<T = string>(props: SelectProps<T>): JSX.Element {
                   handleListKeys(key)
                 }}
               >
-                <text fg={isCursor ? theme.colors.primary : undefined}>
+                <text fg={isCursor ? ring.borderColor : undefined}>
                   {`${mark}${option.label}${suffix}`}
                 </text>
               </interactive>

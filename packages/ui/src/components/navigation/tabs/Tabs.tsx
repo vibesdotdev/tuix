@@ -39,6 +39,7 @@ import { isFocused } from '@tuix/reactive'
 import type { StateRune } from '@tuix/reactive/runes/runes'
 import { isStateRune } from '@tuix/reactive/runes/runes'
 import { style, colors, borderStyle, type Style } from '@tuix/ansi'
+import { useUITheme } from '../../../theme'
 
 // Types
 export interface TabProps {
@@ -80,6 +81,9 @@ export function Tab(props: TabProps): JSX.Element {
  * Tabs Component
  */
 export function Tabs(props: TabsProps): JSX.Element {
+  const { theme, depth } = useUITheme()
+  const accentColor = theme.colors.primary ?? colors.blue
+
   // Extract tab information from children
   const tabs = $derived(() => {
     const children = Array.isArray(props.children) ? props.children : [props.children]
@@ -213,12 +217,12 @@ export function Tabs(props: TabsProps): JSX.Element {
 
     const activeStyle = isActive
       ? style({
-          background: colors.blue,
-          foreground: colors.white,
+          background: accentColor,
+          foreground: theme.colors.bg ?? colors.black,
           bold: true,
         })
       : style({
-          foreground: colors.gray,
+          foreground: theme.colors.textDim ?? colors.gray,
         })
 
     const focusStyle =

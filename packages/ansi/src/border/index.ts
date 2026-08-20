@@ -22,5 +22,11 @@ export {
   type GradientBoxOptions,
 } from './utils'
 
+export {
+  renderGradientBorder,
+  gradientColorAtRow,
+  type GradientBorderConfig,
+} from './gradient'
+
 export type { Border, BorderStyle } from './types'
 export { BorderSide } from './types'

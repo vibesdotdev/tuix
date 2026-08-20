@@ -36,7 +36,7 @@ import { Effect } from 'effect'
 import { toView } from '@tuix/jsx'
 import { $effect } from '@tuix/reactive/runes/runes'
 import { useViewport, useFocus } from '@tuix/reactive'
-import { style, colors, borderStyle as makeBorderStyle, type Style, renderStyled } from '@tuix/ansi'
+import { style, colors, borderStyle as makeBorderStyle, type Style, type Color, renderStyled } from '@tuix/ansi'
 import {
   unwrapRendered,
   resolveSize,
@@ -46,6 +46,7 @@ import {
 } from '@tuix/view'
 import { createViewportStore, type ViewportStore } from '../../../stores/viewportStore'
 import { useUITheme } from '../../../theme'
+import { ScrollGlyph } from '../../../glyphs'
 
 // Types
 export interface ViewportProps {
@@ -244,9 +245,11 @@ export const Viewport = (props: ViewportProps) => {
         const visible = store.visibleLines()
 
         // 3. Build scrollbar strings
+        const trackColor = theme.colors.border ?? theme.colors.textDim ?? colors.gray
+        const thumbColor = theme.colors.textBright ?? theme.colors.fg ?? colors.white
         const vScrollbar =
           showScrollbars && store.hasVerticalScroll()
-            ? renderVerticalScrollbar(store, resolvedHeight)
+            ? renderVerticalScrollbar(store, resolvedHeight, trackColor, thumbColor)
             : null
         const hScrollbar =
           showScrollbars && store.hasHorizontalScroll()
@@ -300,14 +303,55 @@ export const Viewport = (props: ViewportProps) => {
 // Scrollbar helpers
 // ---------------------------------------------------------------------------
 
-function renderVerticalScrollbar(store: ViewportStore, height: number): string[] {
-  const thumbSize = store.verticalThumbSize()
-  const thumbPosition = store.verticalThumbPosition()
-  const viewportHeight = Math.max(0, height - 1)
-  return Array.from({ length: viewportHeight }, (_, i) => {
-    if (i >= thumbPosition && i < thumbPosition + thumbSize) return '█'
-    return '│'
-  })
+function renderVerticalScrollbar(
+  store: ViewportStore,
+  height: number,
+  trackColor: Color,
+  thumbColor: Color
+): string[] {
+  const contentHeight = store.dimensions().contentHeight
+  const viewHeight = Math.max(1, height)
+  const scrollY = store.scrollY()
+  const maxScroll = store.maxScrollY()
+  const scrollRatio = maxScroll > 0 ? scrollY / maxScroll : 0
+
+  const hasContentAbove = scrollY > 0
+  const hasContentBelow = scrollY < maxScroll
+
+  // Track height minus the arrow indicators at top/bottom
+  const trackHeight = Math.max(1, viewHeight - 2)
+  const thumbHeight = Math.max(1, Math.round((viewHeight / contentHeight) * trackHeight))
+  const thumbTop = Math.round(scrollRatio * (trackHeight - thumbHeight))
+
+  const trackStyle = style().foreground(trackColor)
+  const thumbStyle = style().foreground(thumbColor)
+
+  const result: string[] = []
+
+  // Top arrow: show ▲ when content is above
+  if (hasContentAbove) {
+    result.push(renderStyled(ScrollGlyph.up, thumbStyle))
+  } else {
+    result.push(renderStyled(ScrollGlyph.trackThin, trackStyle))
+  }
+
+  // Track body with thumb
+  for (let i = 0; i < trackHeight; i++) {
+    if (i >= thumbTop && i < thumbTop + thumbHeight) {
+      result.push(renderStyled(ScrollGlyph.thumb, thumbStyle))
+    } else {
+      result.push(renderStyled(ScrollGlyph.trackThin, trackStyle))
+    }
+  }
+
+  // Bottom arrow: show ▼ when content is below
+  if (hasContentBelow) {
+    result.push(renderStyled(ScrollGlyph.down, thumbStyle))
+  } else {
+    result.push(renderStyled(ScrollGlyph.trackThin, trackStyle))
+  }
+
+  return result
 }
 
 function renderHorizontalScrollbar(store: ViewportStore, width: number): string {

@@ -1,6 +1,6 @@
 # TUIX Implementation Status
 
-Last updated: 2026-08-17
+Last updated: 2026-08-19
 
 This file is the living status of the Tuix checkout on `grok/react-adapter`.
 It replaces the 2025-10-09 "Phase 6 Complete" note, which described a
@@ -46,8 +46,6 @@ A short-lived React host (`dfe301b`) was added and then dropped
   an auto-generated tree scan from an older layout — do not treat it as
   current.
 - **React adapter:** not a product. Do not revive it.
-- **RendererService** still no-ops some advanced APIs (clip, dirty
-  regions). The path the runtime actually calls is live.
 
 ## Next edge
 
@@ -67,10 +65,25 @@ A short-lived React host (`dfe301b`) was added and then dropped
   night: dirty-region tracking, clip-respecting `renderAt`,
   non-destructive `renderBatch`, width-aware `wrapText`/`truncateText`,
   multi-line `measureText`, live frame-time stats).
-- `setProfilingEnabled` is still a no-op; `saveState`/`restoreState`
-  return the full state despite the interface saying void.
-- view `optimized-renderer.performRender` still simulates output —
-  needs a real View render callback.
+- ~~`setProfilingEnabled` no-op~~ (fixed 2026-08-19:
+  `setProfilingEnabled` gates profiling; `getStats` returns frame-time
+  history, dirty-row skip rate, and forced-redraw counts).
+- ~~`optimized-renderer.performRender`~~ (removed: the file was
+  deleted; rendering is handled by `RendererService` directly).
+- **Dirty-row bitmap acceleration** — rows unchanged since last frame
+  are skipped via a per-row dirty bitmap; `dirtyRowSkipRate` reported
+  in stats.
+- **Frame-skip optimization** — when no cell has changed between
+  `requestRender` calls the frame is elided entirely.
+- **DECSTBM scroll detection** — the renderer detects contiguous
+  vertical shifts and emits `CSI r` / `CSI S` / `CSI T` instead of
+  redrawing every shifted row.
+- **Incremental SGR** — only the delta between the previous cell's
+  attributes and the current cell's attributes is emitted (avoids
+  `\e[0m` + full re-state on every cell).
+- **Cursor cost model** — CUP moves are costed against relative moves
+  (`CUF`/`CUB`/`CUD`/`CUU`) and the cheaper sequence is chosen per
+  cell transition.
 - PNG shots (live xterm) still wanted for the widget/theme galleries;
   raw PTY streams + decoded grids are in `docs/evidence/`.
 

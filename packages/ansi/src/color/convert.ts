@@ -111,24 +111,25 @@ export function rgbToAnsi256(r: number, g: number, b: number): number {
 }
 
 /**
- * Convert RGB to basic ANSI 16 color
+ * Map RGB to nearest ANSI 16-color index using luminance-weighted distance.
  */
 export function rgbToAnsi(r: number, g: number, b: number): number {
-  const intensity = (r + g + b) / 3
-  const bright = intensity > 127
+  // Convert to rough luminance
+  const lum = (r * 299 + g * 587 + b * 114) / 1000
 
-  // Find dominant color
-  if (r > g && r > b) return bright ? 9 : 1 // Red
-  if (g > r && g > b) return bright ? 10 : 2 // Green
-  if (b > r && b > g) return bright ? 12 : 4 // Blue
-  if (r > b && g > b) return bright ? 11 : 3 // Yellow
-  if (r > g && b > g) return bright ? 13 : 5 // Magenta
-  if (g > r && b > r) return bright ? 14 : 6 // Cyan
+  // Check for near-black/white
+  if (lum < 8) return 0 // black
+  if (lum > 248) return 15 // bright white
 
-  // Grayscale
-  if (intensity < 64) return 0 // Black
-  if (intensity < 192) return 8 // Gray
-  return bright ? 15 : 7 // White
+  // Map to nearest base color (8 colors × bright/normal)
+  const rBit = r > 128 ? 1 : 0
+  const gBit = g > 128 ? 1 : 0
+  const bBit = b > 128 ? 1 : 0
+  const base = (bBit << 2) | (gBit << 1) | rBit
+
+  // Determine if bright variant
+  const bright = lum > 128 ? 8 : 0
+  return base + bright
 }
 
 /**
@@ -185,7 +186,7 @@ export function toAnsiSequence(c: ColorDef, profile: ColorProfile, background = 
       if (profile === ColorProfile.ANSI256) {
         return `\x1b[${prefix}8;5;${rgbToAnsi256(r, g, b)}m`
       }
-      return `\x1b[${prefix}${rgbToAnsi(r, g, b)}m`
+      return `\x1b[${ansi16Code(rgbToAnsi(r, g, b), background)}m`
 
     case 'rgb':
       if (profile === ColorProfile.NoColor) return ''
@@ -195,7 +196,7 @@ export function toAnsiSequence(c: ColorDef, profile: ColorProfile, background = 
       if (profile === ColorProfile.ANSI256) {
         return `\x1b[${prefix}8;5;${rgbToAnsi256(c.r, c.g, c.b)}m`
       }
-      return `\x1b[${prefix}${rgbToAnsi(c.r, c.g, c.b)}m`
+      return `\x1b[${ansi16Code(rgbToAnsi(c.r, c.g, c.b), background)}m`
 
     case 'adaptive':
       // TODO: Detect terminal theme

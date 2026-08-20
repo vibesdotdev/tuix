@@ -3,6 +3,7 @@
 import { colors } from '@tuix/ansi'
 import { isFocused, type BindableRune, type StateRune } from '@tuix/reactive'
 import { readBound } from '../../../bind'
+import { computeFocusRing } from '../../../focus-ring'
 import { useUITheme } from '../../../theme'
 import { email } from '../../../validation'
 
@@ -44,11 +45,16 @@ export function Input(props: InputProps): JSX.Element {
   const focusKey = bound?.$key
   const focusId = focusKey ? `bind:${focusKey}` : props.id ? `input:${props.id}` : undefined
   const isFieldFocused = focusId ? isFocused(focusId) : Boolean(props.focused)
+  const ring = computeFocusRing({
+    focused: isFieldFocused,
+    colors: theme.colors,
+    variant: 'border',
+  })
 
   return (
     <box
       border="thin"
-      borderColor={isFieldFocused ? theme.colors.primary : depth.outset}
+      borderColor={ring.borderColor}
       padding={0}
     >
       <input

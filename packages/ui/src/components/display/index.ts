@@ -16,6 +16,7 @@ export * from './mark'
 export * from './kbd'
 export * from './avatar'
 export * from './accordion'
+export * from './perf-hud'
 
 // Re-export commonly used components
 export { Text, Heading, Code, Success, Error, Warning, Info } from './text'
@@ -26,3 +27,4 @@ export { Divider } from './divider'
 export { Kbd, KbdHint, formatKeys } from './kbd'
 export { Avatar, initialsOf, avatarAccent } from './avatar'
 export { Accordion } from './accordion'
+export { PerfHud } from './perf-hud'

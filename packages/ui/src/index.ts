@@ -65,6 +65,12 @@ export { LargeText } from './components/display/large-text/index.js'
 export { Wordmark, wordmark, wordmarkRows } from './components/display/wordmark/index.js'
 export { Viewport } from './components/layout/viewport/index.js'
 
+export { KeyBar } from './components/navigation/key-bar/index.js'
+export type { KeyBarProps, KeyHint } from './components/navigation/key-bar/index.js'
+
+export { PerfHud } from './components/display/perf-hud/index.js'
+export type { PerfHudProps } from './components/display/perf-hud/index.js'
+
 // Theme utilities
 export * from './theme/index.js'
 export { useViewport, setViewportSize, type ViewportSize } from '@tuix/reactive'

@@ -10,6 +10,7 @@ import { style, colors, borderStyle, type Style } from '@tuix/ansi'
 import { useUITheme } from '../../../theme'
 import { Box } from '../box'
 import { Viewport } from '../viewport'
+import { ScrollGlyph } from '../../../glyphs'
 
 export interface ScrollableBoxProps<T = unknown> {
   readonly title?: string
@@ -77,7 +78,10 @@ export function ScrollableBox<T>(props: ScrollableBoxProps<T>): JSX.Element {
           width={width}
           height={height}
           showScrollbars={showScrollbar}
-          scrollbarStyle={props.scrollbarStyle}
+          scrollbarStyle={
+            props.scrollbarStyle ??
+            style().foreground(theme.colors.border ?? theme.colors.textDim ?? colors.gray)
+          }
         >
           <vstack gap={itemGap}>{listChildren}</vstack>
         </Viewport>

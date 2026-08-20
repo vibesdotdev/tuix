@@ -40,6 +40,7 @@
 import { $state, $derived, $effect, type StateRune, isStateRune, isFocused } from '@tuix/reactive'
 import { style, colors, type Style } from '@tuix/ansi'
 import { stringWidth } from '@tuix/view'
+import { useUITheme } from '../../../theme'
 
 // Types
 export interface Column<T = any> {
@@ -81,6 +82,7 @@ export interface TableProps<T = any> {
   focusable?: boolean
   autoFocus?: boolean
   wrap?: boolean
+  striped?: boolean
   highlightOnFocus?: boolean
   className?: string
   style?: Style
@@ -93,10 +95,13 @@ export interface TableProps<T = any> {
  * Table Component
  */
 export function Table<T = any>(props: TableProps<T>): JSX.Element {
+  const { theme, depth } = useUITheme()
+
   // Default props
   const showHeader = props.showHeader !== false
   const showBorder = props.showBorder !== false
   const showRowNumbers = props.showRowNumbers || false
+  const striped = props.striped || false
   const focusable = props.focusable !== false
 
   // Internal state
@@ -440,6 +445,10 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
         ? props.rowStyle(row, actualIndex, isSelected)
         : props.rowStyle
 
+    const stripeBackground = striped && actualIndex % 2 === 0
+      ? (depth.inset ?? theme.colors.bg ?? 'transparent')
+      : 'transparent'
+
     return (
       <interactive
         key={String(actualIndex)}
@@ -461,7 +470,7 @@ export function Table<T = any>(props: TableProps<T>): JSX.Element {
           gap={1}
           style={style({
             ...rowStyle,
-            background: isSelected ? colors.blue : 'transparent',
+            background: isSelected ? colors.blue : stripeBackground,
             foreground: isSelected ? colors.white : colors.white,
             bold: isFocused,
           })}

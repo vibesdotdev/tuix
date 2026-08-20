@@ -36,6 +36,10 @@ export {
 } from './runes/runes'
 export { useViewport, setViewportSize, type ViewportSize } from './runes/viewport'
 export { useFocus, type UseFocusResult } from './runes/use-focus'
+export { useAsync } from './runes/useAsync'
+export type { AsyncState, UseAsyncOptions } from './runes/useAsync'
+export { useBreakpoint, resolveBreakpoint, DEFAULT_BREAKPOINTS } from './runes/useBreakpoint'
+export type { Breakpoint, BreakpointConfig } from './runes/useBreakpoint'
 export type {
   StateRune,
   DerivedRune,

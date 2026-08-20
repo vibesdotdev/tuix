@@ -268,15 +268,12 @@ Complete inventory of all features, APIs, and capabilities in the @tuix/view pac
 
 ---
 
-## 8. Performance Optimization (`/src/performance/optimized-renderer.ts`)
+## 8. Performance Optimization (removed)
 
-### 8.1 Status ⚠️
-- ⚠️ Optimized renderer implementation exists
-- ⚠️ No documentation
-- ⚠️ Performance characteristics unknown
-
-**Test Coverage:** 0% - NO TESTS
-**Status:** 🔍 Needs investigation
+### 8.1 Status
+- `optimized-renderer.ts` was deleted. Rendering performance (dirty-row
+  bitmap, frame-skip, DECSTBM scroll, incremental SGR, cursor cost model)
+  is implemented directly in `@tuix/core` `RendererService`.
 
 ---
 
