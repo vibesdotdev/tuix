@@ -37,6 +37,8 @@ const PAINT_BG: AnsiStyle['background'] | undefined = (() => {
     Number.parseInt(v.slice(4, 6), 16)
   )
 })()
+/** Packed form of PAINT_BG (0 when unset) for allocation-free compare in paint. */
+const PAINT_BG_PACKED = PAINT_BG ? packColor(PAINT_BG as AnsiStyle['foreground']) : 0
 
 /** Visual width of a grapheme, memoized (width is a diff-loop hotspot). */
 const widthCache = new Map<string, number>()
@@ -57,7 +59,14 @@ function graphemeWidth(char: string): number {
  */
 function packColor(c: AnsiStyle['foreground'] | undefined | null): number {
   if (!c) return 0
-  const obj = c as { type?: string; r?: number; g?: number; b?: number; code?: number; value?: string }
+  const obj = c as {
+    type?: string
+    r?: number
+    g?: number
+    b?: number
+    code?: number
+    value?: string
+  }
   switch (obj.type) {
     case 'rgb':
       // type=1, r, g, b packed
@@ -136,17 +145,30 @@ function unpackDecorations(dec: number): Partial<AnsiStyle> {
   return result
 }
 
-function stylesEqual(a: Option.Option<AnsiStyle>, b: Option.Option<AnsiStyle>): boolean {
-  if (Option.isNone(a) && Option.isNone(b)) return true
-  if (Option.isNone(a) || Option.isNone(b)) return false
-  const left = a.value
-  const right = b.value
-  // Numeric comparison — zero allocations, no JSON.stringify.
-  return (
-    packColor(left.foreground) === packColor(right.foreground) &&
-    packColor(left.background) === packColor(right.background) &&
-    packDecorations(left) === packDecorations(right)
-  )
+/**
+ * Rebuild an Option<AnsiStyle> from packed fg/bg/dec words. Used only at
+ * style-transition boundaries in the paint loop (not per cell), so allocation
+ * is O(style changes) rather than O(cells).
+ */
+function reconstructStyle(fg: number, bg: number, dec: number): Option.Option<AnsiStyle> {
+  if (!fg && !bg && !dec) return Option.none()
+  return Option.some({
+    ...(fg ? { foreground: unpackColor(fg) } : {}),
+    ...(bg ? { background: unpackColor(bg) as AnsiStyle['background'] } : {}),
+    ...unpackDecorations(dec),
+  })
+}
+
+/** Packed equivalent of stylesEqual — pure numeric compare, no allocation. */
+function packedStylesEqual(
+  fg1: number,
+  bg1: number,
+  dec1: number,
+  fg2: number,
+  bg2: number,
+  dec2: number
+): boolean {
+  return fg1 === fg2 && bg1 === bg2 && dec1 === dec2
 }
 
 /** Blend factor for scrim cells — how much light survives beneath a modal. */
@@ -227,30 +249,36 @@ function computeStyleTransition(
   }
 
   // Handle decoration removals with individual off codes.
-  if (removedDecs & 1) codes.push('22')  // bold off (SGR 22)
-  if (removedDecs & 2) codes.push('22')  // faint off (SGR 22 — same as bold off)
-  if (removedDecs & 4) codes.push('23')  // italic off (SGR 23)
-  if (removedDecs & 8) codes.push('24')  // underline off (SGR 24)
+  if (removedDecs & 1) codes.push('22') // bold off (SGR 22)
+  if (removedDecs & 2) codes.push('22') // faint off (SGR 22 — same as bold off)
+  if (removedDecs & 4) codes.push('23') // italic off (SGR 23)
+  if (removedDecs & 8) codes.push('24') // underline off (SGR 24)
   if (removedDecs & 16) codes.push('25') // blink off (SGR 25)
   if (removedDecs & 32) codes.push('27') // reverse off (SGR 27)
   if (removedDecs & 64) codes.push('29') // strikethrough off (SGR 29)
 
   // Handle decoration additions.
   const addedDecs = targetDec & ~sourceDec
-  if (addedDecs & 1) codes.push('1')   // bold
-  if (addedDecs & 2) codes.push('2')   // faint
-  if (addedDecs & 4) codes.push('3')   // italic
-  if (addedDecs & 8) codes.push('4')   // underline
-  if (addedDecs & 16) codes.push('5')  // blink
-  if (addedDecs & 32) codes.push('7')  // reverse
-  if (addedDecs & 64) codes.push('9')  // strikethrough
+  if (addedDecs & 1) codes.push('1') // bold
+  if (addedDecs & 2) codes.push('2') // faint
+  if (addedDecs & 4) codes.push('3') // italic
+  if (addedDecs & 8) codes.push('4') // underline
+  if (addedDecs & 16) codes.push('5') // blink
+  if (addedDecs & 32) codes.push('7') // reverse
+  if (addedDecs & 64) codes.push('9') // strikethrough
 
   // Handle color changes incrementally.
   if (fgChanged) {
     if (!target.foreground) {
       codes.push('39') // default fg
     } else {
-      const c = target.foreground as { type?: string; r?: number; g?: number; b?: number; code?: number }
+      const c = target.foreground as {
+        type?: string
+        r?: number
+        g?: number
+        b?: number
+        code?: number
+      }
       if (c.type === 'rgb') {
         codes.push(`38;2;${c.r};${c.g};${c.b}`)
       } else if (c.type === 'ansi256') {
@@ -265,7 +293,13 @@ function computeStyleTransition(
     if (!target.background) {
       codes.push('49') // default bg
     } else {
-      const c = target.background as { type?: string; r?: number; g?: number; b?: number; code?: number }
+      const c = target.background as {
+        type?: string
+        r?: number
+        g?: number
+        b?: number
+        code?: number
+      }
       if (c.type === 'rgb') {
         codes.push(`48;2;${c.r};${c.g};${c.b}`)
       } else if (c.type === 'ansi256') {
@@ -310,12 +344,15 @@ interface Cell {
  * @internal
  */
 interface DiffPatch {
-  /** The x-coordinate of the patch */
+  /** The x-coordinate (column) where the run starts. */
   readonly x: number
-  /** The y-coordinate of the patch */
+  /** The y-coordinate (row) of the run. */
   readonly y: number
-  /** The cells to be rendered in the patch */
-  readonly cells: ReadonlyArray<Cell>
+  /**
+   * Number of cells in the run, read directly from the back buffer during
+   * patch emission. No per-cell Cell objects are allocated on the diff path.
+   */
+  readonly length: number
 }
 
 /**
@@ -371,32 +408,123 @@ interface RenderState {
 // Screen buffer (cell grid) — not Node.js Buffer
 // -----------------------------------------------------------------------------
 
+/**
+ * Typed-array backed cell grid. Each cell is a fixed 16-byte record inside a
+ * flat Uint32Array (4 words: charIndex, fgPacked, bgPacked, flags|decorations).
+ * Eliminates per-cell heap objects entirely — zero GC pressure per frame.
+ *
+ * Word layout:
+ *   [0] charIndex — index into stringPool (0 = ' ')
+ *   [1] fgPacked  — packColor() result (0 = none)
+ *   [2] bgPacked  — packColor() result (0 = none)
+ *   [3] flags|dec — low 8 bits = flags, high 8 bits = packDecorations()
+ *
+ * Flags (bits 0-2): painted=1, scrim=2, wide=4
+ */
 class ScreenBuffer {
   readonly width: number
   readonly height: number
-  private cells: Cell[][]
+  /** Flat typed-array of packed cells: 4 words × width × height. */
+  private data: Uint32Array
   /** Dirty-row bitmap: true means this row was written during the current frame. */
   private dirtyRows: Uint8Array
+
+  /** Deduplicated grapheme pool: charIndex → string. Index 0 is always ' '. */
+  private stringPool: string[]
+  private stringMap: Map<string, number>
 
   constructor(width: number, height: number) {
     this.width = Math.max(0, width | 0)
     this.height = Math.max(0, height | 0)
-    this.cells = Array.from({ length: this.height }, () =>
-      Array.from({ length: this.width }, () => ({
-        char: ' ',
-        style: Option.none<AnsiStyle>(),
-        painted: false,
-      }))
-    )
+    this.data = new Uint32Array(this.width * this.height * 4)
     this.dirtyRows = new Uint8Array(this.height)
+    this.stringPool = [' ']
+    this.stringMap = new Map([[' ', 0]])
+  }
+
+  /** Linear cell index for (x, y). */
+  private indexOf(x: number, y: number): number {
+    return (y * this.width + x) * 4
+  }
+
+  /** Intern a grapheme, returning its charIndex (deduping into the pool). */
+  private intern(char: string): number {
+    const existing = this.stringMap.get(char)
+    if (existing !== undefined) return existing
+    const index = this.stringPool.length
+    this.stringPool.push(char)
+    this.stringMap.set(char, index)
+    return index
+  }
+
+  /** Reconstruct a Cell object from the packed buffer (diff output path only). */
+  private cellAt(x: number, y: number): Cell {
+    const i = this.indexOf(x, y)
+    const ci = this.data[i]!
+    const fg = this.data[i + 1]!
+    const bg = this.data[i + 2]!
+    const flags = this.data[i + 3]! & 0xff
+    const dec = (this.data[i + 3]! >>> 8) & 0xff
+    const style =
+      fg || bg || dec
+        ? Option.some({
+            ...(fg ? { foreground: unpackColor(fg) } : {}),
+            ...(bg ? { background: unpackColor(bg) as AnsiStyle['background'] } : {}),
+            ...unpackDecorations(dec),
+          })
+        : Option.none<AnsiStyle>()
+    return {
+      char: ci === 0 ? ' ' : (this.stringPool[ci] ?? ' '),
+      style,
+      painted: (flags & 1) === 1,
+      scrim: (flags & 2) === 2,
+      wide: (flags & 4) === 4,
+    }
+  }
+
+  /** Compare two cells (this at (ax,ay), other at (bx,by)) via packed words. */
+  private packedEqual(
+    other: ScreenBuffer,
+    ax: number,
+    ay: number,
+    bx: number,
+    by: number
+  ): boolean {
+    const a = this.indexOf(ax, ay)
+    const b = other.indexOf(bx, by)
+    return (
+      this.data[a] === other.data[b] &&
+      this.data[a + 1] === other.data[b + 1] &&
+      this.data[a + 2] === other.data[b + 2] &&
+      this.data[a + 3] === other.data[b + 3]
+    )
+  }
+
+  /** Grapheme string at (x, y), resolved from the pool (no allocation). */
+  charAt(x: number, y: number): string {
+    const ci = this.data[this.indexOf(x, y)]!
+    return ci === 0 ? ' ' : (this.stringPool[ci] ?? ' ')
+  }
+
+  /** Reader for the diff/apply hot path — packed words, no object allocation. */
+  fgAt(x: number, y: number): number {
+    return this.data[this.indexOf(x, y) + 1]!
+  }
+  bgAt(x: number, y: number): number {
+    return this.data[this.indexOf(x, y) + 2]!
+  }
+  decAt(x: number, y: number): number {
+    return (this.data[this.indexOf(x, y) + 3]! >>> 8) & 0xff
+  }
+  /** True when the cell is the trailing half of a wide grapheme (skip+wide). */
+  isWideAt(x: number, y: number): boolean {
+    return (this.data[this.indexOf(x, y) + 3]! & 0xff & 0x4) === 0x4
   }
 
   clear(): void {
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        this.cells[y]![x] = { char: ' ', style: Option.none(), painted: false }
-      }
-    }
+    // Zeroing the typed array resets every cell to charIndex 0 (' '), fg/bg/dec
+    // = 0 (no style), flags = 0 (unpainted). One O(n) fill — no per-cell heap.
+    this.data.fill(0)
     // All rows dirty after clear (entire content changed)
     this.dirtyRows.fill(1)
   }
@@ -431,12 +559,9 @@ class ScreenBuffer {
   fillScrim(): void {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        this.cells[y]![x] = {
-          char: ' ',
-          style: Option.none(),
-          painted: true,
-          scrim: true,
-        }
+        const i = this.indexOf(x, y)
+        // charIndex=0 (' '), fg/bg=0, flags=painted|scrim
+        this.data[i + 3] = 1 | 2
       }
       this.dirtyRows[y] = 1
     }
@@ -454,10 +579,11 @@ class ScreenBuffer {
     let maxX = -1
     let maxY = -1
     for (let y = 0; y < this.height; y++) {
-      const row = this.cells[y]!
       for (let x = 0; x < this.width; x++) {
-        const cell = row[x]!
-        if (cell.painted && cell.char !== ' ') {
+        const i = this.indexOf(x, y)
+        const flags = this.data[i + 3]! & 0xff
+        const ci = this.data[i]!
+        if ((flags & 1) === 1 && ci !== 0) {
           if (x < minX) minX = x
           if (y < minY) minY = y
           if (x > maxX) maxX = x
@@ -487,31 +613,47 @@ class ScreenBuffer {
         if (col < 0 || col >= this.width) break
         const cell = cells[lx]!
         const dec = cell.decorations
-        const style =
-          cell.fg || cell.bg || dec
-            ? Option.some({
-                ...(cell.fg ? { foreground: rgb(cell.fg.r, cell.fg.g, cell.fg.b) } : {}),
-                ...(cell.bg ? { background: rgb(cell.bg.r, cell.bg.g, cell.bg.b) } : {}),
-                ...(dec?.bold ? { bold: true } : {}),
-                ...(dec?.faint ? { faint: true } : {}),
-                ...(dec?.italic ? { italic: true } : {}),
-                ...(dec?.underline ? { underline: true } : {}),
-                ...(dec?.blink ? { blink: true } : {}),
-                ...(dec?.reverse ? { reverse: true } : {}),
-                ...(dec?.strikethrough ? { strikethrough: true } : {}),
-              })
-            : Option.none<AnsiStyle>()
-        const charWidth = graphemeWidth(cell.char || ' ')
-        this.cells[row]![col] = { char: cell.char || ' ', style, painted: true }
+        const fgPacked = packColor(cell.fg ? rgb(cell.fg.r, cell.fg.g, cell.fg.b) : undefined)
+        const bgPacked = packColor(cell.bg ? rgb(cell.bg.r, cell.bg.g, cell.bg.b) : undefined)
+        const decPacked = packDecorations({
+          bold: !!dec?.bold,
+          faint: !!dec?.faint,
+          italic: !!dec?.italic,
+          underline: !!dec?.underline,
+          blink: !!dec?.blink,
+          reverse: !!dec?.reverse,
+          strikethrough: !!dec?.strikethrough,
+        })
+        const char = cell.char || ' '
+        const charWidth = graphemeWidth(char)
+        const ci = this.intern(char)
+        // Primary cell: charIndex, fg, bg, flags=painted.
+        this.setPacked(col, row, ci, fgPacked, bgPacked, 1 | (decPacked << 8))
         // Mark trailing cells of wide characters as skip markers.
         for (let w = 1; w < charWidth && col + w < this.width; w++) {
-          this.cells[row]![col + w] = { char: '', style, painted: true, wide: true }
+          this.setPacked(col + w, row, 0, fgPacked, bgPacked, 1 | 4 | (decPacked << 8))
         }
         rowTouched = true
         col += charWidth
       }
       if (rowTouched) this.dirtyRows[row] = 1
     }
+  }
+
+  /** Write a packed cell at (x, y). */
+  private setPacked(
+    x: number,
+    y: number,
+    ci: number,
+    fg: number,
+    bg: number,
+    flagsDec: number
+  ): void {
+    const i = this.indexOf(x, y)
+    this.data[i] = ci
+    this.data[i + 1] = fg
+    this.data[i + 2] = bg
+    this.data[i + 3] = flagsDec
   }
 
   composite(other: ScreenBuffer, ox: number, oy: number, transparent = false): void {
@@ -522,18 +664,48 @@ class ScreenBuffer {
       for (let x = 0; x < other.width; x++) {
         const tx = ox + x
         if (tx < 0 || tx >= this.width) continue
-        const cell = other.cells[y]![x]!
-        if (!transparent || cell.painted) {
-          if (cell.scrim) {
-            this.cells[ty]![tx] = dimCell(this.cells[ty]![tx]!)
+        const oi = other.indexOf(x, y)
+        const origFlags = other.data[oi + 3]! & 0xff
+        if (!transparent || (origFlags & 1) === 1) {
+          if ((origFlags & 2) === 2) {
+            // Scrim: blend whatever is beneath toward the dim floor.
+            const dimmed = dimCell(this.cellAt(tx, ty))
+            this.setPackedCell(tx, ty, dimmed)
           } else {
-            this.cells[ty]![tx] = { ...cell }
+            // Copy packed cell directly — no object allocation. Intern the
+            // charIndex into THIS buffer's pool so lookups resolve correctly.
+            const ti = this.indexOf(tx, ty)
+            const ci = other.data[oi]!
+            this.data[ti] = ci === 0 ? 0 : this.intern(other.stringPool[ci] ?? ' ')
+            this.data[ti + 1] = other.data[oi + 1]!
+            this.data[ti + 2] = other.data[oi + 2]!
+            this.data[ti + 3] = other.data[oi + 3]!
           }
           rowTouched = true
         }
       }
       if (rowTouched) this.dirtyRows[ty] = 1
     }
+  }
+
+  /** Write a Cell object into the packed buffer (used by the scrim path). */
+  private setPackedCell(x: number, y: number, cell: Cell): void {
+    const i = this.indexOf(x, y)
+    this.data[i] = cell.char === ' ' ? 0 : this.intern(cell.char)
+    let fg = 0
+    let bg = 0
+    let dec = 0
+    if (Option.isSome(cell.style)) {
+      fg = packColor(cell.style.value.foreground)
+      bg = packColor(cell.style.value.background)
+      dec = packDecorations(cell.style.value)
+    }
+    this.data[i + 1] = fg
+    this.data[i + 2] = bg
+    let flags = cell.painted ? 1 : 0
+    if (cell.scrim) flags |= 2
+    if (cell.wide) flags |= 4
+    this.data[i + 3] = flags | (dec << 8)
   }
 
   /**
@@ -551,58 +723,58 @@ class ScreenBuffer {
       // even if its content matches the front buffer) but never under-reports.
       if (!other.isRowDirty(y)) continue
 
-      let run: Cell[] = []
-      let runX = 0
-      const flush = () => {
-        if (run.length) {
-          patches.push({ x: runX, y, cells: run })
-          run = []
-        }
-      }
-      for (let x = 0; x < w; x++) {
-        const a = this.cells[y]![x]!
-        const b = other.cells[y]![x]!
-        if (a.char !== b.char || !stylesEqual(a.style, b.style)) {
-          if (!run.length) runX = x
-          run.push(b)
+      // Runs are recorded as column ranges into the back buffer — no Cell
+      // objects are allocated on this path.
+      let runStart = -1 // x of first cell in the current run (-1 = none)
+      let runEnd = -1 // exclusive end x of the current run
+      let x = 0
+      while (x < w) {
+        // Packed comparison of whole cells — no object allocation.
+        if (!this.packedEqual(other, x, y, x, y)) {
+          // Changed cell at x → (re)start/extend the run through its span.
+          if (runStart < 0) runStart = x
           // Wide graphemes (especially emoji with VS16) leave residue in the
           // trailing columns the old glyph occupied: some terminals do not
           // clear them when a narrower glyph replaces a wide one. Extend the
           // patch across the wider span so those columns are repainted
           // explicitly even when the new cells match the previous buffer.
-          const span = Math.max(graphemeWidth(a.char), graphemeWidth(b.char))
-          for (let t = 1; t < span && x + t < w; t++) {
-            run.push(other.cells[y]![x + t]!)
+          const span = Math.max(graphemeWidth(this.charAt(x, y)), graphemeWidth(other.charAt(x, y)))
+          const newEnd = Math.min(x + span, w)
+          if (newEnd > runEnd) runEnd = newEnd
+          x = newEnd
+        } else if (runStart >= 0) {
+          // In a run and hit an unchanged cell. Gap coalescing: if the next
+          // changed cell is close, bridge it (re-emitting 1-4 unchanged cells
+          // is cheaper than a CUP move).
+          let gapEnd = x + 1
+          const GAP_THRESHOLD = 4
+          while (
+            gapEnd < w &&
+            gapEnd - x <= GAP_THRESHOLD &&
+            this.packedEqual(other, gapEnd, y, gapEnd, y)
+          ) {
+            gapEnd++
           }
-          x += span - 1
+          if (gapEnd < w && gapEnd - x <= GAP_THRESHOLD) {
+            // Next change is within threshold — bridge the gap (the changed
+            // cell at gapEnd is processed by the next loop iteration).
+            const end = gapEnd + 1
+            if (end > runEnd) runEnd = end
+            x = gapEnd
+          } else {
+            // No nearby change — flush the run.
+            patches.push({ x: runStart, y, length: runEnd - runStart })
+            runStart = -1
+            runEnd = -1
+            x++
+          }
         } else {
-          // Gap coalescing: if we're in a run and the gap to the next
-          // changed cell is small, keep the run alive instead of flushing
-          // (re-emitting 1-4 unchanged cells is cheaper than a CUP move).
-          if (run.length > 0) {
-            // Look ahead: is there another changed cell within GAP_THRESHOLD?
-            let gapEnd = x + 1
-            const GAP_THRESHOLD = 4
-            while (gapEnd < w && gapEnd - x <= GAP_THRESHOLD) {
-              const ga = this.cells[y]![gapEnd]!
-              const gb = other.cells[y]![gapEnd]!
-              if (ga.char !== gb.char || !stylesEqual(ga.style, gb.style)) break
-              gapEnd++
-            }
-            if (gapEnd < w && gapEnd - x <= GAP_THRESHOLD) {
-              // Next change is within threshold — bridge the gap.
-              // Include the unchanged cells in the current run.
-              for (let g = x; g < gapEnd; g++) {
-                run.push(other.cells[y]![g]!)
-              }
-              x = gapEnd - 1 // will be incremented by the for loop
-            } else {
-              flush()
-            }
-          }
+          x++
         }
       }
-      flush()
+      if (runStart >= 0) {
+        patches.push({ x: runStart, y, length: runEnd - runStart })
+      }
     }
     return patches
   }
@@ -619,7 +791,7 @@ class ScreenBuffer {
     let paintedCells = 0
     for (let y = 0; y < this.height && paintedCells < 10; y++) {
       for (let x = 0; x < this.width && paintedCells < 10; x++) {
-        if (this.cells[y]![x]!.char !== ' ') paintedCells++
+        if (this.data[this.indexOf(x, y)] !== 0) paintedCells++
       }
     }
     if (paintedCells < 10) return null
@@ -630,9 +802,7 @@ class ScreenBuffer {
       let matchUp = true
       for (let y = 0; y < this.height - delta && matchUp; y++) {
         for (let x = 0; x < this.width; x++) {
-          const oldCell = this.cells[y]![x]!
-          const newCell = other.cells[y + delta]![x]!
-          if (oldCell.char !== newCell.char || !stylesEqual(oldCell.style, newCell.style)) {
+          if (!this.packedEqual(other, x, y, x, y + delta)) {
             matchUp = false
             break
           }
@@ -644,9 +814,7 @@ class ScreenBuffer {
       let matchDown = true
       for (let y = delta; y < this.height && matchDown; y++) {
         for (let x = 0; x < this.width; x++) {
-          const oldCell = this.cells[y]![x]!
-          const newCell = other.cells[y - delta]![x]!
-          if (oldCell.char !== newCell.char || !stylesEqual(oldCell.style, newCell.style)) {
+          if (!this.packedEqual(other, x, y, x, y - delta)) {
             matchDown = false
             break
           }
@@ -659,7 +827,16 @@ class ScreenBuffer {
   }
 
   toString(): string {
-    return this.cells.map(row => row.map(c => c.char).join('')).join('\n')
+    const out: string[] = []
+    for (let y = 0; y < this.height; y++) {
+      let row = ''
+      for (let x = 0; x < this.width; x++) {
+        const ci = this.data[this.indexOf(x, y)]!
+        row += ci === 0 ? ' ' : (this.stringPool[ci] ?? ' ')
+      }
+      out.push(row)
+    }
+    return out.join('\n')
   }
 }
 
@@ -857,15 +1034,17 @@ export const RendererServiceLive = Layer.effect(
       // Frame-skip: if nothing was painted this frame, the back buffer
       // is identical to front — skip diff entirely (O(1) vs O(w×h)).
       if (!back.hasAnyDirtyRow()) {
-        yield* _(Ref.update(state, s => ({
-          ...s,
-          stats: {
-            ...s.stats,
-            framesRendered: s.stats.framesRendered + 1,
-            lastFrameTime: frameElapsed,
-            dirtyRowSkipRate: 100,
-          },
-        })))
+        yield* _(
+          Ref.update(state, s => ({
+            ...s,
+            stats: {
+              ...s.stats,
+              framesRendered: s.stats.framesRendered + 1,
+              lastFrameTime: frameElapsed,
+              dirtyRowSkipRate: 100,
+            },
+          }))
+        )
         return
       }
 
@@ -918,7 +1097,7 @@ export const RendererServiceLive = Layer.effect(
       const skipRate = totalRows > 0 ? ((totalRows - dirtyRowCount) / totalRows) * 100 : 0
 
       if (diff.length > 0) {
-        yield* _(applyPatches(diff))
+        yield* _(applyPatches(diff, back))
         yield* _(
           Ref.update(state, s => ({
             ...s,
@@ -1155,10 +1334,13 @@ export const RendererServiceLive = Layer.effect(
     }).pipe(Effect.catchAll(cause => Effect.fail(new RenderError({ phase: 'composite', cause }))))
 
     const applyPatches = (
-      patches: ReadonlyArray<DiffPatch>
+      patches: ReadonlyArray<DiffPatch>,
+      back: ScreenBuffer
     ): Effect.Effect<void, RenderError, never> =>
       Effect.gen(function* (_) {
-        let currentStyle: Option.Option<AnsiStyle> = Option.none()
+        let currentFg = 0
+        let currentBg = 0
+        let currentDec = 0
         const caps = yield* _(terminal.getCapabilities)
         // Resolve the color profile from capabilities.colors field.
         const colorProfile =
@@ -1226,24 +1408,34 @@ export const RendererServiceLive = Layer.effect(
 
           let line = ''
           let cellsWritten = 0
-          for (const cell of patch.cells) {
+          for (let i = 0; i < patch.length; i++) {
+            const cx = patch.x + i
             // Skip trailing half of wide characters (terminal handles them).
-            if (cell.wide) continue
-            const paint =
-              !PAINT_BG || Option.isSome(cell.style)
-                ? cell.style
-                : Option.some({ background: PAINT_BG } as AnsiStyle)
-            if (!stylesEqual(paint, currentStyle)) {
+            if (back.isWideAt(cx, patch.y)) continue
+            // Read packed style directly from the back buffer — no Option, no
+            // per-cell object. Apply the opaque PAINT_BG override to unstyled
+            // cells in packed form.
+            let fg = back.fgAt(cx, patch.y)
+            let bg = back.bgAt(cx, patch.y)
+            const dec = back.decAt(cx, patch.y)
+            if (PAINT_BG_PACKED && !fg && !bg && !dec) bg = PAINT_BG_PACKED
+            if (!packedStylesEqual(fg, bg, dec, currentFg, currentBg, currentDec)) {
               if (line.length > 0) {
                 frame += line
                 line = ''
               }
               // Incremental SGR: compute minimal transition between styles.
-              frame += computeStyleTransition(currentStyle, paint, colorProfile)
-              currentStyle = paint
+              // Options are rebuilt only at transition boundaries.
+              const from = reconstructStyle(currentFg, currentBg, currentDec)
+              const to = reconstructStyle(fg, bg, dec)
+              frame += computeStyleTransition(from, to, colorProfile)
+              currentFg = fg
+              currentBg = bg
+              currentDec = dec
             }
-            line += cell.char
-            cellsWritten += graphemeWidth(cell.char)
+            const ch = back.charAt(cx, patch.y)
+            line += ch
+            cellsWritten += graphemeWidth(ch)
           }
 
           if (line.length > 0) {
