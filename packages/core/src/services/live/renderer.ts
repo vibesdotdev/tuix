@@ -457,8 +457,27 @@ class ScreenBuffer {
     return index
   }
 
-  /** Reconstruct a Cell object from the packed buffer (diff output path only). */
+  /** Number of Cell objects allocated via cellAt — the ONLY per-cell heap path. */
+  private static cellAllocs = 0
+
+  /**
+   * Reset the allocation counter. The drive path (diff, applyPatches, and
+   * non-scrim composite) must never allocate per-cell Cell objects; only the
+   * scrim path goes through cellAt(). The bench/guard reads this to prove
+   * the typed-array win holds.
+   */
+  static resetCellAllocs(): void {
+    ScreenBuffer.cellAllocs = 0
+  }
+
+  /** Cells (Cell objects) allocated by cellAt since the last reset. */
+  static get cellAllocationCount(): number {
+    return ScreenBuffer.cellAllocs
+  }
+
+  /** Reconstruct a Cell object from the packed buffer (scrim path only). */
   private cellAt(x: number, y: number): Cell {
+    ScreenBuffer.cellAllocs++
     const i = this.indexOf(x, y)
     const ci = this.data[i]!
     const fg = this.data[i + 1]!
