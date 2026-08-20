@@ -4,7 +4,7 @@
 
 import { describe, it, expect } from 'bun:test'
 import { Effect, Layer } from 'effect'
-import { RendererServiceLive } from './renderer'
+import { RendererServiceLive, ScreenBuffer } from './renderer'
 import { TerminalServiceLive } from './terminal'
 import { RendererService } from '../renderer'
 import { text } from '@tuix/view/primitives/view'
@@ -445,6 +445,91 @@ describe('Renderer Service Implementation', () => {
       expect(overlayLayer?.text.startsWith('XX  YY') || overlayLayer?.text.includes('XX  YY')).toBe(
         true
       )
+    })
+  })
+
+  describe('Scroll detection and range diff', () => {
+    const make = (w: number, h: number) => new ScreenBuffer(w, h)
+
+    // Packed comparison uses raw charIndex words, so both buffers must intern
+    // graphemes into identical pool positions (as the renderer's two persistent
+    // instances do from their shared deterministic paint order). Prime both
+    // pools by painting the digits in the same order, then clear both — clear()
+    // preserves the string pool while wiping content.
+    const prime = (front: ScreenBuffer, back: ScreenBuffer, chars: string) => {
+      const w = front.width
+      for (const [i, c] of chars.split('').entries()) {
+        if (i >= w) break
+        front.writeText(i, 0, c)
+        back.writeText(i, 0, c)
+      }
+      front.clear()
+      back.clear()
+    }
+
+    it('detectScroll reports a positive delta for scroll up', () => {
+      // front: rows "00000".."33333". back simulated as front scrolled up by
+      // 1: back[y] = front[y+1], plus one new row "99999" at the bottom.
+      const front = make(10, 4)
+      const back = make(10, 4)
+      prime(front, back, '0123456789')
+      for (let y = 0; y < 4; y++) front.writeText(0, y, `${y}${y}${y}${y}${y}`)
+      for (let y = 0; y < 3; y++) back.writeText(0, y, `${y + 1}${y + 1}${y + 1}${y + 1}${y + 1}`)
+      back.writeText(0, 3, '99999')
+      expect(front.detectScroll(back)).toBe(1)
+    })
+
+    it('detectScroll reports a negative delta for scroll down', () => {
+      // back = front scrolled down by 1: back[y] = front[y-1], new "9" at top.
+      const front = make(10, 4)
+      const back = make(10, 4)
+      prime(front, back, '0123456789')
+      for (let y = 0; y < 4; y++) front.writeText(0, y, `${y}${y}${y}${y}${y}`)
+      back.writeText(0, 0, '99999')
+      for (let y = 1; y < 4; y++) back.writeText(0, y, `${y - 1}${y - 1}${y - 1}${y - 1}${y - 1}`)
+      expect(front.detectScroll(back)).toBe(-1)
+    })
+
+    it('detectScroll returns null when every row differs', () => {
+      const front = make(10, 3)
+      const back = make(10, 3)
+      prime(front, back, '0123456789abcdef')
+      for (let y = 0; y < 3; y++) front.writeText(0, y, `${y}${y}${y}${y}${y}`)
+      back.writeText(0, 0, 'aaaaa')
+      back.writeText(0, 1, 'bbbbb')
+      back.writeText(0, 2, 'ccccc')
+      expect(front.detectScroll(back)).toBeNull()
+    })
+
+    it('range-restricted diff emits patches only within the boundary rows', () => {
+      // Simulate scroll up by 1 over a 5-wide buffer. Every back row is dirty,
+      // but a full diff would emit patches on ALL rows; restricting to the
+      // bottom boundary row (the only brand-new row) must emit only that row.
+      const front = make(10, 4)
+      const back = make(10, 4)
+      prime(front, back, '0123456789')
+      for (let y = 0; y < 4; y++) front.writeText(0, y, `${y}${y}${y}${y}${y}`)
+      // back = front scrolled up by 1, fresh bottom row holds "99999".
+      for (let y = 0; y < 3; y++) back.writeText(0, y, `${y + 1}${y + 1}${y + 1}${y + 1}${y + 1}`)
+      back.writeText(0, 3, '99999')
+
+      // Sanity: detection finds the scroll before we restrict the range.
+      expect(front.detectScroll(back)).toBe(1)
+
+      const full = front.diff(back)
+      const boundary = front.diff(back, { start: 3, end: 4 })
+
+      // The unmasked diff also covers the relocated rows (all four rows dirty).
+      const relocatedRows = new Set(full.map(p => p.y))
+      expect(relocatedRows.size).toBeGreaterThan(1)
+
+      // The scroll-boundary diff contains only patches on the new bottom row,
+      // so it is a strict subset of the full diff — the scroll optimization
+      // genuinely avoids repainting the relocated rows.
+      expect(boundary.length).toBeGreaterThan(0)
+      for (const patch of boundary) {
+        expect(patch.y).toBe(3)
+      }
     })
   })
 })

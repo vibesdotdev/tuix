@@ -712,16 +712,25 @@ class ScreenBuffer {
    * Diff this buffer (front/previous) against `other` (back/current).
    * Uses the dirty-row bitmap on `other` to skip rows that were never
    * written — O(dirty_rows × width) instead of O(height × width).
+   *
+   * `range` optionally restricts the scan to rows [start, end) and forces
+   * them to be considered regardless of the dirty bitmap. Used by the scroll
+   * optimization: after a DECSTBM scroll escape only the boundary rows that
+   * hold brand-new content need painting, and those rows may not be marked
+   * dirty if their packed content coincides with the previous frame.
    */
-  diff(other: ScreenBuffer): DiffPatch[] {
+  diff(other: ScreenBuffer, range?: { start: number; end: number }): DiffPatch[] {
     const patches: DiffPatch[] = []
     const h = Math.min(this.height, other.height)
     const w = Math.min(this.width, other.width)
-    for (let y = 0; y < h; y++) {
-      // Skip rows that were never touched in the back buffer this frame.
+    const rowStart = range ? Math.max(0, range.start) : 0
+    const rowEnd = range ? Math.min(h, range.end) : h
+    for (let y = rowStart; y < rowEnd; y++) {
+      // Force-diff rows inside an explicit range (the scroll boundary rows);
+      // otherwise skip rows that were never touched in the back buffer.
       // Soundness: dirty tracking may over-report (a cleared row is dirty
       // even if its content matches the front buffer) but never under-reports.
-      if (!other.isRowDirty(y)) continue
+      if (!range && !other.isRowDirty(y)) continue
 
       // Runs are recorded as column ranges into the back buffer — no Cell
       // objects are allocated on this path.
@@ -781,8 +790,15 @@ class ScreenBuffer {
 
   /**
    * Detect if the buffer change is a pure vertical scroll (content shifted
-   * up or down by N rows). Returns the scroll delta if detected, null otherwise.
-   * A pure scroll means: rows [delta..height] in new buffer match rows [0..height-delta] in old.
+   * up or down by N rows). Returns the scroll delta if detected, null
+   * otherwise, with physically-correct sign relative to the terminal:
+   *   +delta → content shifted UP by delta (new content at the bottom, emit
+   *            CSI S, repaint rows [height-delta, height));
+   *   -delta → content shifted DOWN by delta (new content at the top, emit
+   *            CSI T, repaint rows [0, delta)).
+   * A content-up shift means back[y] matches front[y+delta] for y in
+   * [0, height-delta); a content-down shift means back[y] matches
+   * front[y-delta] for y in [delta, height).
    */
   detectScroll(other: ScreenBuffer): number | null {
     if (this.width !== other.width || this.height !== other.height) return null
@@ -798,29 +814,31 @@ class ScreenBuffer {
 
     // Try small scroll amounts (1-5 rows — larger scrolls are rare per frame)
     for (let delta = 1; delta <= Math.min(5, Math.floor(this.height / 2)); delta++) {
-      // Check scroll up: new rows [delta..] match old rows [0..height-delta]
-      let matchUp = true
-      for (let y = 0; y < this.height - delta && matchUp; y++) {
+      // Content shifted UP: new rows [0..height-delta) match old rows [delta..),
+      // i.e. back[y] === front[y+delta].
+      let shiftUp = true
+      for (let y = 0; y < this.height - delta && shiftUp; y++) {
         for (let x = 0; x < this.width; x++) {
-          if (!this.packedEqual(other, x, y, x, y + delta)) {
-            matchUp = false
+          if (!this.packedEqual(other, x, y + delta, x, y)) {
+            shiftUp = false
             break
           }
         }
       }
-      if (matchUp) return delta
+      if (shiftUp) return delta
 
-      // Check scroll down: new rows [0..height-delta] match old rows [delta..]
-      let matchDown = true
-      for (let y = delta; y < this.height && matchDown; y++) {
+      // Content shifted DOWN: new rows [delta..] match old rows [0..height-delta),
+      // i.e. back[y] === front[y-delta].
+      let shiftDown = true
+      for (let y = delta; y < this.height && shiftDown; y++) {
         for (let x = 0; x < this.width; x++) {
-          if (!this.packedEqual(other, x, y, x, y - delta)) {
-            matchDown = false
+          if (!this.packedEqual(other, x, y - delta, x, y)) {
+            shiftDown = false
             break
           }
         }
       }
-      if (matchDown) return -delta
+      if (shiftDown) return -delta
     }
 
     return null
@@ -843,6 +861,8 @@ class ScreenBuffer {
 // Type alias used throughout this file
 type Buffer = ScreenBuffer
 const Buffer = ScreenBuffer
+
+export { ScreenBuffer }
 
 /**
  * Clip a styled line to the [start, end) visual-column range without
@@ -1060,6 +1080,7 @@ export const RendererServiceLive = Layer.effect(
       // Scroll optimization: if the entire change is a vertical scroll,
       // use DECSTBM + scroll sequences instead of full cell diff.
       const scrollDelta = front.detectScroll(back)
+      let scrollRange: { start: number; end: number } | undefined
       if (scrollDelta !== null) {
         const absScroll = Math.abs(scrollDelta)
         let scrollFrame = SYNC_UPDATE_BEGIN
@@ -1068,25 +1089,28 @@ export const RendererServiceLive = Layer.effect(
         if (scrollDelta > 0) {
           // Scroll up: content moves up, new content at bottom
           scrollFrame += `\x1b[${absScroll}S` // Scroll Up N lines
+          // Only the bottom `absScroll` rows hold brand-new content.
+          scrollRange = { start: back.height - absScroll, end: back.height }
         } else {
           // Scroll down: content moves down, new content at top
           scrollFrame += `\x1b[${absScroll}T` // Scroll Down N lines
+          // Only the top `absScroll` rows hold brand-new content.
+          scrollRange = { start: 0, end: absScroll }
         }
         // Reset scroll region
         scrollFrame += `\x1b[r`
-        // Now only diff the new lines (top or bottom rows)
-        // For scroll up, only rows [height-delta..height] need painting
-        // For scroll down, only rows [0..delta] need painting
         scrollFrame += SYNC_UPDATE_END
         yield* _(terminal.write(scrollFrame))
 
-        // Still need to paint the new rows — mark only those dirty and do a partial diff
-        // For now, fall through to full diff for the remaining new rows
-        // (the scroll saved repainting height-delta rows)
+        // The shifted rows are already correct on the terminal after the
+        // scroll escape; only the boundary rows need painting. Diff those
+        // rows in isolation (force-included regardless of the dirty bitmap),
+        // so the scroll optimization actually avoids repainting the
+        // `height - delta` relocated rows.
       }
 
       // Diff front and back buffers (dirty-row bitmap accelerated).
-      const diff = front.diff(back)
+      const diff = front.diff(back, scrollRange)
 
       // Track dirty-row skip rate for diagnostics.
       let totalRows = back.height
